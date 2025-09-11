@@ -1,65 +1,54 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 from app.device import DeviceItem
-from app import units
 
-class ArrayDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Array Placement")
-        f = QtWidgets.QFormLayout(self)
-        self.spacing_x = QtWidgets.QDoubleSpinBox(); self.spacing_x.setRange(0.1, 500); self.spacing_x.setValue(15.0); self.spacing_x.setSuffix(" ft")
-        self.spacing_y = QtWidgets.QDoubleSpinBox(); self.spacing_y.setRange(0.1, 500); self.spacing_y.setValue(15.0); self.spacing_y.setSuffix(" ft")
-        f.addRow("Spacing X:", self.spacing_x)
-        f.addRow("Spacing Y:", self.spacing_y)
-        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
-        bb.accepted.connect(self.accept); bb.rejected.connect(self.reject)
-        f.addRow(bb)
-
-    def get(self):
-        return float(self.spacing_x.value()), float(self.spacing_y.value())
-
-class ArrayTool:
-    def __init__(self, window, layer_devices):
+class ArrayTool(QtCore.QObject):
+    """Simple rectangular array: spacing derived from active device coverage or manual."""
+    def __init__(self, window, devices_group):
+        super().__init__(window)
         self.win = window
-        self.layer = layer_devices
-        self.pending = False
-        self.p0 = None
-        self.spacing_ft = (15.0, 15.0)
+        self.layer_devices = devices_group
 
     def run(self):
-        dlg = ArrayDialog(self.win)
-        if dlg.exec() != QtWidgets.QDialog.Accepted:
+        win = self.win
+        proto = getattr(win.view, "current_proto", None)
+        if not proto:
+            QtWidgets.QMessageBox.information(win, "Array", "Pick a device in the palette first.")
             return
-        self.spacing_ft = dlg.get()
-        self.win.statusBar().showMessage("Array: click first corner, then opposite corner")
-        self.pending = True
-        self.p0 = None
 
-    def on_mouse_move(self, p: QtCore.QPointF):
-        pass
+        # spacing from active "defaults" or device coverage after place; here ask user:
+        spacing_ft, ok = QtWidgets.QInputDialog.getDouble(win, "Array spacing", "Center-to-center spacing (ft):",
+                                                          win.prefs.get("array_spacing_ft", 20.0), 1.0, 200.0, 1)
+        if not ok: return
+        win.prefs["array_spacing_ft"] = spacing_ft
 
-    def on_click(self, p: QtCore.QPointF):
-        if not self.pending: return False
-        if self.p0 is None:
-            self.p0 = p; return False
-        # place array within rect p0..p
-        r = QtCore.QRectF(self.p0, p).normalized()
-        sx_ft, sy_ft = self.spacing_ft
-        pxft = self.win.px_per_ft
-        sx_px = sx_ft * pxft; sy_px = sy_ft * pxft
-        proto = self.win.current_proto or {"symbol":"SD","name":"Smoke Detector","manufacturer":"(Any)","part_number":"GEN-SD"}
-        y = r.top() + sy_px/2
-        placed = 0
-        while y < r.bottom():
-            x = r.left() + sx_px/2
-            while x < r.right():
-                it = DeviceItem(x, y, proto["symbol"], proto["name"], proto.get("manufacturer",""), proto.get("part_number",""))
-                it.setParentItem(self.layer)
-                placed += 1
-                x += sx_px
-            y += sy_px
-        self.win.push_history()
-        self.win.statusBar().showMessage(f"Array placed: {placed} devices")
-        self.pending = False
-        self.p0 = None
-        return True
+        width_ft, ok = QtWidgets.QInputDialog.getDouble(win, "Area width", "Width (ft):",
+                                                        60.0, 1.0, 10000.0, 1)
+        if not ok: return
+        height_ft, ok = QtWidgets.QInputDialog.getDouble(win, "Area height", "Height (ft):",
+                                                         40.0, 1.0, 10000.0, 1)
+        if not ok: return
+
+        ppf = float(win.px_per_ft)
+        sx = spacing_ft * ppf
+        cols = max(1, int(width_ft/spacing_ft))
+        rows = max(1, int(height_ft/spacing_ft))
+
+        # place centered in the current view rect
+        vis = win.view.mapToScene(win.view.viewport().rect()).boundingRect()
+        cx, cy = vis.center().x(), vis.center().y()
+        left = cx - (cols-1)*sx/2.0
+        top  = cy - (rows-1)*sx/2.0
+
+        for r in range(rows):
+            for c in range(cols):
+                x = left + c*sx
+                y = top  + r*sx
+                d = proto
+                it = DeviceItem(x, y, d["symbol"], d["name"], d.get("manufacturer",""), d.get("part_number",""))
+                # default coverage for previewed arrays (optional: half spacing ring)
+                it.set_coverage({"mode":"strobe","mount":"ceiling",
+                                 "computed_radius_ft": spacing_ft/2.0, "px_per_ft": ppf})
+                it.setParentItem(self.layer_devices)
+
+        win.push_history()
+        win.statusBar().showMessage(f"Array placed: {cols}x{rows} at ~{spacing_ft:.1f} ft.")

@@ -1,3 +1,13 @@
+# apply_066_esc_theme_hotfix.py
+# Fixes: Esc cancels tools/placement, Space=hand-pan, dark theme restored.
+from pathlib import Path
+import time, shutil
+
+STAMP = time.strftime("%Y%m%d_%H%M%S")
+ROOT  = Path(__file__).resolve().parent
+TGT   = ROOT / "app" / "main.py"
+
+NEW_MAIN = r'''
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -699,6 +709,20 @@ def main():
     win = create_window()
     win.show()
     app.exec()
+
+if __name__ == "__main__":
+    main()
+'''
+
+def main():
+    if not TGT.parent.exists():
+        TGT.parent.mkdir(parents=True, exist_ok=True)
+    if TGT.exists():
+        bak = TGT.with_suffix(TGT.suffix + f".bak-{STAMP}")
+        shutil.copy2(TGT, bak)
+        print(f"[backup] {bak}")
+    TGT.write_text(NEW_MAIN.strip()+"\n", encoding="utf-8")
+    print(f"[write ] {TGT}\n\nDone. Launch with:\n  py -3 -m app.boot\n")
 
 if __name__ == "__main__":
     main()

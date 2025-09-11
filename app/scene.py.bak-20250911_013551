@@ -10,21 +10,10 @@ class GridScene(QtWidgets.QGraphicsScene):
         self.snap_enabled = True
         self.snap_step_px = 0.0  # if >0, overrides grid intersections
 
-        # Style (preferences can override via setters)
-        self.grid_opacity = 0.35     # 0..1
-        self.grid_width   = 0.0      # 0 = hairline; otherwise widthF in px
-        self.major_every  = 5
-
-        # Base colors (dark theme)
-        self.col_minor_rgb = QtGui.QColor(120, 130, 145)  # we apply alpha every frame
-        self.col_major_rgb = QtGui.QColor(160, 170, 185)
-        self.col_axis_rgb  = QtGui.QColor(180, 190, 205)
-
-    def set_grid_style(self, opacity: float = None, width: float = None, major_every: int = None):
-        if opacity is not None: self.grid_opacity = max(0.05, min(1.0, float(opacity)))
-        if width   is not None: self.grid_width   = max(0.0, float(width))
-        if major_every is not None: self.major_every = max(2, int(major_every))
-        self.update()
+        # Colors tuned for dark theme
+        self.col_minor = QtGui.QColor(70, 70, 80)     # minor
+        self.col_major = QtGui.QColor(95, 95, 110)    # every 5th
+        self.col_axis  = QtGui.QColor(150, 150, 170)  # axes
 
     # simple grid snap
     def snap(self, pt: QtCore.QPointF) -> QtCore.QPointF:
@@ -41,15 +30,6 @@ class GridScene(QtWidgets.QGraphicsScene):
         y = round(pt.y()/g)*g
         return QtCore.QPointF(x, y)
 
-    def _pen(self, base_rgb: QtGui.QColor):
-        c = QtGui.QColor(base_rgb)
-        c.setAlphaF(self.grid_opacity)
-        pen = QtGui.QPen(c)
-        pen.setCosmetic(True)
-        if self.grid_width > 0.0:
-            pen.setWidthF(self.grid_width)
-        return pen
-
     def drawBackground(self, painter: QtGui.QPainter, rect: QtCore.QRectF):
         super().drawBackground(painter, rect)
         if not self.show_grid or self.grid_size <= 0:
@@ -59,29 +39,27 @@ class GridScene(QtWidgets.QGraphicsScene):
         left = int(rect.left()) - (int(rect.left()) % g)
         top  = int(rect.top())  - (int(rect.top())  % g)
 
-        pen_minor = self._pen(self.col_minor_rgb)
-        pen_major = self._pen(self.col_major_rgb)
-        major_every = self.major_every
-
+        # draw minor/major grid
+        pen_minor = QtGui.QPen(self.col_minor); pen_minor.setCosmetic(True)
+        pen_major = QtGui.QPen(self.col_major); pen_major.setCosmetic(True)
         painter.save()
         # verticals
         x = left
         idx = 0
         while x < rect.right():
-            painter.setPen(pen_major if (idx % major_every == 0) else pen_minor)
+            painter.setPen(pen_major if (idx % 5 == 0) else pen_minor)
             painter.drawLine(int(x), int(rect.top()), int(x), int(rect.bottom()))
             x += g; idx += 1
         # horizontals
         y = top
         idy = 0
         while y < rect.bottom():
-            painter.setPen(pen_major if (idy % major_every == 0) else pen_minor)
+            painter.setPen(pen_major if (idy % 5 == 0) else pen_minor)
             painter.drawLine(int(rect.left()), int(y), int(rect.right()), int(y))
             y += g; idy += 1
 
         # axes cross at (0,0)
-        axis_pen = self._pen(self.col_axis_rgb)
-        painter.setPen(axis_pen)
+        painter.setPen(QtGui.QPen(self.col_axis))
         painter.drawLine(0, int(rect.top()), 0, int(rect.bottom()))
         painter.drawLine(int(rect.left()), 0, int(rect.right()), 0)
         painter.restore()

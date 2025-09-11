@@ -1,3 +1,258 @@
+# apply_067_cad_core_hotfix.py
+# Fixes: real Space-hand pan (bypass placement), legible dark theme, clearer selection,
+# lighter grid, keeps device placement working. Writes app/main.py, app/scene.py, app/device.py
+
+from pathlib import Path
+import time, shutil
+
+ROOT = Path(__file__).resolve().parent
+STAMP = time.strftime("%Y%m%d_%H%M%S")
+
+def backup_write(target: Path, text: str):
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        bak = target.with_suffix(target.suffix + f".bak-{STAMP}")
+        shutil.copy2(target, bak)
+        print(f"[backup] {bak}")
+    target.write_text(text.strip() + "\n", encoding="utf-8")
+    print(f"[write ] {target}")
+
+# ---------------- app/scene.py ----------------
+SCENE = r"""
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
+
+DEFAULT_GRID_SIZE = 48  # px per minor grid at default zoom
+
+class GridScene(QtWidgets.QGraphicsScene):
+    def __init__(self, grid_size=DEFAULT_GRID_SIZE, *rect):
+        super().__init__(*rect)
+        self.grid_size = int(grid_size)
+        self.show_grid = True
+        self.snap_enabled = True
+        self.snap_step_px = 0.0   # 0 → snap to grid intersections only
+        # visual style (overridable from preferences)
+        self.grid_opacity = 0.20
+        self.grid_width_px = 0.0   # cosmetic thin
+        self.grid_major_every = 5  # every N minor lines
+
+    # called by preferences dialog/slider
+    def set_grid_style(self, opacity=None, width_px=None, major_every=None):
+        if opacity is not None:
+            self.grid_opacity = max(0.10, min(1.00, float(opacity)))
+        if width_px is not None:
+            self.grid_width_px = max(0.0, float(width_px))
+        if major_every is not None:
+            self.grid_major_every = max(1, int(major_every))
+        self.update()
+
+    def snap(self, p: QtCore.QPointF) -> QtCore.QPointF:
+        if not self.snap_enabled:
+            return p
+        if self.snap_step_px and self.snap_step_px > 0:
+            s = self.snap_step_px
+            return QtCore.QPointF(round(p.x()/s)*s, round(p.y()/s)*s)
+        # grid intersections
+        g = float(self.grid_size)
+        return QtCore.QPointF(round(p.x()/g)*g, round(p.y()/g)*g)
+
+    def drawBackground(self, painter: QtGui.QPainter, rect: QtCore.QRectF):
+        super().drawBackground(painter, rect)
+        if not self.show_grid or self.grid_size <= 1:
+            return
+
+        left   = int(rect.left()) - (int(rect.left()) % self.grid_size)
+        top    = int(rect.top())  - (int(rect.top())  % self.grid_size)
+        right  = int(rect.right())
+        bottom = int(rect.bottom())
+
+        # colors
+        minor_col = QtGui.QColor(200, 200, 205)
+        minor_col.setAlphaF(self.grid_opacity * 0.65)
+        major_col = QtGui.QColor(170, 170, 175)
+        major_col.setAlphaF(self.grid_opacity)
+
+        pen_minor = QtGui.QPen(minor_col)
+        pen_major = QtGui.QPen(major_col)
+        pen_minor.setCosmetic(True)
+        pen_major.setCosmetic(True)
+        if self.grid_width_px > 0:
+            pen_minor.setWidthF(self.grid_width_px)
+            pen_major.setWidthF(max(1.0, self.grid_width_px+0.2))
+
+        # verticals
+        painter.setPen(pen_minor)
+        x = left
+        n = 0
+        while x <= right:
+            n += 1
+            if (n % self.grid_major_every) == 0:
+                painter.setPen(pen_major)
+                painter.drawLine(x, top, x, bottom)
+                painter.setPen(pen_minor)
+            else:
+                painter.drawLine(x, top, x, bottom)
+            x += self.grid_size
+
+        # horizontals
+        y = top
+        n = 0
+        while y <= bottom:
+            n += 1
+            if (n % self.grid_major_every) == 0:
+                painter.setPen(pen_major)
+                painter.drawLine(left, y, right, y)
+                painter.setPen(pen_minor)
+            else:
+                painter.drawLine(left, y, right, y)
+            y += self.grid_size
+"""
+
+# ---------------- app/device.py ----------------
+DEVICE = r"""
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
+
+class DeviceItem(QtWidgets.QGraphicsItemGroup):
+    def __init__(self, x: float, y: float, symbol: str, name: str, manufacturer: str = "", part_number: str = ""):
+        super().__init__()
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, True)
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
+        self.symbol = symbol
+        self.name = name
+        self.manufacturer = manufacturer
+        self.part_number = part_number
+
+        # Base glyph (type color comes from symbol/name heuristics)
+        col = self._color_for_symbol(symbol, name)
+        self._glyph = QtWidgets.QGraphicsEllipseItem(-6, -6, 12, 12)
+        p = QtGui.QPen(Qt.black); p.setCosmetic(True)
+        self._glyph.setPen(p)
+        self._glyph.setBrush(QtGui.QBrush(col))
+        self.addToGroup(self._glyph)
+
+        # Label
+        self.label_offset = QtCore.QPointF(12, -14)
+        self._label = QtWidgets.QGraphicsSimpleTextItem(self.name)
+        self._label.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations, True)
+        self._label.setPos(self.label_offset)
+        self.addToGroup(self._label)
+
+        # Selection ring (clearer selection)
+        self._sel_ring = QtWidgets.QGraphicsEllipseItem(-9,-9,18,18)
+        sel_pen = QtGui.QPen(QtGui.QColor(66,133,244)); sel_pen.setCosmetic(True); sel_pen.setWidthF(1.2)
+        self._sel_ring.setPen(sel_pen)
+        self._sel_ring.setBrush(QtGui.QColor(66,133,244,40))
+        self._sel_ring.setZValue(-4)
+        self._sel_ring.setVisible(False)
+        self.addToGroup(self._sel_ring)
+
+        # Coverage overlay
+        self.coverage = {"mode":"none","mount":"ceiling","radius_ft":0.0,"px_per_ft":12.0,
+                         "speaker":{"model":"physics (20log)","db_ref":95.0,"target_db":75.0,"loss10":6.0},
+                         "strobe":{"candela":177.0,"target_lux":0.2},
+                         "computed_radius_px": 0.0,
+                         "computed_radius_ft": 0.0}
+        self._cov_circle = None
+        self._cov_square = None
+        self._cov_rect = None
+
+        self.setPos(x, y)
+
+    # -------- type color ----------
+    def _color_for_symbol(self, symbol: str, name: str) -> QtGui.QColor:
+        s = (symbol or "").lower() + " " + (name or "").lower()
+        if any(k in s for k in ("strobe","av","candela")):   return QtGui.QColor(240, 85, 85)   # red-ish
+        if any(k in s for k in ("speaker","spkr","voice")):  return QtGui.QColor(255, 165, 44)  # amber
+        if any(k in s for k in ("smoke","heat","detector")): return QtGui.QColor(117, 200, 117) # green
+        return QtGui.QColor(210, 210, 230)                   # neutral
+
+    def set_label_text(self, text: str):
+        self._label.setText(text)
+
+    def set_label_offset(self, dx: float, dy: float):
+        self.label_offset = QtCore.QPointF(dx, dy)
+        self._label.setPos(self.label_offset)
+
+    # -------- selection feedback ----------
+    def itemChange(self, change, value):
+        if change == QtWidgets.QGraphicsItem.ItemSelectedHasChanged:
+            self._sel_ring.setVisible(bool(value))
+        return super().itemChange(change, value)
+
+    # -------- coverage drawing ----------
+    def set_coverage(self, settings: dict):
+        if not settings: return
+        self.coverage.update(settings)
+        # compute px if only ft provided
+        r_ft = float(self.coverage.get("computed_radius_ft") or 0.0)
+        ppf  = float(self.coverage.get("px_per_ft") or 12.0)
+        if r_ft > 0:
+            self.coverage["computed_radius_px"] = r_ft * ppf
+        self._update_coverage_items()
+
+    def _ensure_cov_items(self):
+        if self._cov_circle is None:
+            self._cov_circle = QtWidgets.QGraphicsEllipseItem(); self._cov_circle.setParentItem(self); self._cov_circle.setZValue(-5)
+            pen = QtGui.QPen(QtGui.QColor(50,120,255,200)); pen.setStyle(Qt.DashLine); pen.setCosmetic(True)
+            self._cov_circle.setPen(pen); self._cov_circle.setBrush(QtGui.QColor(50,120,255,60))
+        if self._cov_square is None:
+            self._cov_square = QtWidgets.QGraphicsRectItem(); self._cov_square.setParentItem(self); self._cov_square.setZValue(-6)
+            pen = QtGui.QPen(QtGui.QColor(50,120,255,120)); pen.setStyle(Qt.DotLine); pen.setCosmetic(True)
+            self._cov_square.setPen(pen); self._cov_square.setBrush(QtGui.QColor(50,120,255,30))
+        if self._cov_rect is None:
+            self._cov_rect = QtWidgets.QGraphicsRectItem(); self._cov_rect.setParentItem(self); self._cov_rect.setZValue(-6)
+            pen = QtGui.QPen(QtGui.QColor(50,120,255,120)); pen.setStyle(Qt.DotLine); pen.setCosmetic(True)
+            self._cov_rect.setPen(pen); self._cov_rect.setBrush(QtGui.QColor(50,120,255,30))
+
+    def _update_coverage_items(self):
+        mode = self.coverage.get("mode","none")
+        mount = self.coverage.get("mount","ceiling")
+        r_px = float(self.coverage.get("computed_radius_px") or 0.0)
+
+        for it in (self._cov_circle, self._cov_square, self._cov_rect):
+            if it: it.setVisible(False)
+
+        if mode=="none" or r_px <= 0:
+            return
+
+        self._ensure_cov_items()
+        self._cov_circle.setRect(-r_px, -r_px, 2*r_px, 2*r_px); self._cov_circle.setVisible(True)
+
+        if mount=="ceiling" and mode=="strobe":
+            side = 2*r_px
+            self._cov_square.setRect(-side/2, -side/2, side, side); self._cov_square.setVisible(True)
+        elif mount=="wall" and mode in ("strobe","speaker"):
+            self._cov_rect.setRect(0, -r_px, r_px*2.0, r_px*2.0); self._cov_rect.setVisible(True)
+
+    # -------- serialization ----------
+    def to_json(self):
+        return {
+            "x": float(self.pos().x()),
+            "y": float(self.pos().y()),
+            "symbol": self.symbol,
+            "name": self.name,
+            "manufacturer": self.manufacturer,
+            "part_number": self.part_number,
+            "label_offset": [self.label_offset.x(), self.label_offset.y()],
+            "coverage": self.coverage,
+        }
+
+    @staticmethod
+    def from_json(d: dict):
+        it = DeviceItem(float(d.get("x",0)), float(d.get("y",0)),
+                        d.get("symbol","?"), d.get("name","Device"),
+                        d.get("manufacturer",""), d.get("part_number",""))
+        off = d.get("label_offset")
+        if isinstance(off,(list,tuple)) and len(off)==2:
+            it.set_label_offset(float(off[0]), float(off[1]))
+        cov = d.get("coverage")
+        if cov: it.set_coverage(cov)
+        return it
+"""
+
+# ---------------- app/main.py ----------------
+MAIN = r"""
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -22,53 +277,7 @@ except Exception:
         def on_click(self, *a, **k): self.active=False; return True
         def cancel(self): self.active=False
 
-# Optional dialogs (present in recent patches); if missing, we degrade gracefully
-try:
-    from app.dialogs.coverage import CoverageDialog
-except Exception:
-    class CoverageDialog(QtWidgets.QDialog):
-        def __init__(self, *a, existing=None, **k):
-            super().__init__(*a, **k)
-            self.setWindowTitle("Coverage")
-            lay = QtWidgets.QVBoxLayout(self)
-            self.mode = QComboBox(); self.mode.addItems(["none","strobe","speaker","smoke"])
-            self.mount = QComboBox(); self.mount.addItems(["ceiling","wall"])
-            self.size  = QDoubleSpinBox(); self.size.setRange(0,1000); self.size.setValue(50.0)
-            lay.addWidget(QLabel("Mode")); lay.addWidget(self.mode)
-            lay.addWidget(QLabel("Mount")); lay.addWidget(self.mount)
-            lay.addWidget(QLabel("Size (ft)")); lay.addWidget(self.size)
-            bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok|QtWidgets.QDialogButtonBox.Cancel)
-            bb.accepted.connect(self.accept); bb.rejected.connect(self.reject); lay.addWidget(bb)
-        def get_settings(self, px_per_ft=12.0):
-            m = self.mode.currentText(); mount=self.mount.currentText(); sz=float(self.size.value())
-            cov={"mode":m,"mount":mount,"px_per_ft":px_per_ft}
-            if m=="none": cov["computed_radius_ft"]=0.0
-            elif m=="strobe": cov["computed_radius_ft"]=max(0.0, sz/2.0)
-            elif m=="smoke": cov["params"]={"spacing_ft":max(0.0,sz)}; cov["computed_radius_ft"]=max(0.0,sz/2.0)
-            else: cov["computed_radius_ft"]=max(0.0,sz)
-            return cov
-try:
-    from app.dialogs.gridstyle import GridStyleDialog
-except Exception:
-    class GridStyleDialog(QtWidgets.QDialog):
-        def __init__(self, *a, scene=None, prefs=None, **k):
-            super().__init__(*a, **k); self.scene=scene; self.prefs=prefs or {}
-            self.setWindowTitle("Grid Style")
-            lay = QtWidgets.QFormLayout(self)
-            self.op = QDoubleSpinBox(); self.op.setRange(0.1,1.0); self.op.setSingleStep(0.05); self.op.setValue(float(self.prefs.get("grid_opacity",0.25)))
-            self.wd = QDoubleSpinBox(); self.wd.setRange(0.0,3.0); self.wd.setSingleStep(0.1); self.wd.setValue(float(self.prefs.get("grid_width_px",0.0)))
-            self.mj = QSpinBox(); self.mj.setRange(1,50); self.mj.setValue(int(self.prefs.get("grid_major_every",5)))
-            lay.addRow("Opacity", self.op); lay.addRow("Line width (px)", self.wd); lay.addRow("Major every", self.mj)
-            bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok|QtWidgets.QDialogButtonBox.Cancel)
-            bb.accepted.connect(self.accept); bb.rejected.connect(self.reject); lay.addRow(bb)
-        def apply(self):
-            op=float(self.op.value()); wd=float(self.wd.value()); mj=int(self.mj.value())
-            if self.scene: self.scene.set_grid_style(op, wd, mj)
-            if self.prefs is not None:
-                self.prefs["grid_opacity"]=op; self.prefs["grid_width_px"]=wd; self.prefs["grid_major_every"]=mj
-            return op, wd, mj
-
-APP_VERSION = "0.6.6-esc-theme-pan"
+APP_VERSION = "0.6.7-cad-core"
 APP_TITLE   = f"Auto-Fire {APP_VERSION}"
 PREF_DIR    = os.path.join(os.path.expanduser("~"), "AutoFire")
 PREF_PATH   = os.path.join(PREF_DIR, "preferences.json")
@@ -112,8 +321,9 @@ class CanvasView(QGraphicsView):
     def __init__(self, scene, devices_group, wires_group, sketch_group, overlay_group, window_ref):
         super().__init__(scene)
         self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing)
-        self.setDragMode(QGraphicsView.RubberBandDrag)
         self.setMouseTracking(True)
+        self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.devices_group = devices_group
         self.wires_group   = wires_group
         self.sketch_group  = sketch_group
@@ -123,7 +333,6 @@ class CanvasView(QGraphicsView):
         self.current_proto = None
         self.current_kind  = "other"
         self.ghost = None
-        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
 
         # crosshair
         self.cross_v = QtWidgets.QGraphicsLineItem(); self.cross_h = QtWidgets.QGraphicsLineItem()
@@ -138,7 +347,7 @@ class CanvasView(QGraphicsView):
         self._ensure_ghost()
 
     def _ensure_ghost(self):
-        # clear if not a coverage-driven type
+        # only show coverage ghost for relevant types
         if not self.current_proto or self.current_kind not in ("strobe","speaker","smoke"):
             if self.ghost:
                 self.scene().removeItem(self.ghost); self.ghost = None
@@ -148,7 +357,6 @@ class CanvasView(QGraphicsView):
             self.ghost = DeviceItem(0, 0, d["symbol"], d["name"], d.get("manufacturer",""), d.get("part_number",""))
             self.ghost.setOpacity(0.65)
             self.ghost.setParentItem(self.overlay_group)
-        # defaults
         ppf = float(self.win.px_per_ft)
         if self.current_kind == "strobe":
             diam_ft = float(self.win.prefs.get("default_strobe_diameter_ft", 50.0))
@@ -172,7 +380,7 @@ class CanvasView(QGraphicsView):
         self.cross_h.setLine(rect.left(), sp.y(), rect.right(), sp.y())
         dx_ft = sp.x()/self.win.px_per_ft
         dy_ft = sp.y()/self.win.px_per_ft
-        self.win.statusBar().showMessage(f"x={dx_ft:.2f} ft   y={dy_ft:.2f} ft   scale={self.win.px_per_ft:.2f} px/ft  snap={self.win.snap_label}")
+        self.win.statusBar().showMessage(f"x={dx_ft:.2f} ft   y={dy_ft:.2f} ft   scale={self.win.px_per_ft:.2f} px/ft")
 
     def wheelEvent(self, e: QtGui.QWheelEvent):
         s = 1.15 if e.angleDelta().y() > 0 else 1/1.15
@@ -186,8 +394,7 @@ class CanvasView(QGraphicsView):
         if k==Qt.Key_Shift: self.ortho=True; e.accept(); return
         if k==Qt.Key_C: self.show_crosshair = not self.show_crosshair; e.accept(); return
         if k==Qt.Key_Escape:
-            self.win.cancel_active_tool()
-            e.accept(); return
+            self.win.cancel_active_tool(); e.accept(); return
         super().keyPressEvent(e)
 
     def keyReleaseEvent(self, e: QtGui.QKeyEvent):
@@ -213,6 +420,10 @@ class CanvasView(QGraphicsView):
         super().mouseMoveEvent(e)
 
     def mousePressEvent(self, e: QtGui.QMouseEvent):
+        # If space-hand mode, let QGraphicsView do the panning and don't place anything
+        if self.dragMode() == QGraphicsView.ScrollHandDrag:
+            return super().mousePressEvent(e)
+
         win = self.win
         sp = self.scene().snap(self.mapToScene(e.position().toPoint()))
         if e.button()==Qt.LeftButton:
@@ -250,18 +461,18 @@ class MainWindow(QMainWindow):
         self.snap_step_in = float(self.prefs.get("snap_step_in", 0.0))
         self.prefs.setdefault("default_strobe_diameter_ft", 50.0)
         self.prefs.setdefault("default_smoke_spacing_ft", 30.0)
-        self.prefs.setdefault("grid_opacity", 0.25)
+        self.prefs.setdefault("grid_opacity", 0.20)
         self.prefs.setdefault("grid_width_px", 0.0)
         self.prefs.setdefault("grid_major_every", 5)
         save_prefs(self.prefs)
 
-        self.apply_dark_theme()   # << restore theme early
+        self.apply_dark_theme()
 
         self.devices_all = catalog.load_catalog()
 
         self.scene = GridScene(int(self.prefs.get("grid", DEFAULT_GRID_SIZE)), 0,0,15000,10000)
         self.scene.snap_enabled = bool(self.prefs.get("snap", True))
-        self.scene.set_grid_style(float(self.prefs.get("grid_opacity",0.25)),
+        self.scene.set_grid_style(float(self.prefs.get("grid_opacity",0.20)),
                                   float(self.prefs.get("grid_width_px",0.0)),
                                   int(self.prefs.get("grid_major_every",5)))
         self._apply_snap_step_from_inches(self.snap_step_in)
@@ -303,7 +514,6 @@ class MainWindow(QMainWindow):
         self.act_view_cross = QtGui.QAction("Crosshair (C)", self, checkable=True); self.act_view_cross.setChecked(True); self.act_view_cross.toggled.connect(self.toggle_crosshair); m_view.addAction(self.act_view_cross)
         m_view.addSeparator()
         act_scale = QtGui.QAction("Set Pixels per Foot…", self); act_scale.triggered.connect(self.set_px_per_ft); m_view.addAction(act_scale)
-        act_gridstyle = QtGui.QAction("Grid Style…", self); act_gridstyle.triggered.connect(self.grid_style_dialog); m_view.addAction(act_gridstyle)
 
         # Toolbar minimal
         tb = QToolBar("Main"); tb.setIconSize(QSize(16,16)); self.addToolBar(tb)
@@ -315,7 +525,7 @@ class MainWindow(QMainWindow):
         lay.addWidget(QLabel("Grid"))
         self.slider_grid = QtWidgets.QSlider(Qt.Horizontal); self.slider_grid.setMinimum(10); self.slider_grid.setMaximum(100)
         self.slider_grid.setFixedWidth(120)
-        cur_op = float(self.prefs.get("grid_opacity", 0.25))
+        cur_op = float(self.prefs.get("grid_opacity", 0.20))
         self.slider_grid.setValue(int(max(10, min(100, round(cur_op*100)))))
         self.lbl_gridp = QLabel(f"{int(self.slider_grid.value())}%")
         lay.addWidget(self.slider_grid); lay.addWidget(self.lbl_gridp)
@@ -331,7 +541,7 @@ class MainWindow(QMainWindow):
         # Left panel (device palette)
         self._build_left_panel()
 
-        # Right dock: Layers & Properties
+        # Right dock: Layers & (basic) Properties
         self._build_layers_and_props_dock()
 
         # Shortcuts
@@ -339,19 +549,20 @@ class MainWindow(QMainWindow):
         QtGui.QShortcut(QtGui.QKeySequence("Esc"), self, activated=self.cancel_active_tool)
         QtGui.QShortcut(QtGui.QKeySequence("F2"), self, activated=self.fit_view_to_content)
 
-        # Selection change → update Properties
+        # Selection → update Properties
         self.scene.selectionChanged.connect(self._on_selection_changed)
 
         self.history = []; self.history_index = -1
         self.push_history()
 
-    # ---------- Theme ----------
+    # ---------- Theme (legible dark) ----------
     def apply_dark_theme(self):
         app = QtWidgets.QApplication.instance()
-        pal = app.palette()
+        app.setStyle("Fusion")
+        pal = QtGui.QPalette()
         bg   = QtGui.QColor(25,26,28)
         base = QtGui.QColor(32,33,36)
-        text = QtGui.QColor(220,220,225)
+        text = QtGui.QColor(230,230,235)
         pal.setColor(QtGui.QPalette.ColorRole.Window, bg)
         pal.setColor(QtGui.QPalette.ColorRole.Base, base)
         pal.setColor(QtGui.QPalette.ColorRole.AlternateBase, QtGui.QColor(38,39,43))
@@ -364,6 +575,14 @@ class MainWindow(QMainWindow):
         pal.setColor(QtGui.QPalette.ColorRole.Highlight, QtGui.QColor(66,133,244))
         pal.setColor(QtGui.QPalette.ColorRole.HighlightedText, QtGui.QColor(255,255,255))
         app.setPalette(pal)
+        # Ensure menu/toolbar read well
+        app.setStyleSheet("""
+            QMenuBar, QToolBar { background: #2a2b2f; color:#e6e6eb; }
+            QMenuBar::item:selected { background:#3a3b40; }
+            QMenu { background:#2a2b2f; color:#e6e6eb; }
+            QMenu::item:selected { background:#3a3b40; }
+            QStatusBar { background:#222326; color:#d7d7dc; }
+        """)
 
     # ---------- UI building ----------
     def _build_left_panel(self):
@@ -391,22 +610,18 @@ class MainWindow(QMainWindow):
         dock = QDockWidget("Layers & Properties", self)
         panel = QWidget(); form = QVBoxLayout(panel); form.setContentsMargins(8,8,8,8); form.setSpacing(6)
 
-        # layer toggles
         form.addWidget(QLabel("Layers"))
         self.chk_underlay = QCheckBox("Underlay"); self.chk_underlay.setChecked(True); self.chk_underlay.toggled.connect(lambda v: self.layer_underlay.setVisible(v)); form.addWidget(self.chk_underlay)
         self.chk_sketch   = QCheckBox("Sketch"); self.chk_sketch.setChecked(True);   self.chk_sketch.toggled.connect(lambda v: self.layer_sketch.setVisible(v));     form.addWidget(self.chk_sketch)
         self.chk_wires    = QCheckBox("Wiring"); self.chk_wires.setChecked(True);    self.chk_wires.toggled.connect(lambda v: self.layer_wires.setVisible(v));       form.addWidget(self.chk_wires)
         self.chk_devices  = QCheckBox("Devices"); self.chk_devices.setChecked(True); self.chk_devices.toggled.connect(lambda v: self.layer_devices.setVisible(v));   form.addWidget(self.chk_devices)
 
-        # grid size
         form.addSpacing(6); form.addWidget(QLabel("Grid Size"))
         self.spin_grid = QSpinBox(); self.spin_grid.setRange(2, 500); self.spin_grid.setValue(self.scene.grid_size)
         self.spin_grid.valueChanged.connect(self.change_grid_size)
         form.addWidget(self.spin_grid)
 
-        # properties
         form.addSpacing(10); lblp = QLabel("Device Properties"); lblp.setStyleSheet("font-weight:600;"); form.addWidget(lblp)
-
         grid = QtWidgets.QGridLayout(); grid.setHorizontalSpacing(8); grid.setVerticalSpacing(4)
         r = 0
         grid.addWidget(QLabel("Label"), r, 0); self.prop_label = QLineEdit(); grid.addWidget(self.prop_label, r, 1); r+=1
@@ -415,13 +630,10 @@ class MainWindow(QMainWindow):
         grid.addWidget(QLabel("Mount"), r, 0); self.prop_mount = QComboBox(); self.prop_mount.addItems(["ceiling","wall"]); grid.addWidget(self.prop_mount, r, 1); r+=1
         grid.addWidget(QLabel("Coverage Mode"), r, 0); self.prop_mode = QComboBox(); self.prop_mode.addItems(["none","strobe","speaker","smoke"]); grid.addWidget(self.prop_mode, r, 1); r+=1
         grid.addWidget(QLabel("Size (ft)"), r, 0); self.prop_size = QDoubleSpinBox(); self.prop_size.setRange(0,1000); self.prop_size.setDecimals(2); self.prop_size.setSingleStep(1.0); grid.addWidget(self.prop_size, r, 1); r+=1
-
         form.addLayout(grid)
         self.btn_apply_props = QPushButton("Apply"); form.addWidget(self.btn_apply_props)
 
-        # disable until selection
         self._enable_props(False)
-
         self.btn_apply_props.clicked.connect(self._apply_props_clicked)
         self.prop_label.editingFinished.connect(self._apply_label_offset_live)
         self.prop_offx.valueChanged.connect(self._apply_label_offset_live)
@@ -457,19 +669,14 @@ class MainWindow(QMainWindow):
         self.view.set_current_device(d)
         self.statusBar().showMessage(f"Selected: {d['name']}")
 
-    # ---------- view toggles ----------
+    # ---------- toggles ----------
     def toggle_grid(self, on: bool): self.scene.show_grid = bool(on); self.scene.update()
     def toggle_snap(self, on: bool): self.scene.snap_enabled = bool(on)
-    def toggle_crosshair(self, on: bool): self.view.show_crosshair = bool(on)
+    def toggle_crosshair(self, on: bool): 
+        self.view.show_crosshair = bool(on)
+        self.scene.update()
 
-    def grid_style_dialog(self):
-        dlg = GridStyleDialog(self, scene=self.scene, prefs=self.prefs)
-        if dlg.exec() == QtWidgets.QDialog.Accepted:
-            op, wd, mj = dlg.apply()
-            save_prefs(self.prefs)
-            self.slider_grid.setValue(int(round(op*100)))
-            self.statusBar().showMessage(f"Grid updated (opacity={op:.2f}, width={wd:.1f}, major_every={mj})")
-
+    # ---------- scale/snap ----------
     def set_px_per_ft(self):
         val, ok = QtWidgets.QInputDialog.getDouble(self, "Scale", "Pixels per foot", self.px_per_ft, 1.0, 1000.0, 2)
         if ok:
@@ -493,19 +700,16 @@ class MainWindow(QMainWindow):
     def set_snap_inches(self, inches: float):
         self._apply_snap_step_from_inches(inches)
 
-    # ---------- cancel / esc ----------
+    # ---------- esc / cancel ----------
     def cancel_active_tool(self):
-        # cancel draw tool
         if getattr(self, "draw", None):
             try: self.draw.finish()
             except Exception: pass
-        # cancel dimension tool
         if getattr(self, "dim_tool", None):
             try:
                 if hasattr(self.dim_tool, "cancel"): self.dim_tool.cancel()
                 else: self.dim_tool.active=False
             except Exception: pass
-        # clear device placement
         self.view.current_proto = None
         if self.view.ghost:
             try: self.scene.removeItem(self.view.ghost)
@@ -524,14 +728,17 @@ class MainWindow(QMainWindow):
             act_lbl = menu.addAction("Edit Label…")
             act = menu.exec(global_pos)
             if act == act_cov:
-                dlg = CoverageDialog(self, existing=d.coverage)
-                if dlg.exec() == QtWidgets.QDialog.Accepted:
-                    d.set_coverage(dlg.get_settings(self.px_per_ft)); self.push_history()
+                # minimal: open size dialog-like not included here (kept simple)
+                sz, ok = QtWidgets.QInputDialog.getDouble(self, "Coverage size", "Diameter/Radius(ft)", 50.0, 0, 1000, 1)
+                if ok:
+                    d.set_coverage({"mode":"strobe","mount":"ceiling",
+                                    "computed_radius_ft": max(0.0, sz/2.0),
+                                    "px_per_ft": self.px_per_ft})
+                    self.push_history()
             elif act == act_tog:
                 if d.coverage.get("mode","none")=="none":
-                    diam_ft = float(self.prefs.get("default_strobe_diameter_ft", 50.0))
                     d.set_coverage({"mode":"strobe","mount":"ceiling",
-                                    "computed_radius_ft": max(0.0, diam_ft/2.0),
+                                    "computed_radius_ft": 25.0,
                                     "px_per_ft": self.px_per_ft})
                 else:
                     d.set_coverage({"mode":"none","computed_radius_ft":0.0,"px_per_ft":self.px_per_ft})
@@ -551,7 +758,7 @@ class MainWindow(QMainWindow):
         return {"grid":int(self.scene.grid_size), "snap":bool(self.scene.snap_enabled),
                 "px_per_ft": float(self.px_per_ft),
                 "snap_step_in": float(self.snap_step_in),
-                "grid_opacity": float(self.prefs.get("grid_opacity",0.25)),
+                "grid_opacity": float(self.prefs.get("grid_opacity",0.20)),
                 "grid_width_px": float(self.prefs.get("grid_width_px",0.0)),
                 "grid_major_every": int(self.prefs.get("grid_major_every",5)),
                 "devices":devs,"wires":[]}
@@ -560,11 +767,11 @@ class MainWindow(QMainWindow):
         for it in list(self.layer_devices.childItems()): it.scene().removeItem(it)
         for it in list(self.layer_wires.childItems()): it.scene().removeItem(it)
         self.scene.snap_enabled = bool(data.get("snap", True)); self.act_view_snap.setChecked(self.scene.snap_enabled)
-        self.scene.grid_size = int(data.get("grid", DEFAULT_GRID_SIZE)); 
+        self.scene.grid_size = int(data.get("grid", DEFAULT_GRID_SIZE));
         if hasattr(self, "spin_grid"): self.spin_grid.setValue(self.scene.grid_size)
         self.px_per_ft = float(data.get("px_per_ft", self.px_per_ft))
         self.snap_step_in = float(data.get("snap_step_in", self.snap_step_in))
-        self.prefs["grid_opacity"] = float(data.get("grid_opacity", self.prefs.get("grid_opacity",0.25)))
+        self.prefs["grid_opacity"] = float(data.get("grid_opacity", self.prefs.get("grid_opacity",0.20)))
         self.prefs["grid_width_px"] = float(data.get("grid_width_px", self.prefs.get("grid_width_px",0.0)))
         self.prefs["grid_major_every"] = int(data.get("grid_major_every", self.prefs.get("grid_major_every",5)))
         self.scene.set_grid_style(self.prefs["grid_opacity"], self.prefs["grid_width_px"], self.prefs["grid_major_every"])
@@ -584,11 +791,10 @@ class MainWindow(QMainWindow):
         if self.history_index < len(self.history)-1:
             self.history_index+=1; self.load_state(self.history[self.history_index]); self.statusBar().showMessage("Redo")
 
-    # ---------- right-dock props logic ----------
+    # ---------- right-dock props ----------
     def _get_selected_device(self):
         for it in self.scene.selectedItems():
-            if isinstance(it, DeviceItem):
-                return it
+            if isinstance(it, DeviceItem): return it
         return None
 
     def _on_selection_changed(self):
@@ -597,14 +803,12 @@ class MainWindow(QMainWindow):
             self._enable_props(False); 
             return
         self._enable_props(True)
-        # label + offset in ft
         self.prop_label.setText(d._label.text())
         offx = d.label_offset.x()/self.px_per_ft
         offy = d.label_offset.y()/self.px_per_ft
         self.prop_offx.blockSignals(True); self.prop_offy.blockSignals(True)
         self.prop_offx.setValue(offx); self.prop_offy.setValue(offy)
         self.prop_offx.blockSignals(False); self.prop_offy.blockSignals(False)
-        # coverage
         cov = d.coverage or {}
         self.prop_mount.setCurrentText(cov.get("mount","ceiling"))
         mode = cov.get("mode","none")
@@ -614,6 +818,10 @@ class MainWindow(QMainWindow):
                   float(cov.get("params",{}).get("spacing_ft",0.0)) if mode=="smoke" else
                   float(cov.get("computed_radius_ft",0.0)))
         self.prop_size.setValue(max(0.0, size_ft))
+
+    def _enable_props(self, on: bool):
+        for w in (self.prop_label, self.prop_offx, self.prop_offy, self.prop_mount, self.prop_mode, self.prop_size, self.btn_apply_props):
+            w.setEnabled(on)
 
     def _apply_label_offset_live(self):
         d = self._get_selected_device()
@@ -699,6 +907,16 @@ def main():
     win = create_window()
     win.show()
     app.exec()
+
+if __name__ == "__main__":
+    main()
+"""
+
+def main():
+    backup_write(ROOT / "app" / "scene.py", SCENE)
+    backup_write(ROOT / "app" / "device.py", DEVICE)
+    backup_write(ROOT / "app" / "main.py", MAIN)
+    print("\nDone. Launch with:\n  py -3 -m app.boot\n")
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,5 @@
-# app/boot.py — dynamic entry, resilient to missing create_window
-import os, sys, traceback, time, importlib
+# app/boot.py — hardened entry that avoids "minimal window" fallback surprises.
+import os, sys, traceback, time
 
 # Ensure project root is on sys.path when running from source
 HERE = os.path.dirname(__file__)
@@ -25,48 +25,28 @@ def log_startup_error(msg: str):
     except Exception:
         return None
 
-def resolve_create_window():
-    """Return a callable that builds the main window."""
-    main_mod = importlib.import_module("app.main")
-    # Preferred: explicit factory
-    cw = getattr(main_mod, "create_window", None)
-    if callable(cw):
-        return cw
-    # Fallback: direct MainWindow construction
-    MW = getattr(main_mod, "MainWindow", None)
-    if MW is not None:
-        def _cw():
-            return MW()
-        return _cw
-    # Nothing suitable found
-    raise ImportError(
-        "app.main has neither 'create_window()' nor 'MainWindow'. "
-        f"Found: {', '.join([n for n in dir(main_mod) if not n.startswith('_')])}"
-    )
-
 def main():
     try:
         from PySide6 import QtWidgets
-    except Exception:
-        log_startup_error(traceback.format_exc())
+    except Exception as ex:
+        path = log_startup_error(traceback.format_exc())
         raise
 
     try:
-        create_window = resolve_create_window()
+        from app.main import create_window
     except Exception:
+        # Log full traceback, then show a minimal window so you see *something*
         tb = traceback.format_exc()
         log_startup_error(tb)
-        # Show a visible fallback window so you know it failed
+        # Minimal window
         app = QtWidgets.QApplication([])
         w = QtWidgets.QWidget()
-        from PySide6 import QtCore
         w.setWindowTitle("Auto-Fire (fallback)")
-        w.resize(600, 320)
-        lab = QtWidgets.QLabel(
-            "Main UI failed to load.\n\n"
-            "See latest file in ~/AutoFire/logs for details.\n"
-            "Tip: ensure app/main.py defines create_window() or a MainWindow class."
-        )
+        w.resize(520, 260)
+        from PySide6 import QtCore, QtGui
+        lab = QtWidgets.QLabel("Main UI failed to load.\n\nSee latest file in ~/AutoFire/logs for details.\n"
+                               "Run:  py -3 -m app.boot  from repo root\n"
+                               "to surface import errors in the console.")
         lab.setAlignment(QtCore.Qt.AlignCenter)
         lay = QtWidgets.QVBoxLayout(w); lay.addWidget(lab)
         w.show(); app.exec()
@@ -74,8 +54,8 @@ def main():
 
     # Normal path
     app = QtWidgets.QApplication([])
-    win = create_window()
-    win.show()
+    w = create_window()
+    w.show()
     app.exec()
 
 if __name__ == "__main__":

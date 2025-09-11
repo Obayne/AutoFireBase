@@ -1,4 +1,15 @@
-# app/boot.py — dynamic entry, resilient to missing create_window
+# fix_boot_dynamic_factory.py
+# Make app/boot.py resilient: it will use app.main.create_window if present,
+# otherwise instantiate app.main.MainWindow.
+
+from pathlib import Path
+import time
+
+ROOT = Path(__file__).resolve().parent
+BOOT = ROOT / "app" / "boot.py"
+STAMP = time.strftime("%Y%m%d_%H%M%S")
+
+CODE = r'''# app/boot.py — dynamic entry, resilient to missing create_window
 import os, sys, traceback, time, importlib
 
 # Ensure project root is on sys.path when running from source
@@ -77,6 +88,20 @@ def main():
     win = create_window()
     win.show()
     app.exec()
+
+if __name__ == "__main__":
+    main()
+'''
+
+def main():
+    BOOT.parent.mkdir(parents=True, exist_ok=True)
+    if BOOT.exists():
+        bkp = BOOT.with_suffix(".py.bak-" + STAMP)
+        bkp.write_text(BOOT.read_text(encoding="utf-8", errors="ignore"), encoding="utf-8")
+        print(f"[backup] {bkp}")
+    BOOT.write_text(CODE, encoding="utf-8")
+    print(f"[write]  {BOOT}")
+    print("\nDone. Launch with:  py -3 -m app.boot")
 
 if __name__ == "__main__":
     main()

@@ -1,3 +1,14 @@
+# apply_065_props_toggles.py
+# Restores a right-side "Layers & Properties" dock with layer toggles, grid size,
+# and basic device properties editor. Keeps prior Tools menu + grid opacity slider.
+from pathlib import Path
+import time, shutil
+
+STAMP = time.strftime("%Y%m%d_%H%M%S")
+ROOT  = Path(__file__).resolve().parent
+TGT   = ROOT / "app" / "main.py"
+
+NEW_MAIN = r'''
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -12,67 +23,15 @@ from app.scene import GridScene, DEFAULT_GRID_SIZE
 from app.device import DeviceItem
 from app import catalog
 from app.tools import draw as draw_tools
-try:
-    from app.tools.dimension import DimensionTool
-except Exception:
-    class DimensionTool:
-        def __init__(self, *a, **k): self.active=False
-        def start(self): self.active=True
-        def on_mouse_move(self, *a, **k): pass
-        def on_click(self, *a, **k): self.active=False; return True
-        def cancel(self): self.active=False
+from app.tools.dimension import DimensionTool
+from app.dialogs.coverage import CoverageDialog
+from app.dialogs.gridstyle import GridStyleDialog
 
-# Optional dialogs (present in recent patches); if missing, we degrade gracefully
-try:
-    from app.dialogs.coverage import CoverageDialog
-except Exception:
-    class CoverageDialog(QtWidgets.QDialog):
-        def __init__(self, *a, existing=None, **k):
-            super().__init__(*a, **k)
-            self.setWindowTitle("Coverage")
-            lay = QtWidgets.QVBoxLayout(self)
-            self.mode = QComboBox(); self.mode.addItems(["none","strobe","speaker","smoke"])
-            self.mount = QComboBox(); self.mount.addItems(["ceiling","wall"])
-            self.size  = QDoubleSpinBox(); self.size.setRange(0,1000); self.size.setValue(50.0)
-            lay.addWidget(QLabel("Mode")); lay.addWidget(self.mode)
-            lay.addWidget(QLabel("Mount")); lay.addWidget(self.mount)
-            lay.addWidget(QLabel("Size (ft)")); lay.addWidget(self.size)
-            bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok|QtWidgets.QDialogButtonBox.Cancel)
-            bb.accepted.connect(self.accept); bb.rejected.connect(self.reject); lay.addWidget(bb)
-        def get_settings(self, px_per_ft=12.0):
-            m = self.mode.currentText(); mount=self.mount.currentText(); sz=float(self.size.value())
-            cov={"mode":m,"mount":mount,"px_per_ft":px_per_ft}
-            if m=="none": cov["computed_radius_ft"]=0.0
-            elif m=="strobe": cov["computed_radius_ft"]=max(0.0, sz/2.0)
-            elif m=="smoke": cov["params"]={"spacing_ft":max(0.0,sz)}; cov["computed_radius_ft"]=max(0.0,sz/2.0)
-            else: cov["computed_radius_ft"]=max(0.0,sz)
-            return cov
-try:
-    from app.dialogs.gridstyle import GridStyleDialog
-except Exception:
-    class GridStyleDialog(QtWidgets.QDialog):
-        def __init__(self, *a, scene=None, prefs=None, **k):
-            super().__init__(*a, **k); self.scene=scene; self.prefs=prefs or {}
-            self.setWindowTitle("Grid Style")
-            lay = QtWidgets.QFormLayout(self)
-            self.op = QDoubleSpinBox(); self.op.setRange(0.1,1.0); self.op.setSingleStep(0.05); self.op.setValue(float(self.prefs.get("grid_opacity",0.25)))
-            self.wd = QDoubleSpinBox(); self.wd.setRange(0.0,3.0); self.wd.setSingleStep(0.1); self.wd.setValue(float(self.prefs.get("grid_width_px",0.0)))
-            self.mj = QSpinBox(); self.mj.setRange(1,50); self.mj.setValue(int(self.prefs.get("grid_major_every",5)))
-            lay.addRow("Opacity", self.op); lay.addRow("Line width (px)", self.wd); lay.addRow("Major every", self.mj)
-            bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok|QtWidgets.QDialogButtonBox.Cancel)
-            bb.accepted.connect(self.accept); bb.rejected.connect(self.reject); lay.addRow(bb)
-        def apply(self):
-            op=float(self.op.value()); wd=float(self.wd.value()); mj=int(self.mj.value())
-            if self.scene: self.scene.set_grid_style(op, wd, mj)
-            if self.prefs is not None:
-                self.prefs["grid_opacity"]=op; self.prefs["grid_width_px"]=wd; self.prefs["grid_major_every"]=mj
-            return op, wd, mj
-
-APP_VERSION = "0.6.6-esc-theme-pan"
-APP_TITLE   = f"Auto-Fire {APP_VERSION}"
-PREF_DIR    = os.path.join(os.path.expanduser("~"), "AutoFire")
-PREF_PATH   = os.path.join(PREF_DIR, "preferences.json")
-LOG_DIR     = os.path.join(PREF_DIR, "logs")
+APP_VERSION = "0.6.5-layers-props"
+APP_TITLE = f"Auto-Fire {APP_VERSION}"
+PREF_DIR = os.path.join(os.path.expanduser("~"), "AutoFire")
+PREF_PATH = os.path.join(PREF_DIR, "preferences.json")
+LOG_DIR = os.path.join(PREF_DIR, "logs")
 
 def ensure_pref_dir():
     try:
@@ -103,9 +62,12 @@ def infer_device_kind(d: dict) -> str:
     n = (d.get("name","") or "").lower()
     s = (d.get("symbol","") or "").lower()
     text = " ".join([t,n,s])
-    if any(k in text for k in ["strobe","av","nac-strobe","cd","candela"]): return "strobe"
-    if any(k in text for k in ["speaker","spkr","voice"]): return "speaker"
-    if any(k in text for k in ["smoke","detector","heat"]): return "smoke"
+    if any(k in text for k in ["strobe","av","nac-strobe","cd","candela"]):
+        return "strobe"
+    if any(k in text for k in ["speaker","spkr","voice"]):
+        return "speaker"
+    if any(k in text for k in ["smoke","sm","detector","heat"]):
+        return "smoke"
     return "other"
 
 class CanvasView(QGraphicsView):
@@ -115,11 +77,11 @@ class CanvasView(QGraphicsView):
         self.setDragMode(QGraphicsView.RubberBandDrag)
         self.setMouseTracking(True)
         self.devices_group = devices_group
-        self.wires_group   = wires_group
-        self.sketch_group  = sketch_group
+        self.wires_group = wires_group
+        self.sketch_group = sketch_group
         self.overlay_group = overlay_group
         self.ortho = False
-        self.win   = window_ref
+        self.win = window_ref
         self.current_proto = None
         self.current_kind  = "other"
         self.ghost = None
@@ -138,7 +100,6 @@ class CanvasView(QGraphicsView):
         self._ensure_ghost()
 
     def _ensure_ghost(self):
-        # clear if not a coverage-driven type
         if not self.current_proto or self.current_kind not in ("strobe","speaker","smoke"):
             if self.ghost:
                 self.scene().removeItem(self.ghost); self.ghost = None
@@ -156,8 +117,11 @@ class CanvasView(QGraphicsView):
                                      "computed_radius_ft": max(0.0, diam_ft/2.0),
                                      "px_per_ft": ppf})
         elif self.current_kind == "speaker":
+            # crude 20log drop preview
             self.ghost.set_coverage({"mode":"speaker","mount":"ceiling",
-                                     "computed_radius_ft": 30.0, "px_per_ft": ppf})
+                                     "params":{"L10":95.0,"target_db":75.0},
+                                     "computed_radius_ft": 10.0 * (10.0 ** ((95.0 - 75.0)/20.0)),
+                                     "px_per_ft": ppf})
         elif self.current_kind == "smoke":
             spacing_ft = float(self.win.prefs.get("default_smoke_spacing_ft", 30.0))
             self.ghost.set_coverage({"mode":"smoke","mount":"ceiling",
@@ -179,23 +143,19 @@ class CanvasView(QGraphicsView):
         self.scale(s, s)
 
     def keyPressEvent(self, e: QtGui.QKeyEvent):
-        k = e.key()
-        if k==Qt.Key_Space:
-            self.setDragMode(QGraphicsView.ScrollHandDrag)
-            self.setCursor(Qt.OpenHandCursor); e.accept(); return
-        if k==Qt.Key_Shift: self.ortho=True; e.accept(); return
-        if k==Qt.Key_C: self.show_crosshair = not self.show_crosshair; e.accept(); return
-        if k==Qt.Key_Escape:
-            self.win.cancel_active_tool()
-            e.accept(); return
+        if e.key()==Qt.Key_Shift: self.ortho=True; e.accept(); return
+        if e.key()==Qt.Key_C: self.show_crosshair = not self.show_crosshair; e.accept(); return
+        if e.key()==Qt.Key_Escape and getattr(self.win, "draw", None):
+            try:
+                if self.win.draw.mode != 0:
+                    self.win.draw.finish()
+                    e.accept(); return
+            except Exception:
+                pass
         super().keyPressEvent(e)
 
     def keyReleaseEvent(self, e: QtGui.QKeyEvent):
-        k = e.key()
-        if k==Qt.Key_Space:
-            self.setDragMode(QGraphicsView.RubberBandDrag)
-            self.unsetCursor(); e.accept(); return
-        if k==Qt.Key_Shift: self.ortho=False; e.accept(); return
+        if e.key()==Qt.Key_Shift: self.ortho=False; e.accept(); return
         super().keyReleaseEvent(e)
 
     def mouseMoveEvent(self, e: QtGui.QMouseEvent):
@@ -254,8 +214,6 @@ class MainWindow(QMainWindow):
         self.prefs.setdefault("grid_width_px", 0.0)
         self.prefs.setdefault("grid_major_every", 5)
         save_prefs(self.prefs)
-
-        self.apply_dark_theme()   # << restore theme early
 
         self.devices_all = catalog.load_catalog()
 
@@ -336,34 +294,13 @@ class MainWindow(QMainWindow):
 
         # Shortcuts
         QtGui.QShortcut(QtGui.QKeySequence("D"), self, activated=self.start_dimension)
-        QtGui.QShortcut(QtGui.QKeySequence("Esc"), self, activated=self.cancel_active_tool)
-        QtGui.QShortcut(QtGui.QKeySequence("F2"), self, activated=self.fit_view_to_content)
+        QtGui.QShortcut(QtGui.QKeySequence("Esc"), self, activated=lambda: getattr(self.draw,"finish",lambda:None)())
 
         # Selection change → update Properties
         self.scene.selectionChanged.connect(self._on_selection_changed)
 
         self.history = []; self.history_index = -1
         self.push_history()
-
-    # ---------- Theme ----------
-    def apply_dark_theme(self):
-        app = QtWidgets.QApplication.instance()
-        pal = app.palette()
-        bg   = QtGui.QColor(25,26,28)
-        base = QtGui.QColor(32,33,36)
-        text = QtGui.QColor(220,220,225)
-        pal.setColor(QtGui.QPalette.ColorRole.Window, bg)
-        pal.setColor(QtGui.QPalette.ColorRole.Base, base)
-        pal.setColor(QtGui.QPalette.ColorRole.AlternateBase, QtGui.QColor(38,39,43))
-        pal.setColor(QtGui.QPalette.ColorRole.Text, text)
-        pal.setColor(QtGui.QPalette.ColorRole.WindowText, text)
-        pal.setColor(QtGui.QPalette.ColorRole.Button, base)
-        pal.setColor(QtGui.QPalette.ColorRole.ButtonText, text)
-        pal.setColor(QtGui.QPalette.ColorRole.ToolTipBase, base)
-        pal.setColor(QtGui.QPalette.ColorRole.ToolTipText, text)
-        pal.setColor(QtGui.QPalette.ColorRole.Highlight, QtGui.QColor(66,133,244))
-        pal.setColor(QtGui.QPalette.ColorRole.HighlightedText, QtGui.QColor(255,255,255))
-        app.setPalette(pal)
 
     # ---------- UI building ----------
     def _build_left_panel(self):
@@ -455,7 +392,8 @@ class MainWindow(QMainWindow):
     def choose_device(self, it: QListWidgetItem):
         d = it.data(Qt.UserRole)
         self.view.set_current_device(d)
-        self.statusBar().showMessage(f"Selected: {d['name']}")
+        kind = infer_device_kind(d)
+        self.statusBar().showMessage(f"Selected: {d['name']} [{kind}]")
 
     # ---------- view toggles ----------
     def toggle_grid(self, on: bool): self.scene.show_grid = bool(on); self.scene.update()
@@ -492,26 +430,6 @@ class MainWindow(QMainWindow):
 
     def set_snap_inches(self, inches: float):
         self._apply_snap_step_from_inches(inches)
-
-    # ---------- cancel / esc ----------
-    def cancel_active_tool(self):
-        # cancel draw tool
-        if getattr(self, "draw", None):
-            try: self.draw.finish()
-            except Exception: pass
-        # cancel dimension tool
-        if getattr(self, "dim_tool", None):
-            try:
-                if hasattr(self.dim_tool, "cancel"): self.dim_tool.cancel()
-                else: self.dim_tool.active=False
-            except Exception: pass
-        # clear device placement
-        self.view.current_proto = None
-        if self.view.ghost:
-            try: self.scene.removeItem(self.view.ghost)
-            except Exception: pass
-            self.view.ghost = None
-        self.statusBar().showMessage("Cancelled")
 
     # ---------- scene menu ----------
     def canvas_menu(self, global_pos):
@@ -610,6 +528,7 @@ class MainWindow(QMainWindow):
         mode = cov.get("mode","none")
         if mode not in ("none","strobe","speaker","smoke"): mode="none"
         self.prop_mode.setCurrentText(mode)
+        # size proxy (ft): strobe uses diameter/2 -> radius; smoke uses spacing/2; speaker we just show computed radius if present
         size_ft = float(cov.get("computed_radius_ft",0.0))*2.0 if mode=="strobe" else (
                   float(cov.get("params",{}).get("spacing_ft",0.0)) if mode=="smoke" else
                   float(cov.get("computed_radius_ft",0.0)))
@@ -626,6 +545,7 @@ class MainWindow(QMainWindow):
     def _apply_props_clicked(self):
         d = self._get_selected_device()
         if not d: return
+        # label + offset already handled live
         mode = self.prop_mode.currentText()
         mount = self.prop_mount.currentText()
         sz = float(self.prop_size.value())
@@ -633,12 +553,15 @@ class MainWindow(QMainWindow):
         if mode == "none":
             cov["computed_radius_ft"] = 0.0
         elif mode == "strobe":
-            cov["computed_radius_ft"] = max(0.0, sz/2.0)
+            # interpret "size ft" as DIAMETER in ft for strobe (easy visual)
+            diam_ft = max(0.0, sz)
+            cov["computed_radius_ft"] = diam_ft/2.0
         elif mode == "smoke":
             spacing_ft = max(0.0, sz)
             cov["params"] = {"spacing_ft": spacing_ft}
             cov["computed_radius_ft"] = spacing_ft/2.0
         elif mode == "speaker":
+            # interpret "size ft" as desired radius directly for now (quick placeholder)
             cov["computed_radius_ft"] = max(0.0, sz)
         d.set_coverage(cov)
         self.push_history()
@@ -699,6 +622,19 @@ def main():
     win = create_window()
     win.show()
     app.exec()
+
+if __name__ == "__main__":
+    main()
+'''
+
+def main():
+    if TGT.exists():
+        bak = TGT.with_suffix(TGT.suffix + f".bak-{STAMP}")
+        shutil.copy2(TGT, bak)
+        print(f"[backup] {bak}")
+    TGT.parent.mkdir(parents=True, exist_ok=True)
+    TGT.write_text(NEW_MAIN.strip()+"\n", encoding="utf-8")
+    print(f"[write ] {TGT}\n\nDone. Launch with:\n  py -3 -m app.boot\n")
 
 if __name__ == "__main__":
     main()
