@@ -1,0 +1,110 @@
+from enum import IntEnum
+from PySide6 import QtCore, QtGui, QtWidgets
+
+class DrawMode(IntEnum):
+    NONE = 0
+    LINE = 1
+    RECT = 2
+    CIRCLE = 3
+    POLYLINE = 4
+
+class DrawController:
+    def __init__(self, window, layer):
+        self.win = window
+        self.layer = layer
+        self.mode = DrawMode.NONE
+               # temp preview item while drawing
+        self.temp_item = None
+        self.points = []
+
+    def set_mode(self, mode: DrawMode):
+        self.finish()
+        self.mode = mode
+        self.win.statusBar().showMessage(f"Draw: {mode.name.title()} — click to start, Esc to finish")
+
+    def finish(self):
+        if self.temp_item and self.temp_item.scene():
+            self.temp_item.scene().removeItem(self.temp_item)
+        self.temp_item = None
+        self.points = []
+        self.mode = DrawMode.NONE
+
+    def on_mouse_move(self, pt_scene: QtCore.QPointF, shift_ortho=False):
+        if not self.points:
+            return
+        p0 = self.points[0]
+        p1 = pt_scene
+        if shift_ortho:
+            dx = abs(p1.x() - p0.x())
+            dy = abs(p1.y() - p0.y())
+            if dx > dy:
+                p1.setY(p0.y())
+            else:
+                p1.setX(p0.x())
+
+        if self.mode == DrawMode.LINE:
+            if self.temp_item is None:
+                self.temp_item = QtWidgets.QGraphicsLineItem()
+                pen = QtGui.QPen(QtGui.QColor("#7aa2f7")); pen.setCosmetic(True)
+                self.temp_item.setPen(pen); self.temp_item.setParentItem(self.layer)
+            self.temp_item.setLine(p0.x(), p0.y(), p1.x(), p1.y())
+
+        elif self.mode == DrawMode.RECT:
+            if self.temp_item is None:
+                self.temp_item = QtWidgets.QGraphicsRectItem()
+                pen = QtGui.QPen(QtGui.QColor("#7dcfff")); pen.setCosmetic(True)
+                self.temp_item.setPen(pen); self.temp_item.setParentItem(self.layer)
+            rect = QtCore.QRectF(p0, p1).normalized()
+            self.temp_item.setRect(rect)
+
+        elif self.mode == DrawMode.CIRCLE:
+            if self.temp_item is None:
+                self.temp_item = QtWidgets.QGraphicsEllipseItem()
+                pen = QtGui.QPen(QtGui.QColor("#bb9af7")); pen.setCosmetic(True)
+                self.temp_item.setPen(pen); self.temp_item.setParentItem(self.layer)
+            r = QtCore.QLineF(p0, p1).length()
+            self.temp_item.setRect(p0.x()-r, p0.y()-r, 2*r, 2*r)
+
+        elif self.mode == DrawMode.POLYLINE:
+            if self.temp_item is None:
+                self.temp_item = QtWidgets.QGraphicsPathItem()
+                pen = QtGui.QPen(QtGui.QColor("#9ece6a")); pen.setCosmetic(True)
+                self.temp_item.setPen(pen); self.temp_item.setParentItem(self.layer)
+            path = QtGui.QPainterPath(self.points[0])
+            for pt in self.points[1:]:
+                path.lineTo(pt)
+            path.lineTo(p1)
+            self.temp_item.setPath(path)
+
+    def on_click(self, pt_scene: QtCore.QPointF, shift_ortho=False):
+        if self.mode == DrawMode.NONE:
+            return False  # not handled
+        if not self.points:
+            self.points = [pt_scene]
+            return False
+        # finalize shapes on second click (except polyline: continue until Esc)
+        if self.mode in (DrawMode.LINE, DrawMode.RECT, DrawMode.CIRCLE):
+            p0 = self.points[0]
+            p1 = pt_scene
+            if shift_ortho:
+                dx = abs(p1.x() - p0.x()); dy = abs(p1.y() - p0.y())
+                if dx > dy: p1.setY(p0.y())
+                else: p1.setX(p0.x())
+            item = None
+            if self.mode == DrawMode.LINE:
+                item = QtWidgets.QGraphicsLineItem(p0.x(), p0.y(), p1.x(), p1.y())
+            elif self.mode == DrawMode.RECT:
+                rect = QtCore.QRectF(p0, p1).normalized()
+                item = QtWidgets.QGraphicsRectItem(rect)
+            elif self.mode == DrawMode.CIRCLE:
+                r = QtCore.QLineF(p0, p1).length()
+                item = QtWidgets.QGraphicsEllipseItem(p0.x()-r, p0.y()-r, 2*r, 2*r)
+            pen = QtGui.QPen(QtGui.QColor("#e0e0e0")); pen.setCosmetic(True)
+            item.setPen(pen); item.setZValue(20); item.setParentItem(self.layer)
+            self.finish()
+            return True
+        elif self.mode == DrawMode.POLYLINE:
+            if len(self.points) >= 1:
+                self.points.append(pt_scene)
+                return False
+        return False

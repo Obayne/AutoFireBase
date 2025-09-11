@@ -1,0 +1,84 @@
+# app/boot.py  — robust loader for script or EXE
+import os, sys, traceback, datetime, importlib, importlib.util, types
+from pathlib import Path
+from PySide6 import QtWidgets
+
+def _log_startup_error(text: str) -> str:
+    base = Path.home() / "AutoFire" / "logs"
+    base.mkdir(parents=True, exist_ok=True)
+    path = base / f"startup_error_{datetime.datetime.now():%Y%m%d_%H%M%S}.log"
+    try: path.write_text(text, encoding="utf-8")
+    except Exception: pass
+    return str(path)
+
+def _import_app_main():
+    # 1) Normal import (works when run as module or in EXE where app package exists)
+    try:
+        return importlib.import_module("app.main")
+    except Exception:
+        pass
+
+    # 2) Running as a script from source: create a synthetic 'app' package
+    here = Path(__file__).resolve().parent  # ...\app
+    direct = here / "main.py"
+    if direct.exists():
+        if "app" not in sys.modules:
+            pkg = types.ModuleType("app")
+            pkg.__path__ = [str(here)]   # mark as package
+            pkg.__package__ = "app"
+            sys.modules["app"] = pkg
+        spec = importlib.util.spec_from_file_location("app.main", str(direct))
+        mod  = importlib.util.module_from_spec(spec)  # type: ignore
+        assert spec and spec.loader
+        spec.loader.exec_module(mod)                  # type: ignore[attr-defined]
+        sys.modules["app.main"] = mod
+        return mod
+
+    # 3) Frozen EXE fallbacks
+    bases = []
+    if getattr(sys, "frozen", False):
+        bases.append(Path(sys.executable).resolve().parent)
+        meipass = getattr(sys, "_MEIPASS", None)
+        if meipass:
+            bases.append(Path(meipass))
+
+    for base in bases:
+        for cand in (base / "app" / "main.py", base / "_internal" / "app" / "main.py"):
+            if cand.exists():
+                if "app" not in sys.modules:
+                    pkg = types.ModuleType("app")
+                    pkg.__path__ = [str(cand.parent)]
+                    pkg.__package__ = "app"
+                    sys.modules["app"] = pkg
+                spec = importlib.util.spec_from_file_location("app.main", str(cand))
+                mod  = importlib.util.module_from_spec(spec)  # type: ignore
+                assert spec and spec.loader
+                spec.loader.exec_module(mod)                  # type: ignore[attr-defined]
+                sys.modules["app.main"] = mod
+                return mod
+
+    raise ModuleNotFoundError("app.main")
+
+def main():
+    app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    try:
+        m = _import_app_main()
+        create_window = getattr(m, "create_window", None)
+        if callable(create_window):
+            w = create_window(); w.show(); app.exec(); return
+        # Fallback UI if create_window missing
+        win = QtWidgets.QMainWindow()
+        win.setWindowTitle("Auto-Fire — Fallback UI (no create_window)")
+        lab = QtWidgets.QLabel("Fallback loaded. app.main.create_window() not found.")
+        lab.setMargin(16)
+        win.setCentralWidget(lab)
+        win.resize(900, 600)
+        win.show()
+        app.exec()
+    except Exception:
+        tb = traceback.format_exc()
+        p = _log_startup_error(tb)
+        QtWidgets.QMessageBox.critical(None, "Startup Error", f"{tb}\n\nSaved: {p}")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,36 @@
+from PySide6 import QtCore, QtGui, QtWidgets
+
+DEFAULT_GRID_SIZE = 24  # px
+
+class GridScene(QtWidgets.QGraphicsScene):
+    def __init__(self, grid=DEFAULT_GRID_SIZE, *a):
+        super().__init__(*a)
+        self.grid_size    = int(grid)
+        self.snap_enabled = True
+        self.snap_step_px = 0.0
+        self.show_grid    = True
+
+    def drawBackground(self, painter: QtGui.QPainter, rect: QtCore.QRectF):
+        if not self.show_grid:
+            return
+        s = max(2, int(self.grid_size))
+        pen_major = QtGui.QPen(QtGui.QColor(70,70,75))
+        pen_minor = QtGui.QPen(QtGui.QColor(45,45,50))
+        left = int(rect.left()) - (int(rect.left()) % s)
+        top  = int(rect.top())  - (int(rect.top())  % s)
+
+        painter.setPen(pen_minor)
+        for x in range(left, int(rect.right())+s, s):
+            painter.drawLine(x, rect.top(), x, rect.bottom())
+        for y in range(top, int(rect.bottom())+s, s):
+            painter.drawLine(rect.left(), y, rect.right(), y)
+
+        painter.setPen(pen_major)
+        painter.drawLine(0, rect.top(), 0, rect.bottom())
+        painter.drawLine(rect.left(), 0, rect.right(), 0)
+
+    def snap(self, p: QtCore.QPointF) -> QtCore.QPointF:
+        if not self.snap_enabled:
+            return p
+        s = self.snap_step_px if self.snap_step_px > 0 else self.grid_size
+        return QtCore.QPointF(round(p.x()/s)*s, round(p.y()/s)*s)

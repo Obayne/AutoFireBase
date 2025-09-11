@@ -1,0 +1,32 @@
+
+import sys, traceback, os, datetime
+from PySide6 import QtWidgets
+
+def main():
+    app = QtWidgets.QApplication(sys.argv)
+    app.setStyle("Fusion")
+    try:
+        from app.main import create_window
+        win = create_window()
+        win.show()
+        sys.exit(app.exec())
+    except Exception as ex:
+        msg = "Startup error:\\n\\n" + "".join(traceback.format_exception(ex)).replace("\\n\\n", "\\n")
+        w = QtWidgets.QWidget()
+        w.setWindowTitle("Auto-Fire — Startup Error")
+        lay = QtWidgets.QVBoxLayout(w)
+        te = QtWidgets.QPlainTextEdit(readOnly=True); te.setPlainText(msg); lay.addWidget(te)
+        QtWidgets.QMessageBox.critical(w, "Startup Error", str(ex))
+        w.show()
+        try:
+            base = os.path.join(os.path.expanduser("~"), "AutoFire", "logs")
+            os.makedirs(base, exist_ok=True)
+            ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            with open(os.path.join(base, f"startup_error_{ts}.log"), "w", encoding="utf-8") as f:
+                f.write(msg)
+        except Exception:
+            pass
+        app.exec()
+
+if __name__ == "__main__":
+    main()

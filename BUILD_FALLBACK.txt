@@ -1,0 +1,7 @@
+
+COPY/PASTE fallback (PowerShell):
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+py -m pip install --upgrade pip
+py -m pip install PySide6 ezdxf packaging pyinstaller
+py -m PyInstaller --noconfirm --clean --noconsole --name AutoFire --add-data "VERSION.txt;." app\boot.py

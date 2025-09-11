@@ -1,0 +1,1 @@
+# Auto-Fire core package

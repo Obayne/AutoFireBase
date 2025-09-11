@@ -1,0 +1,771 @@
+# Build a tiny Patch A zip without printing code into chat.
+# Patch A contents:
+#   - app/catalog.py  (new, small scaffold)
+#   - app/main.py     (updated to add Manufacturer/Type filters + coverage toggle stub)
+#   - CHANGELOG.md    (append entry for 0.4.3-a)
+#   - VERSION.txt     (0.4.3-a)
+#
+# Assumptions:
+# - User already has AutoFire 0.4.2 Modular structure with app/scene.py, app/device.py, app/wiring.py, etc.
+# - This patch only replaces app/main.py and adds app/catalog.py; other files remain untouched.
+#
+# Output file: /mnt/data/AutoFire_patch_043a.zip
+
+import os, zipfile, tempfile, textwrap, json, datetime
+
+patch_root = tempfile.mkdtemp(prefix="autofire_patchA_")
+app_dir = os.path.join(patch_root, "app")
+os.makedirs(app_dir, exist_ok=True)
+
+# catalog.py (small, simple scaffold)
+catalog_py = """
+def load_catalog():
+    # Seed sample devices with manufacturer + type + attributes placeholders
+    return [
+        {"name": "Smoke Detector", "symbol": "SMK", "manufacturer": "Generic", "part_number": "SMK-100", "type": "Detector", "attributes": {}},
+        {"name": "Heat Detector",  "symbol": "HEAT","manufacturer": "Generic", "part_number": "HEAT-100", "type": "Detector", "attributes": {}},
+        {"name": "Horn/Strobe",    "symbol": "H/S", "manufacturer": "Generic", "part_number": "HS-100", "type": "Notification",
+         "attributes": {"strobe": {"candela_options": [15, 30, 75, 110]}, "horn": {"db_ref": 85}}},
+        {"name": "Speaker",        "symbol": "SPK", "manufacturer": "Generic", "part_number": "SPK-25VRMS", "type": "Notification",
+         "attributes": {"speaker": {"wattage_options": [0.25, 0.5, 1.0, 2.0], "db_at_10ft": 87}}},
+        {"name": "Pull Station",   "symbol": "PULL","manufacturer": "Generic", "part_number": "PULL-100", "type": "Pull", "attributes": {}},
+        {"name": "FACP Panel",     "symbol": "FACP","manufacturer": "Generic", "part_number": "FACP-100", "type": "Panel", "attributes": {}},
+    ]
+
+def list_manufacturers(devs):
+    vals = sorted({d.get("manufacturer","") for d in devs if d.get("manufacturer")})
+    return ["(Any)"] + vals
+
+def list_types(devs):
+    vals = sorted({d.get("type","") for d in devs if d.get("type")})
+    return ["(Any)"] + vals
+""".strip()
+with open(os.path.join(app_dir, "catalog.py"), "w", encoding="utf-8") as f:
+    f.write(catalog_py)
+
+# main.py (compact version that introduces the two dropdowns + coverage toggle stub)
+main_py = """
+import os, json, zipfile, tempfile, shutil, csv, datetime
+import ezdxf
+
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt, QPointF, QRectF, QSize, QMarginsF
+from PySide6.QtGui import QAction, QPainter, QPen, QBrush, QPainterPath, QKeySequence, QImage
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
+    QListWidget, QListWidgetItem, QLineEdit, QLabel, QToolBar, QFileDialog,
+    QGraphicsView, QGraphicsScene, QGraphicsItem, QMessageBox, QSplitter, QGraphicsPathItem,
+    QMenu, QDockWidget, QCheckBox, QSpinBox, QSlider, QComboBox,
+    QGraphicsItemGroup, QPushButton, QFormLayout, QDialog, QDialogButtonBox, QDoubleSpinBox
+)
+
+from .scene import GridScene, DEFAULT_GRID_SIZE
+from .device import DeviceItem
+from .wiring import WireItem
+from . import catalog
+
+APP_TITLE = "Auto-Fire 0.4.3-a (Qt)"
+PREF_DIR = os.path.join(os.path.expanduser("~"), "AutoFire")
+PREF_PATH = os.path.join(PREF_DIR, "preferences.json")
+AUTOSAVE_PATH = os.path.join(PREF_DIR, "autosave.autofire")
+
+def ensure_pref_dir():
+    try: os.makedirs(PREF_DIR, exist_ok=True)
+    except Exception: pass
+
+def load_prefs():
+    ensure_pref_dir()
+    if os.path.exists(PREF_PATH):
+        try:
+            with open(PREF_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+def save_prefs(prefs):
+    ensure_pref_dir()
+    try:
+        with open(PREF_PATH, "w", encoding="utf-8") as f:
+            json.dump(prefs, f, indent=2)
+    except Exception:
+        pass
+
+class CanvasView(QGraphicsView):
+    def __init__(self, scene, devices_group, wires_group):
+        super().__init__(scene)
+        self.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
+        self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setMouseTracking(True)
+        self.current_proto = None
+        self.devices_group = devices_group
+        self.wires_group = wires_group
+        self._space_pan = False
+        self.wire_mode = False
+        self._wire_first = None
+        self.calibrate_mode = False
+        self._calib_first = None
+        self.ortho = False
+        self.coverage_preview = False  # stub
+
+    def set_current_device(self, proto: dict):
+        self.current_proto = proto
+
+    def wheelEvent(self, e: QtGui.QWheelEvent):
+        self.scale(1.15 if e.angleDelta().y()>0 else 1/1.15, 1.15 if e.angleDelta().y()>0 else 1/1.15)
+
+    def keyPressEvent(self, e: QtGui.QKeyEvent):
+        if e.key()==Qt.Key_Space and not self._space_pan:
+            self._space_pan=True; self.setDragMode(QGraphicsView.ScrollHandDrag); e.accept(); return
+        if e.modifiers() & Qt.ControlModifier and e.key()==Qt.Key_D:
+            for it in self.scene().selectedItems():
+                if isinstance(it, DeviceItem):
+                    c = it.rect().center() + QPointF(20,20)
+                    dup = DeviceItem(c.x(), c.y(), it.symbol, it.name, it.manufacturer, it.part_number)
+                    dup.setParentItem(self.devices_group)
+            self.scene().views()[0].window().push_history(); e.accept(); return
+        if e.key()==Qt.Key_Delete:
+            s = list(self.scene().selectedItems())
+            for it in s: it.scene().removeItem(it)
+            self.scene().views()[0].window().push_history(); e.accept(); return
+        if e.key()==Qt.Key_Shift:
+            self.ortho = True; e.accept(); return
+        super().keyPressEvent(e)
+
+    def keyReleaseEvent(self, e: QtGui.QKeyEvent):
+        if e.key()==Qt.Key_Space and self._space_pan:
+            self._space_pan=False; self.setDragMode(QGraphicsView.RubberBandDrag); e.accept(); return
+        if e.key()==Qt.Key_Shift:
+            self.ortho = False; e.accept(); return
+        super().keyReleaseEvent(e)
+
+    def mousePressEvent(self, e: QtGui.QMouseEvent):
+        if e.button()==Qt.LeftButton:
+            scene_pos = self.mapToScene(e.position().toPoint())
+            scene: GridScene = self.scene()
+            sp = scene.snap(scene_pos)
+            win = self.scene().views()[0].window()
+
+            if self.calibrate_mode:
+                if self._calib_first is None:
+                    self._calib_first = sp
+                    win.statusBar().showMessage("Calibration: pick second point...")
+                    e.accept(); return
+                else:
+                    p1 = self._calib_first; p2 = sp
+                    self._calib_first = None
+                    self.calibrate_mode = False
+                    win.finish_calibration(p1, p2)
+                    e.accept(); return
+
+            if self.wire_mode:
+                device = self._device_at(scene_pos)
+                if device is None: super().mousePressEvent(e); return
+                center = device.rect().center()
+                if self._wire_first is None:
+                    self._wire_first = center; e.accept(); return
+                else:
+                    a = self._wire_first; b = center
+                    if self.ortho:
+                        mid = QPointF(b.x(), a.y())
+                        WireItem(a, mid).setParentItem(self.wires_group)
+                        WireItem(mid, b).setParentItem(self.wires_group)
+                    else:
+                        WireItem(a, b).setParentItem(self.wires_group)
+                    self._wire_first = None
+                    win.push_history(); e.accept(); return
+
+            if self.current_proto:
+                proto = self.current_proto
+                item = DeviceItem(sp.x(), sp.y(), proto["symbol"], proto["name"], proto.get("manufacturer",""), proto.get("part_number",""))
+                item.setParentItem(self.devices_group)
+                win.push_history(); e.accept(); return
+        super().mousePressEvent(e)
+
+    def _device_at(self, pos: QPointF):
+        for it in self.items(self.mapFromScene(pos)):
+            if isinstance(it, DeviceItem): return it
+        return None
+
+class MainWindow(QMainWindow):
+    autosave_interval_ms = 60_000
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle(APP_TITLE); self.resize(1500,900)
+        self.prefs = load_prefs()
+
+        self.devices_all = catalog.load_catalog()
+
+        self.scene = GridScene(int(self.prefs.get("grid", DEFAULT_GRID_SIZE)), 0,0,8000,8000)
+        self.scene.snap_enabled = bool(self.prefs.get("snap", True))
+
+        self.layer_underlay = QtWidgets.QGraphicsItemGroup(); self.layer_underlay.setZValue(-10); self.scene.addItem(self.layer_underlay)
+        self.layer_wires    = QtWidgets.QGraphicsItemGroup(); self.layer_wires.setZValue(60);   self.scene.addItem(self.layer_wires)
+        self.layer_devices  = QtWidgets.QGraphicsItemGroup(); self.layer_devices.setZValue(100); self.scene.addItem(self.layer_devices)
+
+        self.view = CanvasView(self.scene, self.layer_devices, self.layer_wires)
+
+        self.current_underlay_path = None
+        self.underlay_scale = float(self.prefs.get("underlay_scale", 1.0))
+        self.underlay_opacity = float(self.prefs.get("underlay_opacity", 1.0))
+
+        # Left panel: filters + search + list
+        self.search = QLineEdit(); self.search.setPlaceholderText("Search devices...")
+        self.cmb_mfr = QComboBox(); self.cmb_type = QComboBox()
+        self._populate_filters()
+        self.list = QtWidgets.QListWidget(); self.list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self._refresh_device_list()
+
+        self.search.textChanged.connect(self._refresh_device_list)
+        self.cmb_mfr.currentIndexChanged.connect(self._refresh_device_list)
+        self.cmb_type.currentIndexChanged.connect(self._refresh_device_list)
+        self.list.itemClicked.connect(self.choose_device)
+
+        left = QWidget(); ll = QVBoxLayout(left); ll.addWidget(QLabel("Device Palette"))
+        fl = QHBoxLayout(); fl.addWidget(QLabel("Manufacturer:")); fl.addWidget(self.cmb_mfr)
+        tl = QHBoxLayout(); tl.addWidget(QLabel("Type:")); tl.addWidget(self.cmb_type)
+        ll.addLayout(fl); ll.addLayout(tl)
+        ll.addWidget(self.search); ll.addWidget(self.list)
+
+        splitter = QtWidgets.QSplitter(); splitter.addWidget(left); splitter.addWidget(self.view); splitter.setStretchFactor(1,1)
+        container = QWidget(); lay = QHBoxLayout(container); lay.addWidget(splitter); self.setCentralWidget(container)
+
+        tb = QToolBar("Tools"); tb.setIconSize(QSize(16,16)); self.addToolBar(tb)
+        self.snap_action = QAction("Snap", self); self.snap_action.setCheckable(True); self.snap_action.setChecked(self.scene.snap_enabled)
+        self.snap_action.triggered.connect(self.toggle_snap); tb.addAction(self.snap_action)
+
+        act_import = QAction("Import DXF Underlay", self); act_import.triggered.connect(self.import_dxf_underlay); tb.addAction(act_import)
+        act_fit = QAction("Fit", self); act_fit.triggered.connect(self.fit_view_to_content); tb.addAction(act_fit)
+        self.grid_action = QAction("Grid", self); self.grid_action.setCheckable(True); self.grid_action.setChecked(True)
+        self.grid_action.triggered.connect(self.toggle_grid); tb.addAction(self.grid_action)
+        self.act_wiring = QAction("Wiring Mode", self); self.act_wiring.setCheckable(True); self.act_wiring.toggled.connect(self.toggle_wiring); tb.addAction(self.act_wiring)
+        self.act_calib = QAction("Calibrate Scale", self); self.act_calib.setCheckable(True); self.act_calib.toggled.connect(self.toggle_calibrate); tb.addAction(self.act_calib)
+
+        # Coverage toggle (stub)
+        self.act_cov = QAction("Coverage Preview", self); self.act_cov.setCheckable(True)
+        self.act_cov.toggled.connect(self.toggle_coverage_preview); tb.addAction(self.act_cov)
+
+        act_png = QAction("Export View (PNG)...", self); act_png.triggered.connect(self.export_view_png); tb.addAction(act_png)
+        act_pdf = QAction("Export View (PDF)...", self); act_pdf.triggered.connect(self.export_view_pdf); tb.addAction(act_pdf)
+
+        self.banner = QWidget(); self.banner.setAutoFillBackground(True)
+        pal = self.banner.palette(); pal.setColor(self.banner.backgroundRole(), QtGui.QColor(255, 243, 205)); self.banner.setPalette(pal)
+        hb = QtWidgets.QHBoxLayout(self.banner)
+        self.banner_label = QLabel("This project has devices but no embedded floorplan underlay. ")
+        hb.addWidget(self.banner_label)
+        btn_relink = QPushButton("Re-link Underlay…"); btn_relink.clicked.connect(self.relink_underlay)
+        hb.addWidget(btn_relink); hb.addStretch()
+        self.banner.setVisible(False)
+        lay.insertWidget(0, self.banner)
+
+        dock = QDockWidget("Layers / CAD Controls", self); panel = QWidget(); form = QVBoxLayout(panel)
+        self.chk_underlay = QCheckBox("Underlay"); self.chk_underlay.setChecked(True); self.chk_underlay.toggled.connect(lambda v:self.layer_underlay.setVisible(v)); form.addWidget(self.chk_underlay)
+        self.chk_wires = QCheckBox("Wiring"); self.chk_wires.setChecked(True); self.chk_wires.toggled.connect(lambda v:self.layer_wires.setVisible(v)); form.addWidget(self.chk_wires)
+        self.chk_devices = QCheckBox("Devices"); self.chk_devices.setChecked(True); self.chk_devices.toggled.connect(lambda v:self.layer_devices.setVisible(v)); form.addWidget(self.chk_devices)
+        form.addWidget(QLabel("Underlay Opacity"))
+        self.opacity_slider = QSlider(Qt.Horizontal); self.opacity_slider.setRange(20,100); self.opacity_slider.setValue(int(self.underlay_opacity*100)); self.opacity_slider.valueChanged.connect(self.change_underlay_opacity); form.addWidget(self.opacity_slider)
+        form.addWidget(QLabel("Grid / Snap Spacing"))
+        self.spin_grid = QSpinBox(); self.spin_grid.setRange(2,500); self.spin_grid.setValue(self.scene.grid_size); self.spin_grid.valueChanged.connect(self.change_grid_size); form.addWidget(self.spin_grid)
+        panel.setLayout(form); dock.setWidget(panel); self.addDockWidget(Qt.RightDockWidgetArea, dock)
+
+        m_file = self.menuBar().addMenu("&File")
+        act_save = QAction("Save Project...", self); act_open = QAction("Open Project...", self); act_bom = QAction("Export BOM (CSV)...", self)
+        m_file.addAction(act_save); m_file.addAction(act_open); m_file.addSeparator(); m_file.addAction(act_bom)
+        m_file.addSeparator(); m_file.addAction(act_png); m_file.addAction(act_pdf)
+        act_save.triggered.connect(self.save_project); act_open.triggered.connect(self.open_project); act_bom.triggered.connect(self.export_bom_csv)
+
+        self.recent = list(self.prefs.get("recent", []))[:5]
+        self.menu_recent = m_file.addMenu("Open Recent")
+        self.refresh_recent_menu()
+
+        help_menu = self.menuBar().addMenu("&Help")
+        act_help = QAction("Help / Shortcuts", self); act_help.triggered.connect(self.show_help); help_menu.addAction(act_help)
+
+        self.history = []; self.history_index = -1
+        self.shortcut_undo = QtGui.QShortcut(QKeySequence.Undo, self); self.shortcut_undo.activated.connect(self.undo)
+        self.shortcut_redo = QtGui.QShortcut(QKeySequence.Redo, self); self.shortcut_redo.activated.connect(self.redo)
+
+        self.view.setContextMenuPolicy(Qt.CustomContextMenu); self.view.customContextMenuRequested.connect(self.canvas_menu)
+
+        self.autosave_timer = QtCore.QTimer(self); self.autosave_timer.timeout.connect(self.autosave_now)
+        self.autosave_timer.start(self.autosave_interval_ms)
+
+        self.check_recovery()
+
+        self.statusBar().showMessage("Ready")
+        self.push_history()
+        self.apply_prefs_to_ui()
+
+    # Filters
+    def _populate_filters(self):
+        mfrs = catalog.list_manufacturers(self.devices_all)
+        types = catalog.list_types(self.devices_all)
+        self.cmb_mfr.clear(); self.cmb_mfr.addItems(mfrs)
+        self.cmb_type.clear(); self.cmb_type.addItems(types)
+
+    def _refresh_device_list(self):
+        q = self.search.text().lower().strip()
+        want_mfr = self.cmb_mfr.currentText()
+        want_type = self.cmb_type.currentText()
+        self.list.clear()
+        for d in self.devices_all:
+            if want_mfr and want_mfr != "(Any)" and d.get("manufacturer") != want_mfr:
+                continue
+            if want_type and want_type != "(Any)" and d.get("type") != want_type:
+                continue
+            txt = f"{d['name']} ({d['symbol']})"
+            if q and q not in txt.lower() and q not in (d.get('part_number','').lower()):
+                continue
+            it = QListWidgetItem(txt); it.setData(Qt.UserRole, d); self.list.addItem(it)
+
+    # Recovery / Autosave
+    def check_recovery(self):
+        if os.path.exists(AUTOSAVE_PATH):
+            btn = QMessageBox.question(self, "Recover Project", "Autosave data was found. Recover it now?")
+            if btn == QMessageBox.Yes:
+                self.open_project_path(AUTOSAVE_PATH)
+
+    def autosave_now(self):
+        try:
+            tmpdir = tempfile.mkdtemp(prefix="af_autosave_")
+            data = self.serialize_state()
+            with open(os.path.join(tmpdir, "project.json"), "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+            if self.current_underlay_path and os.path.exists(self.current_underlay_path):
+                shutil.copyfile(self.current_underlay_path, os.path.join(tmpdir, "underlay.dxf"))
+            with zipfile.ZipFile(AUTOSAVE_PATH, "w", zipfile.ZIP_DEFLATED) as z:
+                z.write(os.path.join(tmpdir, "project.json"), "project.json")
+                dxfp = os.path.join(tmpdir, "underlay.dxf")
+                if os.path.exists(dxfp): z.write(dxfp, "underlay.dxf")
+            shutil.rmtree(tmpdir, ignore_errors=True)
+        except Exception:
+            pass
+
+    # Prefs / Recent
+    def apply_prefs_to_ui(self):
+        self.snap_action.setChecked(self.scene.snap_enabled)
+        self.opacity_slider.setValue(int(self.underlay_opacity*100))
+
+    def add_recent(self, path):
+        if not path: return
+        if path in self.recent: self.recent.remove(path)
+        self.recent.insert(0, path)
+        self.recent = self.recent[:5]
+        self.prefs["recent"] = self.recent; save_prefs(self.prefs)
+        self.refresh_recent_menu()
+
+    def refresh_recent_menu(self):
+        self.menu_recent.clear()
+        if not self.recent:
+            act = QAction("(None)", self); act.setEnabled(False); self.menu_recent.addAction(act); return
+        for p in self.recent:
+            act = QAction(p, self)
+            act.triggered.connect(lambda checked=False, pp=p: self.open_project_path(pp))
+            self.menu_recent.addAction(act)
+
+    # History
+    def serialize_state(self):
+        devices = []
+        for it in self.layer_devices.childItems():
+            if isinstance(it, DeviceItem): devices.append(it.to_json())
+        wires = []
+        for it in self.layer_wires.childItems():
+            if isinstance(it, WireItem): wires.append(it.to_json())
+        return {"snap": self.scene.snap_enabled, "grid": int(self.scene.grid_size),
+                "underlay": {"scale": float(self.underlay_scale), "opacity": float(self.underlay_opacity)},
+                "devices": devices, "wires": wires}
+
+    def load_state(self, data):
+        for it in list(self.layer_devices.childItems()): it.scene().removeItem(it)
+        for it in list(self.layer_wires.childItems()): it.scene().removeItem(it)
+        self.scene.snap_enabled = bool(data.get("snap", True)); self.snap_action.setChecked(self.scene.snap_enabled)
+        self.scene.grid_size = int(data.get("grid", DEFAULT_GRID_SIZE)); self.spin_grid.setValue(self.scene.grid_size)
+        u = data.get("underlay", {}) or {}
+        self.underlay_scale = float(u.get("scale", 1.0)); self.underlay_opacity = float(u.get("opacity", 1.0))
+        self.opacity_slider.setValue(int(self.underlay_opacity*100)); self.layer_underlay.setOpacity(self.underlay_opacity); self.layer_underlay.setScale(self.underlay_scale)
+        for d in data.get("devices", []):
+            it = DeviceItem(float(d["x"]), float(d["y"]), str(d["symbol"]), str(d["name"]), d.get("manufacturer",""), d.get("part_number","")); it.setParentItem(self.layer_devices)
+        for w in data.get("wires", []):
+            it = WireItem(QPointF(float(w["ax"]), float(w["ay"])), QPointF(float(w["bx"]), float(w["by"]))); it.setParentItem(self.layer_wires)
+        self.fit_view_to_content()
+        self.update_missing_underlay_banner(data)
+
+    def push_history(self):
+        if self.history_index < len(self.history)-1: self.history = self.history[:self.history_index+1]
+        self.history.append(self.serialize_state()); self.history_index += 1
+
+    def undo(self):
+        if self.history_index > 0:
+            self.history_index -= 1; self.load_state(self.history[self.history_index]); self.statusBar().showMessage("Undo")
+
+    def redo(self):
+        if self.history_index < len(self.history)-1:
+            self.history_index += 1; self.load_state(self.history[self.history_index]); self.statusBar().showMessage("Redo")
+
+    # UI actions
+    def choose_device(self, item: QListWidgetItem):
+        proto = item.data(Qt.UserRole); self.view.set_current_device(proto)
+        self.statusBar().showMessage(f"Selected: {proto['name']} [{proto['symbol']}] — click to place.")
+
+    def toggle_snap(self, v): self.scene.snap_enabled = v; self.prefs["snap"]=v; save_prefs(self.prefs); self.statusBar().showMessage(f"Snap {'ON' if v else 'OFF'}")
+    def toggle_grid(self, v): self.scene.show_grid = v; self.scene.update(); self.statusBar().showMessage(f"Grid {'ON' if v else 'OFF'}")
+    def toggle_wiring(self, v): self.view.wire_mode = v; self.view.calibrate_mode = False; self.act_calib.setChecked(False); self.statusBar().showMessage(f"Wiring {'ON' if v else 'OFF'}")
+    def toggle_calibrate(self, v): self.view.calibrate_mode = v; self.view.wire_mode = False; self.act_wiring.setChecked(False); self.statusBar().showMessage("Calibration mode: pick two points" if v else "Calibration off")
+    def toggle_coverage_preview(self, v): self.view.coverage_preview = v; self.statusBar().showMessage(f"Coverage preview {'ON' if v else 'OFF'} (stub)")
+
+    def canvas_menu(self, pos):
+        m = QMenu(self)
+        a = QAction("Clear Underlay", self); a.triggered.connect(self.clear_underlay); m.addAction(a)
+        sel = self.view.scene().selectedItems()
+        if sel and isinstance(sel[0], DeviceItem):
+            b = QAction("Edit Device Properties…", self); b.triggered.connect(lambda: self.edit_device(sel[0])); m.addAction(b)
+        m.exec(self.view.mapToGlobal(pos))
+
+    # CAD helpers
+    def change_grid_size(self, v):
+        self.scene.grid_size = int(v); self.prefs["grid"]=int(v); save_prefs(self.prefs); self.scene.update()
+
+    def change_underlay_opacity(self, v):
+        self.underlay_opacity = max(0.2, min(1.0, v/100.0)); self.layer_underlay.setOpacity(self.underlay_opacity)
+        self.prefs["underlay_opacity"]=self.underlay_opacity; save_prefs(self.prefs)
+
+    def fit_view_to_content(self):
+        rect = self.scene.itemsBoundingRect()
+        if rect.isValid():
+            padded = rect.marginsAdded(QMarginsF(50,50,50,50)); self.view.fitInView(padded, Qt.KeepAspectRatio)
+
+    # Underlay
+    def clear_underlay(self):
+        for it in list(self.layer_underlay.childItems()): it.scene().removeItem(it)
+        self.current_underlay_path = None
+        self.update_missing_underlay_banner(self.serialize_state())
+
+    def _build_underlay_path(self, msp):
+        path = QPainterPath()
+        for e in msp:
+            t = e.dxftype()
+            if t=="LINE":
+                sx,sy,_ = e.dxf.start; ex,ey,_=e.dxf.end
+                path.moveTo(float(sx), float(sy)); path.lineTo(float(ex), float(ey))
+            elif t=="CIRCLE":
+                cx,cy,_=e.dxf.center; r=float(e.dxf.radius); rect=QtCore.QRectF(cx-r, cy-r, 2*r, 2*r); path.addEllipse(rect)
+            elif t=="ARC":
+                cx,cy,_=e.dxf.center; r=float(e.dxf.radius)
+                start=float(e.dxf.start_angle); end=float(e.dxf.end_angle); rect=QtCore.QRectF(cx-r, cy-r, 2*r, 2*r)
+                path.arcMoveTo(rect, start); path.arcTo(rect, start, end-start)
+        return path
+
+    def _apply_underlay_path(self, path):
+        for it in list(self.layer_underlay.childItems()): it.scene().removeItem(it)
+        pen = QPen(Qt.darkGray); pen.setCosmetic(True); pen.setWidthF(0)
+        it = QGraphicsPathItem(path); it.setPen(pen); it.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, False); it.setParentItem(self.layer_underlay)
+        self.layer_underlay.setOpacity(self.underlay_opacity); self.layer_underlay.setScale(self.underlay_scale)
+
+    def _load_underlay(self, path):
+        doc = ezdxf.readfile(path); msp = doc.modelspace(); p = self._build_underlay_path(msp); self._apply_underlay_path(p)
+        self.current_underlay_path = path
+        self.update_missing_underlay_banner(self.serialize_state())
+
+    def import_dxf_underlay(self):
+        p, _ = QFileDialog.getOpenFileName(self, "Import DXF Underlay", "", "DXF Files (*.dxf)")
+        if not p: return
+        scale, ok = QtWidgets.QInputDialog.getDouble(self, "Underlay Scale", "Enter display scale (1 unit × scale):", float(self.prefs.get("underlay_scale",1.0)), 0.01, 1000.0, 2)
+        if not ok: return
+        self.underlay_scale = float(scale); self.prefs["underlay_scale"]=self.underlay_scale; save_prefs(self.prefs)
+        try:
+            self._load_underlay(p); self.fit_view_to_content(); self.statusBar().showMessage(f"Underlay loaded: {os.path.basename(p)} (scale {self.underlay_scale})")
+            self.push_history()
+        except Exception as ex:
+            QMessageBox.critical(self, "DXF Underlay Error", str(ex))
+
+    def relink_underlay(self):
+        p, _ = QFileDialog.getOpenFileName(self, "Re-link DXF Underlay", "", "DXF Files (*.dxf)")
+        if not p: return
+        try:
+            self._load_underlay(p); self.fit_view_to_content(); self.statusBar().showMessage(f"Underlay linked: {os.path.basename(p)}")
+        except Exception as ex:
+            QMessageBox.critical(self, "Re-link Error", str(ex))
+
+    def update_missing_underlay_banner(self, state):
+        has_devices = bool(state.get("devices"))
+        has_underlay = any(isinstance(it, QGraphicsPathItem) for it in self.layer_underlay.childItems())
+        self.banner.setVisible(has_devices and not has_underlay)
+
+    # Calibration
+    def finish_calibration(self, p1: QPointF, p2: QPointF):
+        dlg = QDialog(self); dlg.setWindowTitle("Calibrate Distance")
+        layout = QVBoxLayout(dlg)
+        layout.addWidget(QLabel("Enter real distance between the two picked points:"))
+        tabs = QtWidgets.QTabWidget()
+
+        w_ft = QWidget(); l1 = QHBoxLayout(w_ft)
+        sp_ft = QtWidgets.QSpinBox(); sp_ft.setRange(0, 100000)
+        sp_in = QDoubleSpinBox(); sp_in.setRange(0, 12); sp_in.setDecimals(2)
+        l1.addWidget(QLabel("Feet")); l1.addWidget(sp_ft); l1.addWidget(QLabel("Inches")); l1.addWidget(sp_in)
+        w_ft.setLayout(l1)
+
+        w_m = QWidget(); l2 = QHBoxLayout(w_m)
+        sp_m = QDoubleSpinBox(); sp_m.setRange(0, 100000); sp_m.setDecimals(3)
+        l2.addWidget(QLabel("Meters")); l2.addWidget(sp_m)
+        w_m.setLayout(l2)
+
+        tabs.addTab(w_ft, "Feet/Inches")
+        tabs.addTab(w_m, "Meters")
+        layout.addWidget(tabs)
+        bb = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel); layout.addWidget(bb)
+        bb.accepted.connect(dlg.accept); bb.rejected.connect(dlg.reject)
+        if dlg.exec() != QtWidgets.QDialog.Accepted:
+            self.statusBar().showMessage("Calibration cancelled"); return
+
+        dx = p2.x()-p1.x(); dy = p2.y()-p1.y()
+        scene_dist = (dx*dx + dy*dy) ** 0.5
+
+        if tabs.currentIndex()==0:
+            real_in = sp_ft.value()*12.0 + sp_in.value()
+            if real_in<=0: QtWidgets.QMessageBox.warning(self,"Calibration","Distance must be > 0"); return
+            scale = float(real_in)/float(scene_dist)
+        else:
+            meters = sp_m.value()
+            if meters<=0: QtWidgets.QMessageBox.warning(self,"Calibration","Distance must be > 0"); return
+            scale = float(meters)/float(scene_dist)
+
+        self.underlay_scale = scale
+        self.layer_underlay.setScale(self.underlay_scale)
+        self.statusBar().showMessage(f"Calibrated scale = {self.underlay_scale:.4f}")
+        self.prefs["underlay_scale"]=self.underlay_scale; save_prefs(self.prefs)
+
+    # Save/Open
+    def _serialize_bundle(self):
+        return self.serialize_state()
+
+    def save_project(self):
+        p, _ = QFileDialog.getSaveFileName(self, "Save Project", "project.autofire", "AutoFire Bundle (*.autofire)")
+        if not p: return
+        if not p.lower().endswith(".autofire"): p += ".autofire"
+        data = self._serialize_bundle()
+        try:
+            tmp = tempfile.mkdtemp(prefix="af043a_")
+            with open(os.path.join(tmp, "project.json"), "w", encoding="utf-8") as f: json.dump(data, f, indent=2)
+            if self.current_underlay_path and os.path.exists(self.current_underlay_path):
+                shutil.copyfile(self.current_underlay_path, os.path.join(tmp, "underlay.dxf"))
+            with zipfile.ZipFile(p, "w", zipfile.ZIP_DEFLATED) as z:
+                z.write(os.path.join(tmp, "project.json"), "project.json")
+                dxfp = os.path.join(tmp, "underlay.dxf")
+                if os.path.exists(dxfp): z.write(dxfp, "underlay.dxf")
+            shutil.rmtree(tmp, ignore_errors=True)
+            self.add_recent(p)
+            self.statusBar().showMessage(f"Saved project: {os.path.basename(p)}")
+        except Exception as ex:
+            QtWidgets.QMessageBox.critical(self, "Save Project Error", str(ex))
+
+    def open_project_path(self, p):
+        try:
+            with zipfile.ZipFile(p, "r") as z:
+                data = json.loads(z.read("project.json").decode("utf-8"))
+                self.clear_underlay(); self.current_underlay_path = None
+                u = data.get("underlay", {}) or {}
+                self.underlay_scale = float(u.get("scale", 1.0)); self.underlay_opacity = float(u.get("opacity", 1.0))
+                self.opacity_slider.setValue(int(self.underlay_opacity*100))
+                if "underlay.dxf" in z.namelist():
+                    tmp = tempfile.mkdtemp(prefix="af043a_open_"); dxfp = os.path.join(tmp, "underlay.dxf")
+                    with z.open("underlay.dxf") as src, open(dxfp, "wb") as dst: shutil.copyfileobj(src, dst)
+                    self._load_underlay(dxfp)
+                self.load_state(data)
+                self.push_history()
+                self.add_recent(p)
+                self.statusBar().showMessage(f"Opened: {os.path.basename(p)}")
+        except Exception as ex:
+            QtWidgets.QMessageBox.critical(self, "Open Project Error", str(ex))
+
+    def open_project(self):
+        p, _ = QFileDialog.getOpenFileName(self, "Open Project", "", "AutoFire Bundle (*.autofire)")
+        if not p: return
+        self.open_project_path(p)
+
+    # Output
+    def export_bom_csv(self):
+        p, _ = QFileDialog.getSaveFileName(self, "Export BOM", "bom.csv", "CSV Files (*.csv)")
+        if not p: return
+        counts = {}
+        for it in self.layer_devices.childItems():
+            if isinstance(it, DeviceItem):
+                key = (it.manufacturer or "", it.part_number or "", it.name or "")
+                counts[key] = counts.get(key, 0) + 1
+        try:
+            with open(p, "w", newline="", encoding="utf-8") as f:
+                w = csv.writer(f)
+                w.writerow(["Manufacturer", "Part Number", "Device Type", "Count"])
+                for (mfr, pn, dtype), cnt in sorted(counts.items(), key=lambda x: (x[0][0], x[0][1], x[0][2])):
+                    w.writerow([mfr, pn, dtype, cnt])
+            self.statusBar().showMessage(f"BOM exported: {os.path.basename(p)}")
+        except Exception as ex:
+            QtWidgets.QMessageBox.critical(self, "BOM Export Error", str(ex))
+
+    def _render_current_view_to_image(self, target_w=3000):
+        rect = self.scene.itemsBoundingRect().marginsAdded(QMarginsF(10,10,10,10))
+        if not rect.isValid(): rect = QtCore.QRectF(0,0,800,600)
+        aspect = rect.width()/max(1.0, rect.height())
+        w = int(target_w); h = int(w/aspect)
+        img = QImage(w, h, QImage.Format_ARGB32); img.fill(Qt.white)
+        p = QtGui.QPainter(img); p.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing)
+        self.view.render(p, QtCore.QRectF(0,0,w,h), rect, Qt.KeepAspectRatio); p.end()
+        return img
+
+    def export_view_png(self):
+        p, _ = QFileDialog.getSaveFileName(self, "Export View (PNG)", "sheet.png", "PNG Files (*.png)")
+        if not p: return
+        img = self._render_current_view_to_image()
+        ok = img.save(p, "PNG")
+        if ok: self.statusBar().showMessage(f"PNG exported: {os.path.basename(p)}")
+        else: QtWidgets.QMessageBox.critical(self, "Export PNG Error", "Failed to save PNG")
+
+    def export_view_pdf(self):
+        try:
+            from reportlab.lib.units import inch
+            from reportlab.pdfgen import canvas as pdfcanvas
+            from reportlab.lib.utils import ImageReader
+        except Exception:
+            QtWidgets.QMessageBox.critical(self, "PDF Export Error", "ReportLab is not installed. Run: pip install reportlab"); return
+
+        sizes = {
+            "Letter (8.5 x 11 in)": (8.5, 11),
+            "Arch C (18 x 24 in)": (18, 24),
+            "Arch D (24 x 36 in)": (24, 36),
+            "Arch E1 (30 x 42 in)": (30, 42),
+        }
+        items = list(sizes.keys())
+        sel, ok = QtWidgets.QInputDialog.getItem(self, "Export PDF", "Choose page size:", items, items.index("Arch D (24 x 36 in)"), False)
+        if not ok: return
+        w_in, h_in = sizes[sel]
+
+        today = datetime.date.today().strftime("%Y-%m-%d")
+        dlg = QDialog(self); dlg.setWindowTitle("Title Block (optional)")
+        form = QFormLayout(dlg)
+        e_proj = QtWidgets.QLineEdit("Project"); e_des = QtWidgets.QLineEdit("Designer"); e_date = QtWidgets.QLineEdit(today)
+        form.addRow("Project:", e_proj); form.addRow("Designer:", e_des); form.addRow("Date:", e_date)
+        bb = QtWidgets.QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel); form.addRow(bb)
+        bb.accepted.connect(dlg.accept); bb.rejected.connect(dlg.reject)
+        if dlg.exec() != QtWidgets.QDialog.Accepted:
+            proj = ""; des = ""; dat = ""
+        else:
+            proj = e_proj.text().strip(); des = e_des.text().strip(); dat = e_date.text().strip()
+
+        pth, _ = QFileDialog.getSaveFileName(self, "Export View (PDF)", "sheet.pdf", "PDF Files (*.pdf)")
+        if not pth: return
+
+        img = self._render_current_view_to_image(target_w=3500)
+        tmp_png = os.path.join(tempfile.gettempdir(), "af_export.png"); img.save(tmp_png, "PNG")
+
+        dpi = 72.0; page_w = w_in * dpi; page_h = h_in * dpi
+        c = pdfcanvas.Canvas(pth, pagesize=(page_w, page_h))
+
+        margin = 0.5 * dpi
+        img_w = page_w - 2*margin; img_h = page_h - 2*margin
+
+        im = ImageReader(tmp_png)
+        iw, ih = img.width(), img.height()
+        aspect = iw/ih
+        draw_w = img_w; draw_h = draw_w/aspect
+        if draw_h > img_h:
+            draw_h = img_h; draw_w = draw_h * aspect
+
+        x = (page_w - draw_w) / 2; y = (page_h - draw_h) / 2
+        c.drawImage(im, x, y, width=draw_w, height=draw_h)
+
+        tb_margin = 0.35 * dpi
+        tb_x = page_w - margin - 4.5*inch
+        tb_y = margin - 0.1*inch
+        c.setFont("Helvetica", 10)
+        if proj or des or dat:
+            c.rect(tb_x, tb_y, 4.5*inch, 0.9*inch)
+            c.drawString(tb_x+tb_margin, tb_y+0.6*inch, f"Project: {proj}")
+            c.drawString(tb_x+tb_margin, tb_y+0.35*inch, f"Designer: {des}")
+            c.drawString(tb_x+tb_margin, tb_y+0.1*inch, f"Date: {dat}")
+
+        c.showPage(); c.save()
+        self.statusBar().showMessage(f"PDF exported: {os.path.basename(pth)}")
+
+    # Device props / help
+    def edit_device(self, dev_item: "DeviceItem"):
+        dlg = QtWidgets.QDialog(self); dlg.setWindowTitle("Device Properties")
+        layout = QtWidgets.QVBoxLayout(dlg)
+        e_name = QtWidgets.QLineEdit(dev_item.name); e_symbol = QtWidgets.QLineEdit(dev_item.symbol)
+        e_mfr = QtWidgets.QLineEdit(dev_item.manufacturer); e_pn = QtWidgets.QLineEdit(dev_item.part_number)
+        form = QtWidgets.QFormLayout()
+        form.addRow("Device Type:", e_name)
+        form.addRow("Symbol:", e_symbol)
+        form.addRow("Manufacturer:", e_mfr)
+        form.addRow("Part Number:", e_pn)
+        layout.addLayout(form)
+        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        layout.addWidget(bb)
+        bb.accepted.connect(dlg.accept); bb.rejected.connect(dlg.reject)
+        if dlg.exec() == QtWidgets.QDialog.Accepted:
+            dev_item.name = e_name.text().strip() or dev_item.name
+            dev_item.symbol = e_symbol.text().strip() or dev_item.symbol
+            dev_item.manufacturer = e_mfr.text().strip()
+            dev_item.part_number = e_pn.text().strip()
+            dev_item.label.setPlainText(dev_item.symbol)
+            self.push_history()
+
+    def show_help(self):
+        text = \"\"\"
+<b>AutoFire 0.4.3-a – Help & Shortcuts</b><br><br>
+<b>Palette Filters</b><br>
+• Manufacturer and Type drop-downs filter the device list (combined with search).<br><br>
+<b>Coverage Preview</b><br>
+• Toolbar toggle only (stub). Rendering of coverage will arrive next patch.<br><br>
+<b>Basics</b><br>
+• Pick a device on the left, click canvas to place. Space+drag to pan. Mouse wheel to zoom.<br>
+        \"\"\"
+        dlg = QtWidgets.QMessageBox(self)
+        dlg.setWindowTitle("AutoFire Help")
+        dlg.setTextFormat(QtCore.Qt.RichText)
+        dlg.setText(text)
+        dlg.exec()
+
+    def export_dxf(self):
+        QtWidgets.QMessageBox.information(self, "Export DXF", "DXF export coming in 0.4.3.")
+
+def main():
+    import sys
+    app = QApplication([])
+    win = MainWindow(); win.show()
+    if len(sys.argv) > 1:
+        QtCore.QTimer.singleShot(0, lambda: win.open_project_path(sys.argv[1]))
+    app.exec()
+
+if __name__ == "__main__":
+    main()
+""".strip()
+with open(os.path.join(app_dir, "main.py"), "w", encoding="utf-8") as f:
+    f.write(main_py)
+
+# CHANGELOG.md
+changelog = f"""
+# AutoFire Changelog
+
+## 0.4.3-a — Palette filters + coverage toggle (stub) — {datetime.date.today().isoformat()}
+- Added **Manufacturer** and **Type** dropdowns above the search box
+- Introduced lightweight **catalog** (`app/catalog.py`) to host device metadata and attributes placeholders
+- Toolbar toggle **Coverage Preview** added (no rendering yet). Next patch will add simple rings for speakers/strobes.
+- Kept patch intentionally small (2 code files changed) for reliability
+""".strip()
+with open(os.path.join(patch_root, "CHANGELOG.md"), "w", encoding="utf-8") as f:
+    f.write(changelog + "\n")
+
+# VERSION.txt
+with open(os.path.join(patch_root, "VERSION.txt"), "w", encoding="utf-8") as f:
+    f.write("0.4.3-a\n")
+
+# Build zip
+zip_path = "/mnt/data/AutoFire_patch_043a.zip"
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    for root, _, files in os.walk(patch_root):
+        for fn in files:
+            p = os.path.join(root, fn)
+            rel = os.path.relpath(p, patch_root)
+            z.write(p, rel)
+
+zip_path
