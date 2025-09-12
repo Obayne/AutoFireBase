@@ -1,0 +1,8 @@
+# Default owner (human) for all files
+* @Obayne
+
+# HAL lead for repo hygiene and CI
+.github/ @Obayne
+AGENTS.md @Obayne
+docs/ @Obayne
+

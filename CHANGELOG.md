@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## Unreleased (CAD Base)
+- Added: DXF underlay import with layer-aware rendering and auto-fit.
+- Added: Draw tools (Line, Rect, Circle, Polyline, Arc-3pt), Wire, Text.
+- Added: Modify tools (Offset Selected…, Trim Lines, Extend Lines, Fillet/Corner, Fillet/Radius, Rotate, Mirror, Scale, Chamfer).
+- Added: Measure tool (temporary readout).
+- Added: OSNAP (Endpoint/Midpoint/Center/Intersection/Perpendicular) with toggles under View.
+- Added: Export PNG/PDF (letter landscape, fit to content).
+- Added: Settings menu with themes (Dark/Light/High Contrast) and improved menu contrast.
+- Improved: Panning (Space or Middle Mouse), Esc commits polyline, sketch/wires included in Save/Open.
+- UI: Keep Draw/Modify in menus; removed CAD toolbars from top bar; status bar shows Grid opacity and Grid size.
+- Added: DXF Layers dock (visibility, color override, lock, print flags).
+- Added: Command Bar (commands + coordinate entry in feet; absolute, relative, polar).
+- Coverage: Placement and global/per-device overlay toggles; Candela mapping for strobes (placeholder).
+- DB: SQLite catalog scaffold (auto-created at %USERPROFILE%/AutoFire/catalog.db); palette loads from DB if present and seeds demo devices.
+- Annotations: MText (scalable) and Freehand sketch tool added.
+- UI: Device Palette is now a dockable panel (tabbed with other docks); Properties and DXF Layers appear as tabs.
+- Underlay: Added scale by reference (two picks + real distance), scale by factor, and scale by drag (anchor + live factor); respect non-print DXF layers on export; underlay transform persists with project.
+
 ## 0.5.3 – coverage + array (2025-09-08 21:04)
 - Restored **Coverage** overlays:
   - Detector circle

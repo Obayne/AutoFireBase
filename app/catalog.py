@@ -1,4 +1,9 @@
-# Minimal, built-in catalog with filters; replace with DB later
+# Minimal catalog; loads from SQLite if available, else builtin
+import os
+try:
+    from db import loader as db_loader
+except Exception:
+    db_loader = None
 def _builtin():
     return [
         {"name":"Smoke Detector", "symbol":"SD", "type":"Detector", "manufacturer":"(Any)", "part_number":"GEN-SD"},
@@ -10,7 +15,17 @@ def _builtin():
     ]
 
 def load_catalog():
-    # In the future, look for a JSON file; for now return builtin
+    if db_loader is not None:
+        try:
+            con = db_loader.connect()
+            db_loader.ensure_schema(con)
+            db_loader.seed_demo(con)
+            devs = db_loader.fetch_devices(con)
+            con.close()
+            if devs:
+                return devs
+        except Exception:
+            pass
     return _builtin()
 
 def list_manufacturers(devs):
