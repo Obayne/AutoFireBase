@@ -1,4 +1,4 @@
-import os, json, zipfile
+﻿import os, json, zipfile
 import sys
 # Allow running as `python app\main.py` by fixing sys.path for absolute `app.*` imports
 if __package__ in (None, ""):
@@ -343,7 +343,7 @@ class CanvasView(QGraphicsView):
                     vec = QtCore.QLineF(p0, sp)
                     length_ft = vec.length()/self.win.px_per_ft
                     ang = vec.angle()  # 0 to 360 CCW from +x in Qt
-                    draw_info = f"  len={length_ft:.2f} ft  ang={ang:.1f}°"
+                    draw_info = f"  len={length_ft:.2f} ft  ang={ang:.1f}Â°"
         except Exception:
             pass
         self.win.statusBar().showMessage(f"x={dx_ft:.2f} ft   y={dy_ft:.2f} ft   scale={self.win.px_per_ft:.2f} px/ft  snap={self.win.snap_label}{draw_info}")
@@ -668,6 +668,9 @@ class MainWindow(QMainWindow):
                 pass
 
         self.view = CanvasView(self.scene, self.layer_devices, self.layer_wires, self.layer_sketch, self.layer_overlay, self)
+        # Distinguish model space visually
+        try: self.view.setBackgroundBrush(QtGui.QColor(20, 22, 26))
+        except Exception: pass
         self.page_frame = None
         self.title_block = None
         self.paper_scene = None
@@ -706,16 +709,16 @@ class MainWindow(QMainWindow):
         menubar = self.menuBar()
         m_file = menubar.addMenu("&File")
         m_file.addAction("New", self.new_project, QtGui.QKeySequence.New)
-        m_file.addAction("Open…", self.open_project, QtGui.QKeySequence.Open)
-        m_file.addAction("Save As…", self.save_project_as, QtGui.QKeySequence.SaveAs)
+        m_file.addAction("Openâ€¦", self.open_project, QtGui.QKeySequence.Open)
+        m_file.addAction("Save Asâ€¦", self.save_project_as, QtGui.QKeySequence.SaveAs)
         m_file.addSeparator()
         imp = m_file.addMenu("Import")
-        imp.addAction("DXF Underlay…", self.import_dxf_underlay)
-        imp.addAction("PDF Underlay…", self.import_pdf_underlay)
+        imp.addAction("DXF Underlayâ€¦", self.import_dxf_underlay)
+        imp.addAction("PDF Underlayâ€¦", self.import_pdf_underlay)
         exp = m_file.addMenu("Export")
-        exp.addAction("PNG…", self.export_png)
-        exp.addAction("PDF…", self.export_pdf)
-        exp.addAction("Device Schedule (CSV)…", self.export_device_schedule_csv)
+        exp.addAction("PNGâ€¦", self.export_png)
+        exp.addAction("PDFâ€¦", self.export_pdf)
+        exp.addAction("Device Schedule (CSV)â€¦", self.export_device_schedule_csv)
         exp.addAction("Place Symbol Legend", self.place_symbol_legend)
         # Settings submenu (moved under File)
         m_settings = m_file.addMenu("Settings")
@@ -755,10 +758,10 @@ class MainWindow(QMainWindow):
 
         # Layout / Paper Space
         m_layout = menubar.addMenu("&Layout")
-        m_layout.addAction("Add Page Frame…", self.add_page_frame)
+        m_layout.addAction("Add Page Frameâ€¦", self.add_page_frame)
         m_layout.addAction("Remove Page Frame", self.remove_page_frame)
-        m_layout.addAction("Add/Update Title Block…", self.add_or_update_title_block)
-        m_layout.addAction("Page Setup…", self.page_setup_dialog)
+        m_layout.addAction("Add/Update Title Blockâ€¦", self.add_or_update_title_block)
+        m_layout.addAction("Page Setupâ€¦", self.page_setup_dialog)
         m_layout.addAction("Add Viewport", self.add_viewport)
         m_layout.addSeparator()
         m_layout.addAction("Switch to Paper Space", lambda: self.toggle_paper_space(True))
@@ -770,30 +773,34 @@ class MainWindow(QMainWindow):
             scale_menu.addAction(act)
         for lbl, v in [("1/16\" = 1'", 1.0/16.0), ("3/32\" = 1'", 3.0/32.0), ("1/8\" = 1'", 1.0/8.0), ("3/16\" = 1'", 3.0/16.0), ("1/4\" = 1'", 0.25), ("3/8\" = 1'", 0.375), ("1/2\" = 1'", 0.5), ("1\" = 1'", 1.0)]:
             add_scale(lbl, v)
-        scale_menu.addAction("Custom…", self.set_print_scale_custom)
+        scale_menu.addAction("Customâ€¦", self.set_print_scale_custom)
+        # Space badge in status bar (right side)
+        self.space_badge = QtWidgets.QLabel("MODEL SPACE")
+        self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
+        self.statusBar().addPermanentWidget(self.space_badge)
         # Underlay tools
         m_underlay = m_layout.addMenu("Underlay")
-        m_underlay.addAction("Scale by Reference…", self.start_underlay_scale_ref)
-        m_underlay.addAction("Scale by Factor…", self.underlay_scale_factor)
-        m_underlay.addAction("Scale by Drag…", self.start_underlay_scale_drag)
+        m_underlay.addAction("Scale by Referenceâ€¦", self.start_underlay_scale_ref)
+        m_underlay.addAction("Scale by Factorâ€¦", self.underlay_scale_factor)
+        m_underlay.addAction("Scale by Dragâ€¦", self.start_underlay_scale_drag)
         m_underlay.addAction("Center Underlay In View", self.center_underlay_in_view)
         m_underlay.addAction("Move Underlay To Origin", self.move_underlay_to_origin)
         m_underlay.addAction("Reset Underlay Transform", self.reset_underlay_transform)
 
         # Modify menu
         m_modify = menubar.addMenu("&Modify")
-        m_modify.addAction("Offset Selected…", self.offset_selected_dialog)
+        m_modify.addAction("Offset Selectedâ€¦", self.offset_selected_dialog)
         m_modify.addAction("Trim Lines", self.start_trim)
         m_modify.addAction("Finish Trim", self.finish_trim)
         m_modify.addAction("Extend Lines", self.start_extend)
         m_modify.addAction("Fillet (Corner)", self.start_fillet)
-        m_modify.addAction("Fillet (Radius)…", self.start_fillet_radius)
+        m_modify.addAction("Fillet (Radius)â€¦", self.start_fillet_radius)
         m_modify.addAction("Move", self.start_move)
         m_modify.addAction("Copy", self.start_copy)
         m_modify.addAction("Rotate", self.start_rotate)
         m_modify.addAction("Mirror", self.start_mirror)
         m_modify.addAction("Scale", self.start_scale)
-        m_modify.addAction("Chamfer…", self.start_chamfer)
+        m_modify.addAction("Chamferâ€¦", self.start_chamfer)
 
         # Help menu
         m_help = menubar.addMenu("&Help")
@@ -814,8 +821,8 @@ class MainWindow(QMainWindow):
         self.act_view_place_cov.toggled.connect(self.toggle_placement_coverage)
         m_view.addAction(self.act_view_place_cov)
         m_view.addSeparator()
-        act_scale = QtGui.QAction("Set Pixels per Foot…", self); act_scale.triggered.connect(self.set_px_per_ft); m_view.addAction(act_scale)
-        act_gridstyle = QtGui.QAction("Grid Style…", self); act_gridstyle.triggered.connect(self.grid_style_dialog); m_view.addAction(act_gridstyle)
+        act_scale = QtGui.QAction("Set Pixels per Footâ€¦", self); act_scale.triggered.connect(self.set_px_per_ft); m_view.addAction(act_scale)
+        act_gridstyle = QtGui.QAction("Grid Styleâ€¦", self); act_gridstyle.triggered.connect(self.grid_style_dialog); m_view.addAction(act_gridstyle)
         # Quick snap step presets (guardrail: snap to fixed inch steps or grid)
         snap_menu = m_view.addMenu("Snap Step")
         def add_snap(label, inches):
@@ -889,7 +896,7 @@ class MainWindow(QMainWindow):
         # Command bar
         cmd_wrap = QWidget(); cmd_l = QHBoxLayout(cmd_wrap); cmd_l.setContentsMargins(6,0,6,0); cmd_l.setSpacing(6)
         cmd_l.addWidget(QLabel("Cmd:"))
-        self.cmd = QLineEdit(); self.cmd.setPlaceholderText("Type command (e.g., L, RECT, MOVE)…")
+        self.cmd = QLineEdit(); self.cmd.setPlaceholderText("Type command (e.g., L, RECT, MOVE)â€¦")
         self.cmd.returnPressed.connect(self._run_command)
         cmd_l.addWidget(self.cmd)
         sb.addPermanentWidget(cmd_wrap, 1)
@@ -910,7 +917,7 @@ class MainWindow(QMainWindow):
         QtGui.QShortcut(QtGui.QKeySequence("Esc"), self, activated=self.cancel_active_tool)
         QtGui.QShortcut(QtGui.QKeySequence("F2"), self, activated=self.fit_view_to_content)
 
-        # Selection change → update Properties
+        # Selection change â†’ update Properties
         self.scene.selectionChanged.connect(self._on_selection_changed)
 
         self.history = []; self.history_index = -1
@@ -1011,7 +1018,7 @@ class MainWindow(QMainWindow):
     def _build_left_panel(self):
         # Device Palette as dockable panel
         left = QWidget(); ll = QVBoxLayout(left)
-        self.search = QLineEdit(); self.search.setPlaceholderText("Search name / part number…")
+        self.search = QLineEdit(); self.search.setPlaceholderText("Search name / part numberâ€¦")
         self.cmb_mfr = QComboBox(); self.cmb_type = QComboBox()
         ll_top = QHBoxLayout(); ll_top.addWidget(QLabel("Manufacturer:")); ll_top.addWidget(self.cmb_mfr)
         ll_typ = QHBoxLayout(); ll_typ.addWidget(QLabel("Type:")); ll_typ.addWidget(self.cmb_type)
@@ -1032,7 +1039,7 @@ class MainWindow(QMainWindow):
         self.list.itemClicked.connect(self.choose_device)
         self._refresh_device_list()
 
-        # OSNAP initial states are wired in View → Object Snaps
+        # OSNAP initial states are wired in View â†’ Object Snaps
 
         # CAD-style shortcuts
         QtGui.QShortcut(QtGui.QKeySequence("L"), self, activated=lambda: (setattr(self.draw,'layer', self.layer_sketch), self.draw.set_mode(draw_tools.DrawMode.LINE)))
@@ -1100,7 +1107,7 @@ class MainWindow(QMainWindow):
         v.addWidget(self.lst_dxf)
         # Controls row
         row1 = QHBoxLayout();
-        self.btn_dxf_color = QPushButton("Set Color…"); self.btn_dxf_reset = QPushButton("Reset Color")
+        self.btn_dxf_color = QPushButton("Set Colorâ€¦"); self.btn_dxf_reset = QPushButton("Reset Color")
         row1.addWidget(self.btn_dxf_color); row1.addWidget(self.btn_dxf_reset)
         wrap1 = QWidget(); wrap1.setLayout(row1); v.addWidget(wrap1)
         # Flags row
@@ -1432,9 +1439,9 @@ class MainWindow(QMainWindow):
         if dev_sel:
             menu.addSeparator()
             d = dev_sel[0]
-            act_cov = menu.addAction("Coverage…")
+            act_cov = menu.addAction("Coverageâ€¦")
             act_tog = menu.addAction("Toggle Coverage On/Off")
-            act_lbl = menu.addAction("Edit Label…")
+            act_lbl = menu.addAction("Edit Labelâ€¦")
 
         # Scene actions
         menu.addSeparator()
@@ -2346,6 +2353,7 @@ class MainWindow(QMainWindow):
         if getattr(self, 'paper_scene', None):
             return
         sc = QtWidgets.QGraphicsScene()
+        sc.setBackgroundBrush(QtGui.QColor(250, 250, 250))
         # page frame and title block (reuse prefs)
         pf = PageFrame(self.px_per_ft, size_name=self.prefs.get('page_size','Letter'), orientation=self.prefs.get('page_orient','Landscape'), margin_in=self.prefs.get('page_margin_in',0.5))
         sc.addItem(pf)
@@ -2475,44 +2483,44 @@ class MainWindow(QMainWindow):
 
 # Inline help content (can be moved to a file later)
 _USER_GUIDE_TEXT = """
-Auto-Fire CAD Base — User Guide (Quick)
+Auto-Fire CAD Base â€” User Guide (Quick)
 
-• Pan: Hold Space + Left Drag, or Middle-mouse Drag
-• Zoom: Mouse wheel
-• Select: Click items, or Drag a box in empty space
-• Delete: Del key or Edit → Delete
+â€¢ Pan: Hold Space + Left Drag, or Middle-mouse Drag
+â€¢ Zoom: Mouse wheel
+â€¢ Select: Click items, or Drag a box in empty space
+â€¢ Delete: Del key or Edit â†’ Delete
 
-Draw (Tools menu): Line, Rect, Circle, Polyline, Arc (3‑Point), Wire, Text
+Draw (Tools menu): Line, Rect, Circle, Polyline, Arc (3â€‘Point), Wire, Text
 
 Modify (Modify menu): Offset, Trim, Extend, Fillet (Corner), Move, Copy, Rotate, Mirror, Scale, Chamfer
 
-Measure/Dimension: Tools → Measure, Dimension (D)
+Measure/Dimension: Tools â†’ Measure, Dimension (D)
 
-Snaps: View → Object Snaps (Endpoint, Midpoint, Center)
+Snaps: View â†’ Object Snaps (Endpoint, Midpoint, Center)
 
-Underlays: File → Import → DXF/PDF Underlay
+Underlays: File â†’ Import â†’ DXF/PDF Underlay
 
-Paper Space: Layout → Add Page Frame, Print Scale presets, Export PNG/PDF
+Paper Space: Layout â†’ Add Page Frame, Print Scale presets, Export PNG/PDF
 
-Settings: File → Settings → Theme
+Settings: File â†’ Settings â†’ Theme
 """
 
 _SHORTCUTS_TEXT = """
 Keyboard Shortcuts
 
-• L Line
-• R Rect
-• C Circle
-• P Polyline
-• A Arc (3‑Point)
-• W Wire
-• T Text
-• M Measure
-• O Offset
-• D Dimension
-• X Toggle Crosshair
-• Esc Cancel/Finish
-• F2 Fit View
+â€¢ L Line
+â€¢ R Rect
+â€¢ C Circle
+â€¢ P Polyline
+â€¢ A Arc (3â€‘Point)
+â€¢ W Wire
+â€¢ T Text
+â€¢ M Measure
+â€¢ O Offset
+â€¢ D Dimension
+â€¢ X Toggle Crosshair
+â€¢ Esc Cancel/Finish
+â€¢ F2 Fit View
 """
 
 # factory for boot.py
