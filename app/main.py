@@ -760,6 +760,9 @@ class MainWindow(QMainWindow):
         m_layout.addAction("Add/Update Title Block…", self.add_or_update_title_block)
         m_layout.addAction("Page Setup…", self.page_setup_dialog)
         m_layout.addAction("Add Viewport", self.add_viewport)
+        m_layout.addSeparator()
+        m_layout.addAction("Switch to Paper Space", lambda: self.toggle_paper_space(True))
+        m_layout.addAction("Switch to Model Space", lambda: self.toggle_paper_space(False))
         scale_menu = m_layout.addMenu("Print Scale")
         def add_scale(label, inches_per_ft):
             act = QtGui.QAction(label, self)
