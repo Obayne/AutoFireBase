@@ -686,6 +686,8 @@ class MainWindow(QMainWindow):
         except Exception: pass
         self.page_frame = None
         self.title_block = None
+        # Sheet manager: list of {name, scene}; paper_scene points to current sheet
+        self.sheets = []
         self.paper_scene = None
         self.in_paper_space = False
         # Auto-add a default page frame on first run (can be removed via Layout menu)
@@ -795,6 +797,9 @@ class MainWindow(QMainWindow):
         self.space_badge = QtWidgets.QLabel("MODEL SPACE")
         self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
         self.statusBar().addPermanentWidget(self.space_badge)
+        # Sheet Manager dock and export
+        self._init_sheet_manager()
+        m_layout.addAction("Export Sheets to PDF...", self.export_sheets_pdf)
         # Underlay tools
         m_underlay = m_tools.addMenu("Underlay")
         m_underlay.addAction("Scale by Referenceâ€¦", self.start_underlay_scale_ref)
@@ -2375,14 +2380,28 @@ class MainWindow(QMainWindow):
         pf = PageFrame(self.px_per_ft, size_name=self.prefs.get('page_size','Letter'), orientation=self.prefs.get('page_orient','Landscape'), margin_in=self.prefs.get('page_margin_in',0.5))
         sc.addItem(pf)
         inner = pf._inner.rect()
-        vp = ViewportItem(self.scene, inner.adjusted(10,10,-10,-10), self)\n        try:\n            mbr = self.scene.itemsBoundingRect()\n            if mbr.width() > 0 and mbr.height() > 0 and inner.width() > 0 and inner.height() > 0:\n                fx = (mbr.width() / inner.width()) * 1.1\n                fy = (mbr.height() / inner.height()) * 1.1\n                vp.scale_factor = max(fx, fy)\n                vp.src_center = mbr.center()\n        except Exception:\n            pass\n        sc.addItem(vp)
+        vp = ViewportItem(self.scene, inner.adjusted(10, 10, -10, -10), self)
+        try:
+            mbr = self.scene.itemsBoundingRect()
+            if mbr.width() > 0 and mbr.height() > 0 and inner.width() > 0 and inner.height() > 0:
+                fx = (mbr.width() / inner.width()) * 1.1
+                fy = (mbr.height() / inner.height()) * 1.1
+                vp.scale_factor = max(fx, fy)
+                vp.src_center = mbr.center()
+        except Exception:
+            pass
+        sc.addItem(vp)
         meta = {
             'project': self.prefs.get('proj_project',''), 'address': self.prefs.get('proj_address',''),
             'sheet': self.prefs.get('proj_sheet',''), 'date': self.prefs.get('proj_date',''), 'by': self.prefs.get('proj_by','')
         }
         tb = TitleBlock(self.px_per_ft, size_name=self.prefs.get('page_size','Letter'), orientation=self.prefs.get('page_orient','Landscape'), meta=meta)
         sc.addItem(tb)
+        # Register first sheet if none exists
+        if not self.sheets:
+            self.sheets.append({"name": "Sheet 1", "scene": sc})
         self.paper_scene = sc
+        self._refresh_sheets_list()
 
     def add_viewport(self):
         if not self.in_paper_space:
@@ -2391,7 +2410,17 @@ class MainWindow(QMainWindow):
             self._ensure_paper_scene()
         # add a new viewport in the center
         rect = QtCore.QRectF(100, 100, 600, 400)
-        vp = ViewportItem(self.scene, rect, self)\n        try:\n            mbr = self.scene.itemsBoundingRect()\n            if mbr.width() > 0 and mbr.height() > 0 and rect.width() > 0 and rect.height() > 0:\n                fx = (mbr.width() / rect.width()) * 1.1\n                fy = (mbr.height() / rect.height()) * 1.1\n                vp.scale_factor = max(fx, fy)\n                vp.src_center = mbr.center()\n        except Exception:\n            pass\n        self.paper_scene.addItem(vp)
+        vp = ViewportItem(self.scene, rect, self)
+        try:
+            mbr = self.scene.itemsBoundingRect()
+            if mbr.width() > 0 and mbr.height() > 0 and rect.width() > 0 and rect.height() > 0:
+                fx = (mbr.width() / rect.width()) * 1.1
+                fy = (mbr.height() / rect.height()) * 1.1
+                vp.scale_factor = max(fx, fy)
+                vp.src_center = mbr.center()
+        except Exception:
+            pass
+        self.paper_scene.addItem(vp)
         self.statusBar().showMessage("Viewport added")
 
     def toggle_paper_space(self, on: bool):
@@ -2410,6 +2439,11 @@ class MainWindow(QMainWindow):
                 self.view.setBackgroundBrush(QtGui.QColor(250, 250, 250))
             except Exception:
                 pass
+            # Update sheet list selection to current scene
+            try:
+                self._refresh_sheets_list()
+            except Exception:
+                pass
         else:
             self.view.setScene(self.scene)
             # Update badges and background
@@ -2423,6 +2457,131 @@ class MainWindow(QMainWindow):
             except Exception:
                 pass
         self.fit_view_to_content()
+
+    # ---------- sheet manager ----------
+    def _init_sheet_manager(self):
+        dock = QtWidgets.QDockWidget("Sheets", self)
+        w = QtWidgets.QWidget(); lay = QtWidgets.QVBoxLayout(w)
+        self.lst_sheets = QtWidgets.QListWidget()
+        btns = QtWidgets.QHBoxLayout()
+        b_add = QtWidgets.QPushButton("Add")
+        b_ren = QtWidgets.QPushButton("Rename")
+        b_del = QtWidgets.QPushButton("Delete")
+        b_up  = QtWidgets.QPushButton("Up")
+        b_dn  = QtWidgets.QPushButton("Down")
+        btns.addWidget(b_add); btns.addWidget(b_ren); btns.addWidget(b_del); btns.addWidget(b_up); btns.addWidget(b_dn)
+        lay.addWidget(self.lst_sheets); lay.addLayout(btns)
+        dock.setWidget(w)
+        self.addDockWidget(Qt.RightDockWidgetArea, dock)
+        # Wire
+        b_add.clicked.connect(self.sheet_add)
+        b_ren.clicked.connect(self.sheet_rename)
+        b_del.clicked.connect(self.sheet_delete)
+        b_up.clicked.connect(lambda: self.sheet_move(-1))
+        b_dn.clicked.connect(lambda: self.sheet_move(+1))
+        self.lst_sheets.currentRowChanged.connect(self.sheet_switch)
+        self._refresh_sheets_list()
+
+    def _refresh_sheets_list(self):
+        if not hasattr(self, 'lst_sheets'):
+            return
+        self.lst_sheets.clear()
+        for s in self.sheets:
+            self.lst_sheets.addItem(s.get("name", "Sheet"))
+        if self.paper_scene:
+            try:
+                idx = next((i for i,s in enumerate(self.sheets) if s.get("scene") is self.paper_scene), 0)
+                self.lst_sheets.setCurrentRow(idx)
+            except Exception:
+                pass
+
+    def sheet_add(self):
+        name, ok = QtWidgets.QInputDialog.getText(self, "New Sheet", "Sheet name", text=f"Sheet {len(self.sheets)+1}")
+        if not ok:
+            return
+        sc = QtWidgets.QGraphicsScene(); sc.setBackgroundBrush(QtGui.QColor(250,250,250))
+        pf = PageFrame(self.px_per_ft, size_name=self.prefs.get('page_size','Letter'), orientation=self.prefs.get('page_orient','Landscape'), margin_in=self.prefs.get('page_margin_in',0.5))
+        sc.addItem(pf)
+        tb = TitleBlock(self.px_per_ft, size_name=self.prefs.get('page_size','Letter'), orientation=self.prefs.get('page_orient','Landscape'), meta={})
+        sc.addItem(tb)
+        self.sheets.append({"name": name or "Sheet", "scene": sc})
+        self._refresh_sheets_list()
+
+    def sheet_rename(self):
+        idx = self.lst_sheets.currentRow()
+        if idx < 0 or idx >= len(self.sheets):
+            return
+        cur = self.sheets[idx]["name"]
+        name, ok = QtWidgets.QInputDialog.getText(self, "Rename Sheet", "New name", text=cur)
+        if ok and name:
+            self.sheets[idx]["name"] = name
+            self._refresh_sheets_list()
+
+    def sheet_delete(self):
+        idx = self.lst_sheets.currentRow()
+        if idx < 0 or idx >= len(self.sheets):
+            return
+        if len(self.sheets) <= 1:
+            QtWidgets.QMessageBox.warning(self, "Sheets", "At least one sheet is required.")
+            return
+        del self.sheets[idx]
+        if idx >= len(self.sheets):
+            idx = len(self.sheets)-1
+        self.paper_scene = self.sheets[idx]["scene"]
+        if self.in_paper_space:
+            self.view.setScene(self.paper_scene)
+        self._refresh_sheets_list()
+
+    def sheet_move(self, delta: int):
+        idx = self.lst_sheets.currentRow()
+        j = idx + int(delta)
+        if idx < 0 or j < 0 or j >= len(self.sheets):
+            return
+        self.sheets[idx], self.sheets[j] = self.sheets[j], self.sheets[idx]
+        self._refresh_sheets_list()
+        self.lst_sheets.setCurrentRow(j)
+
+    def sheet_switch(self, idx: int):
+        if idx < 0 or idx >= len(self.sheets):
+            return
+        self.paper_scene = self.sheets[idx]["scene"]
+        if self.in_paper_space:
+            self.view.setScene(self.paper_scene)
+
+    def export_sheets_pdf(self):
+        if not self.sheets:
+            QtWidgets.QMessageBox.information(self, "Export", "No sheets to export.")
+            return
+        p, _ = QFileDialog.getSaveFileName(self, "Export Sheets to PDF", "", "PDF Files (*.pdf)")
+        if not p:
+            return
+        try:
+            # Prepare writer
+            writer = QtGui.QPdfWriter(p)
+            writer.setResolution(int(self.prefs.get('print_dpi', 300)))
+            painter = QtGui.QPainter(writer)
+            first = True
+            for sheet in self.sheets:
+                sc = sheet["scene"]
+                # Set page size from prefs
+                size_in = PAGE_SIZES.get(self.prefs.get('page_size','Letter'), PAGE_SIZES['Letter'])
+                orient = self.prefs.get('page_orient','Landscape')
+                if (orient or 'Landscape').lower().startswith('land'):
+                    w_in, h_in = size_in[1], size_in[0]
+                else:
+                    w_in, h_in = size_in
+                w_mm = w_in * 25.4; h_mm = h_in * 25.4
+                page_size = QtGui.QPageSize(QtCore.QSizeF(w_mm, h_mm), QtGui.QPageSize.Millimeter)
+                writer.setPageSize(page_size)
+                if not first:
+                    writer.newPage()
+                first = False
+                target = QtCore.QRectF(0, 0, writer.width(), writer.height())
+                sc.render(painter, target, sc.itemsBoundingRect())
+            painter.end()
+            self.statusBar().showMessage(f"Exported {len(self.sheets)} sheet(s) to PDF")
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Export", f"Failed to export PDF: {e}")
 
     def remove_page_frame(self):
         if self.page_frame and self.page_frame.scene():
