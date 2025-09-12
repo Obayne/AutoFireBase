@@ -660,6 +660,12 @@ class MainWindow(QMainWindow):
         self.layer_wires    = QtWidgets.QGraphicsItemGroup(); self.layer_wires.setZValue(60);    self.scene.addItem(self.layer_wires)
         self.layer_devices  = QtWidgets.QGraphicsItemGroup(); self.layer_devices.setZValue(100);  self.scene.addItem(self.layer_devices)
         self.layer_overlay  = QtWidgets.QGraphicsItemGroup(); self.layer_overlay.setZValue(200);  self.scene.addItem(self.layer_overlay)
+        # Allow child items to receive mouse events for selection and dragging
+        for grp in (self.layer_underlay, self.layer_sketch, self.layer_wires, self.layer_devices, self.layer_overlay):
+            try:
+                grp.setHandlesChildEvents(False)
+            except Exception:
+                pass
 
         self.view = CanvasView(self.scene, self.layer_devices, self.layer_wires, self.layer_sketch, self.layer_overlay, self)
         self.page_frame = None
