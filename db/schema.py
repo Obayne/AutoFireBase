@@ -33,4 +33,17 @@ def ensure_db(path: str):
         FOREIGN KEY(type_id) REFERENCES device_types(id)
     );
     """)
+    # Optional structured specs for common calculations
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS device_specs(
+        device_id INTEGER PRIMARY KEY,
+        strobe_candela REAL,
+        speaker_db_at10ft REAL,
+        smoke_spacing_ft REAL,
+        current_a REAL,
+        voltage_v REAL,
+        notes TEXT,
+        FOREIGN KEY(device_id) REFERENCES devices(id)
+    );
+    """)
     con.commit(); con.close()

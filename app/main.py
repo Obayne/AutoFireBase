@@ -1119,6 +1119,7 @@ class MainWindow(QMainWindow):
         self.prop_mode.currentTextChanged.connect(self._on_mode_changed_props)
 
         panel.setLayout(form); dock.setWidget(panel); self.addDockWidget(Qt.RightDockWidgetArea, dock)
+        self.sheets_dock = dock\n        dock.setVisible(False)
         self.dock_layers_props = dock
 
     def _enable_props(self, on: bool):
@@ -2757,4 +2758,5 @@ if __name__ == "__main__":
             return
         # 0 = Model, 1 = Paper
         self.toggle_paper_space(idx == 1)
+
 
