@@ -2375,8 +2375,7 @@ class MainWindow(QMainWindow):
         pf = PageFrame(self.px_per_ft, size_name=self.prefs.get('page_size','Letter'), orientation=self.prefs.get('page_orient','Landscape'), margin_in=self.prefs.get('page_margin_in',0.5))
         sc.addItem(pf)
         inner = pf._inner.rect()
-        vp = ViewportItem(self.scene, inner.adjusted(10,10,-10,-10), self)
-        sc.addItem(vp)
+        vp = ViewportItem(self.scene, inner.adjusted(10,10,-10,-10), self)\n        try:\n            mbr = self.scene.itemsBoundingRect()\n            if mbr.width() > 0 and mbr.height() > 0 and inner.width() > 0 and inner.height() > 0:\n                fx = (mbr.width() / inner.width()) * 1.1\n                fy = (mbr.height() / inner.height()) * 1.1\n                vp.scale_factor = max(fx, fy)\n                vp.src_center = mbr.center()\n        except Exception:\n            pass\n        sc.addItem(vp)
         meta = {
             'project': self.prefs.get('proj_project',''), 'address': self.prefs.get('proj_address',''),
             'sheet': self.prefs.get('proj_sheet',''), 'date': self.prefs.get('proj_date',''), 'by': self.prefs.get('proj_by','')
@@ -2392,8 +2391,7 @@ class MainWindow(QMainWindow):
             self._ensure_paper_scene()
         # add a new viewport in the center
         rect = QtCore.QRectF(100, 100, 600, 400)
-        vp = ViewportItem(self.scene, rect, self)
-        self.paper_scene.addItem(vp)
+        vp = ViewportItem(self.scene, rect, self)\n        try:\n            mbr = self.scene.itemsBoundingRect()\n            if mbr.width() > 0 and mbr.height() > 0 and rect.width() > 0 and rect.height() > 0:\n                fx = (mbr.width() / rect.width()) * 1.1\n                fy = (mbr.height() / rect.height()) * 1.1\n                vp.scale_factor = max(fx, fy)\n                vp.src_center = mbr.center()\n        except Exception:\n            pass\n        self.paper_scene.addItem(vp)
         self.statusBar().showMessage("Viewport added")
 
     def toggle_paper_space(self, on: bool):
@@ -2579,4 +2577,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
 
