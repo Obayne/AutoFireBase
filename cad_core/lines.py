@@ -89,11 +89,26 @@ def extend_line_to_intersection(line: Line, other: Line, end: str = "b", tol: fl
     return extend_line_end_to_point(line, ip, end=end)
 
 
+def trim_line_by_cut(line: Line, cutter: Line, end: str = "b", tol: float = 1e-9) -> Optional[Line]:
+    """Trim a line segment towards its intersection with a cutter.
+
+    If the infinite lines intersect, this moves the chosen endpoint of `line`
+    to the intersection point. Returns None if lines are parallel (no cut).
+    Note: This does not check whether the intersection lies within the cutter
+    segment bounds; callers may enforce segment-vs-segment rules upstream.
+    """
+    ip = intersection_line_line(line, cutter, tol=tol)
+    if ip is None:
+        return None
+    return extend_line_end_to_point(line, ip, end=end)
+
+
 __all__ = [
     "Point",
     "Line",
     "intersection_line_line",
     "extend_line_end_to_point",
     "extend_line_to_intersection",
+    "trim_line_by_cut",
 ]
 
