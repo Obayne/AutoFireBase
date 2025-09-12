@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from app.scene import GridScene, DEFAULT_GRID_SIZE
-from app.layout import PageFrame, PAGE_SIZES, TitleBlock
+from app.layout import PageFrame, PAGE_SIZES, TitleBlock, ViewportItem
 from app.device import DeviceItem
 from app import catalog
 from app.tools import draw as draw_tools
