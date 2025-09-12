@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from .lines import Line, Point, intersection_line_line
+from .arc import Arc, arc_from_points
 from .circle import Circle
 
 
@@ -205,3 +206,37 @@ def fillet_circle_circle(c1: Circle, c2: Circle, radius: float, tol: float = 1e-
                 )
                 results.append((p1, p2, center))
     return results
+
+
+def fillet_segments_line_line(seg1: Line, seg2: Line, pick1: Point, pick2: Point, radius: float, tol: float = 1e-9):
+    """Fillet two line segments with given pick points and radius.
+
+    Returns (new_seg1, new_seg2, arc) or None if fillet cannot be constructed.
+    - pick points determine which endpoints to move on each segment.
+    - arc connects the two tangent points with a short arc.
+    """
+    res = fillet_line_line(seg1, seg2, radius, tol=tol)
+    if res is None:
+        return None
+    p1, p2, center = res
+
+    # Choose which endpoint to move based on proximity to user pick
+    def move_endpoint(seg: Line, pick: Point, target: Point) -> Line:
+        d_a = (pick.x - seg.a.x) ** 2 + (pick.y - seg.a.y) ** 2
+        d_b = (pick.x - seg.b.x) ** 2 + (pick.y - seg.b.y) ** 2
+        if d_a <= d_b:
+            return Line(a=target, b=seg.b)
+        return Line(a=seg.a, b=target)
+
+    n1 = move_endpoint(seg1, pick1, p1)
+    n2 = move_endpoint(seg2, pick2, p2)
+
+    arc = arc_from_points(center, p1, p2, prefer_short=True)
+    return (n1, n2, arc)
+
+
+__all__ += [
+    "fillet_line_circle",
+    "fillet_circle_circle",
+    "fillet_segments_line_line",
+]
