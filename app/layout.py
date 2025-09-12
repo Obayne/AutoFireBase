@@ -60,6 +60,57 @@ class TitleBlock(QtWidgets.QGraphicsItemGroup):
         self.setZValue(10)
         self._build()
 
+    def _inch_to_px(self, inches: float) -> float:
+        return (float(inches)/12.0) * self._px_per_ft
+
+    def _build(self):
+        # Simple block at bottom right with a few fields
+        for it in self._items:
+            try:
+                if it.scene():
+                    it.scene().removeItem(it)
+            except Exception:
+                pass
+        self._items.clear()
+        w_in, h_in = PAGE_SIZES.get(self._size, PAGE_SIZES["Letter"])
+        if (self._orient or "").lower().startswith("port"):
+            pass
+        else:
+            w_in, h_in = h_in, w_in
+        w = self._inch_to_px(w_in)
+        h = self._inch_to_px(h_in)
+        # Block rectangle 3x10 inches in bottom-right
+        bw = self._inch_to_px(10)
+        bh = self._inch_to_px(3)
+        rect = QtCore.QRectF(w - bw - self._inch_to_px(0.5), h - bh - self._inch_to_px(0.5), bw, bh)
+        box = QtWidgets.QGraphicsRectItem(rect)
+        pen = QtGui.QPen(QtGui.QColor(180, 180, 180))
+        pen.setCosmetic(True)
+        box.setPen(pen)
+        box.setBrush(QtCore.Qt.NoBrush)
+        self.addToGroup(box)
+        self._items.append(box)
+        # Text rows
+        def add_line(label, value, y_off_in):
+            y = rect.top() + self._inch_to_px(y_off_in)
+            t = QtWidgets.QGraphicsSimpleTextItem(f"{label}: {value}")
+            t.setPen(QtGui.QPen(QtGui.QColor(200, 200, 210)))
+            t.setBrush(QtGui.QBrush(QtGui.QColor(200, 200, 210)))
+            t.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations, True)
+            t.setPos(rect.left() + self._inch_to_px(0.3), y)
+            self.addToGroup(t)
+            self._items.append(t)
+
+        add_line("Project", self._meta.get("project", ""), 0.3)
+        add_line("Address", self._meta.get("address", ""), 0.8)
+        add_line("Sheet", self._meta.get("sheet", ""), 1.3)
+        add_line("Date", self._meta.get("date", ""), 1.8)
+        add_line("By", self._meta.get("by", ""), 2.3)
+
+    def set_meta(self, meta: dict | None):
+        self._meta = meta or {}
+        self._build()
+
 
 class ViewportItem(QtWidgets.QGraphicsRectItem):
     def __init__(self, model_scene: QtWidgets.QGraphicsScene, rect: QtCore.QRectF, window: QtWidgets.QMainWindow | None = None):
@@ -127,43 +178,4 @@ class ViewportItem(QtWidgets.QGraphicsRectItem):
             pass
         painter.restore()
 
-    def _inch_to_px(self, inches: float) -> float:
-        return (float(inches)/12.0) * self._px_per_ft
-
-    def _build(self):
-        # Simple block at bottom right with a few fields
-        for it in self._items:
-            try:
-                if it.scene(): it.scene().removeItem(it)
-            except Exception: pass
-        self._items.clear()
-        w_in, h_in = PAGE_SIZES.get(self._size, PAGE_SIZES["Letter"])
-        if (self._orient or "").lower().startswith("port"): pass
-        else:
-            w_in, h_in = h_in, w_in
-        w = self._inch_to_px(w_in); h = self._inch_to_px(h_in)
-        # Block rectangle 3x10 inches in bottom-right
-        bw = self._inch_to_px(10); bh = self._inch_to_px(3)
-        rect = QtCore.QRectF(w - bw - self._inch_to_px(0.5), h - bh - self._inch_to_px(0.5), bw, bh)
-        box = QtWidgets.QGraphicsRectItem(rect)
-        pen = QtGui.QPen(QtGui.QColor(180,180,180)); pen.setCosmetic(True)
-        box.setPen(pen); box.setBrush(QtCore.Qt.NoBrush)
-        self.addToGroup(box); self._items.append(box)
-        # Text rows
-        def add_line(label, value, y_off_in):
-            y = rect.top() + self._inch_to_px(y_off_in)
-            t = QtWidgets.QGraphicsSimpleTextItem(f"{label}: {value}")
-            t.setPen(QtGui.QPen(QtGui.QColor(200,200,210)))
-            t.setBrush(QtGui.QBrush(QtGui.QColor(200,200,210)))
-            t.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations, True)
-            t.setPos(rect.left() + self._inch_to_px(0.3), y)
-            self.addToGroup(t); self._items.append(t)
-        add_line("Project", self._meta.get("project",""), 0.3)
-        add_line("Address", self._meta.get("address",""), 0.8)
-        add_line("Sheet", self._meta.get("sheet",""), 1.3)
-        add_line("Date", self._meta.get("date",""), 1.8)
-        add_line("By", self._meta.get("by",""), 2.3)
-
-    def set_meta(self, meta: dict | None):
-        self._meta = meta or {}
-        self._build()
+    
