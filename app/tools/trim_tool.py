@@ -1,5 +1,8 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 
+# CAD core math for robust intersections
+from cad_core.lines import Line as CoreLine, Point as CorePoint, intersection_line_line
+
 
 def _nearest_line_item(scene: QtWidgets.QGraphicsScene, p: QtCore.QPointF):
     box = QtCore.QRectF(p.x()-4, p.y()-4, 8, 8)
@@ -23,6 +26,9 @@ def _intersection_point(l1: QtCore.QLineF, l2: QtCore.QLineF):
     px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4)) / den
     py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4)) / den
     return QtCore.QPointF(px, py)
+
+def _to_core(seg: QtCore.QLineF) -> CoreLine:
+    return CoreLine(CorePoint(seg.x1(), seg.y1()), CorePoint(seg.x2(), seg.y2()))
 
 
 class TrimTool:
@@ -66,7 +72,9 @@ class TrimTool:
             return False
         lcut = _line_from_item(self.cut_item)
         ltar = _line_from_item(it)
-        ip = _intersection_point(lcut, ltar)
+        # Prefer CAD core intersection for numerical stability
+        ip_core = intersection_line_line(_to_core(lcut), _to_core(ltar))
+        ip = None if ip_core is None else QtCore.QPointF(ip_core.x, ip_core.y)
         if ip is None:
             self.win.statusBar().showMessage("Trim: lines do not intersect")
             self.active = False
