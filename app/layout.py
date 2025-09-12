@@ -1,4 +1,4 @@
-
+﻿
 from PySide6 import QtCore, QtGui, QtWidgets
 
 PAGE_SIZES = {
@@ -140,8 +140,9 @@ class ViewportItem(QtWidgets.QGraphicsRectItem):
 
     def contextMenuEvent(self, event: QtWidgets.QGraphicsSceneContextMenuEvent):
         m = QtWidgets.QMenu()
-        act_scale = m.addAction("Set Scale Factor…")
+        act_scale = m.addAction("Set Scale Factor...")
         act_center = m.addAction("Center on Model View")
+        act_fit = m.addAction("Fit Model to Viewport")
         act_lock = m.addAction("Lock Viewport")
         act_lock.setCheckable(True); act_lock.setChecked(self.locked)
         chosen = m.exec(event.screenPos())
@@ -154,6 +155,11 @@ class ViewportItem(QtWidgets.QGraphicsRectItem):
                 if self.win is not None:
                     vc = self.win.view.mapToScene(self.win.view.viewport().rect().center())
                     self.set_src_center(vc)
+            except Exception:
+                pass
+        elif chosen == act_fit:
+            try:
+                self.fit_to_model()
             except Exception:
                 pass
         elif chosen == act_lock:
@@ -178,4 +184,18 @@ class ViewportItem(QtWidgets.QGraphicsRectItem):
             pass
         painter.restore()
 
-    
+    def fit_to_model(self, margin: float = 1.1):
+        """Center on model and set scale_factor so model fits viewport."""
+        try:
+            r = self.rect()
+            mbr = self.model_scene.itemsBoundingRect()
+            if mbr.width() <= 0 or mbr.height() <= 0 or r.width() <= 0 or r.height() <= 0:
+                return
+            fx = (mbr.width() / r.width()) * margin
+            fy = (mbr.height() / r.height()) * margin
+            self.scale_factor = max(fx, fy)
+            self.src_center = mbr.center()
+            self.update()
+        except Exception:
+            pass
+
