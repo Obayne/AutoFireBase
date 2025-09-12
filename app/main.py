@@ -789,15 +789,20 @@ class MainWindow(QMainWindow):
         for lbl, v in [("1/16\" = 1'", 1.0/16.0), ("3/32\" = 1'", 3.0/32.0), ("1/8\" = 1'", 1.0/8.0), ("3/16\" = 1'", 3.0/16.0), ("1/4\" = 1'", 0.25), ("3/8\" = 1'", 0.375), ("1/2\" = 1'", 0.5), ("1\" = 1'", 1.0)]:
             add_scale(lbl, v)
         scale_menu.addAction("Customâ€¦", self.set_print_scale_custom)
-        # Space badge in status bar (right side)
-        # Add scale badge after space badge
+        # Status bar: left space selector/lock; right badges
+        self.space_combo = QtWidgets.QComboBox(); self.space_combo.addItems(["Model","Paper"]) ; self.space_combo.setCurrentIndex(0)
+        self.space_lock = QtWidgets.QToolButton(); self.space_lock.setCheckable(True); self.space_lock.setText("Lock")
+        self.statusBar().addWidget(QtWidgets.QLabel("Space:"))
+        self.statusBar().addWidget(self.space_combo)
+        self.statusBar().addWidget(self.space_lock)
+        self.space_combo.currentIndexChanged.connect(self._on_space_combo_changed)
+        # Right badges
         self.scale_badge = QtWidgets.QLabel("")
         self.scale_badge.setStyleSheet("QLabel { color: #c0c0c0; }")
         self.statusBar().addPermanentWidget(self.scale_badge)
         self.space_badge = QtWidgets.QLabel("MODEL SPACE")
         self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
         self.statusBar().addPermanentWidget(self.space_badge)
-        # Sheet Manager dock and export
         self._init_sheet_manager()
         m_layout.addAction("Export Sheets to PDF...", self.export_sheets_pdf)
         # Underlay tools
@@ -2738,4 +2743,18 @@ if __name__ == "__main__":
     main()
 
 
+
+
+
+    def _on_space_combo_changed(self, idx: int):
+        if self.space_lock.isChecked():
+            # Revert change if locked
+            try:
+                self.space_combo.blockSignals(True)
+                self.space_combo.setCurrentIndex(1 if self.in_paper_space else 0)
+            finally:
+                self.space_combo.blockSignals(False)
+            return
+        # 0 = Model, 1 = Paper
+        self.toggle_paper_space(idx == 1)
 
