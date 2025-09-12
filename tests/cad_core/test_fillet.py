@@ -1,7 +1,8 @@
 import math
 
 from cad_core.lines import Line, Point
-from cad_core.fillet import fillet_line_line
+from cad_core.circle import Circle
+from cad_core.fillet import fillet_line_line, fillet_line_circle, fillet_circle_circle
 
 
 def dist(a: Point, b: Point) -> float:
@@ -28,3 +29,17 @@ def test_fillet_parallel_returns_none():
     l2 = Line(Point(0, 1), Point(10, 1))
     assert fillet_line_line(l1, l2, 2.0) is None
 
+
+def test_fillet_line_circle_candidates_nonempty():
+    c = Circle(Point(0, 0), 5.0)
+    l = Line(Point(-10, 0), Point(10, 0))
+    out = fillet_line_circle(l, c, 2.0)
+    assert isinstance(out, list) and len(out) >= 1
+
+
+def test_fillet_circle_circle_candidates_nonempty():
+    c1 = Circle(Point(-5, 0), 5.0)
+    c2 = Circle(Point(5, 0), 5.0)
+    out = fillet_circle_circle(c1, c2, 2.0)
+    assert isinstance(out, list)
+    assert len(out) >= 1
