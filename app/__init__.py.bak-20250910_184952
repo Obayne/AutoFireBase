@@ -1,1 +1,0 @@
-# AutoFire modular package
