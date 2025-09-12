@@ -788,11 +788,15 @@ class MainWindow(QMainWindow):
             add_scale(lbl, v)
         scale_menu.addAction("Customâ€¦", self.set_print_scale_custom)
         # Space badge in status bar (right side)
+        # Add scale badge after space badge
+        self.scale_badge = QtWidgets.QLabel("")
+        self.scale_badge.setStyleSheet("QLabel { color: #c0c0c0; }")
+        self.statusBar().addPermanentWidget(self.scale_badge)
         self.space_badge = QtWidgets.QLabel("MODEL SPACE")
         self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
         self.statusBar().addPermanentWidget(self.space_badge)
         # Underlay tools
-        m_underlay = m_layout.addMenu("Underlay")
+        m_underlay = m_tools.addMenu("Underlay")
         m_underlay.addAction("Scale by Referenceâ€¦", self.start_underlay_scale_ref)
         m_underlay.addAction("Scale by Factorâ€¦", self.underlay_scale_factor)
         m_underlay.addAction("Scale by Dragâ€¦", self.start_underlay_scale_drag)
@@ -2397,8 +2401,29 @@ class MainWindow(QMainWindow):
         if self.in_paper_space:
             self._ensure_paper_scene()
             self.view.setScene(self.paper_scene)
+            # Update badges and background
+            try:
+                if hasattr(self, 'space_badge'):
+                    self.space_badge.setText("PAPER SPACE")
+                    self.space_badge.setStyleSheet("QLabel { color: #e0af68; font-weight: bold; }")
+                if hasattr(self, 'scale_badge'):
+                    val = float(self.prefs.get('print_in_per_ft', 0.125))
+                    self.scale_badge.setText(f"Scale: {val}\" = 1'")
+                self.view.setBackgroundBrush(QtGui.QColor(250, 250, 250))
+            except Exception:
+                pass
         else:
             self.view.setScene(self.scene)
+            # Update badges and background
+            try:
+                if hasattr(self, 'space_badge'):
+                    self.space_badge.setText("MODEL SPACE")
+                    self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
+                if hasattr(self, 'scale_badge'):
+                    self.scale_badge.setText("")
+                self.view.setBackgroundBrush(QtGui.QColor(20, 22, 26))
+            except Exception:
+                pass
         self.fit_view_to_content()
 
     def remove_page_frame(self):
@@ -2411,6 +2436,12 @@ class MainWindow(QMainWindow):
     def set_print_scale(self, inches_per_ft: float):
         self.prefs['print_in_per_ft'] = float(inches_per_ft); save_prefs(self.prefs)
         self.statusBar().showMessage(f"Print scale set: {inches_per_ft}\" = 1'-0\"")
+        # Update scale badge in paper space
+        try:
+            if self.in_paper_space and hasattr(self, 'scale_badge'):
+                self.scale_badge.setText(f"Scale: {inches_per_ft}\" = 1'")
+        except Exception:
+            pass
 
     def set_print_scale_custom(self):
         val, ok = QtWidgets.QInputDialog.getDouble(self, "Custom Print Scale", "Inches per foot", float(self.prefs.get('print_in_per_ft',0.125)), 0.01, 12.0, 3)
@@ -2548,3 +2579,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
