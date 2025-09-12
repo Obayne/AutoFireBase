@@ -12,6 +12,7 @@ Quick Start (Windows, PowerShell)
 - Run: `./setup_dev.ps1` (creates `.venv`, installs requirements, sets up pre-commit).
 - Activate later: `. .venv/Scripts/Activate.ps1`
 - Run the app: `python app/main.py`
+  - Alternative (new entry): `python -m frontend.app`
 
 Daily Workflow
 - Activate venv: `. .venv/Scripts/Activate.ps1`
