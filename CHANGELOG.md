@@ -1,6 +1,8 @@
-# CHANGELOG
+# Changelog
 
 
+## [0.4.7] - 2025-09-12
+- Fillet radius UI + CAD core geometry (lines, circles, fillets)
 
 ## 0.4.6 - 2025-09-12
 - Add CAD core line geometry scaffold and tests
@@ -57,4 +59,5 @@
   - **Alt+[ / Alt+]** → speaker **target dB −/+ 1 dB**
 - **Grid** is lighter by default; added **View → Grid Style…** for opacity, line width, and major-line interval (saved in prefs).
 - Persisted grid style in project saves; status bar messages clarify current adjustments.
+
 
