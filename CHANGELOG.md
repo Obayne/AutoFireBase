@@ -1,6 +1,11 @@
 # CHANGELOG
 
-## Unreleased (CAD Base)
+
+
+## 0.4.6 - 2025-09-12
+- Add CAD core line geometry scaffold and tests
+- Add repo hygiene, CI, and release workflow
+
 - Added: DXF underlay import with layer-aware rendering and auto-fit.
 - Added: Draw tools (Line, Rect, Circle, Polyline, Arc-3pt), Wire, Text.
 - Added: Modify tools (Offset Selected…, Trim Lines, Extend Lines, Fillet/Corner, Fillet/Radius, Rotate, Mirror, Scale, Chamfer).
@@ -52,3 +57,4 @@
   - **Alt+[ / Alt+]** → speaker **target dB −/+ 1 dB**
 - **Grid** is lighter by default; added **View → Grid Style…** for opacity, line width, and major-line interval (saved in prefs).
 - Persisted grid style in project saves; status bar messages clarify current adjustments.
+

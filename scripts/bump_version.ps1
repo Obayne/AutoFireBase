@@ -29,7 +29,8 @@ if (-not (Test-Path 'CHANGELOG.md')) {
   $date = Get-Date -Format 'yyyy-MM-dd'
   $insert = "`n## [$new] - $date`n- $Message`n"
   $ch = $ch -replace '(?s)(## \[Unreleased\].*?)(\r?\n## )', "$1$insert`n## "
-  if ($ch -notmatch "\[\Q$new\E\]") { $ch += $insert }
+  $escaped = [regex]::Escape($new)
+  if ($ch -notmatch "\[${escaped}\]") { $ch += $insert }
   Set-Content CHANGELOG.md $ch
 }
 
