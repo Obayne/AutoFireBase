@@ -1725,19 +1725,31 @@ class MainWindow(QMainWindow):
                     if isinstance(it, DeviceItem):
                         if (sym and getattr(it, 'symbol', None) == sym) or (name and getattr(it, 'name', None) == name):
                             it.setSelected(True)
+                self._update_selection_visuals()
                 return
-            # Geometry similarity: same class within same layer group
-            layer = base_item.parentItem()
-            if layer is None:
-                items = self.scene.items()
+            # Geometry similarity: same class within the same top-level group under the scene
+            top = base_item.parentItem()
+            last = base_item
+            while top is not None and top.parentItem() is not None:
+                last = top
+                top = top.parentItem()
+            group = last if isinstance(last, QtWidgets.QGraphicsItemGroup) else top
+            if group is not None and isinstance(group, QtWidgets.QGraphicsItemGroup):
+                items = list(group.childItems())
             else:
-                items = list(layer.childItems())
+                items = [it for it in self.scene.items() if not isinstance(it, QtWidgets.QGraphicsItemGroup)]
             t = type(base_item)
+            try:
+                base_item.setSelected(True)
+            except Exception:
+                pass
             for it in items:
                 try:
-                    if type(it) is t: it.setSelected(True)
+                    if isinstance(it, t):
+                        it.setSelected(True)
                 except Exception:
                     pass
+            self._update_selection_visuals()
         except Exception:
             pass
 
