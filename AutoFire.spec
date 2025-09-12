@@ -6,7 +6,7 @@ a = Analysis(
     pathex=['.'],
     binaries=[],
     datas=[('app', 'app'), ('core', 'core'), ('updater', 'updater')],
-    hiddenimports=['app.main', 'app.minwin', 'app.tools.array', 'app.tools.draw', 'app.tools.dimension', 'app.tools.text_tool', 'app.tools.trim_tool', 'app.tools.measure_tool', 'app.tools.extend_tool', 'app.tools.fillet_tool', 'app.tools.fillet_radius_tool', 'app.tools.rotate_tool', 'app.tools.mirror_tool', 'app.tools.scale_tool', 'app.tools.chamfer_tool', 'app.layout', 'app.dxf_import'],
+    hiddenimports=['shapely','shapely.geometry','app.main', 'app.minwin', 'app.tools.array', 'app.tools.draw', 'app.tools.dimension', 'app.tools.text_tool', 'app.tools.trim_tool', 'app.tools.measure_tool', 'app.tools.extend_tool', 'app.tools.fillet_tool', 'app.tools.fillet_radius_tool', 'app.tools.rotate_tool', 'app.tools.mirror_tool', 'app.tools.scale_tool', 'app.tools.chamfer_tool', 'app.layout', 'app.dxf_import'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -42,3 +42,4 @@ coll = COLLECT(
     upx_exclude=[],
     name='AutoFire',
 )
+
