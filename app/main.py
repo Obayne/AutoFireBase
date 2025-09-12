@@ -277,10 +277,23 @@ class CanvasView(QGraphicsView):
     def _apply_osnap(self, p: QPointF) -> QtCore.QPointF:
         sp = QtCore.QPointF(p)
         q = None
+        # In paper space, skip object snaps and grid snap entirely
+        try:
+            if getattr(self.win, 'in_paper_space', False):
+                self.osnap_marker.setVisible(False)
+                return sp
+        except Exception:
+            pass
         if self.osnap_end or self.osnap_mid or self.osnap_center:
             q = self._compute_osnap(sp)
         if q is None:
-            sp = self.scene().snap(sp)
+            # Use scene snap only if available (GridScene in model space)
+            try:
+                sc = self.scene()
+                if hasattr(sc, 'snap') and callable(getattr(sc, 'snap')):
+                    sp = sc.snap(sp)
+            except Exception:
+                pass
             self.osnap_marker.setVisible(False)
             return sp
         else:
