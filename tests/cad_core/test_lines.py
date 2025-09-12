@@ -1,4 +1,10 @@
-from cad_core.lines import Line, Point, intersection_line_line, extend_line_to_intersection
+from cad_core.lines import (
+    Line,
+    Point,
+    intersection_line_line,
+    extend_line_to_intersection,
+    trim_line_by_cut,
+)
 
 
 def test_line_line_intersection_basic():
@@ -24,4 +30,13 @@ def test_extend_line_to_intersection_moves_endpoint():
     assert extended.a == base.a
     assert abs(extended.b.x - 5.0) < 1e-9
     assert abs(extended.b.y - 0.0) < 1e-9
+
+
+def test_trim_line_by_cut_same_as_extend_here():
+    base = Line(Point(0, 0), Point(1, 0))
+    cutter = Line(Point(5, -5), Point(5, 5))
+    trimmed = trim_line_by_cut(base, cutter, end="b")
+    assert trimmed is not None
+    assert trimmed.a == base.a
+    assert abs(trimmed.b.x - 5.0) < 1e-9
 

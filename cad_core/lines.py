@@ -64,6 +64,41 @@ def intersection_line_line(l1: Line, l2: Line, tol: float = 1e-9) -> Optional[Po
     return _add(p, _scale(r, t))
 
 
+def nearest_point_on_line(line: Line, p: Point) -> Point:
+    """Return the closest point to p on the infinite line through line.a->line.b."""
+    a, b = line.a, line.b
+    ab = _sub(b, a)
+    ap = _sub(p, a)
+    denom = _dot(ab, ab)
+    if denom <= 0:
+        return a
+    t = _dot(ap, ab) / denom
+    return _add(a, _scale(ab, t))
+
+
+def is_point_on_segment(p: Point, seg: Line, tol: float = 1e-9) -> bool:
+    """Check if point p lies on the segment seg within tolerance."""
+    a, b = seg.a, seg.b
+    # Collinearity: cross((p-a),(b-a)) ~ 0
+    if abs(_cross(_sub(p, a), _sub(b, a))) > tol:
+        return False
+    # Within bounds via dot-products
+    ab = _sub(b, a)
+    ap = _sub(p, a)
+    bp = _sub(p, b)
+    return _dot(ap, ab) >= -tol and _dot(bp, _sub(a, b)) >= -tol
+
+
+def intersection_segment_segment(s1: Line, s2: Line, tol: float = 1e-9) -> Optional[Point]:
+    """Intersection point of two finite segments, or None."""
+    ip = intersection_line_line(s1, s2, tol=tol)
+    if ip is None:
+        return None
+    if is_point_on_segment(ip, s1, tol=tol) and is_point_on_segment(ip, s2, tol=tol):
+        return ip
+    return None
+
+
 def extend_line_end_to_point(line: Line, target: Point, end: str = "b") -> Line:
     """Return a new line where one end ('a' or 'b') is moved to target.
 
@@ -89,11 +124,41 @@ def extend_line_to_intersection(line: Line, other: Line, end: str = "b", tol: fl
     return extend_line_end_to_point(line, ip, end=end)
 
 
+def trim_line_by_cut(line: Line, cutter: Line, end: str = "b", tol: float = 1e-9) -> Optional[Line]:
+    """Trim a line segment towards its intersection with a cutter.
+
+    If the infinite lines intersect, this moves the chosen endpoint of `line`
+    to the intersection point. Returns None if lines are parallel (no cut).
+    Note: This does not check whether the intersection lies within the cutter
+    segment bounds; callers may enforce segment-vs-segment rules upstream.
+    """
+    ip = intersection_line_line(line, cutter, tol=tol)
+    if ip is None:
+        return None
+    return extend_line_end_to_point(line, ip, end=end)
+
+
+def trim_segment_by_cutter(seg: Line, cutter: Line, end: str = "b", tol: float = 1e-9) -> Optional[Line]:
+    """Trim a finite segment to the intersection with a cutter segment.
+
+    Returns new segment or None if no valid intersection lies on both segments.
+    """
+    ip = intersection_segment_segment(seg, cutter, tol=tol)
+    if ip is None:
+        return None
+    return extend_line_end_to_point(seg, ip, end=end)
+
+
 __all__ = [
     "Point",
     "Line",
     "intersection_line_line",
     "extend_line_end_to_point",
     "extend_line_to_intersection",
+    "trim_line_by_cut",
+    "nearest_point_on_line",
+    "is_point_on_segment",
+    "intersection_segment_segment",
+    "trim_segment_by_cutter",
 ]
 
