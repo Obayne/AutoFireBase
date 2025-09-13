@@ -1,0 +1,39 @@
+name: Open PR for feat/backend-settings-and-store
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/backend-settings-and-store
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create or update PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = 'feat/backend-settings-and-store';
+            const base = 'main';
+            const prs = await github.paginate(github.rest.pulls.list, { owner, repo, state: 'open', head: `${owner}:${head}` });
+            if (prs.length > 0) {
+              core.info(`PR already open: #${prs[0].number}`);
+              return;
+            }
+            const title = 'feat(backend): AppSettings load/save + tests';
+            const body = [
+              'Adds typed AppSettings with JSON persistence and recent projects helper, with tests.',
+              '',
+              'Pure backend change, ≤100 LOC. Ready for review.',
+            ].join('\n');
+            await github.rest.pulls.create({ owner, repo, head, base, title, body });
+
