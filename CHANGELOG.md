@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [Unreleased]
+- Frontend: Layout Space dock integrated; toggle under View.
+- UI: Command bar styling improved (highlight, clearer placeholder).
+- Help: Add Commands dialog (Help → Commands… and ? button near Cmd box).
+- Status bar: Move Grid controls to the right of the command bar.
+
 ## [0.4.7] - 2025-09-12
 - Fillet radius UI + CAD core geometry (lines, circles, fillets)
 
