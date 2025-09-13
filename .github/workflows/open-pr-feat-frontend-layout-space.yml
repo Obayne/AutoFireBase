@@ -1,0 +1,38 @@
+name: Open PR for feat/frontend-layout-space
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/frontend-layout-space
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create or update PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = 'feat/frontend-layout-space';
+            const base = 'main';
+            const prs = await github.paginate(github.rest.pulls.list, { owner, repo, state: 'open', head: `${owner}:${head}` });
+            if (prs.length > 0) {
+              core.info(`PR already open: #${prs[0].number}`);
+              return;
+            }
+            const title = 'feat(frontend): Layout Space state + tests';
+            const body = [
+              'Introduces headless Layout Space (formerly Paper Space) state with event hooks and tests.',
+              'This avoids Qt deps and unblocks UI integration.',
+            ].join('\n');
+            await github.rest.pulls.create({ owner, repo, head, base, title, body });
+
