@@ -839,6 +839,12 @@ class MainWindow(QMainWindow):
         m_view = menubar.addMenu("&View")
         self.act_view_grid = QtGui.QAction("Grid", self, checkable=True); self.act_view_grid.setChecked(True); self.act_view_grid.toggled.connect(self.toggle_grid); m_view.addAction(self.act_view_grid)
         self.act_view_snap = QtGui.QAction("Snap", self, checkable=True); self.act_view_snap.setChecked(self.scene.snap_enabled); self.act_view_snap.toggled.connect(self.toggle_snap); m_view.addAction(self.act_view_snap)
+        # Toggle Layout Space dock if available
+        if getattr(self, 'layout_space_dock', None) is not None:
+            act_layout = QtGui.QAction("Layout Space", self, checkable=True)
+            act_layout.setChecked(False)
+            act_layout.toggled.connect(lambda v: self.layout_space_dock.setVisible(bool(v)))
+            m_view.addAction(act_layout)
         self.act_view_cross = QtGui.QAction("Crosshair (X)", self, checkable=True); self.act_view_cross.setChecked(True); self.act_view_cross.toggled.connect(self.toggle_crosshair); m_view.addAction(self.act_view_cross)
         self.act_paperspace = QtGui.QAction("Paper Space Mode", self, checkable=True); self.act_paperspace.setChecked(False); self.act_paperspace.toggled.connect(self.toggle_paper_space); m_view.addAction(self.act_paperspace)
         self.show_coverage = bool(self.prefs.get('show_coverage', True))
@@ -1059,6 +1065,20 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea, dock)
         # Ensure central widget is just the view
         self.setCentralWidget(self.view)
+
+        # Optional Layout Space controls dock (binds to headless state)
+        try:
+            from frontend.layout_space import LayoutSpaceState
+            from frontend.widgets.layout_space_widget import LayoutSpaceWidget
+            self._layout_space_state = LayoutSpaceState()
+            ls_widget = LayoutSpaceWidget(self._layout_space_state)
+            self.layout_space_dock = QDockWidget("Layout Space", self)
+            self.layout_space_dock.setObjectName("LayoutSpaceDock")
+            self.layout_space_dock.setWidget(ls_widget)
+            self.addDockWidget(Qt.RightDockWidgetArea, self.layout_space_dock)
+            self.layout_space_dock.hide()
+        except Exception:
+            self.layout_space_dock = None
 
         self.search.textChanged.connect(self._refresh_device_list)
         self.cmb_mfr.currentIndexChanged.connect(self._refresh_device_list)
