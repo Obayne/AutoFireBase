@@ -1,0 +1,34 @@
+name: Label Sprint Issues for Agents
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - chore/dev-setup-warnings
+    paths:
+      - .github/workflows/label-sprint-issues.yml
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Add agent:auto label to Sprint 01 issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: 'open', per_page: 100, labels: 'sprint:01'
+            });
+            for (const i of issues) {
+              const has = (i.labels || []).some(l => l.name === 'agent:auto');
+              if (!has) {
+                core.info(`Labeling issue #${i.number}: ${i.title}`);
+                await github.rest.issues.addLabels({ owner, repo, issue_number: i.number, labels: ['agent:auto'] });
+              }
+            }
+
