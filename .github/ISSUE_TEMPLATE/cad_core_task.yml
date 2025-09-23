@@ -1,0 +1,28 @@
+name: CAD Core Task
+description: Geometry kernels, tools, algorithms, and units (cad_core/)
+labels: [area:cad_core, type:feature]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the geometry/algorithm addition.
+      placeholder: e.g., Point/Vector/LineSegment + transforms
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Modules/functions to add/edit; pure code only.
+      placeholder: cad_core/geom/primitives.py, cad_core/geom/transform.py
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definition of Done
+      options:
+        - label: Black/Ruff clean
+        - label: Unit tests cover new functions
+        - label: No UI imports or side effects
+        - label: ≤300 LOC changed
+

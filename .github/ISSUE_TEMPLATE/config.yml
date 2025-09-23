@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Sprint Plan
+    url: https://github.com/Obayne/AutoFireBase/blob/main/docs/SPRINT-01.md
+    about: Review the sprint plan for goals, tasks, and acceptance.

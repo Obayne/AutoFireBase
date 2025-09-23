@@ -1,0 +1,28 @@
+[
+  {
+    "title": "Sprint 01: CAD Core — primitives + transforms",
+    "labels": ["area:cad_core", "type:feature", "sprint:01"],
+    "body": "Implement Point, Vector, LineSegment and pure transform functions (translate/scale/rotate). Add unit tests with deterministic outputs. See docs/SPRINT-01.md (cad_core section). DoD: Black/Ruff clean; no UI deps; tests added."
+  },
+  {
+    "title": "Sprint 01: Backend — settings service",
+    "labels": ["area:backend", "type:feature", "sprint:01"],
+    "body": "Typed settings object with load/save to disk and sensible defaults. Round-trip tests to ensure persistence. See docs/SPRINT-01.md (Backend / Settings service). DoD: Black/Ruff clean; tests; no module side-effects."
+  },
+  {
+    "title": "Sprint 01: Backend — catalog store (SQLite)",
+    "labels": ["area:backend", "type:feature", "sprint:01"],
+    "body": "Wrap SQLite access for seed/types/devices/specs with simple CRUD and list/search. Use in-memory fixtures for tests. See docs/SPRINT-01.md (Backend / Catalog store). DoD: Black/Ruff clean; CRUD covered by tests."
+  },
+  {
+    "title": "Sprint 01: Frontend — Model Space shell + command bar",
+    "labels": ["area:frontend", "type:feature", "sprint:01"],
+    "body": "Minimal Model Space widget shell. Hide Sheets dock by default with a View menu toggle. Space selector + lock (non-functional toggle wired to backend stub). Command bar emits signal on Enter. See docs/SPRINT-01.md (Frontend / Model Space). DoD: Black/Ruff; signals tested; no crashes."
+  },
+  {
+    "title": "Sprint 01: Frontend — Input handling foundation",
+    "labels": ["area:frontend", "type:feature", "sprint:01"],
+    "body": "Centralize key/mouse events in a small handler class and log via signal. Unit test for key mapping. See docs/SPRINT-01.md (Frontend / Input handling). DoD: Black/Ruff; tests; no side-effects."
+  }
+]
+
