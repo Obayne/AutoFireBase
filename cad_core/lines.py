@@ -152,6 +152,7 @@ def trim_segment_by_cutter(seg: Line, cutter: Line, end: str = "b", tol: float =
 __all__ = [
     "Point",
     "Line",
+    "is_parallel",
     "intersection_line_line",
     "extend_line_end_to_point",
     "extend_line_to_intersection",
