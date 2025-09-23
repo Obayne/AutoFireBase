@@ -1,0 +1,5 @@
+Create a Gemini CI config.
+Language: {{LANG}}
+Steps: checkout, install deps, test, build.
+Use free runner. Save logs + artifacts.
+Output: valid Gemini CI config.

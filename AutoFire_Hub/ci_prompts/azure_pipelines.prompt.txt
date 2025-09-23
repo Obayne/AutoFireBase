@@ -1,0 +1,5 @@
+Create azure-pipelines.yml.
+Pool: ubuntu-latest
+Steps: checkout, install deps, test, build, publish artifact.
+Trigger: main branch pushes.
+Output: valid YAML with short comments.

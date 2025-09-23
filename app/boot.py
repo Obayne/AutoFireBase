@@ -27,17 +27,32 @@ def log_startup_error(msg: str):
 
 def resolve_create_window():
     """Return a callable that builds the main window."""
-    main_mod = importlib.import_module("app.main")
+    try:
+        print("DEBUG: Attempting to import app.main...")
+        main_mod = importlib.import_module("app.main")
+        print(f"DEBUG: Successfully imported app.main. Contents: {dir(main_mod)}")
+    except Exception as e:
+        print(f"DEBUG: Error importing app.main: {e}")
+        raise
+
     # Preferred: explicit factory
     cw = getattr(main_mod, "create_window", None)
     if callable(cw):
+        print("DEBUG: Found callable create_window().")
         return cw
+    else:
+        print(f"DEBUG: create_window() not found or not callable. Type: {type(cw)}")
+
     # Fallback: direct MainWindow construction
     MW = getattr(main_mod, "MainWindow", None)
     if MW is not None:
+        print("DEBUG: Found MainWindow class.")
         def _cw():
             return MW()
         return _cw
+    else:
+        print(f"DEBUG: MainWindow class not found. Type: {type(MW)}")
+
     # Nothing suitable found
     raise ImportError(
         "app.main has neither 'create_window()' nor 'MainWindow'. "

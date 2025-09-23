@@ -1,0 +1,6 @@
+Create .gitlab-ci.yml.
+Language: {{LANG}}
+Stages: test -> build -> deploy
+Image: {{IMAGE}}
+Cache deps. Save build/ as artifact.
+Output: valid YAML with short comments.

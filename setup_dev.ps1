@@ -26,7 +26,7 @@ if (Test-Path "requirements.txt") {
   Write-Host "[dev-setup] Installing project requirements"
   pip install -r requirements.txt
 } else {
-  Write-Warning "requirements.txt not found - skipping."
+  Write-Warning "requirements.txt not found — skipping."
 }
 
 if (Test-Path "requirements-dev.txt") {
@@ -35,9 +35,8 @@ if (Test-Path "requirements-dev.txt") {
   Write-Host "[dev-setup] Installing pre-commit hooks"
   pre-commit install
 } else {
-  Write-Warning "requirements-dev.txt not found - skipping dev tools."
+  Write-Warning "requirements-dev.txt not found — skipping dev tools."
 }
 
 Write-Host "[dev-setup] Done. To activate later: . .venv/Scripts/Activate.ps1"
-
 

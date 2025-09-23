@@ -1,0 +1,5 @@
+Create .travis.yml.
+Language: {{LANG}}  Version: {{VERSION}}
+Cache deps. Install -> test -> build.
+Only run on main.
+Output: valid YAML with short comments.

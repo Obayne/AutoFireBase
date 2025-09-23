@@ -1,0 +1,5 @@
+Create .circleci/config.yml.
+Language: {{LANG}}  Image: {{IMAGE}}
+Steps: checkout -> deps -> test -> build -> store artifacts.
+Run on pushes to main.
+Output: valid YAML with short comments.

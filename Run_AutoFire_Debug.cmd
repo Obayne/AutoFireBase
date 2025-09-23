@@ -1,3 +1,4 @@
+
 @echo off
 title AutoFire - Run in Python (debug)
 echo Running AutoFire in Python so errors show in this window...

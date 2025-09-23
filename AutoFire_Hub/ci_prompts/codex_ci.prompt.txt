@@ -1,0 +1,6 @@
+Create a Codex CI config.
+Language: {{LANG}}
+Stages: build, test, deploy
+Use an image/env that fits {{LANG}}. Cache deps.
+Run build + tests. Publish artifacts.
+Output: valid YAML or JSON (what Codex needs), short comments.

@@ -1,0 +1,13 @@
+This is a placeholder DWG file that would contain NFPA-compliant fire alarm symbols.
+In a real implementation, this would be created with AutoCAD or similar CAD software.
+
+The file would contain blocks for:
+1. Smoke Detector (Diamond with diagonal line)
+2. Heat Detector (Diamond shape)
+3. Manual Pull Station (Rectangle)
+4. Strobe (Circle)
+5. Horn/Strobe (Circle with combined notation)
+6. Speaker (Circle with sound notation)
+7. Fire Alarm Control Panel (Large rectangle with connection points)
+
+Each block would be properly attributed and named according to NFPA standards.

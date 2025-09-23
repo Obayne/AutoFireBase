@@ -3,23 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-
-@dataclass(frozen=True)
-class Point:
-    x: float
-    y: float
-
-    def as_tuple(self) -> Tuple[float, float]:
-        return (float(self.x), float(self.y))
+from .point import Point
+from .geom import Vector
+from .units import almost_equal
 
 
 @dataclass(frozen=True)
 class Line:
     a: Point
     b: Point
-
-    def as_tuple(self) -> Tuple[Tuple[float, float], Tuple[float, float]]:
-        return (self.a.as_tuple(), self.b.as_tuple())
 
 
 def _sub(p: Point, q: Point) -> Point:
@@ -152,7 +144,6 @@ def trim_segment_by_cutter(seg: Line, cutter: Line, end: str = "b", tol: float =
 __all__ = [
     "Point",
     "Line",
-    "is_parallel",
     "intersection_line_line",
     "extend_line_end_to_point",
     "extend_line_to_intersection",
@@ -162,4 +153,3 @@ __all__ = [
     "intersection_segment_segment",
     "trim_segment_by_cutter",
 ]
-

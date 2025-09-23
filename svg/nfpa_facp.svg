@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- NFPA-compliant FACP symbol -->
+  <!-- Large rectangle with multiple connection points -->
+  <rect x="10" y="20" width="80" height="60" fill="none" stroke="black" stroke-width="2"/>
+  <text x="50" y="45" font-family="Arial" font-size="12" text-anchor="middle">FACP</text>
+  <!-- Connection points -->
+  <circle cx="5" cy="30" r="2" fill="black"/>
+  <circle cx="5" cy="40" r="2" fill="black"/>
+  <circle cx="5" cy="50" r="2" fill="black"/>
+  <circle cx="5" cy="60" r="2" fill="black"/>
+  <circle cx="95" cy="30" r="2" fill="black"/>
+  <circle cx="95" cy="40" r="2" fill="black"/>
+  <circle cx="95" cy="50" r="2" fill="black"/>
+  <circle cx="95" cy="60" r="2" fill="black"/>
+</svg>
