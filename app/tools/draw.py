@@ -1,5 +1,6 @@
 from enum import IntEnum
 from PySide6 import QtCore, QtGui, QtWidgets
+from app.wiring import WireItem
 
 class DrawMode(IntEnum):
     NONE = 0
@@ -32,8 +33,8 @@ class DrawController:
             it = QtWidgets.QGraphicsPathItem(path)
             pen = QtGui.QPen(QtGui.QColor("#e0e0e0")); pen.setCosmetic(True)
             it.setPen(pen); it.setZValue(20); it.setParentItem(self.layer)
-            it.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
-            it.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, True)
+            it.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, True)
+            it.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable, True)
         # Cleanup preview
         if self.temp_item and self.temp_item.scene():
             self.temp_item.scene().removeItem(self.temp_item)
@@ -58,23 +59,26 @@ class DrawController:
                 pen = QtGui.QPen(QtGui.QColor(col)); pen.setCosmetic(True)
                 if self.mode==DrawMode.WIRE: pen.setWidth(2)
                 self.temp_item.setPen(pen); self.temp_item.setParentItem(self.layer)
-            self.temp_item.setLine(p0.x(), p0.y(), p1.x(), p1.y())
+            if isinstance(self.temp_item, QtWidgets.QGraphicsLineItem):
+                self.temp_item.setLine(p0.x(), p0.y(), p1.x(), p1.y())
 
         elif self.mode == DrawMode.RECT:
             if self.temp_item is None:
                 self.temp_item = QtWidgets.QGraphicsRectItem()
                 pen = QtGui.QPen(QtGui.QColor("#7dcfff")); pen.setCosmetic(True)
                 self.temp_item.setPen(pen); self.temp_item.setParentItem(self.layer)
-            rect = QtCore.QRectF(p0, p1).normalized()
-            self.temp_item.setRect(rect)
+            if isinstance(self.temp_item, QtWidgets.QGraphicsRectItem):
+                rect = QtCore.QRectF(p0, p1).normalized()
+                self.temp_item.setRect(rect)
 
         elif self.mode == DrawMode.CIRCLE:
             if self.temp_item is None:
                 self.temp_item = QtWidgets.QGraphicsEllipseItem()
                 pen = QtGui.QPen(QtGui.QColor("#bb9af7")); pen.setCosmetic(True)
                 self.temp_item.setPen(pen); self.temp_item.setParentItem(self.layer)
-            r = QtCore.QLineF(p0, p1).length()
-            self.temp_item.setRect(p0.x()-r, p0.y()-r, 2*r, 2*r)
+            if isinstance(self.temp_item, QtWidgets.QGraphicsEllipseItem):
+                r = QtCore.QLineF(p0, p1).length()
+                self.temp_item.setRect(p0.x()-r, p0.y()-r, 2*r, 2*r)
 
         elif self.mode == DrawMode.POLYLINE:
             if self.temp_item is None:
@@ -85,7 +89,8 @@ class DrawController:
             for pt in self.points[1:]:
                 path.lineTo(pt)
             path.lineTo(p1)
-            self.temp_item.setPath(path)
+            if isinstance(self.temp_item, QtWidgets.QGraphicsPathItem):
+                self.temp_item.setPath(path)
         elif self.mode == DrawMode.ARC3 and len(self.points) == 2:
             # live preview for 3-point arc after two points chosen
             a, b = self.points[0], self.points[1]
@@ -100,7 +105,8 @@ class DrawController:
                 path = QtGui.QPainterPath()
                 path.arcMoveTo(rect, start_deg)
                 path.arcTo(rect, start_deg, span_deg)
-                self.temp_item.setPath(path)
+                if isinstance(self.temp_item, QtWidgets.QGraphicsPathItem):
+                    self.temp_item.setPath(path)
 
     def on_click(self, pt_scene: QtCore.QPointF, shift_ortho=False):
         if self.mode == DrawMode.NONE:
@@ -116,7 +122,15 @@ class DrawController:
 
         if self.mode in (DrawMode.LINE, DrawMode.WIRE, DrawMode.RECT, DrawMode.CIRCLE, DrawMode.ARC3):
             if self.mode in (DrawMode.LINE, DrawMode.WIRE):
-                it = QtWidgets.QGraphicsLineItem(p0.x(), p0.y(), p1.x(), p1.y())
+                # Create fire alarm specific wire if in wire mode
+                if self.mode == DrawMode.WIRE and hasattr(self.win, 'fire_alarm_integrator'):
+                    # Default to SLC wire type, but this could be configurable
+                    it = WireItem(QtCore.QPointF(p0.x(), p0.y()), QtCore.QPointF(p1.x(), p1.y()), "SLC")
+                    it.setParentItem(self.layer)
+                    # Notify fire alarm integrator of wire creation
+                    self.win.fire_alarm_integrator.on_wire_created(it)
+                else:
+                    it = QtWidgets.QGraphicsLineItem(p0.x(), p0.y(), p1.x(), p1.y())
             elif self.mode == DrawMode.RECT:
                 it = QtWidgets.QGraphicsRectItem(QtCore.QRectF(p0, p1).normalized())
             elif self.mode == DrawMode.CIRCLE:
@@ -136,11 +150,14 @@ class DrawController:
                 path.arcMoveTo(rect, start_deg)
                 path.arcTo(rect, start_deg, span_deg)
                 it = QtWidgets.QGraphicsPathItem(path)
-            pen = QtGui.QPen(QtGui.QColor("#e0e0e0")); pen.setCosmetic(True)
-            if self.mode == DrawMode.WIRE: pen.setWidth(2)
-            it.setPen(pen); it.setZValue(20); it.setParentItem(self.layer)
-            it.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
-            it.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, True)
+            # For non-fire alarm wires, set pen and flags
+            if not isinstance(it, WireItem):
+                pen = QtGui.QPen(QtGui.QColor("#e0e0e0")); pen.setCosmetic(True)
+                if self.mode == DrawMode.WIRE: pen.setWidth(2)
+                it.setPen(pen); it.setZValue(20)
+                it.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, True)
+                it.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable, True)
+            it.setParentItem(self.layer)
             self.finish()
             return True
 

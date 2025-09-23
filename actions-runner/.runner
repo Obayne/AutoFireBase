@@ -1,0 +1,11 @@
+﻿{
+  "agentId": 21,
+  "agentName": "MSI",
+  "poolId": 1,
+  "poolName": "Default",
+  "serverUrl": "https://pipelinesghubeus15.actions.githubusercontent.com/YQPoiP9CgrReOkvG1P2Ijl7jSZ2XRaOr754ainEn2h2uq7bVx9/",
+  "gitHubUrl": "https://github.com/Obayne/AutoFireBase",
+  "workFolder": "_work",
+  "useV2Flow": true,
+  "serverUrlV2": "https://broker.actions.githubusercontent.com/"
+}

@@ -1,0 +1,6 @@
+Create a GitHub Actions workflow at .github/workflows/ci.yml.
+Language: {{LANG}}  Version: {{VERSION}}
+OS: {{OS_MATRIX}}
+Steps: checkout, install deps, test, build, upload logs/artifacts.
+Triggers: push + pull_request to main.
+Output: valid YAML with short comments.

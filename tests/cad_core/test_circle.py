@@ -16,8 +16,6 @@ def test_circle_circle_two_points():
     c1 = Circle(Point(-5, 0), 5)
     c2 = Circle(Point(5, 0), 5)
     pts = circle_circle_intersections(c1, c2)
-    assert len(pts) == 2
-    # y coordinates symmetric
-    ys = sorted(p.y for p in pts)
-    assert abs(ys[0] + ys[1]) < 1e-9
+    assert len(pts) == 1  # Tangent circles touch at one point
+    assert abs(pts[0].x - 0.0) < 1e-6 and abs(pts[0].y - 0.0) < 1e-6
 

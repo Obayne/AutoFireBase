@@ -1,0 +1,7 @@
+{
+  "repoPath": "C:\\Dev\\AutoFire",
+  "mainBranch": "main",
+  "versionFile": "version.txt",
+  "updaterDir": "C:\\AutoFireUpdates",
+  "logsDir": "logs"
+}
