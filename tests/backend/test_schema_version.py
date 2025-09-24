@@ -17,4 +17,3 @@ def test_is_compatible_minor_bump_true():
     # Same major version considered compatible
     major = CURRENT_VERSION.split(".")[0]
     assert is_compatible(f"{major}.99.0")
-

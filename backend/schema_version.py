@@ -18,4 +18,3 @@ def is_compatible(ver: str) -> bool:
         return major_current == major_input
     except Exception:
         return False
-
