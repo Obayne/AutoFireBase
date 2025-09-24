@@ -1,11 +1,5 @@
 from __future__ import annotations
 
-"""
-Operations service that composes `cad_core` algorithms with the backend repository.
-
-Stub implementation for wiring; extend with concrete operations as features land.
-"""
-
 from dataclasses import dataclass
 
 from .geom_repo import EntityRef, InMemoryGeomRepo
