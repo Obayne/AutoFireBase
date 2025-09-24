@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Tuple
 
 from .lines import Point, _sub
 
@@ -12,7 +11,7 @@ class Arc:
     center: Point
     radius: float
     start_angle: float  # radians
-    end_angle: float    # radians
+    end_angle: float  # radians
     ccw: bool = True
 
 
@@ -42,3 +41,45 @@ def arc_from_points(center: Point, p_start: Point, p_end: Point, prefer_short: b
 
 __all__ = ["Arc", "arc_from_points"]
 
+
+def _norm_angle(a: float) -> float:
+    import math
+
+    a = a % (2 * math.pi)
+    if a < 0:
+        a += 2 * math.pi
+    return a
+
+
+def is_point_on_arc(arc: Arc, p: Point, tol: float = 1e-9) -> bool:
+    """Return True if point p lies on the finite arc within tolerance.
+
+    Checks radial distance ~ radius and angular position within start/end sweep.
+    """
+    import math
+
+    # Check radial distance
+    r = math.hypot(p.x - arc.center.x, p.y - arc.center.y)
+    if abs(r - arc.radius) > tol:
+        return False
+
+    a = _angle(arc.center, p)
+    a0 = _norm_angle(arc.start_angle)
+    a1 = _norm_angle(arc.end_angle)
+    ap = _norm_angle(a)
+
+    if arc.ccw:
+        # CCW sweep from a0 to a1
+        if a0 <= a1:
+            return a0 - tol <= ap <= a1 + tol
+        # Wrap through 2*pi
+        return ap >= a0 - tol or ap <= a1 + tol
+    else:
+        # CW sweep from a0 down to a1
+        if a1 <= a0:
+            return a1 - tol <= ap <= a0 + tol
+        # Wrap through 0
+        return ap <= a0 + tol or ap >= a1 - tol
+
+
+__all__ += ["is_point_on_arc"]
