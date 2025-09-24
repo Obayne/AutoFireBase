@@ -35,4 +35,3 @@ def test_round_tol_behaviour():
     x = 3.14159
     assert round_tol(x, 0.0) == x
     assert round_tol(x, -0.1) == x
-
