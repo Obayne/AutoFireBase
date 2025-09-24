@@ -243,3 +243,42 @@ __all__ += [
     "extend_segment_to_circle",
     "trim_line_by_arc",
 ]
+
+
+def extend_segment_to_arc(seg: Line, arc: Arc, end: str = "b", tol: float = 1e-9) -> Line | None:
+    """Extend a segment endpoint to the nearest intersection that lies on the arc sweep.
+
+    Extends the chosen endpoint forward along the segment direction; returns None if no
+    suitable intersection exists on the finite arc.
+    """
+    # Local imports to avoid circular dependency
+    from .arc import is_point_on_arc
+    from .circle import Circle, line_circle_intersections
+
+    circle = Circle(arc.center, arc.radius)
+    ips = [
+        p
+        for p in line_circle_intersections(seg, circle, tol=tol)
+        if is_point_on_arc(arc, p, tol=tol)
+    ]
+    if not ips:
+        return None
+    endpoint = seg.b if end == "b" else seg.a
+    other = seg.a if end == "b" else seg.b
+    # For extension, move from endpoint outward along segment direction
+    v = _sub(endpoint, other)
+    denom = _dot(v, v)
+    if denom <= tol:
+        return None
+    cand = []
+    for p in ips:
+        t = _dot(_sub(p, endpoint), v) / denom
+        if t >= -tol:
+            cand.append(p)
+    if not cand:
+        return None
+    target = min(cand, key=lambda p: (p.x - endpoint.x) ** 2 + (p.y - endpoint.y) ** 2)
+    return extend_line_end_to_point(seg, target, end=end)
+
+
+__all__ += ["extend_segment_to_arc"]
