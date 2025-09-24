@@ -7,9 +7,8 @@ Stub implementation for wiring; extend with concrete operations as features land
 """
 
 from dataclasses import dataclass
-from typing import Optional
 
-from .geom_repo import InMemoryGeomRepo, EntityRef
+from .geom_repo import EntityRef, InMemoryGeomRepo
 from .models import PointDTO, SegmentDTO
 
 
@@ -27,4 +26,3 @@ class OpsService:
         _ = (seg_ref, cut_a, cut_b)
         # TODO: integrate with cad_core.trim operation
         return False
-

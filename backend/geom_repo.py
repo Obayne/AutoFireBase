@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Dict, Iterator, Optional
 
-from .models import PointDTO, SegmentDTO, CircleDTO
+from .models import CircleDTO, PointDTO, SegmentDTO
 
 
 @dataclass(frozen=True)
@@ -21,10 +21,10 @@ class InMemoryGeomRepo:
     """
 
     def __init__(self) -> None:
-        self._points: Dict[str, PointDTO] = {}
-        self._segments: Dict[str, SegmentDTO] = {}
-        self._circles: Dict[str, CircleDTO] = {}
-        self._counters: Dict[str, int] = {"point": 0, "segment": 0, "circle": 0}
+        self._points: dict[str, PointDTO] = {}
+        self._segments: dict[str, SegmentDTO] = {}
+        self._circles: dict[str, CircleDTO] = {}
+        self._counters: dict[str, int] = {"point": 0, "segment": 0, "circle": 0}
 
     def _next_id(self, kind: str) -> str:
         n = self._counters[kind] + 1
@@ -37,7 +37,7 @@ class InMemoryGeomRepo:
         self._points[eid] = p
         return EntityRef("point", eid)
 
-    def get_point(self, eid: str) -> Optional[PointDTO]:
+    def get_point(self, eid: str) -> PointDTO | None:
         return self._points.get(eid)
 
     def update_point(self, eid: str, p: PointDTO) -> bool:
@@ -55,7 +55,7 @@ class InMemoryGeomRepo:
         self._segments[eid] = s
         return EntityRef("segment", eid)
 
-    def get_segment(self, eid: str) -> Optional[SegmentDTO]:
+    def get_segment(self, eid: str) -> SegmentDTO | None:
         return self._segments.get(eid)
 
     def update_segment(self, eid: str, s: SegmentDTO) -> bool:
@@ -73,7 +73,7 @@ class InMemoryGeomRepo:
         self._circles[eid] = c
         return EntityRef("circle", eid)
 
-    def get_circle(self, eid: str) -> Optional[CircleDTO]:
+    def get_circle(self, eid: str) -> CircleDTO | None:
         return self._circles.get(eid)
 
     def update_circle(self, eid: str, c: CircleDTO) -> bool:
@@ -84,4 +84,3 @@ class InMemoryGeomRepo:
 
     def iter_circles(self) -> Iterator[tuple[str, CircleDTO]]:
         return iter(self._circles.items())
-
