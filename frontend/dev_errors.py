@@ -82,3 +82,37 @@ def install() -> None:
 
 
 __all__ = ["bus", "install", "ErrorBus"]
+
+
+def log_exceptions(label: str | None = None, swallow: bool = True):
+    """Decorator to log exceptions in callbacks to the dev error bus.
+
+    - label: optional prefix to include in the log message
+    - swallow: if True, suppress the exception after logging (default)
+    """
+
+    def _decorator(fn):
+        def _wrapped(*args, **kwargs):
+            try:
+                return fn(*args, **kwargs)
+            except Exception:  # pragma: no cover (behavior tested via bus snapshot)
+                prefix = f"[{label}] " if label else ""
+                logging.getLogger("frontend.dev_errors").error(
+                    prefix + "callback error", exc_info=True
+                )
+                if not swallow:
+                    raise
+                return None
+
+        return _wrapped
+
+    return _decorator
+
+
+def wrap_callback(fn, label: str | None = None, swallow: bool = True):
+    """Convenience helper to wrap a callback with log_exceptions."""
+
+    return log_exceptions(label=label, swallow=swallow)(fn)
+
+
+__all__ += ["log_exceptions", "wrap_callback"]

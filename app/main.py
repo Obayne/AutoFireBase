@@ -1008,6 +1008,18 @@ class MainWindow(QMainWindow):
         analysis_menu.addAction("Generate Riser Diagram", self.generate_riser_diagram)
         analysis_menu.addAction("Show Calculations", self.show_calculations)
         
+        # Utilities submenu
+        utilities_menu = m_tools.addMenu("Utilities")
+        utilities_menu.addAction("Grid Style...", self.grid_style_dialog)
+        utilities_menu.addAction("Underlay Scale (Reference)...", self.start_underlay_scale_ref)
+        utilities_menu.addAction("Underlay Scale (Drag)...", self.start_underlay_scale_drag)
+        utilities_menu.addAction("Underlay Scale (Factor)...", self.underlay_scale_factor)
+        utilities_menu.addAction("Center Underlay in View", self.center_underlay_in_view)
+        utilities_menu.addAction("Move Underlay to Origin", self.move_underlay_to_origin)
+        utilities_menu.addAction("Reset Underlay Transform", self.reset_underlay_transform)
+        utilities_menu.addSeparator()
+        utilities_menu.addAction("Offset Selected...", self.offset_selected_dialog)
+        
         # (Settings moved under File)
 
         # View menu
@@ -1044,7 +1056,11 @@ class MainWindow(QMainWindow):
                 m_dev = menubar.addMenu("&Dev")
                 if os.getenv("FRONTEND_OPS_TOOLS"):
                     act = QtGui.QAction("Log Ops Tools", self)
-                    act.triggered.connect(self._dev_log_ops_tools)
+                    try:
+                        from frontend.dev_errors import wrap_callback as _wrap_cb
+                        act.triggered.connect(_wrap_cb(self._dev_log_ops_tools, label="Dev:LogOps"))
+                    except Exception:
+                        act.triggered.connect(self._dev_log_ops_tools)
                     m_dev.addAction(act)
                 if os.getenv("FRONTEND_DEV_ERRORS"):
                     self._init_dev_errors_dock()
@@ -3053,6 +3069,47 @@ Version: {APP_VERSION}
         """Find and replace items in the current view."""
         # For now, just show a message that replacing is not yet implemented
         QtWidgets.QMessageBox.information(self, "Replace", "Replace is not yet implemented.")
+
+    def zoom_in(self):
+        """Zoom in on the current view."""
+        self.view.scale(1.15, 1.15)
+
+    def zoom_out(self):
+        """Zoom out on the current view."""
+        self.view.scale(1/1.15, 1/1.15)
+
+    def zoom_to_selection(self):
+        """Zoom to fit the selected items."""
+        # For now, just show a message that zoom to selection is not yet implemented
+        QtWidgets.QMessageBox.information(self, "Zoom to Selection", "Zoom to selection is not yet implemented.")
+
+    def pan_view(self):
+        """Pan the current view."""
+        # For now, just show a message that panning is not yet implemented
+        QtWidgets.QMessageBox.information(self, "Pan View", "Pan view is not yet implemented.")
+
+    def toggle_grid_view(self):
+        """Toggle the grid visibility."""
+        self.scene.show_grid = not self.scene.show_grid
+        self.scene.update()
+
+    def toggle_snap_view(self):
+        """Toggle snap functionality."""
+        self.scene.snap_enabled = not self.scene.snap_enabled
+
+    def toggle_crosshair_view(self):
+        """Toggle crosshair visibility."""
+        self.view.show_crosshair = not self.view.show_crosshair
+
+    def toggle_coverage_view(self):
+        """Toggle coverage visibility."""
+        self.show_coverage = not self.show_coverage
+        for it in self.layer_devices.childItems():
+            if isinstance(it, DeviceItem):
+                try: it.set_coverage_enabled(self.show_coverage)
+                except Exception: pass
+        self.prefs['show_coverage'] = self.show_coverage
+        save_prefs(self.prefs)
 
 def create_window():
     """Factory function to create the main application window.
