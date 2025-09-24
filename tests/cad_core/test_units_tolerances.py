@@ -1,6 +1,4 @@
-import math
-
-from cad_core.units import EPS, almost_equal, clamp, sgn, round_tol
+from cad_core.units import EPS, almost_equal, clamp, round_tol, sgn
 
 
 def test_eps_value_and_usage():

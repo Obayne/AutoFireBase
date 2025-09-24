@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from decimal import ROUND_HALF_UP, Decimal
+
 MM_PER_INCH = 25.4
 
 # Global default tolerance for geometric comparisons
@@ -37,8 +39,6 @@ def round_tol(value: float, tol: float = 1e-6) -> float:
         return value
     # Try decimal quantization for decimal-friendly tolerances to avoid FP drift
     try:
-        from decimal import Decimal, ROUND_HALF_UP
-
         dval = Decimal(str(value))
         dtol = Decimal(str(tol))
         q = (dval / dtol).to_integral_value(rounding=ROUND_HALF_UP)
