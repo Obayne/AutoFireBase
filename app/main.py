@@ -962,7 +962,17 @@ class MainWindow(QMainWindow):
         act_undo = QtGui.QAction("Undo", self); act_undo.setShortcut(QtGui.QKeySequence.Undo); act_undo.triggered.connect(self.undo); m_edit.addAction(act_undo)
         act_redo = QtGui.QAction("Redo", self); act_redo.setShortcut(QtGui.QKeySequence.Redo); act_redo.triggered.connect(self.redo); m_edit.addAction(act_redo)
         m_edit.addSeparator()
+        act_cut = QtGui.QAction("Cut", self); act_cut.setShortcut(QtGui.QKeySequence.Cut); act_cut.triggered.connect(self.cut_selection); m_edit.addAction(act_cut)
+        act_copy = QtGui.QAction("Copy", self); act_copy.setShortcut(QtGui.QKeySequence.Copy); act_copy.triggered.connect(self.copy_selection); m_edit.addAction(act_copy)
+        act_paste = QtGui.QAction("Paste", self); act_paste.setShortcut(QtGui.QKeySequence.Paste); act_paste.triggered.connect(self.paste_selection); m_edit.addAction(act_paste)
+        m_edit.addSeparator()
+        act_sel_all = QtGui.QAction("Select All", self); act_sel_all.setShortcut(QtGui.QKeySequence.SelectAll); act_sel_all.triggered.connect(self.select_all_items); m_edit.addAction(act_sel_all)
+        act_clear_sel = QtGui.QAction("Clear Selection", self); act_clear_sel.triggered.connect(self.clear_selection); m_edit.addAction(act_clear_sel)
+        m_edit.addSeparator()
         act_del  = QtGui.QAction("Delete", self); act_del.setShortcut(Qt.Key_Delete); act_del.triggered.connect(self.delete_selection); m_edit.addAction(act_del)
+        m_edit.addSeparator()
+        act_find = QtGui.QAction("Find...", self); act_find.setShortcut(QtGui.QKeySequence.Find); act_find.triggered.connect(self.find_items); m_edit.addAction(act_find)
+        act_replace = QtGui.QAction("Find and Replace...", self); act_replace.setShortcut(QtGui.QKeySequence.Replace); act_replace.triggered.connect(self.replace_items); m_edit.addAction(act_replace)
 
         m_tools = menubar.addMenu("&Tools")
 
@@ -1000,28 +1010,22 @@ class MainWindow(QMainWindow):
         
         # (Settings moved under File)
 
+        # View menu
+        m_view = menubar.addMenu("&View")
+        m_view.addAction("Zoom In", self.zoom_in, QtGui.QKeySequence.ZoomIn)
+        m_view.addAction("Zoom Out", self.zoom_out, QtGui.QKeySequence.ZoomOut)
+        m_view.addAction("Zoom to Fit", self.fit_view_to_content, "F2")
+        m_view.addAction("Zoom to Selection", self.zoom_to_selection)
+        m_view.addSeparator()
+        m_view.addAction("Pan View", self.pan_view, "Space")
+        m_view.addSeparator()
+        m_view.addAction("Toggle Grid", self.toggle_grid_view)
+        m_view.addAction("Toggle Snap", self.toggle_snap_view)
+        m_view.addAction("Toggle Crosshair", self.toggle_crosshair_view)
+        m_view.addAction("Toggle Coverage", self.toggle_coverage_view)
+        
         # Layout / Paper Space
         m_layout = menubar.addMenu("&Layout")
-        m_layout.addAction("Add Page FrameΓÇª", self.add_page_frame)
-        m_layout.addAction("Remove Page Frame", self.remove_page_frame)
-        m_layout.addAction("Add/Update Title BlockΓÇª", self.add_or_update_title_block)
-        m_layout.addAction("Job Information...", self.show_job_info_dialog)
-        m_layout.addAction("Page SetupΓÇª", self.page_setup_dialog)
-        m_layout.addAction("Add Viewport", self.add_viewport)
-        m_layout.addSeparator()
-        m_layout.addAction("Switch to Paper Space", lambda: self.toggle_paper_space(True))
-        m_layout.addAction("Switch to Model Space", lambda: self.toggle_paper_space(False))
-        scale_menu = m_layout.addMenu("Print Scale")
-        def add_scale(label, inches_per_ft):
-            act = QtGui.QAction(label, self)
-            act.triggered.connect(lambda v=inches_per_ft: self.set_print_scale(v))
-            scale_menu.addAction(act)
-        for lbl, v in [("1/16\" = 1'", 1.0/16.0), ("3/32\" = 1'", 3.0/32.0), ("1/8\" = 1'", 1.0/8.0), ("3/16\" = 1'", 3.0/16.0), ("1/4\" = 1'", 0.25), ("3/8\" = 1'", 0.375), ("1/2\" = 1'", 0.5), ("1\" = 1'", 1.0)]:
-            add_scale(lbl, v)
-        scale_menu.addAction("CustomΓÇª", self.set_print_scale_custom)
-        # Status bar: left space selector/lock; right badges
-        self.space_combo = QtWidgets.QComboBox(); self.space_combo.addItems(["Model","Paper"]) ; self.space_combo.setCurrentIndex(0)
-        self.space_lock = QtWidgets.QToolButton(); self.space_lock.setCheckable(True); self.space_lock.setText("Lock")
         self.statusBar().addWidget(QtWidgets.QLabel("Space:"))
         self.statusBar().addWidget(self.space_combo)
         self.statusBar().addWidget(self.space_lock)
@@ -1036,11 +1040,16 @@ class MainWindow(QMainWindow):
 
         # Optional Dev menu (env-gated, passive)
         try:
-            if os.getenv("FRONTEND_OPS_TOOLS"):
+            if os.getenv("FRONTEND_OPS_TOOLS") or os.getenv("FRONTEND_DEV_ERRORS"):
                 m_dev = menubar.addMenu("&Dev")
-                act = QtGui.QAction("Log Ops Tools", self)
-                act.triggered.connect(self._dev_log_ops_tools)
-                m_dev.addAction(act)
+                if os.getenv("FRONTEND_OPS_TOOLS"):
+                    act = QtGui.QAction("Log Ops Tools", self)
+                    act.triggered.connect(self._dev_log_ops_tools)
+                    m_dev.addAction(act)
+                if os.getenv("FRONTEND_DEV_ERRORS"):
+                    self._init_dev_errors_dock()
+                    m_dev.addAction("Show Dev Errors", self._dev_show_errors)
+                    m_dev.addAction("Clear Dev Errors", self._dev_clear_errors)
         except Exception:
             pass
 
@@ -1086,6 +1095,42 @@ class MainWindow(QMainWindow):
                 pass
         except Exception as e:
             print("[Dev] Error while logging ops tools:", e)
+
+    def _init_dev_errors_dock(self):
+        try:
+            from frontend.dev_errors import bus
+
+            self._dev_errors_text = QtWidgets.QPlainTextEdit()
+            self._dev_errors_text.setReadOnly(True)
+            try:
+                for m in bus.snapshot():
+                    self._dev_errors_text.appendPlainText(m)
+            except Exception:
+                pass
+
+            def _on_err(msg: str):
+                self._dev_errors_text.appendPlainText(msg)
+
+            bus.subscribe(_on_err)
+            self._dev_err_unsub = lambda: bus.unsubscribe(_on_err)
+
+            dock = QtWidgets.QDockWidget("Dev Errors", self)
+            dock.setWidget(self._dev_errors_text)
+            self.addDockWidget(Qt.BottomDockWidgetArea, dock)
+            dock.hide()
+            self._dev_errors_dock = dock
+        except Exception as e:
+            print("[Dev] Could not init Dev Errors dock:", e)
+            self._dev_errors_dock = None
+            self._dev_err_unsub = lambda: None
+
+    def _dev_show_errors(self):
+        if getattr(self, "_dev_errors_dock", None) is not None:
+            self._dev_errors_dock.show()
+
+    def _dev_clear_errors(self):
+        if getattr(self, "_dev_errors_text", None) is not None:
+            self._dev_errors_text.clear()
 
     def _on_space_combo_changed(self, idx: int):
         if self.space_lock.isChecked():
@@ -2956,6 +3001,58 @@ Version: {APP_VERSION}
                 self.connections_tree.remove_device(it)
             it.scene().removeItem(it)
         self.push_history()
+
+    def update_recent_files_menu(self):
+        """Update the recent files submenu with the most recently opened files."""
+        self.recent_files_menu.clear()
+        # For now, just add a placeholder
+        placeholder = QtGui.QAction("(No recent files)", self)
+        placeholder.setEnabled(False)
+        self.recent_files_menu.addAction(placeholder)
+
+    def print_document(self):
+        """Print the current document."""
+        # For now, just show a message that printing is not yet implemented
+        QtWidgets.QMessageBox.information(self, "Print", "Printing is not yet implemented.")
+
+    def print_preview(self):
+        """Show a print preview of the current document."""
+        # For now, just show a message that print preview is not yet implemented
+        QtWidgets.QMessageBox.information(self, "Print Preview", "Print preview is not yet implemented.")
+
+    def cut_selection(self):
+        """Cut the selected items."""
+        # For now, just show a message that cutting is not yet implemented
+        QtWidgets.QMessageBox.information(self, "Cut", "Cut is not yet implemented.")
+
+    def copy_selection(self):
+        """Copy the selected items."""
+        # For now, just show a message that copying is not yet implemented
+        QtWidgets.QMessageBox.information(self, "Copy", "Copy is not yet implemented.")
+
+    def paste_selection(self):
+        """Paste the copied items."""
+        # For now, just show a message that pasting is not yet implemented
+        QtWidgets.QMessageBox.information(self, "Paste", "Paste is not yet implemented.")
+
+    def select_all_items(self):
+        """Select all items in the current view."""
+        # For now, just show a message that select all is not yet implemented
+        QtWidgets.QMessageBox.information(self, "Select All", "Select all is not yet implemented.")
+
+    def clear_selection(self):
+        """Clear the current selection."""
+        self.scene.clearSelection()
+
+    def find_items(self):
+        """Find items in the current view."""
+        # For now, just show a message that finding is not yet implemented
+        QtWidgets.QMessageBox.information(self, "Find", "Find is not yet implemented.")
+
+    def replace_items(self):
+        """Find and replace items in the current view."""
+        # For now, just show a message that replacing is not yet implemented
+        QtWidgets.QMessageBox.information(self, "Replace", "Replace is not yet implemented.")
 
 def create_window():
     """Factory function to create the main application window.
