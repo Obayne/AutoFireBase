@@ -35,5 +35,13 @@ def sgn(x: float, tol: float = EPS) -> int:
 def round_tol(value: float, tol: float = 1e-6) -> float:
     if tol <= 0:
         return value
-    return round(value / tol) * tol
+    # Try decimal quantization for decimal-friendly tolerances to avoid FP drift
+    try:
+        from decimal import Decimal, ROUND_HALF_UP
 
+        dval = Decimal(str(value))
+        dtol = Decimal(str(tol))
+        q = (dval / dtol).to_integral_value(rounding=ROUND_HALF_UP)
+        return float(q * dtol)
+    except Exception:
+        return round(value / tol) * tol
