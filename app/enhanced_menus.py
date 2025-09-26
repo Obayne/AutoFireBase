@@ -176,6 +176,37 @@ def add_main_window_methods(main_window_class):
         """Clear selection."""
         self.scene.clearSelection()
 
+    def show_user_guide(self):
+        """Open the local user guide in the default viewer."""
+        try:
+            from PySide6 import QtGui
+
+            docs_path = QtCore.QDir.cleanPath(QtCore.QDir.current().filePath("docs/UserGuide.md"))
+            url = QtCore.QUrl.fromLocalFile(docs_path)
+            QtGui.QDesktopServices.openUrl(url)
+        except Exception:
+            QtWidgets.QMessageBox.information(
+                self,
+                "Documentation",
+                "Couldn't open the local user guide. Please check docs/UserGuide.md.",
+            )
+
+    def show_shortcuts(self):
+        """Display a simple dialog listing common keyboard shortcuts."""
+        msg = (
+            "Keyboard Shortcuts\n\n"
+            "Ctrl+N – New\n"
+            "Ctrl+O – Open\n"
+            "Save As – standard shortcut\n"
+            "Ctrl+Z / Ctrl+Y – Undo / Redo\n"
+            "Delete – Delete selection\n"
+            "D – Dimension tool\n"
+            "Esc – Cancel active tool\n"
+            "F2 – Fit view to content\n"
+            "X – Toggle crosshair\n"
+        )
+        QtWidgets.QMessageBox.information(self, "Keyboard Shortcuts", msg)
+
     def zoom_in(self):
         """Zoom in."""
         self.view.scale(1.15, 1.15)
