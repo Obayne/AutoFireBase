@@ -1,11 +1,14 @@
 [tool.black]
 line-length = 100
 target-version = ["py311"]
+extend-exclude = '''
+(_backups|tools|updater|scripts/archive|dist|build|\.venv)
+'''
 
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-extend-exclude = ["build", "dist", ".venv"]
+extend-exclude = ["build", "dist", ".venv", "_backups", "tools", "updater", "scripts/archive"]
 
 [tool.ruff.lint]
 select = [
@@ -17,4 +20,10 @@ select = [
 
 [tool.ruff.format]
 quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = [
+  "tests",
+]
+addopts = "-q"
 

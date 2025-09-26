@@ -1,5 +1,9 @@
 # app/boot.py — dynamic entry, resilient to missing create_window
-import os, sys, traceback, time, importlib
+import importlib
+import os
+import sys
+import time
+import traceback
 
 # Ensure project root is on sys.path when running from source
 HERE = os.path.dirname(__file__)
@@ -13,6 +17,7 @@ if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
     if meipass and meipass not in sys.path:
         sys.path.insert(0, meipass)
 
+
 def log_startup_error(msg: str):
     try:
         base = os.path.join(os.path.expanduser("~"), "AutoFire", "logs")
@@ -25,6 +30,7 @@ def log_startup_error(msg: str):
     except Exception:
         return None
 
+
 def resolve_create_window():
     """Return a callable that builds the main window."""
     main_mod = importlib.import_module("app.main")
@@ -35,8 +41,10 @@ def resolve_create_window():
     # Fallback: direct MainWindow construction
     MW = getattr(main_mod, "MainWindow", None)
     if MW is not None:
+
         def _cw():
             return MW()
+
         return _cw
     # Nothing suitable found
     raise ImportError(
@@ -44,12 +52,21 @@ def resolve_create_window():
         f"Found: {', '.join([n for n in dir(main_mod) if not n.startswith('_')])}"
     )
 
+
 def main():
     try:
         from PySide6 import QtWidgets
     except Exception:
         log_startup_error(traceback.format_exc())
         raise
+
+    # Try to apply optional updates; never crash on failure or absence.
+    try:
+        from backend.update_runner import run_updater_safe
+
+        run_updater_safe()
+    except Exception:
+        pass
 
     try:
         create_window = resolve_create_window()
@@ -60,6 +77,7 @@ def main():
         app = QtWidgets.QApplication([])
         w = QtWidgets.QWidget()
         from PySide6 import QtCore
+
         w.setWindowTitle("Auto-Fire (fallback)")
         w.resize(600, 320)
         lab = QtWidgets.QLabel(
@@ -68,8 +86,10 @@ def main():
             "Tip: ensure app/main.py defines create_window() or a MainWindow class."
         )
         lab.setAlignment(QtCore.Qt.AlignCenter)
-        lay = QtWidgets.QVBoxLayout(w); lay.addWidget(lab)
-        w.show(); app.exec()
+        lay = QtWidgets.QVBoxLayout(w)
+        lay.addWidget(lab)
+        w.show()
+        app.exec()
         return
 
     # Normal path
@@ -77,6 +97,7 @@ def main():
     win = create_window()
     win.show()
     app.exec()
+
 
 if __name__ == "__main__":
     main()
