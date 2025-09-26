@@ -1,7 +1,12 @@
 # Changelog
 
 ## [Unreleased]
-- TBD
+- Startup: updater is optional and no longer blocks app launch if missing (safe wrapper in backend; wired in boot).
+- CAD Core: fixed 3-point arc angle normalization and chamfer line helpers; tests now pass green (46/46).
+- Tests: headless Qt init to avoid QFontDatabase errors; limit collection to tests/.
+- Docs: added docs/UserGuide.md, docs/Shortcuts.md, and docs/PaperSpace.md (current state + plan).
+- Help: added Open_Help.cmd and Help menu handlers to open docs and show shortcuts.
+- Repo hygiene: ignore local `_backups/` and remove embedded backup from index.
 
 ## [0.4.7] - 2025-09-12
 - Fillet radius UI + CAD core geometry (lines, circles, fillets)

@@ -12,6 +12,12 @@ Drawing Basics
 - Use the Dimension tool (D) and Measure from the CAD toolbar.
 - Use Esc to cancel the active tool; F2 to fit view to content.
 
+PaperSpace Basics
+- Switch to Paper Space via Layouts menu when ready to lay out a sheet.
+- Use the slide-out Layout Drawer (as it becomes available) to choose page size/orientation, add windows, and export.
+- Place layout-only annotations (text, dims, leaders) directly on PaperSpace; windows show your ModelSpace at a chosen scale.
+- Layer visibility per window and DXF/PDF exports are evolving; see docs/PaperSpace.md for current status.
+
 Underlays
 - Import DXF/PDF underlays: File > Import.
 - Scale underlay: Tools > Utilities > Underlay Scale (Reference/Drag/Factor).
