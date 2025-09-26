@@ -15,6 +15,9 @@ ENV/
 build/
 dist/
 
+# Local backups (do not commit)
+_backups/
+
 # Backups and temp files
 *.bak
 *.bak-*
