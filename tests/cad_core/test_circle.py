@@ -1,7 +1,6 @@
-import math
 
+from cad_core.circle import Circle, circle_circle_intersections, line_circle_intersections
 from cad_core.lines import Line, Point
-from cad_core.circle import Circle, line_circle_intersections, circle_circle_intersections
 
 
 def test_line_circle_two_points():
@@ -20,4 +19,3 @@ def test_circle_circle_two_points():
     # y coordinates symmetric
     ys = sorted(p.y for p in pts)
     assert abs(ys[0] + ys[1]) < 1e-9
-

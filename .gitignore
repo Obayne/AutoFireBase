@@ -42,3 +42,4 @@ Thumbs.db
 .eggs/
 *.dist-info/
 pip-wheel-metadata/
+.aider*

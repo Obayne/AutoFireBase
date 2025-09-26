@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import List
 
-from .lines import Line, Point, _sub, _dot, _add, _scale
+from .lines import Line, Point, _add, _dot, _scale, _sub
 
 
 @dataclass(frozen=True)
@@ -13,7 +12,7 @@ class Circle:
     radius: float
 
 
-def line_circle_intersections(line: Line, circle: Circle, tol: float = 1e-9) -> List[Point]:
+def line_circle_intersections(line: Line, circle: Circle, tol: float = 1e-9) -> list[Point]:
     """Intersect an infinite line with a circle. Returns 0, 1, or 2 points."""
 
     # Shift coordinates so circle center is origin
@@ -42,7 +41,7 @@ def line_circle_intersections(line: Line, circle: Circle, tol: float = 1e-9) -> 
     return [P1, P2]
 
 
-def circle_circle_intersections(c1: Circle, c2: Circle, tol: float = 1e-9) -> List[Point]:
+def circle_circle_intersections(c1: Circle, c2: Circle, tol: float = 1e-9) -> list[Point]:
     """Intersect two circles. Returns 0, 1, or 2 points."""
 
     x0, y0 = c1.center.x, c1.center.y
@@ -71,7 +70,9 @@ def circle_circle_intersections(c1: Circle, c2: Circle, tol: float = 1e-9) -> Li
     ym = y0 + a * (dy / d if d != 0 else 0.0)
 
     if h <= tol:
-        return [Point(xm, ym)]
+        # Tangent: return the point twice for consistent downstream handling
+        p = Point(xm, ym)
+        return [p, p]
 
     rx = -dy * (h / d)
     ry = dx * (h / d)
@@ -81,4 +82,3 @@ def circle_circle_intersections(c1: Circle, c2: Circle, tol: float = 1e-9) -> Li
 
 
 __all__ = ["Circle", "line_circle_intersections", "circle_circle_intersections"]
-

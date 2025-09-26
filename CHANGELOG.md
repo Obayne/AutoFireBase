@@ -1,5 +1,7 @@
 # Changelog
 
+## [Unreleased]
+- TBD
 
 ## [0.4.7] - 2025-09-12
 - Fillet radius UI + CAD core geometry (lines, circles, fillets)

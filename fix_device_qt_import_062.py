@@ -2,11 +2,13 @@
 # Purpose: fix NameError in app/device.py by ensuring `from PySide6.QtCore import Qt`
 # Safe: makes a timestamped backup alongside device.py
 
+import sys
+import time
 from pathlib import Path
-import time, sys
 
 root = Path(__file__).resolve().parent
 device_py = root / "app" / "device.py"
+
 
 def main():
     if not device_py.exists():
@@ -25,7 +27,9 @@ def main():
         if line.strip().startswith("from PySide6") or line.strip().startswith("import PySide6"):
             # Look ahead to the end of the contiguous import block
             j = i
-            while j + 1 < len(lines) and lines[j+1].strip().startswith(("from PySide6", "import PySide6")):
+            while j + 1 < len(lines) and lines[j + 1].strip().startswith(
+                ("from PySide6", "import PySide6")
+            ):
                 j += 1
             lines.insert(j + 1, "from PySide6.QtCore import Qt")
             inserted = True
@@ -46,6 +50,7 @@ def main():
     print(f"[backup] {backup}")
     print(f"[write ] {device_py}")
     print("Done. Launch with:  py -3 -m app.boot")
+
 
 if __name__ == "__main__":
     main()

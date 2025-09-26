@@ -1,5 +1,5 @@
+from PySide6 import QtWidgets
 
-from PySide6 import QtCore, QtGui, QtWidgets
 
 class SettingsDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, init=None):
@@ -8,13 +8,18 @@ class SettingsDialog(QtWidgets.QDialog):
         init = init or {}
         form = QtWidgets.QFormLayout(self)
 
-        self.chk_grid = QtWidgets.QCheckBox(); self.chk_grid.setChecked(bool(init.get("show_grid", True)))
-        self.chk_snap = QtWidgets.QCheckBox(); self.chk_snap.setChecked(bool(init.get("snap", True)))
+        self.chk_grid = QtWidgets.QCheckBox()
+        self.chk_grid.setChecked(bool(init.get("show_grid", True)))
+        self.chk_snap = QtWidgets.QCheckBox()
+        self.chk_snap.setChecked(bool(init.get("snap", True)))
 
-        self.cmb_theme = QtWidgets.QComboBox(); self.cmb_theme.addItems(["dark","light"])
-        self.cmb_theme.setCurrentText((init.get("theme") or "dark"))
+        self.cmb_theme = QtWidgets.QComboBox()
+        self.cmb_theme.addItems(["dark", "light"])
+        self.cmb_theme.setCurrentText(init.get("theme") or "dark")
 
-        self.spin_ppf = QtWidgets.QDoubleSpinBox(); self.spin_ppf.setRange(1.0, 2000.0); self.spin_ppf.setDecimals(2)
+        self.spin_ppf = QtWidgets.QDoubleSpinBox()
+        self.spin_ppf.setRange(1.0, 2000.0)
+        self.spin_ppf.setDecimals(2)
         self.spin_ppf.setValue(float(init.get("px_per_ft", 12.0)))
 
         form.addRow("Show grid", self.chk_grid)
@@ -22,8 +27,11 @@ class SettingsDialog(QtWidgets.QDialog):
         form.addRow("Theme", self.cmb_theme)
         form.addRow("Pixels per foot", self.spin_ppf)
 
-        btns = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
-        btns.accepted.connect(self.accept); btns.rejected.connect(self.reject)
+        btns = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        )
+        btns.accepted.connect(self.accept)
+        btns.rejected.connect(self.reject)
         form.addRow(btns)
 
     def values(self):

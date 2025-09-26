@@ -1,5 +1,4 @@
-﻿
-from PySide6 import QtCore, QtGui, QtWidgets
+﻿from PySide6 import QtCore, QtGui, QtWidgets
 
 PAGE_SIZES = {
     "Letter": (8.5, 11),
@@ -16,6 +15,7 @@ PAGE_SIZES = {
     "Arch E": (36, 48),
 }
 
+
 class PageFrame(QtWidgets.QGraphicsItemGroup):
     def __init__(self, px_per_ft: float, size_name="Letter", orientation="Portrait", margin_in=0.5):
         super().__init__()
@@ -23,34 +23,50 @@ class PageFrame(QtWidgets.QGraphicsItemGroup):
         self._size_name = size_name
         self._orient = orientation
         self._margin_in = float(margin_in)
-        self._outer = QtWidgets.QGraphicsRectItem(); self._outer.setPen(QtGui.QPen(QtGui.QColor(180,180,180)))
-        self._inner = QtWidgets.QGraphicsRectItem(); pen = QtGui.QPen(QtGui.QColor(130,130,130)); pen.setStyle(QtCore.Qt.DashLine); self._inner.setPen(pen)
-        self.addToGroup(self._outer); self.addToGroup(self._inner)
+        self._outer = QtWidgets.QGraphicsRectItem()
+        self._outer.setPen(QtGui.QPen(QtGui.QColor(180, 180, 180)))
+        self._inner = QtWidgets.QGraphicsRectItem()
+        pen = QtGui.QPen(QtGui.QColor(130, 130, 130))
+        pen.setStyle(QtCore.Qt.DashLine)
+        self._inner.setPen(pen)
+        self.addToGroup(self._outer)
+        self.addToGroup(self._inner)
         self.setZValue(-50)
         self._recalc()
 
     def _inch_to_px(self, inches: float) -> float:
-        return (float(inches)/12.0) * self._px_per_ft
+        return (float(inches) / 12.0) * self._px_per_ft
 
     def _recalc(self):
         w_in, h_in = PAGE_SIZES.get(self._size_name, PAGE_SIZES["Letter"])
         if (self._orient or "Portrait").lower().startswith("land"):
             w_in, h_in = h_in, w_in
-        w_px = self._inch_to_px(w_in); h_px = self._inch_to_px(h_in)
+        w_px = self._inch_to_px(w_in)
+        h_px = self._inch_to_px(h_in)
         m = self._inch_to_px(self._margin_in)
         self._outer.setRect(0, 0, w_px, h_px)
-        self._inner.setRect(m, m, max(0, w_px-2*m), max(0, h_px-2*m))
+        self._inner.setRect(m, m, max(0, w_px - 2 * m), max(0, h_px - 2 * m))
 
     def set_params(self, *, size_name=None, orientation=None, margin_in=None, px_per_ft=None):
-        if size_name: self._size_name = size_name
-        if orientation: self._orient = orientation
-        if margin_in is not None: self._margin_in = float(margin_in)
-        if px_per_ft is not None: self._px_per_ft = float(px_per_ft)
+        if size_name:
+            self._size_name = size_name
+        if orientation:
+            self._orient = orientation
+        if margin_in is not None:
+            self._margin_in = float(margin_in)
+        if px_per_ft is not None:
+            self._px_per_ft = float(px_per_ft)
         self._recalc()
 
 
 class TitleBlock(QtWidgets.QGraphicsItemGroup):
-    def __init__(self, px_per_ft: float, size_name="Letter", orientation="Landscape", meta: dict | None = None):
+    def __init__(
+        self,
+        px_per_ft: float,
+        size_name="Letter",
+        orientation="Landscape",
+        meta: dict | None = None,
+    ):
         super().__init__()
         self._px_per_ft = float(px_per_ft)
         self._size = size_name
@@ -61,7 +77,7 @@ class TitleBlock(QtWidgets.QGraphicsItemGroup):
         self._build()
 
     def _inch_to_px(self, inches: float) -> float:
-        return (float(inches)/12.0) * self._px_per_ft
+        return (float(inches) / 12.0) * self._px_per_ft
 
     def _build(self):
         # Simple block at bottom right with a few fields
@@ -90,6 +106,7 @@ class TitleBlock(QtWidgets.QGraphicsItemGroup):
         box.setBrush(QtCore.Qt.NoBrush)
         self.addToGroup(box)
         self._items.append(box)
+
         # Text rows
         def add_line(label, value, y_off_in):
             y = rect.top() + self._inch_to_px(y_off_in)
@@ -113,7 +130,12 @@ class TitleBlock(QtWidgets.QGraphicsItemGroup):
 
 
 class ViewportItem(QtWidgets.QGraphicsRectItem):
-    def __init__(self, model_scene: QtWidgets.QGraphicsScene, rect: QtCore.QRectF, window: QtWidgets.QMainWindow | None = None):
+    def __init__(
+        self,
+        model_scene: QtWidgets.QGraphicsScene,
+        rect: QtCore.QRectF,
+        window: QtWidgets.QMainWindow | None = None,
+    ):
         super().__init__(rect)
         self.model_scene = model_scene
         self.win = window
@@ -125,10 +147,12 @@ class ViewportItem(QtWidgets.QGraphicsRectItem):
         except Exception:
             self.src_center = QtCore.QPointF(0, 0)
         self.locked = False
-        self.setPen(QtGui.QPen(QtGui.QColor(160,160,160)))
+        self.setPen(QtGui.QPen(QtGui.QColor(160, 160, 160)))
         self.setBrush(QtCore.Qt.NoBrush)
         self.setZValue(5)
-        self.setFlags(QtWidgets.QGraphicsItem.ItemIsSelectable | QtWidgets.QGraphicsItem.ItemIsMovable)
+        self.setFlags(
+            QtWidgets.QGraphicsItem.ItemIsSelectable | QtWidgets.QGraphicsItem.ItemIsMovable
+        )
 
     def set_scale_factor(self, f: float):
         self.scale_factor = max(0.001, float(f))
@@ -144,10 +168,19 @@ class ViewportItem(QtWidgets.QGraphicsRectItem):
         act_center = m.addAction("Center on Model View")
         act_fit = m.addAction("Fit Model to Viewport")
         act_lock = m.addAction("Lock Viewport")
-        act_lock.setCheckable(True); act_lock.setChecked(self.locked)
+        act_lock.setCheckable(True)
+        act_lock.setChecked(self.locked)
         chosen = m.exec(event.screenPos())
         if chosen == act_scale:
-            val, ok = QtWidgets.QInputDialog.getDouble(self.win or None, "Viewport Scale", "Scale factor", self.scale_factor, 0.001, 1000.0, 3)
+            val, ok = QtWidgets.QInputDialog.getDouble(
+                self.win or None,
+                "Viewport Scale",
+                "Scale factor",
+                self.scale_factor,
+                0.001,
+                1000.0,
+                3,
+            )
             if ok:
                 self.set_scale_factor(val)
         elif chosen == act_center:
@@ -174,7 +207,9 @@ class ViewportItem(QtWidgets.QGraphicsRectItem):
         painter.setClipRect(r)
         w_src = r.width() * self.scale_factor
         h_src = r.height() * self.scale_factor
-        src = QtCore.QRectF(self.src_center.x() - w_src/2, self.src_center.y() - h_src/2, w_src, h_src)
+        src = QtCore.QRectF(
+            self.src_center.x() - w_src / 2, self.src_center.y() - h_src / 2, w_src, h_src
+        )
         # draw border
         super().paint(painter, option, widget)
         # render model scene into this item
@@ -198,4 +233,3 @@ class ViewportItem(QtWidgets.QGraphicsRectItem):
             self.update()
         except Exception:
             pass
-

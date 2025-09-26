@@ -38,9 +38,10 @@ jobs:
           script: |
             const fs = require('fs');
             const cp = require('child_process');
-            // Attempt to detect the most recent branch created by this run
-            const out = cp.execSync('git branch --show-current').toString().trim();
-            const head = out && out !== '' ? out : null;
+            // Detect branch name robustly in Actions (detached HEAD common)
+            const ref = context.ref || '';
+            const refName = ref.startsWith('refs/heads/') ? ref.replace('refs/heads/','') : (process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || '');
+            const head = (refName && refName !== '') ? refName : null;
             if (!head || head === 'main' || head.startsWith('chore/')) {
               core.info('No feature branch detected for PR.');
               return;

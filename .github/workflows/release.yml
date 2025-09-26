@@ -17,25 +17,44 @@ jobs:
         shell: pwsh
         run: |
           ./Build_AutoFire.ps1
+      - name: Locate built EXE
+        id: find
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Path dist -Recurse -Filter AutoFire.exe -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $exe) { Write-Error "AutoFire.exe not found under dist/"; exit 1 }
+          echo "exe_path=$exe" >> $env:GITHUB_OUTPUT
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: AutoFire-windows
-          path: dist/AutoFire/AutoFire/AutoFire.exe
+          path: ${{ steps.find.outputs.exe_path }}
 
   release:
     needs: build-windows
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout tag source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: AutoFire-windows
           path: artifacts
+      - name: Generate SHA256 checksum
+        run: |
+          cd artifacts
+          sha256sum AutoFire.exe > AutoFire.exe.sha256
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/AutoFire.exe
+          files: |
+            artifacts/AutoFire.exe
+            artifacts/AutoFire.exe.sha256
+            VERSION.txt
+            CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

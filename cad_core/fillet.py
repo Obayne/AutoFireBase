@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
-from typing import Optional, Tuple
 
-from .lines import Line, Point, intersection_line_line
-from .arc import Arc, arc_from_points
+from .arc import arc_from_points
 from .circle import Circle
+from .lines import Line, Point, intersection_line_line
 
 
 def _len(v: Point) -> float:
@@ -36,7 +34,9 @@ def _dot(a: Point, b: Point) -> float:
     return a.x * b.x + a.y * b.y
 
 
-def fillet_line_line(l1: Line, l2: Line, radius: float, tol: float = 1e-9) -> Optional[Tuple[Point, Point, Point]]:
+def fillet_line_line(
+    l1: Line, l2: Line, radius: float, tol: float = 1e-9
+) -> tuple[Point, Point, Point] | None:
     """Compute fillet between two infinite lines.
 
     Returns (p1, p2, center) where p1 lies on l1, p2 lies on l2, and the
@@ -88,7 +88,8 @@ def fillet_line_line(l1: Line, l2: Line, radius: float, tol: float = 1e-9) -> Op
 
 
 __all__ = ["fillet_line_line"]
- 
+
+
 def fillet_line_circle(line: Line, circle: Circle, radius: float, tol: float = 1e-9):
     """Fillet between an infinite line and a circle (arc). Returns candidates.
 
@@ -113,7 +114,7 @@ def fillet_line_circle(line: Line, circle: Circle, radius: float, tol: float = 1
     normals = [(nx, ny), (-nx, -ny)]
 
     results = []
-    for (nx, ny) in normals:
+    for nx, ny in normals:
         # Offset line for centers: any point C must satisfy n·(C - A) = r
         # We parametrize center candidates along the original line direction
         # and solve intersection with the circle of radius R' around circle.center.
@@ -208,28 +209,72 @@ def fillet_circle_circle(c1: Circle, c2: Circle, radius: float, tol: float = 1e-
     return results
 
 
-def fillet_segments_line_line(seg1: Line, seg2: Line, pick1: Point, pick2: Point, radius: float, tol: float = 1e-9):
+def fillet_segments_line_line(
+    seg1: Line, seg2: Line, pick1: Point, pick2: Point, radius: float, tol: float = 1e-9
+):
     """Fillet two line segments with given pick points and radius.
 
     Returns (new_seg1, new_seg2, arc) or None if fillet cannot be constructed.
     - pick points determine which endpoints to move on each segment.
     - arc connects the two tangent points with a short arc.
     """
-    res = fillet_line_line(seg1, seg2, radius, tol=tol)
-    if res is None:
+    if radius <= tol:
         return None
-    p1, p2, center = res
 
-    # Choose which endpoint to move based on proximity to user pick
-    def move_endpoint(seg: Line, pick: Point, target: Point) -> Line:
+    I = intersection_line_line(seg1, seg2, tol=tol)
+    if I is None:
+        return None
+
+    # Decide which endpoints to move based on user picks
+    def pick_end(seg: Line, pick: Point) -> str:
         d_a = (pick.x - seg.a.x) ** 2 + (pick.y - seg.a.y) ** 2
         d_b = (pick.x - seg.b.x) ** 2 + (pick.y - seg.b.y) ** 2
-        if d_a <= d_b:
+        return "a" if d_a <= d_b else "b"
+
+    end1 = pick_end(seg1, pick1)
+    end2 = pick_end(seg2, pick2)
+
+    # Direction unit vectors away from intersection toward the chosen endpoints
+    def unit_from_I_towards(seg: Line, end: str) -> Point:
+        tgt = seg.a if end == "a" else seg.b
+        v = _sub(tgt, I)
+        l = _len(v)
+        if l <= tol:
+            return Point(0.0, 0.0)
+        return Point(v.x / l, v.y / l)
+
+    # local helpers reused from above
+    def _sub(a: Point, b: Point) -> Point:
+        return Point(a.x - b.x, a.y - b.y)
+
+    u1 = unit_from_I_towards(seg1, end1)
+    u2 = unit_from_I_towards(seg2, end2)
+
+    # Validate angle between directions
+    c = max(-1.0, min(1.0, _dot(u1, u2)))
+    theta = math.acos(c)
+    if theta < tol or abs(math.pi - theta) < tol:
+        return None
+
+    half = theta / 2.0
+    t = radius * math.tan(half)
+    b = _norm(_add(u1, u2))
+    if _len(b) <= tol:
+        return None
+    d = radius / math.sin(half)
+
+    p1 = _add(I, _scale(u1, t))
+    p2 = _add(I, _scale(u2, t))
+    center = _add(I, _scale(b, d))
+
+    # Move the selected endpoints to tangent points
+    def move_to(seg: Line, end: str, target: Point) -> Line:
+        if end == "a":
             return Line(a=target, b=seg.b)
         return Line(a=seg.a, b=target)
 
-    n1 = move_endpoint(seg1, pick1, p1)
-    n2 = move_endpoint(seg2, pick2, p2)
+    n1 = move_to(seg1, end1, p1)
+    n2 = move_to(seg2, end2, p2)
 
     arc = arc_from_points(center, p1, p2, prefer_short=True)
     return (n1, n2, arc)
