@@ -1294,16 +1294,16 @@ class MainWindow(QMainWindow):
         menubar = self.menuBar()
         m_file = menubar.addMenu("&File")
         m_file.addAction("New", self.new_project, QtGui.QKeySequence.New)
-        m_file.addAction("OpenΓÇª", self.open_project, QtGui.QKeySequence.Open)
-        m_file.addAction("Save AsΓÇª", self.save_project_as, QtGui.QKeySequence.SaveAs)
+        m_file.addAction("Open…", self.open_project, QtGui.QKeySequence.Open)
+        m_file.addAction("Save As…", self.save_project_as, QtGui.QKeySequence.SaveAs)
         m_file.addSeparator()
         imp = m_file.addMenu("Import")
-        imp.addAction("DXF UnderlayΓÇª", self.import_dxf_underlay)
-        imp.addAction("PDF UnderlayΓÇª", self.import_pdf_underlay)
+        imp.addAction("DXF Underlay…", self.import_dxf_underlay)
+        imp.addAction("PDF Underlay…", self.import_pdf_underlay)
         exp = m_file.addMenu("Export")
-        exp.addAction("PNGΓÇª", self.export_png)
-        exp.addAction("PDFΓÇª", self.export_pdf)
-        exp.addAction("Device Schedule (CSV)ΓÇª", self.export_device_schedule_csv)
+        exp.addAction("PNG…", self.export_png)
+        exp.addAction("PDF…", self.export_pdf)
+        exp.addAction("Device Schedule (CSV)…", self.export_device_schedule_csv)
         exp.addAction("Bill of Materials (BOM)", self.show_bom_report)
         exp.addAction("Device Schedule", self.show_device_schedule_report)
         exp.addAction("Place Symbol Legend", self.place_symbol_legend)
@@ -1333,6 +1333,28 @@ class MainWindow(QMainWindow):
         act_del.triggered.connect(self.delete_selection)
         m_edit.addAction(act_del)
 
+        # View menu
+        m_view = menubar.addMenu("&View")
+        m_view.addAction("Fit View to Content", self.fit_view_to_content, QtGui.QKeySequence("F2"))
+        m_view.addSeparator()
+        self.act_view_grid = QtGui.QAction("Grid", self, checkable=True)
+        self.act_view_grid.setChecked(True)
+        self.act_view_grid.toggled.connect(self.toggle_grid)
+        m_view.addAction(self.act_view_grid)
+        self.act_view_snap = QtGui.QAction("Snap", self, checkable=True)
+        self.act_view_snap.setChecked(True)
+        self.act_view_snap.toggled.connect(self.toggle_snap)
+        m_view.addAction(self.act_view_snap)
+        self.act_view_cross = QtGui.QAction("Crosshair (X)", self, checkable=True)
+        self.act_view_cross.setChecked(True)
+        self.act_view_cross.toggled.connect(self.toggle_crosshair)
+        m_view.addAction(self.act_view_cross)
+        m_view.addSeparator()
+        m_view.addAction("Zoom In", self.zoom_in, QtGui.QKeySequence.ZoomIn)
+        m_view.addAction("Zoom Out", self.zoom_out, QtGui.QKeySequence.ZoomOut)
+        m_view.addAction("Zoom to Selection", self.zoom_to_selection)
+
+        # Tools menu
         m_tools = menubar.addMenu("&Tools")
 
         def add_tool(name, cb):
@@ -1388,16 +1410,17 @@ class MainWindow(QMainWindow):
         m_tools.addAction("Measure (M)", self.start_measure)
         m_tools.addAction("Generate Riser Diagram", self.generate_riser_diagram)
         m_tools.addAction("Show Calculations", self.show_calculations)
+        m_tools.addAction("Circuit Properties", self.show_circuit_properties)
 
         # (Settings moved under File)
 
         # Layout / Paper Space
         m_layout = menubar.addMenu("&Layout")
-        m_layout.addAction("Add Page FrameΓÇª", self.add_page_frame)
+        m_layout.addAction("Add Page Frame…", self.add_page_frame)
         m_layout.addAction("Remove Page Frame", self.remove_page_frame)
-        m_layout.addAction("Add/Update Title BlockΓÇª", self.add_or_update_title_block)
+        m_layout.addAction("Add/Update Title Block…", self.add_or_update_title_block)
         m_layout.addAction("Job Information...", self.show_job_info_dialog)
-        m_layout.addAction("Page SetupΓÇª", self.page_setup_dialog)
+        m_layout.addAction("Page Setup…", self.page_setup_dialog)
         m_layout.addAction("Add Viewport", self.add_viewport)
         m_layout.addSeparator()
         m_layout.addAction("Switch to Paper Space", lambda: self.toggle_paper_space(True))
@@ -1420,7 +1443,15 @@ class MainWindow(QMainWindow):
             ("1\" = 1'", 1.0),
         ]:
             add_scale(lbl, v)
-        scale_menu.addAction("CustomΓÇª", self.set_print_scale_custom)
+        scale_menu.addAction("Custom…", self.set_print_scale_custom)
+
+        # Help menu
+        m_help = menubar.addMenu("&Help")
+        m_help.addAction("User Guide", self.show_user_guide)
+        m_help.addAction("Keyboard Shortcuts", self.show_shortcuts)
+        m_help.addSeparator()
+        m_help.addAction("About Auto-Fire", self.show_about)
+
         # Status bar: left space selector/lock; right badges
         self.space_combo = QtWidgets.QComboBox()
         self.space_combo.addItems(["Model", "Paper"])
@@ -1461,8 +1492,9 @@ class MainWindow(QMainWindow):
         QtGui.QShortcut(QtGui.QKeySequence("D"), self, activated=self.start_dimension)
         QtGui.QShortcut(QtGui.QKeySequence("Esc"), self, activated=self.cancel_active_tool)
         QtGui.QShortcut(QtGui.QKeySequence("F2"), self, activated=self.fit_view_to_content)
+        QtGui.QShortcut(QtGui.QKeySequence("X"), self, activated=self._toggle_crosshair_shortcut)
 
-        # Selection change ΓåÆ update Properties
+        # Selection change → update Properties
         self.scene.selectionChanged.connect(self._on_selection_changed)
 
         self.history = []
@@ -1473,6 +1505,10 @@ class MainWindow(QMainWindow):
             QtCore.QTimer.singleShot(0, self.fit_view_to_content)
         except Exception:
             pass
+
+    def _toggle_crosshair_shortcut(self):
+        """Toggle crosshair visibility via keyboard shortcut."""
+        self.act_view_cross.setChecked(not self.act_view_cross.isChecked())
 
     def _on_space_combo_changed(self, idx: int):
         if self.space_lock.isChecked():
@@ -1753,109 +1789,6 @@ class MainWindow(QMainWindow):
         dock.setWidget(left)
         self.addDockWidget(Qt.LeftDockWidgetArea, dock)
         # Removed duplicate tab_widget initialization
-
-        dock = QDockWidget("Properties", self)
-        panel = QWidget()
-        form = QVBoxLayout(panel)
-        form.setContentsMargins(8, 8, 8, 8)
-        form.setSpacing(6)
-
-        # layer toggles (visibility)
-        form.addWidget(QLabel("Layers"))
-        self.chk_underlay = QCheckBox("Underlay")
-        self.chk_underlay.setChecked(True)
-        self.chk_underlay.toggled.connect(lambda v: self.layer_underlay.setVisible(v))
-        form.addWidget(self.chk_underlay)
-        self.chk_sketch = QCheckBox("Sketch")
-        self.chk_sketch.setChecked(True)
-        self.chk_sketch.toggled.connect(lambda v: self.layer_sketch.setVisible(v))
-        form.addWidget(self.chk_sketch)
-        self.chk_wires = QCheckBox("Wiring")
-        self.chk_wires.setChecked(True)
-        self.chk_wires.toggled.connect(lambda v: self.layer_wires.setVisible(v))
-        form.addWidget(self.chk_wires)
-        self.chk_devices = QCheckBox("Devices")
-        self.chk_devices.setChecked(True)
-        self.chk_devices.toggled.connect(lambda v: self.layer_devices.setVisible(v))
-        form.addWidget(self.chk_devices)
-
-        self.btn_layer_manager = QPushButton("Layer Manager")
-        self.btn_layer_manager.clicked.connect(self.open_layer_manager)
-        form.addWidget(self.btn_layer_manager)
-
-        # properties
-        form.addSpacing(10)
-        lblp = QLabel("Device Properties")
-        lblp.setStyleSheet("font-weight:600;")
-        form.addWidget(lblp)
-
-        grid = QtWidgets.QGridLayout()
-        grid.setHorizontalSpacing(8)
-        grid.setVerticalSpacing(4)
-        r = 0
-        grid.addWidget(QLabel("Label"), r, 0)
-        self.prop_label = QLineEdit()
-        grid.addWidget(self.prop_label, r, 1)
-        r += 1
-        grid.addWidget(QLabel("Show Coverage"), r, 0)
-        self.prop_showcov = QCheckBox()
-        self.prop_showcov.setChecked(True)
-        grid.addWidget(self.prop_showcov, r, 1)
-        r += 1
-        grid.addWidget(QLabel("Offset X (ft)"), r, 0)
-        self.prop_offx = QDoubleSpinBox()
-        self.prop_offx.setRange(-500, 500)
-        self.prop_offx.setDecimals(2)
-        grid.addWidget(self.prop_offx, r, 1)
-        r += 1
-        grid.addWidget(QLabel("Offset Y (ft)"), r, 0)
-        self.prop_offy = QDoubleSpinBox()
-        self.prop_offy.setRange(-500, 500)
-        self.prop_offy.setDecimals(2)
-        grid.addWidget(self.prop_offy, r, 1)
-        r += 1
-        grid.addWidget(QLabel("Mount"), r, 0)
-        self.prop_mount = QComboBox()
-        self.prop_mount.addItems(["ceiling", "wall"])
-        grid.addWidget(self.prop_mount, r, 1)
-        r += 1
-        grid.addWidget(QLabel("Coverage Mode"), r, 0)
-        self.prop_mode = QComboBox()
-        self.prop_mode.addItems(["none", "strobe", "speaker", "smoke"])
-        grid.addWidget(self.prop_mode, r, 1)
-        r += 1
-        grid.addWidget(QLabel("Candela (strobe)"), r, 0)
-        self.prop_candela = QComboBox()
-        self.prop_candela.addItems(["(custom)", "15", "30", "75", "95", "110", "135", "185"])
-        grid.addWidget(self.prop_candela, r, 1)
-        r += 1
-        grid.addWidget(QLabel("Size (ft)"), r, 0)
-        self.prop_size = QDoubleSpinBox()
-        self.prop_size.setRange(0, 1000)
-        self.prop_size.setDecimals(2)
-        self.prop_size.setSingleStep(1.0)
-        grid.addWidget(self.prop_size, r, 1)
-        r += 1
-
-        form.addLayout(grid)
-        self.btn_apply_props = QPushButton("Apply")
-        form.addWidget(self.btn_apply_props)
-
-        # disable until selection
-        self._enable_props(False)
-
-        self.btn_apply_props.clicked.connect(self._apply_props_clicked)
-        self.prop_label.editingFinished.connect(self._apply_label_offset_live)
-        self.prop_offx.valueChanged.connect(self._apply_label_offset_live)
-        self.prop_offy.valueChanged.connect(self._apply_label_offset_live)
-        self.prop_mode.currentTextChanged.connect(self._on_mode_changed_props)
-
-        panel.setLayout(form)
-        dock.setWidget(panel)
-        self.addDockWidget(Qt.RightDockWidgetArea, dock)
-        self.sheets_dock = dock
-        dock.setVisible(False)
-        self.dock_layers_props = dock
 
     def _build_layers_and_props_dock(self):
         dock = QDockWidget("Properties", self)
@@ -3432,10 +3365,210 @@ class MainWindow(QMainWindow):
         try:
             data = self.serialize_state()
             with open(path, "w") as f:
-                json.dump(data, f, indent=2)
-            self.statusBar().showMessage(f"Saved project: {os.path.basename(path)}")
+                json.dump(data, f)
+            self.statusBar().showMessage(f"Project saved: {os.path.basename(path)}")
+
+            # Update prefs
+            self.prefs["last_open"] = path
+            save_prefs(self.prefs)
+
         except Exception as ex:
             QMessageBox.critical(self, "Save Error", str(ex))
+
+    def save_project(self):
+        if self.prefs["last_open"]:
+            try:
+                data = self.serialize_state()
+                with open(self.prefs["last_open"], "w") as f:
+                    json.dump(data, f)
+                self.statusBar().showMessage(
+                    f"Project saved: {os.path.basename(self.prefs['last_open'])}"
+                )
+            except Exception as ex:
+                QMessageBox.critical(self, "Save Error", str(ex))
+        else:
+            self.save_project_as()
+
+    # ---------- edit operations ----------
+    def undo(self):
+        if self.history_index > 0:
+            self.history_index -= 1
+            self.load_state(self.history[self.history_index])
+            self.statusBar().showMessage("Undo")
+
+    def redo(self):
+        if self.history_index < len(self.history) - 1:
+            self.history_index += 1
+            self.load_state(self.history[self.history_index])
+            self.statusBar().showMessage("Redo")
+
+    # ---------- item operations ----------
+    def add_device(self, device: DeviceItem):
+        try:
+            self.layer_devices.addItem(device)
+            self.push_history()
+            self.statusBar().showMessage(f"Added device: {device.name}")
+        except Exception as ex:
+            QMessageBox.critical(self, "Add Device Error", str(ex))
+
+    def remove_selected_items(self):
+        items = self.scene.selectedItems()
+        if not items:
+            return
+
+        try:
+            for it in items:
+                it.scene().removeItem(it)
+            self.push_history()
+            self.statusBar().showMessage(f"Removed {len(items)} items")
+        except Exception as ex:
+            QMessageBox.critical(self, "Remove Items Error", str(ex))
+
+    def copy_selected_items(self):
+        items = self.scene.selectedItems()
+        if not items:
+            return
+
+        try:
+            self.clipboard = [it.clone() for it in items]
+            self.statusBar().showMessage(f"Copied {len(items)} items")
+        except Exception as ex:
+            QMessageBox.critical(self, "Copy Items Error", str(ex))
+
+    def paste_items(self):
+        if not self.clipboard:
+            return
+
+        try:
+            # Create a group to hold the pasted items
+            group = QtWidgets.QGraphicsItemGroup()
+
+            # Add each item to the group and to the appropriate layer
+            for it in self.clipboard:
+                it.setPos(it.pos().x() + 20, it.pos().y() + 20)
+                group.addToGroup(it)
+                if isinstance(it, DeviceItem):
+                    self.layer_devices.addItem(it)
+                elif isinstance(it, QtWidgets.QGraphicsPathItem):  # Wire items are path items
+                    self.layer_wires.addItem(it)
+                else:
+                    # For underlay items, just ensure they're in the right layer
+                    # Underlay items are already in self.layer_underlay
+                    pass
+
+            # Add the group to the scene
+            self.scene.addItem(group)
+
+            # Select the pasted items
+            self.scene.clearSelection()
+            for it in group.childItems():
+                it.setSelected(True)
+
+            self.push_history()
+            self.statusBar().showMessage(f"Pasted {len(self.clipboard)} items")
+        except Exception as ex:
+            QMessageBox.critical(self, "Paste Items Error", str(ex))
+
+    def offset_selected_items(self):
+        items = self.scene.selectedItems()
+        if not items:
+            return
+
+        distance, ok = QtWidgets.QInputDialog.getDouble(
+            self, "Offset", "Distance (ft):", 1.0, -1000.0, 1000.0, 2
+        )
+        if not ok:
+            return
+
+        try:
+            # Convert distance to pixels
+            distance_px = distance * self.px_per_ft
+
+            # Offset selected items
+            for it in items:
+                if isinstance(it, QtWidgets.QGraphicsItemGroup):
+                    # For groups, offset each child
+                    for child in it.childItems():
+                        pos = child.pos()
+                        child.setPos(pos.x() + distance_px, pos.y() + distance_px)
+                else:
+                    # For individual items, offset the position
+                    pos = it.pos()
+                    it.setPos(pos.x() + distance_px, pos.y() + distance_px)
+
+            self.push_history()
+            self.statusBar().showMessage(f"Offset {len(items)} items by {distance} ft")
+        except Exception as ex:
+            QMessageBox.critical(self, "Offset Error", str(ex))
+
+    # ---------- view tools ----------
+    def fit_view_to_content(self):
+        # Get bounding rect of all content
+        bounds = QtCore.QRectF()
+        for layer in [self.layer_underlay, self.layer_sketch, self.layer_wires, self.layer_devices]:
+            for it in layer.childItems():
+                bounds = bounds.united(it.sceneBoundingRect())
+
+        if not bounds.isEmpty():
+            # Add some margin
+            margin = 100
+            bounds.adjust(-margin, -margin, margin, margin)
+            self.view.fitInView(bounds, Qt.KeepAspectRatio)
+            self.statusBar().showMessage("Fit view to content")
+        else:
+            # If no content, show default area
+            self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+            self.statusBar().showMessage("Fit view to default area")
+
+    # ---------- import/export ----------
+
+    def show_circuit_properties(self):
+        """Open the circuit properties dialog."""
+        try:
+            from app.dialogs.circuit_properties import CircuitPropertiesDialog
+
+            dialog = CircuitPropertiesDialog(self)
+            dialog.exec()
+        except Exception as e:
+            QtWidgets.QMessageBox.information(
+                self, "Circuit Properties", f"Circuit properties dialog not available: {str(e)}"
+            )
+
+    def zoom_in(self):
+        """Zoom in."""
+        self.view.scale(1.15, 1.15)
+
+    def zoom_out(self):
+        """Zoom out."""
+        self.view.scale(1 / 1.15, 1 / 1.15)
+
+    def zoom_to_selection(self):
+        """Zoom to selected items."""
+        # Get bounding rect of selected items
+        bounds = QtCore.QRectF()
+        for item in self.scene.selectedItems():
+            bounds = bounds.united(item.sceneBoundingRect())
+
+        if not bounds.isEmpty():
+            # Add some margin
+            margin = 50
+            bounds.adjust(-margin, -margin, margin, margin)
+            self.view.fitInView(bounds, Qt.AspectRatioMode.KeepAspectRatio)
+            self.statusBar().showMessage("Zoomed to selection")
+        else:
+            self.statusBar().showMessage("No selection to zoom to")
+
+    def show_user_guide(self):
+        """Show the user guide."""
+        QtWidgets.QMessageBox.information(
+            self, "User Guide", "User guide functionality would be implemented here."
+        )
+
+    def show_about(self):
+        """Show the about dialog."""
+        QtWidgets.QMessageBox.about(
+            self, "About Auto-Fire", f"Auto-Fire CAD Application\nVersion: {APP_VERSION}"
+        )
 
     # ---------- import/export ----------
     def import_dxf_underlay(self):
@@ -3672,10 +3805,6 @@ class MainWindow(QMainWindow):
         # Connect tab change signal
         self.tab_widget.currentChanged.connect(self._on_tab_changed)
 
-    def export_sheets_pdf(self):
-        # For now, just show a message that sheet export is not yet implemented
-        QMessageBox.information(self, "Export Sheets", "Sheet export is not yet implemented.")
-
     def _on_tab_changed(self, index):
         if self.tab_widget.tabText(index) == "Model":
             self.toggle_paper_space(False)
@@ -3700,10 +3829,6 @@ class MainWindow(QMainWindow):
         self.sheets.append(
             {"name": name, "view": paperspace_view, "scene": self.paper_scene}
         )  # Store view and scene
-
-    def export_sheets_pdf(self):
-        # For now, just show a message that sheet export is not yet implemented
-        QMessageBox.information(self, "Export Sheets", "Sheet export is not yet implemented.")
 
     def toggle_paper_space(self, on: bool):
         self.in_paper_space = bool(on)
