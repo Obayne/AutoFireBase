@@ -13,6 +13,10 @@ def get_catalog_path() -> str:
     base.mkdir(parents=True, exist_ok=True)
     return str(base / "catalog.db")
 
+# SQL and long docstrings are intentional; allow E501 for this file.
+# ruff: noqa: E501
+# noqa: E501
+
 
 def _connect() -> sqlite3.Connection:
     path = get_catalog_path()

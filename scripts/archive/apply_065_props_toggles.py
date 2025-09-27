@@ -631,10 +631,18 @@ def main():
     if TGT.exists():
         bak = TGT.with_suffix(TGT.suffix + f".bak-{STAMP}")
         shutil.copy2(TGT, bak)
-        print(f"[backup] {bak}")
+        from app.logging_config import setup_logging
+        import logging
+        setup_logging()
+        logging.getLogger(__name__).info("[backup] %s", bak)
     TGT.parent.mkdir(parents=True, exist_ok=True)
+<<<<<<< Updated upstream
     TGT.write_text(NEW_MAIN.strip()+"\n", encoding="utf-8")
     print(f"[write ] {TGT}\n\nDone. Launch with:\n  py -3 -m app.boot\n")
+=======
+    TGT.write_text(NEW_MAIN.strip() + "\n", encoding="utf-8")
+    logging.getLogger(__name__).info("[write ] %s\n\nDone. Launch with:\n  py -3 -m app.boot", TGT)
+>>>>>>> Stashed changes
 
 if __name__ == "__main__":
     main()

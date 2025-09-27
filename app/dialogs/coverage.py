@@ -1,5 +1,14 @@
+<<<<<<< Updated upstream
 from PySide6 import QtCore, QtGui, QtWidgets
 import math
+=======
+from PySide6 import QtWidgets
+
+# UI/dialog strings may be long for clarity. Allow E501 in this dialog.
+# ruff: noqa: E501
+# noqa: E501
+
+>>>>>>> Stashed changes
 
 class CoverageDialog(QtWidgets.QDialog):
     """Edit per-device coverage. v1 keeps it simple & honest:

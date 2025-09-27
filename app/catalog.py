@@ -23,10 +23,37 @@ def load_catalog():
             devs = db_loader.fetch_devices(con)
             con.close()
             if devs:
-                return devs
+                # Normalize DB results for UI safety
+                return [_normalize_proto(d) for d in devs]
         except Exception:
             pass
-    return _builtin()
+    return [_normalize_proto(d) for d in _builtin()]
+
+
+def _normalize_proto(proto: dict) -> dict:
+    """Ensure required fields exist and provide a display_name for UI.
+
+    Rules:
+    - name: string, fallback to part_number or symbol or '<unknown>'
+    - type: string, fallback to 'Unknown'
+    - manufacturer: string, fallback to '(Any)'
+    - part_number: string, fallback to ''
+    - display_name: name or part_number or symbol
+    """
+    if not isinstance(proto, dict):
+        return proto
+    p = dict(proto)  # shallow copy
+    p["name"] = (p.get("name") or "").strip()
+    p["part_number"] = (p.get("part_number") or "").strip()
+    p["symbol"] = (p.get("symbol") or "").strip()
+    if not p["name"]:
+        # prefer part_number, then symbol
+        p["name"] = p["part_number"] or p["symbol"] or "<unknown>"
+    p["type"] = (p.get("type") or "Unknown")
+    p["manufacturer"] = (p.get("manufacturer") or "(Any)")
+    # Add a stable display_name used by UI lists
+    p["display_name"] = p["name"] if p["name"] else (p["part_number"] or p["symbol"] or "<unknown>")
+    return p
 
 def list_manufacturers(devs):
     s = {"(Any)"}

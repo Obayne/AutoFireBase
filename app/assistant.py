@@ -1,4 +1,13 @@
+<<<<<<< Updated upstream
 from PySide6 import QtCore, QtWidgets
+=======
+from PySide6 import QtWidgets
+
+# UI strings here may intentionally be long for clarity; silence E501 for this file
+# ruff: noqa: E501
+# noqa: E501
+
+>>>>>>> Stashed changes
 
 class AssistantDock(QtWidgets.QDockWidget):
     """A lightweight in-app assistant scaffold (no network calls).

@@ -1,5 +1,16 @@
+<<<<<<< Updated upstream
 import sqlite3, json, os
 from typing import List
+=======
+import json
+import os
+import sqlite3
+
+# SQL strings can be long and are clearer on one line; allow E501 for this file.
+# ruff: noqa: E501
+# noqa: E501
+
+>>>>>>> Stashed changes
 from .iface import DeviceRecord
 
 SCHEMA = """

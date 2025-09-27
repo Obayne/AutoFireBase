@@ -2,20 +2,30 @@
 # Purpose: fix NameError in app/device.py by ensuring `from PySide6.QtCore import Qt`
 # Safe: makes a timestamped backup alongside device.py
 
+<<<<<<< Updated upstream
 from pathlib import Path
 import time, sys
+=======
+import sys
+import time
+import logging
+from pathlib import Path
+from app.logging_config import setup_logging
+>>>>>>> Stashed changes
 
 root = Path(__file__).resolve().parent
 device_py = root / "app" / "device.py"
 
 def main():
+    setup_logging()
+    logger = logging.getLogger(__name__)
     if not device_py.exists():
-        print(f"[error] Not found: {device_py}")
+        logger.error("[error] Not found: %s", device_py)
         sys.exit(1)
 
     src = device_py.read_text(encoding="utf-8", errors="ignore")
     if "from PySide6.QtCore import Qt" in src:
-        print("[ok] device.py already imports Qt")
+        logger.info("[ok] device.py already imports Qt")
         return
 
     # Insert the Qt import just after the first PySide6 import block
@@ -43,9 +53,9 @@ def main():
     backup.write_text(src, encoding="utf-8")
     device_py.write_text(new_src, encoding="utf-8")
 
-    print(f"[backup] {backup}")
-    print(f"[write ] {device_py}")
-    print("Done. Launch with:  py -3 -m app.boot")
+    logger.info("[backup] %s", backup)
+    logger.info("[write ] %s", device_py)
+    logger.info("Done. Launch with:  py -3 -m app.boot")
 
 if __name__ == "__main__":
     main()

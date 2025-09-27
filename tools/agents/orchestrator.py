@@ -100,7 +100,8 @@ def scaffold_for_issue(title: str, labels: list[str]):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: orchestrator.py <event_json_path>")
+        import logging
+        logging.getLogger(__name__).error("Usage: orchestrator.py <event_json_path>")
         return 1
     event_path = sys.argv[1]
     with open(event_path, "r", encoding="utf-8") as f:
@@ -112,7 +113,8 @@ def main():
 
     plan = scaffold_for_issue(title, labels)
     if not plan:
-        print("No scaffold rule matched; exiting.")
+        import logging
+        logging.getLogger(__name__).info("No scaffold rule matched; exiting.")
         return 0
 
     branch = plan["branch"]
@@ -122,7 +124,8 @@ def main():
     repo = os.environ.get("GITHUB_REPOSITORY")
     actor = os.environ.get("GITHUB_ACTOR", "agent-bot")
     if not token or not repo:
-        print("Missing GITHUB_TOKEN or GITHUB_REPOSITORY")
+        import logging
+        logging.getLogger(__name__).error("Missing GITHUB_TOKEN or GITHUB_REPOSITORY")
         return 2
 
     create_branch(branch)

@@ -16,6 +16,11 @@ def main():
     args = ap.parse_args()
 
     manifest = {"name": "AutoFire patch", "version": args.version, "files": []}
+    import logging
+    from app.logging_config import setup_logging
+    setup_logging()
+    logger = logging.getLogger(__name__)
+
     with zipfile.ZipFile(args.out, "w", compression=zipfile.ZIP_DEFLATED) as z:
         for rel in args.files:
             src = os.path.join(args.project, rel)
@@ -28,7 +33,7 @@ def main():
                 "bytes": os.path.getsize(src)
             })
         z.writestr("manifest.json", json.dumps(manifest, indent=2))
-    print(f"Wrote {args.out}")
+    logger.info("Wrote %s", args.out)
 
 if __name__ == "__main__":
     main()

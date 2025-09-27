@@ -98,10 +98,14 @@ def main():
     if BOOT.exists():
         bkp = BOOT.with_suffix(".py.bak-" + STAMP)
         bkp.write_text(BOOT.read_text(encoding="utf-8", errors="ignore"), encoding="utf-8")
-        print(f"[backup] {bkp}")
+        import logging
+        _logger = logging.getLogger(__name__)
+        _logger.info("[backup] %s", bkp)
     BOOT.write_text(CODE, encoding="utf-8")
-    print(f"[write]  {BOOT}")
-    print("\nDone. Launch with:  py -3 -m app.boot")
+    import logging
+    _logger = logging.getLogger(__name__)
+    _logger.info("[write]  %s", BOOT)
+    _logger.info("Done. Launch with:  py -3 -m app.boot")
 
 if __name__ == "__main__":
     main()

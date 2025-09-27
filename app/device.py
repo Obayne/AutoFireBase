@@ -1,4 +1,5 @@
 from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
 
 class DeviceItem(QtWidgets.QGraphicsItemGroup):
     """Device glyph + label + optional coverage overlays (strobe/speaker/smoke)."""
@@ -6,7 +7,7 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
 
     def type(self): return DeviceItem.Type
 
-    def __init__(self, x, y, symbol, name, manufacturer="", part_number=""):
+    def __init__(self, x, y, symbol, name, manufacturer="", part_number="", layer=None):
         super().__init__()
         self.setFlags(
             QtWidgets.QGraphicsItem.ItemIsMovable |
@@ -16,6 +17,8 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
         self.name = name
         self.manufacturer = manufacturer
         self.part_number = part_number
+        # Optional layer metadata (may be dict or simple id)
+        self.layer = layer
 
         # Base glyph
         self._glyph = QtWidgets.QGraphicsEllipseItem(-6, -6, 12, 12)

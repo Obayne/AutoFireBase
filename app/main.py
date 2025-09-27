@@ -1,5 +1,15 @@
 ﻿import os, json, zipfile
 import sys
+<<<<<<< Updated upstream
+=======
+
+# Many UI style blocks and template strings in this file intentionally exceed
+# the project's line-length setting. To reduce noisy E501 (line too long)
+# warnings from Ruff for these generated or style strings, allow E501 here.
+# ruff: noqa: E501
+# noqa: E501
+
+>>>>>>> Stashed changes
 # Allow running as `python app\main.py` by fixing sys.path for absolute `app.*` imports
 if __package__ in (None, ""):
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -12,12 +22,31 @@ from PySide6.QtWidgets import (
     QComboBox, QMessageBox, QDoubleSpinBox, QPushButton
 )
 
+<<<<<<< Updated upstream
 from app.scene import GridScene, DEFAULT_GRID_SIZE
 from app.layout import PageFrame, PAGE_SIZES, TitleBlock, ViewportItem
+=======
+from app import catalog, dxf_import
+from app.logging_config import setup_logging
+
+# Ensure logging is configured early so module-level loggers emit during
+# headless simulators and when the app starts from __main__.
+setup_logging()
+>>>>>>> Stashed changes
 from app.device import DeviceItem
 from app import catalog
 from app.tools import draw as draw_tools
+<<<<<<< Updated upstream
 from app.tools.text_tool import TextTool, MTextTool
+=======
+from app.tools.chamfer_tool import ChamferTool
+from app.tools.extend_tool import ExtendTool
+import logging
+
+_logger = logging.getLogger(__name__)
+from app.tools.fillet_radius_tool import FilletRadiusTool
+from app.tools.fillet_tool import FilletTool
+>>>>>>> Stashed changes
 from app.tools.freehand import FreehandTool
 from app.tools.scale_underlay import ScaleUnderlayRefTool, ScaleUnderlayDragTool, scale_underlay_by_factor
 from app.tools.leader import LeaderTool
@@ -305,7 +334,17 @@ class CanvasView(QGraphicsView):
 
     def set_current_device(self, proto: dict):
         self.current_proto = proto
+<<<<<<< Updated upstream
         self.current_kind  = infer_device_kind(proto)
+=======
+        # Debug: log concise proto info for tracing placement
+        try:
+            keys = list(proto.keys()) if isinstance(proto, dict) else []
+            _logger.debug("set_current_device proto_keys=%s kind_guess=%s", keys[:8], infer_device_kind(proto))
+        except Exception:
+            _logger.debug("set_current_device proto=<unprintable>")
+        self.current_kind = infer_device_kind(proto)
+>>>>>>> Stashed changes
         self._ensure_ghost()
 
     def _ensure_ghost(self):
@@ -596,8 +635,39 @@ class CanvasView(QGraphicsView):
                 pass
             if self.current_proto:
                 d = self.current_proto
+<<<<<<< Updated upstream
                 it = DeviceItem(sp.x(), sp.y(), d["symbol"], d["name"], d.get("manufacturer",""), d.get("part_number",""))
                 if self.ghost and self.current_kind in ("strobe","speaker","smoke"):
+=======
+                # Debug: log proto summary and active layer to trace placement
+                try:
+                    import json as _json
+
+                    _logger.debug("placing proto=%s", _json.dumps({k: d.get(k) for k in ("symbol", "name", "manufacturer", "part_number")}))
+                except Exception:
+                    _logger.debug("placing proto=<unserializable>")
+                try:
+                    _logger.debug("active_layer_id=%s", getattr(self.win, "active_layer_id", None))
+                except Exception:
+                    pass
+                try:
+                    _logger.debug("ghost_present=%s kind=%s", bool(self.ghost), self.current_kind)
+                except Exception:
+                    pass
+                layer_obj = next(
+                    (l for l in self.win.layers if l["id"] == self.win.active_layer_id), None
+                )
+                it = DeviceItem(
+                    sp.x(),
+                    sp.y(),
+                    d["symbol"],
+                    d["name"],
+                    d.get("manufacturer", ""),
+                    d.get("part_number", ""),
+                    layer_obj,
+                )
+                if self.ghost and self.current_kind in ("strobe", "speaker", "smoke"):
+>>>>>>> Stashed changes
                     it.set_coverage(self.ghost.coverage)
                 # Respect global overlay toggle on placement
                 try: it.set_coverage_enabled(bool(self.win.show_coverage))
@@ -715,6 +785,22 @@ class MainWindow(QMainWindow):
         self.measure_tool = MeasureTool(self, self.layer_overlay)
         self.move_tool = MoveTool(self)
         self.rotate_tool = RotateTool(self)
+
+        # Try to attach enhanced menu methods and menu enhancements if available.
+        try:
+            from app import enhanced_menus
+
+            try:
+                enhanced_menus.add_main_window_methods(self.__class__)
+            except Exception:
+                pass
+            try:
+                enhanced_menus.enhance_menus(self)
+            except Exception:
+                pass
+        except Exception:
+            # It's OK if enhanced_menus is not present; fall back to defaults
+            pass
         self.mirror_tool = MirrorTool(self)
         self.scale_tool = ScaleTool(self)
         self.chamfer_tool = ChamferTool(self)
@@ -1256,10 +1342,352 @@ class MainWindow(QMainWindow):
             if q and q not in txt.lower() and q not in (d.get('part_number','').lower()): continue
             it = QListWidgetItem(txt); it.setData(Qt.UserRole, d); self.list.addItem(it)
 
+<<<<<<< Updated upstream
     def choose_device(self, it: QListWidgetItem):
         d = it.data(Qt.UserRole)
         self.view.set_current_device(d)
         self.statusBar().showMessage(f"Selected: {d['name']}")
+=======
+        self.cmb_category.clear()
+        self.cmb_category.addItems(["All Categories"] + sorted(list(categories)))
+
+        self.cmb_mfr.clear()
+        self.cmb_mfr.addItems(["All Manufacturers"] + sorted(list(manufacturers)))
+
+        self.cmb_type.clear()
+        self.cmb_type.addItems(["All Device Types"] + sorted(list(types)))
+
+    def _populate_device_tree(self):
+        """Populate the device tree with categorized devices and improved organization."""
+        self.device_tree.clear()
+
+        # Organize devices by category and type with better hierarchy
+        categorized_devices = {}
+        for d in self.devices_all:
+            # Skip devices with empty names
+            if not d.get("name"):
+                continue
+
+            category = d.get("system_category", "Unknown") or "Unknown"
+            device_type = d.get("type", "Unknown") or "Unknown"
+
+            # Ensure category and type are not empty
+            if not category:
+                category = "Unknown"
+            if not device_type:
+                device_type = "Unknown"
+
+            if category not in categorized_devices:
+                categorized_devices[category] = {}
+            if device_type not in categorized_devices[category]:
+                categorized_devices[category][device_type] = []
+
+            categorized_devices[category][device_type].append(d)
+
+        # Create tree items with improved visual hierarchy and spacing
+        for category in sorted(categorized_devices.keys()):
+            category_item = QtWidgets.QTreeWidgetItem([category])
+            category_item.setExpanded(True)  # Start expanded for better visibility
+            font = category_item.font(0)
+            font.setBold(True)
+            font.setPointSize(11)  # Larger font for categories
+            category_item.setFont(0, font)
+            category_item.setIcon(0, QtGui.QIcon())  # Add icon if needed
+
+            for device_type in sorted(categorized_devices[category].keys()):
+                type_item = QtWidgets.QTreeWidgetItem([device_type])
+                type_item.setExpanded(True)  # Start expanded for better visibility
+                font = type_item.font(0)
+                font.setItalic(True)
+                font.setBold(True)
+                font.setPointSize(10)  # Slightly smaller than category
+                type_item.setFont(0, font)
+                type_item.setIcon(0, QtGui.QIcon())  # Add icon if needed
+
+                for device in sorted(
+                    categorized_devices[category][device_type], key=lambda x: x["name"]
+                ):
+                    # Create device item with formatted text and better spacing
+                    display_text = f"{device['name']} ({device['symbol']})"
+                    if device.get("part_number"):
+                        display_text += f" - {device['part_number']}"
+
+                    device_item = QtWidgets.QTreeWidgetItem([display_text])
+                    device_item.setData(0, Qt.UserRole, device)
+
+                    # Set tooltip with detailed information
+                    tooltip = f"Name: {device['name']}\nSymbol: {device['symbol']}\nType: {device_type}\nCategory: {category}"
+                    if device.get("manufacturer") and device["manufacturer"] != "(Any)":
+                        tooltip += f"\nManufacturer: {device['manufacturer']}"
+                    if device.get("part_number"):
+                        tooltip += f"\nPart Number: {device['part_number']}"
+                    device_item.setToolTip(0, tooltip)
+
+                    # Add icon based on device type if needed
+                    device_item.setIcon(0, QtGui.QIcon())  # Add icon if needed
+
+                    type_item.addChild(device_item)
+
+                category_item.addChild(type_item)
+
+            self.device_tree.addTopLevelItem(category_item)
+
+        # Expand all items by default for better visibility
+        self.device_tree.expandAll()
+
+        # Set better styling for the tree
+        self.device_tree.setStyleSheet(
+            "QTreeWidget { border: 1px solid #555; background-color: #252526; alternate-background-color: #2d2d30; selection-background-color: #0078d7; selection-color: white; } QTreeWidget::item { padding: 3px; } QTreeWidget::item:hover { background-color: #3f3f41; } QTreeWidget::item:selected { background-color: #0078d7; } QScrollBar:vertical { border: none; background: #333336; width: 14px; margin: 0px 0px 0px 0px; } QScrollBar::handle:vertical { background: #555558; border-radius: 4px; min-height: 20px; } QScrollBar::handle:vertical:hover { background: #666669; }"
+        )
+
+    def _filter_device_tree(self):
+        """Filter the device tree based on search and filter criteria."""
+        search_text = self.search.text().lower().strip()
+        selected_category = self.cmb_category.currentText()
+        selected_mfr = self.cmb_mfr.currentText()
+        selected_type = self.cmb_type.currentText()
+
+        def item_matches(item):
+            """Recursively check if an item or any of its children match the filters."""
+            # If it's a device, check if it matches
+            device = item.data(0, Qt.UserRole)
+            if device:
+                search_matches = not search_text or (
+                    search_text in device.get("name", "").lower()
+                    or search_text in device.get("symbol", "").lower()
+                    or search_text in device.get("part_number", "").lower()
+                )
+                mfr_matches = selected_mfr == "All Manufacturers" or selected_mfr == device.get(
+                    "manufacturer", "(Any)"
+                )
+                type_matches = selected_type == "All Device Types" or selected_type == device.get(
+                    "type", "Unknown"
+                )
+                category_matches = (
+                    selected_category == "All Categories"
+                    or selected_category == device.get("system_category", "Unknown")
+                )
+
+                return search_matches and mfr_matches and type_matches and category_matches
+
+            # If it's a category or type, check if any children match
+            child_count = item.childCount()
+            any_child_matches = False
+            for i in range(child_count):
+                if item_matches(item.child(i)):
+                    any_child_matches = True
+                    break  # No need to check other children
+
+            return any_child_matches
+
+        def update_visibility(item):
+            """Recursively update the visibility of items."""
+            matches = item_matches(item)
+            item.setHidden(not matches)
+
+            for i in range(item.childCount()):
+                update_visibility(item.child(i))
+
+        # Iterate over top-level items and update visibility
+        for i in range(self.device_tree.topLevelItemCount()):
+            update_visibility(self.device_tree.topLevelItem(i))
+
+        self.device_tree.expandAll()
+
+    def _on_device_selected(self, item: QtWidgets.QTreeWidgetItem, column: int):
+        """Handle device selection from the tree view."""
+        # Only process leaf items (devices, not categories or types)
+        if item.childCount() > 0 or not item.data(0, Qt.UserRole):
+            return
+
+        device = item.data(0, Qt.UserRole)
+        try:
+            import json as _json
+
+            _logger.debug("palette selected device= %s", _json.dumps({
+                'symbol': device.get('symbol'),
+                'name': device.get('name'),
+                'part_number': device.get('part_number'),
+            }))
+        except Exception:
+            _logger.debug("palette selected device=<unprintable>")
+        self.view.set_current_device(device)
+        self.statusBar().showMessage(f"Selected: {device['name']} ({device['symbol']})")
+
+    def _clear_filters(self):
+        """Clear all filter selections."""
+        self.search.clear()
+        self.cmb_category.setCurrentIndex(0)
+        self.cmb_mfr.setCurrentIndex(0)
+        self.cmb_type.setCurrentIndex(0)
+        self._filter_device_tree()
+
+    def _on_search_text_changed(self, text):
+        """Handle search text changes with delay."""
+        self.search_timer.stop()
+        self.search_timer.start(300)  # 300ms delay
+
+    # ---------- FACP placement ----------
+    def place_facp_panel(self):
+        """Place a FACP panel using the wizard dialog."""
+        try:
+            # Create and show the FACP wizard dialog
+            dialog = FACPWizardDialog(self)
+            if dialog.exec() == QtWidgets.QDialog.Accepted:
+                # Get the configured panels
+                panels = dialog.get_panel_configurations()
+                _logger.debug("Panels from wizard: %s", panels)
+
+                for panel in panels:
+                    # Create a device item for the FACP panel
+                    symbol = "FACP"
+                    name = f"{panel.manufacturer} {panel.model}"
+                    manufacturer = panel.manufacturer
+                    part_number = panel.model
+
+                    # Place the panel at the center of the current view
+                    view_center = self.view.mapToScene(self.view.viewport().rect().center())
+                    x, y = view_center.x(), view_center.y()
+
+                    # Create the device item
+                    layer_obj = next(
+                        (l for l in self.layers if l["id"] == self.active_layer_id), None
+                    )
+                    device_item = DeviceItem(
+                        x, y, symbol, name, manufacturer, part_number, layer_obj
+                    )
+                    device_item.setParentItem(self.layer_devices)
+
+                    # Store panel configuration data in the device item
+                    device_item.panel_data = {
+                        "model": panel.model,
+                        "manufacturer": panel.manufacturer,
+                        "panel_type": panel.panel_type,
+                        "max_devices": panel.max_devices,
+                        "max_circuits": panel.max_circuits,
+                        "accessories": panel.accessories,
+                    }
+
+                    # Add to history and update UI
+                    self.push_history()
+                    self.statusBar().showMessage(f"Placed FACP panel: {name}")
+                    self.connections_tree.add_panel(name, device_item, panel.panel_type)
+
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(
+                self, "FACP Placement Error", f"Failed to place FACP panel: {str(e)}"
+            )
+
+    def show_properties_for_item(self, item):
+        """Selects the given item on the canvas and updates the properties panel."""
+        self.view.scene().clearSelection()
+        item.setSelected(True)
+        self.view.centerOn(item)
+
+    def refresh_devices_on_canvas(self):
+        """Refreshes the display of all devices on the canvas based on their layer properties."""
+        # Re-fetch layers to get latest properties
+        self.layers = db_loader.fetch_layers(db_loader.connect())
+        layer_map = {layer["id"]: layer for layer in self.layers}
+
+        for item in self.layer_devices.childItems():
+            if isinstance(item, DeviceItem):
+                # Update the device's layer object with the latest properties
+                if item.layer and item.layer["id"] in layer_map:
+                    item.layer = layer_map[item.layer["id"]]
+                item.update_layer_properties()
+        self.view.scene().update()  # Request a scene update
+
+    def open_wire_spool(self):
+        """Open the wire spool dialog to select a wire type."""
+        dialog = WireSpoolDialog(self)
+        if dialog.exec() == QtWidgets.QDialog.Accepted:
+            selected_wire = dialog.get_selected_wire()
+            if selected_wire:
+                self.wire_tool.set_wire_type(selected_wire)
+                self.statusBar().showMessage(
+                    f"Selected wire: {selected_wire['manufacturer']} {selected_wire['type']}"
+                )
+
+    def toggle_group(self, group_box, checked):
+        for i in range(group_box.layout().count()):
+            widget = group_box.layout().itemAt(i).widget()
+            if widget is not None:
+                widget.setVisible(checked)
+
+    def open_settings(self):
+        """Open the settings dialog."""
+        dialog = SettingsDialog(self)
+        dialog.exec()
+
+    def open_layer_manager(self):
+        """Open the layer manager dialog."""
+        dialog = LayerManagerDialog(self)
+        dialog.exec()
+
+    def show_calculations(self):
+        """Open the calculations dialog."""
+        dialog = CalculationsDialog(self)
+        dialog.exec()
+
+    def show_bom_report(self):
+        """Open the BOM report dialog."""
+        dialog = BomReportDialog(self)
+        dialog.exec()
+
+    def show_device_schedule_report(self):
+        """Open the device schedule report dialog."""
+        dialog = DeviceScheduleReportDialog(self)
+        dialog.exec()
+
+    def generate_riser_diagram(self):
+        """Open the riser diagram dialog."""
+        dialog = RiserDiagramDialog(self)
+        dialog.exec()
+
+    def add_viewport(self):
+        """Adds a new viewport to the current paperspace layout."""
+        if not self.in_paper_space:
+            QtWidgets.QMessageBox.warning(
+                self, "Add Viewport", "Please switch to Paper Space first."
+            )
+            return
+
+        # Create a new viewport item
+        new_viewport = ViewportItem(self.scene, QtCore.QRectF(0, 0, 500, 400), self)
+        self.paper_scene.addItem(new_viewport)
+        self.push_history()
+        self.statusBar().showMessage("New viewport added to Paperspace.")
+
+    def show_job_info_dialog(self):
+        """Open the job information dialog."""
+        dialog = JobInfoDialog(self)
+        dialog.exec()
+
+    def place_token(self):
+        """Open the token selector dialog and allow placing a token on the canvas, linked to a selected device."""
+        selected_device = self._get_selected_device()
+        if not selected_device:
+            QtWidgets.QMessageBox.warning(
+                self, "Place Token", "Please select a device on the canvas first."
+            )
+            return
+
+        dialog = TokenSelectorDialog(self)
+        if dialog.exec() == QtWidgets.QDialog.Accepted:
+            selected_token_string = dialog.get_selected_token()
+            if selected_token_string:
+                token_item = TokenItem(selected_token_string, selected_device)
+                # Place the token relative to the device (e.g., slightly offset)
+                token_item.setPos(
+                    selected_device.pos() + QtCore.QPointF(20, 20)
+                )  # Offset for visibility
+                self.layer_sketch.addToGroup(token_item)
+                self.push_history()
+                self.statusBar().showMessage(
+                    f"Placed token '{selected_token_string}' for {selected_device.name}"
+                )
+>>>>>>> Stashed changes
 
     # ---------- view toggles ----------
     def toggle_grid(self, on: bool): self.scene.show_grid = bool(on); self.scene.update()
@@ -1469,9 +1897,33 @@ class MainWindow(QMainWindow):
             d = dev_sel[0]
             act_cov = menu.addAction("Coverageâ€¦")
             act_tog = menu.addAction("Toggle Coverage On/Off")
+<<<<<<< Updated upstream
             act_lbl = menu.addAction("Edit Labelâ€¦")
 
         # Scene actions
+=======
+            act_lbl = menu.addAction("Edit LabelΓÇª")
+            # Connect these actions later in the function
+        else:
+            # Some startup paths may not have enhanced menu methods attached
+            # (eg. `enhanced_menus.add_main_window_methods` wasn't called). Use
+            # a safe fallback to avoid AttributeError in the context menu.
+            if hasattr(self, "select_all_items"):
+                menu.addAction("Select All", self.select_all_items)
+            else:
+                # Fallback: select all QGraphicsItems in the scene
+                menu.addAction(
+                    "Select All",
+                    lambda: [it.setSelected(True) for it in self.scene.items() if isinstance(it, QtWidgets.QGraphicsItem)],
+                )
+
+        # Some runtime builds may not have enhanced menu methods attached;
+        # provide safe fallbacks to avoid AttributeError in the context menu.
+        if hasattr(self, "clear_selection"):
+            menu.addAction("Clear Selection", self.clear_selection)
+        else:
+            menu.addAction("Clear Selection", lambda: self.scene.clearSelection())
+>>>>>>> Stashed changes
         menu.addSeparator()
         act_clear_underlay = menu.addAction("Clear Underlay")
 
@@ -1788,8 +2240,13 @@ class MainWindow(QMainWindow):
                 except Exception:
                     pass
             self._update_selection_visuals()
+<<<<<<< Updated upstream
         except Exception:
             pass
+=======
+        except Exception as ex:
+            _logger.exception("Error in _select_similar_from: %s", ex)
+>>>>>>> Stashed changes
 
     # ---------- selection visuals ----------
     def _update_selection_visuals(self):

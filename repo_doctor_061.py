@@ -2,8 +2,21 @@
 # Fixes "minimal window" by ensuring packages & import path are correct.
 # Safe to run multiple times.
 
+<<<<<<< Updated upstream
 import sys, os, textwrap, time
+=======
+# This file embeds a large BOOT_SAFE string and long help messages; allow
+# E501 here to avoid noisy line-length warnings from Ruff.
+# ruff: noqa: E501
+# noqa: E501
+
+import sys
+import time
+>>>>>>> Stashed changes
 from pathlib import Path
+import logging
+
+_logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parent
 APP  = ROOT / "app"
@@ -97,48 +110,52 @@ def maybe_patch_boot():
         need = ("from app.main import create_window" not in txt) or ("log_startup_error" not in txt)
     if need:
         if BOOT.exists():
-            bkp = BOOT.with_suffix(".py.bak-" + time.strftime("%Y%m%d_%H%M%S"))
-            bkp.write_text(BOOT.read_text(encoding="utf-8", errors="ignore"), encoding="utf-8")
-            print(f"[backup] {bkp}")
+                bkp = BOOT.with_suffix(".py.bak-" + time.strftime("%Y%m%d_%H%M%S"))
+                bkp.write_text(BOOT.read_text(encoding="utf-8", errors="ignore"), encoding="utf-8")
+                _logger.info("[backup] %s", bkp)
         BOOT.write_text(BOOT_SAFE, encoding="utf-8")
         return True
     return False
 
 def main():
-    print("== AutoFireBase Repo Doctor v0.6.1 ==")
-    print(f"Root: {ROOT}")
+    _logger.info("== AutoFireBase Repo Doctor v0.6.1 ==")
+    _logger.info("Root: %s", ROOT)
 
     missing_dirs = [d for d in REQ_DIRS if not d.exists()]
     if missing_dirs:
         for d in missing_dirs:
-            print(f"[warn] missing directory: {d}")
-        print("Create those folders (even empty) to keep Python imports clean.")
+            _logger.warning("[warn] missing directory: %s", d)
+        _logger.info("Create those folders (even empty) to keep Python imports clean.")
 
     made_inits = ensure_inits()
     for p in made_inits:
-        print(f"[init] created: {p.relative_to(ROOT)}")
+        _logger.info("[init] created: %s", p.relative_to(ROOT))
 
     changed_boot = maybe_patch_boot()
     if changed_boot:
+<<<<<<< Updated upstream
         print(f"[patch] wrote hardened: app/boot.py")
+=======
+        _logger.info("[patch] wrote hardened: app/boot.py")
+>>>>>>> Stashed changes
     else:
-        print("[ok] app/boot.py already hardened")
+        _logger.info("[ok] app/boot.py already hardened")
 
     # quick sanity: can we import app.main?
     sys.path.insert(0, str(ROOT))
     try:
         __import__("app.main")
-        print("[ok] import app.main -> success")
+        _logger.info("[ok] import app.main -> success")
     except Exception as ex:
-        print("[fail] import app.main ->", ex)
+        _logger.error("[fail] import app.main -> %s", ex)
 
     # show tips
-    print("\nNext:")
-    print("  1) Run the app from source to see real errors:")
-    print("       py -3 -m app.boot")
-    print("  2) If it still falls back, open newest file in:")
-    print("       %USERPROFILE%\\AutoFire\\logs\\startup_error_*.log")
-    print("     and paste the latest traceback here.")
+    _logger.info("\nNext:")
+    _logger.info("  1) Run the app from source to see real errors:")
+    _logger.info("       py -3 -m app.boot")
+    _logger.info("  2) If it still falls back, open newest file in:")
+    _logger.info("       %USERPROFILE%\\AutoFire\\logs\\startup_error_*.log")
+    _logger.info("     and paste the latest traceback here.")
 
 if __name__ == "__main__":
     main()

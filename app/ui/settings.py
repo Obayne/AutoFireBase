@@ -1,5 +1,9 @@
 from PySide6 import QtCore, QtWidgets
 
+# UI strings may be long for clarity in dialog help text — allow E501 here.
+# ruff: noqa: E501
+# noqa: E501
+
 DEFAULTS = {
     "quick_tools_enabled": True,
     "quick_tools_items": [

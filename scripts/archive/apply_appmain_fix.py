@@ -4,6 +4,10 @@
 
 from pathlib import Path
 import re, datetime
+import logging
+from app.logging_config import setup_logging
+setup_logging()
+logger = logging.getLogger(__name__)
 
 ROOT = Path(".")
 APP = ROOT / "app"
@@ -21,9 +25,12 @@ def backup(p: Path):
 APP.mkdir(parents=True, exist_ok=True)
 if not APP_INIT.exists():
     APP_INIT.write_text("# package marker\n", encoding="utf-8")
-    print("created", APP_INIT)
+    import logging
+    from app.logging_config import setup_logging
+    setup_logging()
+    logger.info("created %s", APP_INIT)
 else:
-    print("ok:", APP_INIT)
+    logger.info("ok: %s", APP_INIT)
 
 # 2) Ensure app/main.py exists and provides create_window()
 if not MAIN.exists():
@@ -40,8 +47,15 @@ def main():
     w = create_window()
     w.show()
     app.exec()
+<<<<<<< Updated upstream
 """, encoding="utf-8")
     print("created minimal", MAIN)
+=======
+""",
+        encoding="utf-8",
+    )
+    logger.info("created minimal %s", MAIN)
+>>>>>>> Stashed changes
 else:
     txt = MAIN.read_text(encoding="utf-8")
     # If it doesn't expose create_window(), add a tiny factory.
@@ -61,9 +75,9 @@ except Exception:
         return QMainWindow()
 """
         MAIN.write_text(txt, encoding="utf-8")
-        print("patched", MAIN, "to add create_window()")
+        logger.info("patched %s to add create_window()", MAIN)
     else:
-        print("ok: create_window() already present in", MAIN)
+        logger.info("ok: create_window() already present in %s", MAIN)
 
 # 3) Minimal fallback window (if main fails)
 if not MINWIN.exists():
@@ -80,10 +94,17 @@ def run_minimal():
     w.show()
     if not QtWidgets.QApplication.instance().startingUp():
         app.exec()
+<<<<<<< Updated upstream
 """, encoding="utf-8")
     print("created", MINWIN)
+=======
+""",
+        encoding="utf-8",
+    )
+    logger.info("created %s", MINWIN)
+>>>>>>> Stashed changes
 else:
-    print("ok:", MINWIN)
+    logger.info("ok: %s", MINWIN)
 
 # 4) Ensure AutoFire.spec includes hiddenimports so PyInstaller always bundles modules
 if SPEC.exists():
@@ -102,9 +123,9 @@ if SPEC.exists():
         if s2 != s:
             backup(SPEC)
             SPEC.write_text(s2, encoding="utf-8")
-            print("patched hiddenimports in", SPEC)
+            logger.info("patched hiddenimports in %s", SPEC)
         else:
-            print("ok: hiddenimports present in", SPEC)
+            logger.info("ok: hiddenimports present in %s", SPEC)
     else:
         # Insert hiddenimports argument into the Analysis(…) call
         s2 = re.sub(
@@ -119,10 +140,16 @@ if SPEC.exists():
         if s2 != s:
             backup(SPEC)
             SPEC.write_text(s2, encoding="utf-8")
-            print("injected hiddenimports into", SPEC)
+            logger.info("injected hiddenimports into %s", SPEC)
         else:
-            print("NOTE: could not find Analysis(…) in spec to inject hiddenimports.")
+            logger.warning("NOTE: could not find Analysis(…) in spec to inject hiddenimports.")
 else:
+<<<<<<< Updated upstream
     print("WARNING: AutoFire.spec not found; build will still work, but bundling may be incomplete.")
+=======
+    logger.warning(
+        "WARNING: AutoFire.spec not found; build will still work, but bundling may be incomplete."
+    )
+>>>>>>> Stashed changes
 
-print("Done.")
+logger.info("Done.")

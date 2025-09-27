@@ -5,6 +5,9 @@
 
 from pathlib import Path
 import time, re
+import logging
+
+from app.logging_config import setup_logging
 
 ROOT = Path(__file__).resolve().parent
 STAMP = time.strftime("%Y%m%d_%H%M%S")
@@ -142,9 +145,11 @@ def write_dxf():
     if DXF.exists():
         bak = DXF.with_suffix(".py.bak-"+STAMP)
         bak.write_text(DXF.read_text(encoding="utf-8"), encoding="utf-8")
-        print(f"[backup] {bak}")
+        logger = logging.getLogger(__name__)
+        logger.info("[backup] %s", bak)
     DXF.write_text(DXF_CODE.lstrip(), encoding="utf-8")
-    print(f"[write ] {DXF}")
+    logger = logging.getLogger(__name__)
+    logger.info("[write ] %s", DXF)
 
 def patch_main():
     if not MAIN.exists():
@@ -204,10 +209,14 @@ def patch_main():
     bak = MAIN.with_suffix(".py.bak-"+STAMP)
     bak.write_text(MAIN.read_text(encoding="utf-8"), encoding="utf-8")
     MAIN.write_text(src, encoding="utf-8")
-    print(f"[backup] {bak}")
-    print(f"[write ] {MAIN}")
+    logger = logging.getLogger(__name__)
+    logger.info("[backup] %s", bak)
+    logger.info("[write ] %s", MAIN)
 
 if __name__ == "__main__":
+    # initialize structured logging for scripts
+    setup_logging()
     write_dxf()
     patch_main()
-    print("\nDone. Launch with:  py -3 -m app.boot")
+    logger = logging.getLogger(__name__)
+    logger.info("\nDone. Launch with:  py -3 -m app.boot")

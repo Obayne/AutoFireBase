@@ -339,11 +339,15 @@ def main():
 '''
 backup(MAIN)
 MAIN.write_text(MAIN_CODE, encoding="utf-8")
+import logging
+from app.logging_config import setup_logging
+setup_logging()
+logger = logging.getLogger(__name__)
 
-print("Done. Wrote:")
-print(" -", ARR)
-print(" -", MAIN)
-print("\nNext steps:")
-print("  1) Run: py -3 app\\boot.py")
-print("  2) Select a device in the left list, then LEFT-CLICK on the canvas to place.")
-print("  3) Tools ▸ Array in Area… → click two corners to populate devices.")
+logger.info("Done. Wrote:")
+logger.info(" - %s", ARR)
+logger.info(" - %s", MAIN)
+logger.info("Next steps:")
+logger.info("  1) Run: py -3 app\\boot.py")
+logger.info("  2) Select a device in the left list, then LEFT-CLICK on the canvas to place.")
+logger.info("  3) Tools ▸ Array in Area… → click two corners to populate devices.")

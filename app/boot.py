@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # app/boot.py — dynamic entry, resilient to missing create_window
 import os, sys, traceback, time, importlib
 
@@ -14,17 +15,28 @@ if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
         sys.path.insert(0, meipass)
 
 def log_startup_error(msg: str):
-    try:
-        base = os.path.join(os.path.expanduser("~"), "AutoFire", "logs")
-        os.makedirs(base, exist_ok=True)
-        stamp = time.strftime("%Y%m%d_%H%M%S")
-        p = os.path.join(base, f"startup_error_{stamp}.log")
-        with open(p, "w", encoding="utf-8") as f:
-            f.write("Startup error:\n\n" + msg + "\n")
-        return p
-    except Exception:
-        return None
+=======
+# boot.py — robust loader
+# Some helpful error messages and dynamically generated content can be long.
+# Allow E501 for this file to reduce noisy line-length warnings from Ruff.
+# ruff: noqa: E501
+# noqa: E501
+import os, sys, traceback, datetime, importlib
+from PySide6 import QtWidgets
 
+def _log_startup_error(text: str) -> str:
+    base = os.path.join(os.path.expanduser('~'), 'AutoFire', 'logs')
+    os.makedirs(base, exist_ok=True)
+    path = os.path.join(base, f"startup_error_{datetime.datetime.now():%Y%m%d_%H%M%S}.log")
+>>>>>>> Stashed changes
+    try:
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(text)
+    except Exception:
+        pass
+    return path
+
+<<<<<<< Updated upstream
 def resolve_create_window():
     """Return a callable that builds the main window."""
     main_mod = importlib.import_module("app.main")
@@ -51,10 +63,61 @@ def main():
         log_startup_error(traceback.format_exc())
         raise
 
+=======
+def _load_app_main():
+    # Try normal import first (works if PyInstaller bundled the package)
     try:
-        create_window = resolve_create_window()
+        return importlib.import_module('app.main')
+    except Exception:
+        pass
+
+    # Try file-based import from common locations
+    candidates = []
+    exe_dir = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
+    meipass = getattr(sys, '_MEIPASS', None)
+
+    for base in [exe_dir, meipass, os.path.dirname(__file__)]:
+        if not base:
+            continue
+        candidates += [
+            os.path.join(base, '_internal', 'app', 'main.py'),
+            os.path.join(base, 'app', 'main.py'),
+        ]
+
+    for path in candidates:
+        if path and os.path.exists(path):
+            try:
+                import importlib.util
+
+                spec = importlib.util.spec_from_file_location('app.main', path)
+                if spec and spec.loader:
+                    mod = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(mod)  # type: ignore[attr-defined]
+                    sys.modules['app.main'] = mod
+                    return mod
+            except Exception:
+                continue
+
+    raise ModuleNotFoundError('app.main')
+
+def main():
+    app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+>>>>>>> Stashed changes
+    try:
+        m = _load_app_main()
+        create_window = getattr(m, 'create_window', None)
+        if callable(create_window):
+            w = create_window(); w.show(); app.exec(); return
+
+        # Fallback UI
+        w = QtWidgets.QMainWindow()
+        w.setWindowTitle('Auto-Fire — Fallback UI (no create_window)')
+        lab = QtWidgets.QLabel('Fallback window loaded.')
+        lab.setMargin(16); w.setCentralWidget(lab); w.resize(900, 600); w.show()
+        app.exec()
     except Exception:
         tb = traceback.format_exc()
+<<<<<<< Updated upstream
         log_startup_error(tb)
         # Show a visible fallback window so you know it failed
         app = QtWidgets.QApplication([])
@@ -79,4 +142,10 @@ def main():
     app.exec()
 
 if __name__ == "__main__":
+=======
+        p = _log_startup_error(tb)
+        QtWidgets.QMessageBox.critical(None, 'Startup Error', f'{tb}\n\nSaved: {p}')
+
+if __name__ == '__main__':
+>>>>>>> Stashed changes
     main()

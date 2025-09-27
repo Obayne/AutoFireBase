@@ -1,7 +1,15 @@
 import os, sqlite3, json
 from pathlib import Path
 
+<<<<<<< Updated upstream
 DB_DEFAULT = os.path.join(os.path.expanduser('~'), 'AutoFire', 'catalog.db')
+=======
+# This loader contains long SQL schema strings and seed data; allow E501 here.
+# ruff: noqa: E501
+# noqa: E501
+
+DB_DEFAULT = os.path.join(os.path.expanduser("~"), "AutoFire", "catalog.db")
+>>>>>>> Stashed changes
 
 def connect(db_path: str = None):
     path = db_path or DB_DEFAULT

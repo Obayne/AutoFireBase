@@ -1,6 +1,16 @@
 @'
 from pathlib import Path
+<<<<<<< Updated upstream
 import re, datetime
+=======
+import logging
+
+_logger = logging.getLogger(__name__)
+
+# This helper writes embedded code strings (long lines); allow E501 here.
+# ruff: noqa: E501
+# noqa: E501
+>>>>>>> Stashed changes
 
 ROOT = Path(".")
 APP = ROOT/"app"
@@ -17,9 +27,9 @@ def backup(p: Path):
 APP.mkdir(parents=True, exist_ok=True)
 if not INIT.exists():
     INIT.write_text("# package marker\n", encoding="utf-8")
-    print("created", INIT)
+    _logger.info("created %s", INIT)
 else:
-    print("ok:", INIT)
+    _logger.info("ok: %s", INIT)
 
 # 2) ensure main.py exists and exports create_window()
 if not MAIN.exists():
@@ -36,7 +46,7 @@ if not MAIN.exists():
         "    w = create_window(); w.show(); app.exec()\n",
         encoding="utf-8",
     )
-    print("created minimal", MAIN)
+    _logger.info("created minimal %s", MAIN)
 else:
     txt = MAIN.read_text(encoding="utf-8")
     if "def create_window" not in txt:
@@ -44,9 +54,9 @@ else:
         # If a class called MainWindow exists, add a simple factory at the end.
         add = "\n\n# added by repair_entrypoints\ntry:\n    _MW = MainWindow\n    def create_window():\n        return _MW()\nexcept Exception:\n    from PySide6.QtWidgets import QMainWindow\n    def create_window():\n        return QMainWindow()\n"
         MAIN.write_text(txt + add, encoding="utf-8")
-        print("patched", MAIN, "to add create_window()")
+        _logger.info("patched %s to add create_window()", MAIN)
     else:
-        print("ok: create_window() present")
+        _logger.info("ok: create_window() present")
 
 # 3) robust boot loader that can import from files in app/ even if not packaged as code
 boot_code = r"""# boot.py — robust loader
@@ -121,8 +131,15 @@ if __name__ == '__main__':
     main()
 """
 backup(BOOT)
+<<<<<<< Updated upstream
 BOOT.write_text(boot_code, encoding='utf-8')
 print("wrote", BOOT)
 
 print("Done.")
 '@ | Set-Content -Encoding UTF8 .\repair_entrypoints.py
+=======
+BOOT.write_text(boot_code, encoding="utf-8")
+_logger.info("wrote %s", BOOT)
+
+_logger.info("Done.")
+>>>>>>> Stashed changes

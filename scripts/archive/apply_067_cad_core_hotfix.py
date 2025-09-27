@@ -13,9 +13,12 @@ def backup_write(target: Path, text: str):
     if target.exists():
         bak = target.with_suffix(target.suffix + f".bak-{STAMP}")
         shutil.copy2(target, bak)
-        print(f"[backup] {bak}")
+        import logging
+        from app.logging_config import setup_logging
+        setup_logging()
+        logging.getLogger(__name__).info("[backup] %s", bak)
     target.write_text(text.strip() + "\n", encoding="utf-8")
-    print(f"[write ] {target}")
+    logging.getLogger(__name__).info("[write ] %s", target)
 
 # ---------------- app/scene.py ----------------
 SCENE = r"""

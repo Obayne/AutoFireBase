@@ -7,6 +7,10 @@
 
 from pathlib import Path
 import time, shutil
+import logging
+from app.logging_config import setup_logging
+setup_logging()
+logger = logging.getLogger(__name__)
 
 STAMP = time.strftime("%Y%m%d_%H%M%S")
 ROOT  = Path(__file__).resolve().parent
@@ -16,9 +20,9 @@ def backup_write(path: Path, content: str):
     if path.exists():
         bak = path.with_suffix(path.suffix + f".bak-{STAMP}")
         shutil.copy2(path, bak)
-        print(f"[backup] {bak}")
+        logger.info("[backup] %s", bak)
     path.write_text(content.strip() + "\n", encoding="utf-8")
-    print(f"[write ] {path}")
+    logger.info("[write ] %s", path)
 
 SCENE_PY = r'''
 from PySide6 import QtCore, QtGui, QtWidgets
