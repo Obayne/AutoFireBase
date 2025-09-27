@@ -38,4 +38,3 @@ git add VERSION.txt CHANGELOG.md
 git commit -m "chore(release): $new`n`n$Message"
 git tag $tag
 Write-Host "Created tag $tag. Push with: git push && git push origin $tag"
-

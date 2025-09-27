@@ -66,5 +66,3 @@
   - **Alt+[ / Alt+]** → speaker **target dB −/+ 1 dB**
 - **Grid** is lighter by default; added **View → Grid Style…** for opacity, line width, and major-line interval (saved in prefs).
 - Persisted grid style in project saves; status bar messages clarify current adjustments.
-
-

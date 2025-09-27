@@ -1,4 +1,3 @@
-
 from cad_core.circle import Circle, circle_circle_intersections, line_circle_intersections
 from cad_core.lines import Line, Point
 

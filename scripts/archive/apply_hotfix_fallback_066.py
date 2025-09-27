@@ -10,7 +10,7 @@ ROOT = Path(".").resolve()
 STAMP = time.strftime("%Y%m%d_%H%M%S")
 TARGET = ROOT / "app" / "main.py"
 
-MAIN_CODE = r'''
+MAIN_CODE = r"""
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -679,7 +679,8 @@ class MainWindow(QMainWindow):
     def _on_selection_changed(self):
         self.selection_count = len(self.scene.selectedItems())
         # status text updates from CanvasView mouse move
-'''
+"""
+
 
 def main():
     TARGET.parent.mkdir(parents=True, exist_ok=True)
@@ -690,6 +691,7 @@ def main():
     TARGET.write_text(MAIN_CODE.lstrip("\n"), encoding="utf-8")
     print(f"wrote   -> {TARGET}")
     print("\nDone. Launch with:  py -3 -m app.boot")
+
 
 if __name__ == "__main__":
     main()

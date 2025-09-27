@@ -10,7 +10,9 @@ STAMP = time.strftime("%Y%m%d_%H%M%S")
 
 FILES = {}
 
-FILES["app/tools/transform.py"] = r'''
+FILES[
+    "app/tools/transform.py"
+] = r'''
 from PySide6 import QtCore, QtGui, QtWidgets
 from app.device import DeviceItem
 
@@ -88,7 +90,9 @@ def align_selected_to_grid(scene, px_per_ft: float, snap_step_px: float, grid_si
     return len(sel)
 '''
 
-FILES["app/main.py"] = r'''
+FILES[
+    "app/main.py"
+] = r"""
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -693,7 +697,8 @@ def main():
     win = create_window()
     win.show()
     app.exec()
-'''
+"""
+
 
 def write_file(rel, content):
     path = ROOT / rel
@@ -705,11 +710,13 @@ def write_file(rel, content):
     path.write_text(content.lstrip("\n"), encoding="utf-8")
     print(f"wrote   -> {path}")
 
+
 def main():
     print("== Auto-Fire CAD Step 1 (0.6.4) ==")
     for rel, content in FILES.items():
         write_file(rel, content)
     print("Done. Launch with:  py -3 -m app.boot")
+
 
 if __name__ == "__main__":
     main()

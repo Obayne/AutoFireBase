@@ -1,4 +1,3 @@
-
 from cad_core.chamfer import chamfer_lines
 from cad_core.lines import Line, Point
 

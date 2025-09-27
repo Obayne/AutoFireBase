@@ -30,7 +30,8 @@ class MoveTool:
         delta = p - self.base
         sel = list(self.win.scene.selectedItems())
         if not sel:
-            self.active = False; self.base = None
+            self.active = False
+            self.base = None
             return False
         for it in sel:
             try:
@@ -38,14 +39,17 @@ class MoveTool:
                     # attempt to duplicate simple items
                     dup = None
                     if isinstance(it, QtWidgets.QGraphicsLineItem):
-                        l = it.line(); dup = QtWidgets.QGraphicsLineItem(l)
+                        l = it.line()
+                        dup = QtWidgets.QGraphicsLineItem(l)
                     elif isinstance(it, QtWidgets.QGraphicsRectItem):
-                        r = it.rect(); dup = QtWidgets.QGraphicsRectItem(r)
+                        r = it.rect()
+                        dup = QtWidgets.QGraphicsRectItem(r)
                     elif isinstance(it, QtWidgets.QGraphicsEllipseItem):
-                        r = it.rect(); dup = QtWidgets.QGraphicsEllipseItem(r)
+                        r = it.rect()
+                        dup = QtWidgets.QGraphicsEllipseItem(r)
                     elif isinstance(it, QtWidgets.QGraphicsPathItem):
                         dup = QtWidgets.QGraphicsPathItem(it.path())
-                    elif hasattr(it, 'to_json') and hasattr(type(it), 'from_json'):
+                    elif hasattr(it, "to_json") and hasattr(type(it), "from_json"):
                         dup = type(it).from_json(it.to_json())
                     if dup is not None:
                         dup.setParentItem(it.parentItem())
@@ -59,4 +63,3 @@ class MoveTool:
         self.active = False
         self.base = None
         return True
-

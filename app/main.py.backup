@@ -1,4 +1,4 @@
-﻿import csv
+import csv
 import json
 import math
 import os
@@ -215,6 +215,10 @@ except Exception:
         def __init__(self, *a, **k):
             super().__init__("Connections", *a, **k)
             self.setWidget(QtWidgets.QLabel("Connections tree will be implemented here."))
+
+        def get_connections(self):
+            # Return empty connections data for fallback implementation
+            return []
 
 
 try:
@@ -1750,6 +1754,110 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea, dock)
         # Removed duplicate tab_widget initialization
 
+        dock = QDockWidget("Properties", self)
+        panel = QWidget()
+        form = QVBoxLayout(panel)
+        form.setContentsMargins(8, 8, 8, 8)
+        form.setSpacing(6)
+
+        # layer toggles (visibility)
+        form.addWidget(QLabel("Layers"))
+        self.chk_underlay = QCheckBox("Underlay")
+        self.chk_underlay.setChecked(True)
+        self.chk_underlay.toggled.connect(lambda v: self.layer_underlay.setVisible(v))
+        form.addWidget(self.chk_underlay)
+        self.chk_sketch = QCheckBox("Sketch")
+        self.chk_sketch.setChecked(True)
+        self.chk_sketch.toggled.connect(lambda v: self.layer_sketch.setVisible(v))
+        form.addWidget(self.chk_sketch)
+        self.chk_wires = QCheckBox("Wiring")
+        self.chk_wires.setChecked(True)
+        self.chk_wires.toggled.connect(lambda v: self.layer_wires.setVisible(v))
+        form.addWidget(self.chk_wires)
+        self.chk_devices = QCheckBox("Devices")
+        self.chk_devices.setChecked(True)
+        self.chk_devices.toggled.connect(lambda v: self.layer_devices.setVisible(v))
+        form.addWidget(self.chk_devices)
+
+        self.btn_layer_manager = QPushButton("Layer Manager")
+        self.btn_layer_manager.clicked.connect(self.open_layer_manager)
+        form.addWidget(self.btn_layer_manager)
+
+        # properties
+        form.addSpacing(10)
+        lblp = QLabel("Device Properties")
+        lblp.setStyleSheet("font-weight:600;")
+        form.addWidget(lblp)
+
+        grid = QtWidgets.QGridLayout()
+        grid.setHorizontalSpacing(8)
+        grid.setVerticalSpacing(4)
+        r = 0
+        grid.addWidget(QLabel("Label"), r, 0)
+        self.prop_label = QLineEdit()
+        grid.addWidget(self.prop_label, r, 1)
+        r += 1
+        grid.addWidget(QLabel("Show Coverage"), r, 0)
+        self.prop_showcov = QCheckBox()
+        self.prop_showcov.setChecked(True)
+        grid.addWidget(self.prop_showcov, r, 1)
+        r += 1
+        grid.addWidget(QLabel("Offset X (ft)"), r, 0)
+        self.prop_offx = QDoubleSpinBox()
+        self.prop_offx.setRange(-500, 500)
+        self.prop_offx.setDecimals(2)
+        grid.addWidget(self.prop_offx, r, 1)
+        r += 1
+        grid.addWidget(QLabel("Offset Y (ft)"), r, 0)
+        self.prop_offy = QDoubleSpinBox()
+        self.prop_offy.setRange(-500, 500)
+        self.prop_offy.setDecimals(2)
+        grid.addWidget(self.prop_offy, r, 1)
+        r += 1
+        grid.addWidget(QLabel("Mount"), r, 0)
+        self.prop_mount = QComboBox()
+        self.prop_mount.addItems(["ceiling", "wall"])
+        grid.addWidget(self.prop_mount, r, 1)
+        r += 1
+        grid.addWidget(QLabel("Coverage Mode"), r, 0)
+        self.prop_mode = QComboBox()
+        self.prop_mode.addItems(["none", "strobe", "speaker", "smoke"])
+        grid.addWidget(self.prop_mode, r, 1)
+        r += 1
+        grid.addWidget(QLabel("Candela (strobe)"), r, 0)
+        self.prop_candela = QComboBox()
+        self.prop_candela.addItems(["(custom)", "15", "30", "75", "95", "110", "135", "185"])
+        grid.addWidget(self.prop_candela, r, 1)
+        r += 1
+        grid.addWidget(QLabel("Size (ft)"), r, 0)
+        self.prop_size = QDoubleSpinBox()
+        self.prop_size.setRange(0, 1000)
+        self.prop_size.setDecimals(2)
+        self.prop_size.setSingleStep(1.0)
+        grid.addWidget(self.prop_size, r, 1)
+        r += 1
+
+        form.addLayout(grid)
+        self.btn_apply_props = QPushButton("Apply")
+        form.addWidget(self.btn_apply_props)
+
+        # disable until selection
+        self._enable_props(False)
+
+        self.btn_apply_props.clicked.connect(self._apply_props_clicked)
+        self.prop_label.editingFinished.connect(self._apply_label_offset_live)
+        self.prop_offx.valueChanged.connect(self._apply_label_offset_live)
+        self.prop_offy.valueChanged.connect(self._apply_label_offset_live)
+        self.prop_mode.currentTextChanged.connect(self._on_mode_changed_props)
+
+        panel.setLayout(form)
+        dock.setWidget(panel)
+        self.addDockWidget(Qt.RightDockWidgetArea, dock)
+        self.sheets_dock = dock
+        dock.setVisible(False)
+        self.dock_layers_props = dock
+
+    def _build_layers_and_props_dock(self):
         dock = QDockWidget("Properties", self)
         panel = QWidget()
         form = QVBoxLayout(panel)
@@ -3593,29 +3701,21 @@ class MainWindow(QMainWindow):
             {"name": name, "view": paperspace_view, "scene": self.paper_scene}
         )  # Store view and scene
 
+    def export_sheets_pdf(self):
+        # For now, just show a message that sheet export is not yet implemented
+        QMessageBox.information(self, "Export Sheets", "Sheet export is not yet implemented.")
+
     def toggle_paper_space(self, on: bool):
-        self.in_paper_space = on
+        self.in_paper_space = bool(on)
+        self.act_paperspace.setChecked(on)
+        # Update UI to reflect paper space mode
         if on:
             self.space_badge.setText("PAPER SPACE")
-            self.space_badge.setStyleSheet("QLabel { color: #ff7d00; font-weight: bold; }")
-            # Switch to the first paperspace tab, or create one if none exist
-            if self.tab_widget.count() > 1:  # Check if there are paperspace tabs
-                self.tab_widget.setCurrentIndex(1)  # Switch to the first paperspace tab
-            else:
-                self.tab_widget.setCurrentIndex(
-                    self.tab_widget.indexOf(self.view)
-                )  # Switch to model tab if no paperspace tabs
-                self.add_paperspace_sheet("Layout1")
-                self.tab_widget.setCurrentIndex(
-                    self.tab_widget.count() - 1
-                )  # Switch to the newly created paperspace tab
+            self.space_badge.setStyleSheet("QLabel { color: #ff9e64; font-weight: bold; }")
         else:
             self.space_badge.setText("MODEL SPACE")
             self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
-            self.tab_widget.setCurrentIndex(0)  # Switch to the Model tab
-        self.act_paperspace.setChecked(on)
-        self.space_combo.setCurrentIndex(1 if on else 0)
-        self.view.update()
+        self.scene.update()
 
     def set_print_scale(self, inches_per_ft: float):
         self.prefs["print_in_per_ft"] = inches_per_ft
@@ -3670,12 +3770,17 @@ Version: {APP_VERSION}
 
     # ---------- device operations ----------
     def delete_selection(self):
-        items_to_delete = list(self.scene.selectedItems())
-        for it in items_to_delete:
-            if isinstance(it, DeviceItem):
-                self.connections_tree.remove_device(it)
-            it.scene().removeItem(it)
-        self.push_history()
+        items = self.scene.selectedItems()
+        if not items:
+            return
+
+        try:
+            for it in items:
+                it.scene().removeItem(it)
+            self.push_history()
+            self.statusBar().showMessage(f"Deleted {len(items)} items")
+        except Exception as ex:
+            QMessageBox.critical(self, "Delete Error", str(ex))
 
 
 def create_window():

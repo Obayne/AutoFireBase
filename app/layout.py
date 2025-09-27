@@ -1,4 +1,4 @@
-﻿from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 PAGE_SIZES = {
     "Letter": (8.5, 11),

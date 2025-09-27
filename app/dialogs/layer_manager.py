@@ -234,7 +234,7 @@ class LayerManagerDialog(QtWidgets.QDialog):
                 # Update existing layer
                 cur.execute(
                     """
-                    UPDATE layers 
+                    UPDATE layers
                     SET name=?, color=?, visible=?, locked=?, print=?
                     WHERE id=?
                 """,

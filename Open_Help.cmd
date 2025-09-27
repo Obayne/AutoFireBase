@@ -13,4 +13,3 @@ start "" "%DOCS%\Shortcuts.md"
 explorer "%DOCS%"
 
 exit /b 0
-

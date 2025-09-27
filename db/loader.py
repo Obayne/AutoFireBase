@@ -192,7 +192,7 @@ def seed_demo(con: sqlite3.Connection):
 
             cur.execute(
                 """
-                INSERT OR IGNORE INTO fire_alarm_device_specs 
+                INSERT OR IGNORE INTO fire_alarm_device_specs
                 (device_id, device_class, max_current_ma, standby_current_ma, alarm_current_ma, voltage_v, slc_compatible, nac_compatible, addressable, candela_options)
                 VALUES(?,?,?,?,?,?,?,?,?,?)
             """,
@@ -412,7 +412,7 @@ def fetch_devices(con: sqlite3.Connection):
     cur = con.cursor()
     cur.execute(
         """
-        SELECT d.id, d.name, d.symbol, dt.code AS type, m.name AS manufacturer, d.model AS part_number, sc.name AS system_category, 
+        SELECT d.id, d.name, d.symbol, dt.code AS type, m.name AS manufacturer, d.model AS part_number, sc.name AS system_category,
                fas.slc_compatible, fas.nac_compatible
         FROM devices d
         LEFT JOIN manufacturers m ON m.id=d.manufacturer_id
@@ -486,7 +486,7 @@ def register_block_for_device(
         # Update existing block registration
         cur.execute(
             """
-            UPDATE cad_blocks 
+            UPDATE cad_blocks
             SET block_name = ?, block_path = ?, block_attributes = ?
             WHERE device_id = ?
         """,
@@ -513,7 +513,7 @@ def get_block_for_device(con: sqlite3.Connection, device_id: int) -> dict | None
     cur.execute(
         """
         SELECT block_name, block_path, block_attributes
-        FROM cad_blocks 
+        FROM cad_blocks
         WHERE device_id = ?
     """,
         (device_id,),
@@ -537,7 +537,7 @@ def fetch_devices_with_blocks(con: sqlite3.Connection) -> list:
     cur = con.cursor()
     cur.execute(
         """
-        SELECT d.id, d.name, d.symbol, dt.code AS type, m.name AS manufacturer, 
+        SELECT d.id, d.name, d.symbol, dt.code AS type, m.name AS manufacturer,
                d.model AS part_number, sc.name AS system_category,
                cb.block_name, cb.block_path
         FROM devices d

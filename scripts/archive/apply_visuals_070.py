@@ -9,9 +9,9 @@ ROOT = Path(__file__).resolve().parent
 STAMP = time.strftime("%Y%m%d_%H%M%S")
 
 DEVICE_PY = ROOT / "app" / "device.py"
-MAIN_PY   = ROOT / "app" / "main.py"
+MAIN_PY = ROOT / "app" / "main.py"
 
-DEVICE_PATCH = r'''
+DEVICE_PATCH = r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 
@@ -181,9 +181,9 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
         cov = d.get("coverage")
         if cov: it.set_coverage(cov)
         return it
-'''
+"""
 
-THEMES_PATCH = r'''
+THEMES_PATCH = r"""
 THEMES = {
     "dark": {
         "window": (26,26,28), "base": (20,20,22), "text": (238,240,244),
@@ -201,17 +201,19 @@ THEMES = {
         "bg_brush": (236,240,244)
     }
 }
-'''
+"""
+
 
 def patch_device():
     if not DEVICE_PY.exists():
         print(f"[!] missing {DEVICE_PY}")
         return
-    bak = DEVICE_PY.with_suffix(".py.bak-"+STAMP)
+    bak = DEVICE_PY.with_suffix(".py.bak-" + STAMP)
     bak.write_text(DEVICE_PY.read_text(encoding="utf-8"), encoding="utf-8")
     DEVICE_PY.write_text(DEVICE_PATCH.lstrip(), encoding="utf-8")
     print(f"[backup] {bak}")
     print(f"[write ] {DEVICE_PY}")
+
 
 def patch_themes():
     if not MAIN_PY.exists():
@@ -221,7 +223,7 @@ def patch_themes():
     if "THEMES =" not in src:
         print("[i] THEMES block not found; skipping theme patch.")
         return
-    bak = MAIN_PY.with_suffix(".py.bak-"+STAMP)
+    bak = MAIN_PY.with_suffix(".py.bak-" + STAMP)
     bak.write_text(src, encoding="utf-8")
     # Replace the THEMES dict (simple heuristic)
     start = src.find("THEMES =")
@@ -234,6 +236,7 @@ def patch_themes():
     MAIN_PY.write_text(new_src, encoding="utf-8")
     print(f"[backup] {bak}")
     print(f"[write ] {MAIN_PY}")
+
 
 if __name__ == "__main__":
     patch_device()
