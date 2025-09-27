@@ -9,12 +9,16 @@ APP = ROOT / "app"
 APP_INIT = APP / "__init__.py"
 BOOT = APP / "boot.py"
 
+
 def backup(p: Path):
     if p.exists():
         ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        p.with_suffix(p.suffix + f".bak_{ts}").write_text(p.read_text(encoding="utf-8"), encoding="utf-8")
+        p.with_suffix(p.suffix + f".bak_{ts}").write_text(
+            p.read_text(encoding="utf-8"), encoding="utf-8"
+        )
 
-LOADER_BOOT = r'''# boot.py — robust loader
+
+LOADER_BOOT = r"""# boot.py — robust loader
 import os, sys, traceback, datetime, importlib
 
 from PySide6 import QtWidgets
@@ -90,7 +94,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''
+"""
 
 # 1) make sure app/ is a package
 APP.mkdir(parents=True, exist_ok=True)

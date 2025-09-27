@@ -19,12 +19,12 @@ jobs:
             if (branch.startsWith('fix/')) labels.add('type: fix');
             if (branch.startsWith('chore/')) labels.add('type: chore');
 
-            // Area by path fragment
-            if (branch.includes('cad-core')) labels.add('area: cad-core');
-            if (branch.includes('backend')) labels.add('area: backend');
-            if (branch.includes('frontend')) labels.add('area: frontend');
-            if (branch.includes('qa')) labels.add('area: qa');
-            if (branch.includes('integration')) labels.add('area: integration');
+            // Area by branch fragment (standardized names, no spaces)
+            if (branch.includes('cad-core') || branch.includes('cad_core')) labels.add('area:cad_core');
+            if (branch.includes('backend')) labels.add('area:backend');
+            if (branch.includes('frontend')) labels.add('area:frontend');
+            if (branch.includes('qa')) labels.add('area:qa');
+            if (branch.includes('integration')) labels.add('area:integration');
 
             // Ensure labels exist
             for (const name of labels) {
@@ -52,4 +52,3 @@ jobs:
                 labels: [...labels],
               });
             }
-

@@ -17,4 +17,3 @@ Closes #<number>
 ## Checklist
 - [ ] Follows style (Black/Ruff)
 - [ ] Docs updated (README/docs/* if needed)
-

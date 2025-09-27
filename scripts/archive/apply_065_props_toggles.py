@@ -5,10 +5,10 @@ from pathlib import Path
 import time, shutil
 
 STAMP = time.strftime("%Y%m%d_%H%M%S")
-ROOT  = Path(__file__).resolve().parent
-TGT   = ROOT / "app" / "main.py"
+ROOT = Path(__file__).resolve().parent
+TGT = ROOT / "app" / "main.py"
 
-NEW_MAIN = r'''
+NEW_MAIN = r"""
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -478,7 +478,7 @@ class MainWindow(QMainWindow):
         for it in list(self.layer_devices.childItems()): it.scene().removeItem(it)
         for it in list(self.layer_wires.childItems()): it.scene().removeItem(it)
         self.scene.snap_enabled = bool(data.get("snap", True)); self.act_view_snap.setChecked(self.scene.snap_enabled)
-        self.scene.grid_size = int(data.get("grid", DEFAULT_GRID_SIZE)); 
+        self.scene.grid_size = int(data.get("grid", DEFAULT_GRID_SIZE));
         if hasattr(self, "spin_grid"): self.spin_grid.setValue(self.scene.grid_size)
         self.px_per_ft = float(data.get("px_per_ft", self.px_per_ft))
         self.snap_step_in = float(data.get("snap_step_in", self.snap_step_in))
@@ -512,7 +512,7 @@ class MainWindow(QMainWindow):
     def _on_selection_changed(self):
         d = self._get_selected_device()
         if not d:
-            self._enable_props(False); 
+            self._enable_props(False);
             return
         self._enable_props(True)
         # label + offset in ft
@@ -625,7 +625,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''
+"""
+
 
 def main():
     if TGT.exists():
@@ -633,8 +634,9 @@ def main():
         shutil.copy2(TGT, bak)
         print(f"[backup] {bak}")
     TGT.parent.mkdir(parents=True, exist_ok=True)
-    TGT.write_text(NEW_MAIN.strip()+"\n", encoding="utf-8")
+    TGT.write_text(NEW_MAIN.strip() + "\n", encoding="utf-8")
     print(f"[write ] {TGT}\n\nDone. Launch with:\n  py -3 -m app.boot\n")
+
 
 if __name__ == "__main__":
     main()

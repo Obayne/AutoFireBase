@@ -1,5 +1,7 @@
-import sqlite3, json, os
-from typing import List
+import json
+import os
+import sqlite3
+
 from .iface import DeviceRecord
 
 SCHEMA = """
@@ -14,6 +16,7 @@ CREATE TABLE IF NOT EXISTS project_snapshots (
 );
 """
 
+
 class SQLiteStore:
     def __init__(self, path: str):
         self.path = path
@@ -25,24 +28,42 @@ class SQLiteStore:
             db.executescript(SCHEMA)
 
     # ---- Catalog ----
-    def upsert_catalog(self, items: List[DeviceRecord]):
+    def upsert_catalog(self, items: list[DeviceRecord]):
         with sqlite3.connect(self.path) as db:
             for d in items:
                 db.execute(
                     "INSERT INTO catalog (name, symbol, manufacturer, part_number, type, attributes) VALUES (?,?,?,?,?,?)",
-                    (d.name, d.symbol, d.manufacturer, d.part_number, d.type, json.dumps(d.attributes or {}))
+                    (
+                        d.name,
+                        d.symbol,
+                        d.manufacturer,
+                        d.part_number,
+                        d.type,
+                        json.dumps(d.attributes or {}),
+                    ),
                 )
             db.commit()
 
-    def list_catalog(self) -> List[DeviceRecord]:
+    def list_catalog(self) -> list[DeviceRecord]:
         rows = []
         with sqlite3.connect(self.path) as db:
-            cur = db.execute("SELECT id, name, symbol, manufacturer, part_number, type, attributes FROM catalog ORDER BY name")
+            cur = db.execute(
+                "SELECT id, name, symbol, manufacturer, part_number, type, attributes FROM catalog ORDER BY name"
+            )
             rows = cur.fetchall()
         out = []
         for id_, name, symbol, manufacturer, part_number, type_, attrs in rows:
-            out.append(DeviceRecord(id=id_, name=name, symbol=symbol, manufacturer=manufacturer,
-                                    part_number=part_number, type=type_, attributes=json.loads(attrs or "{}")))
+            out.append(
+                DeviceRecord(
+                    id=id_,
+                    name=name,
+                    symbol=symbol,
+                    manufacturer=manufacturer,
+                    part_number=part_number,
+                    type=type_,
+                    attributes=json.loads(attrs or "{}"),
+                )
+            )
         return out
 
     # ---- Project snapshots ----
@@ -53,6 +74,9 @@ class SQLiteStore:
 
     def latest_snapshot(self) -> dict | None:
         with sqlite3.connect(self.path) as db:
-            row = db.execute("SELECT data FROM project_snapshots ORDER BY id DESC LIMIT 1").fetchone()
-            if not row: return None
+            row = db.execute(
+                "SELECT data FROM project_snapshots ORDER BY id DESC LIMIT 1"
+            ).fetchone()
+            if not row:
+                return None
             return json.loads(row[0])

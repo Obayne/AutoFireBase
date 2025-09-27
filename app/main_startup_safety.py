@@ -1,4 +1,3 @@
-
 # app/main_startup_safety.py
 # This companion module is imported by app/main.py near startup in your last patch.
 # If you want to avoid editing main.py directly, this pattern is easy to ship:

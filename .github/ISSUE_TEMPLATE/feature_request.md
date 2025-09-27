@@ -9,7 +9,6 @@ labels: enhancement
 ## Rationale
 
 ## Acceptance Criteria
-- [ ] 
+- [ ]
 
 ## Notes
-

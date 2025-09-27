@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Optional, Tuple
-
-from shapely.geometry import LineString, Point as SPoint
-from shapely.ops import split
+from shapely.geometry import LineString
+from shapely.geometry import Point as SPoint
 
 from .lines import Line, Point
 
@@ -17,7 +14,7 @@ def _to_point(sp: SPoint) -> Point:
     return Point(float(sp.x), float(sp.y))
 
 
-def segment_intersection(seg1: Line, seg2: Line) -> Optional[Point]:
+def segment_intersection(seg1: Line, seg2: Line) -> Point | None:
     """Return intersection point of two finite segments using Shapely (None if disjoint)."""
     a = _to_linestring(seg1)
     b = _to_linestring(seg2)
@@ -30,7 +27,7 @@ def segment_intersection(seg1: Line, seg2: Line) -> Optional[Point]:
     return None
 
 
-def trim_segment_to_intersection(seg: Line, cutter: Line, end: str = "b") -> Optional[Line]:
+def trim_segment_to_intersection(seg: Line, cutter: Line, end: str = "b") -> Line | None:
     """Trim a finite segment to its intersection with a cutter segment.
 
     Returns a new segment or None if there is no intersection.
@@ -44,4 +41,3 @@ def trim_segment_to_intersection(seg: Line, cutter: Line, end: str = "b") -> Opt
 
 
 __all__ = ["segment_intersection", "trim_segment_to_intersection"]
-

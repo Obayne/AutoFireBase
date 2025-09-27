@@ -13,4 +13,3 @@ labels: bug
 ## Logs/Screenshots
 
 ## Proposed Fix
-

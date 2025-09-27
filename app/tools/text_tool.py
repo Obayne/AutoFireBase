@@ -9,7 +9,9 @@ class TextTool:
 
     def start(self):
         self.active = True
-        self.win.statusBar().showMessage("Text: click to place, then enter text (use MText for scalable)")
+        self.win.statusBar().showMessage(
+            "Text: click to place, then enter text (use MText for scalable)"
+        )
 
     def cancel(self):
         self.active = False
@@ -46,15 +48,26 @@ class MTextTool:
 
     def start(self):
         self.active = True
-        dlg = QtWidgets.QDialog(self.win); dlg.setWindowTitle("MText")
+        dlg = QtWidgets.QDialog(self.win)
+        dlg.setWindowTitle("MText")
         form = QtWidgets.QFormLayout(dlg)
-        txt = QtWidgets.QTextEdit(); txt.setPlainText("")
-        h  = QtWidgets.QDoubleSpinBox(); h.setRange(0.1, 100.0); h.setDecimals(2); h.setValue(1.0)
-        form.addRow("Text:", txt); form.addRow("Height (ft):", h)
-        bb = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok|QtWidgets.QDialogButtonBox.Cancel); form.addRow(bb)
-        bb.accepted.connect(dlg.accept); bb.rejected.connect(dlg.reject)
+        txt = QtWidgets.QTextEdit()
+        txt.setPlainText("")
+        h = QtWidgets.QDoubleSpinBox()
+        h.setRange(0.1, 100.0)
+        h.setDecimals(2)
+        h.setValue(1.0)
+        form.addRow("Text:", txt)
+        form.addRow("Height (ft):", h)
+        bb = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        )
+        form.addRow(bb)
+        bb.accepted.connect(dlg.accept)
+        bb.rejected.connect(dlg.reject)
         if dlg.exec() != QtWidgets.QDialog.Accepted:
-            self.active = False; return
+            self.active = False
+            return
         self.text = txt.toPlainText()
         self.height_ft = float(h.value())
         self.win.statusBar().showMessage("MText: click to place")
@@ -69,7 +82,8 @@ class MTextTool:
         if not self.active:
             return False
         if not self.text:
-            self.active = False; return False
+            self.active = False
+            return False
         item = QtWidgets.QGraphicsTextItem(self.text)
         item.setDefaultTextColor(QtGui.QColor("#e0e0e0"))
         item.setPos(p)

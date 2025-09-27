@@ -71,4 +71,3 @@ Open Questions
 - Confirm UI framework pin (PySide6 vs PyQt6) and minimum versions.
 - Confirm DB file location and schema migration approach (alembic vs hand-rolled).
 - Confirm command architecture (text commands vs palette-style actions).
-

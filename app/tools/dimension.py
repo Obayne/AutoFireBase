@@ -1,19 +1,26 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 
+
 def fmt_ft_inches(px: float, px_per_ft: float) -> str:
     ft = px / px_per_ft if px_per_ft > 0 else 0.0
-    sign = '-' if ft < 0 else ''
-    ft = abs(ft); whole = int(ft); inches = (ft - whole) * 12.0
+    sign = "-" if ft < 0 else ""
+    ft = abs(ft)
+    whole = int(ft)
+    inches = (ft - whole) * 12.0
     return f"{sign}{whole}'-{inches:.1f}\""
+
 
 class LinearDimension(QtWidgets.QGraphicsItemGroup):
     def __init__(self, p0: QtCore.QPointF, p1: QtCore.QPointF, px_per_ft: float):
         super().__init__()
-        self.p0 = QtCore.QPointF(p0); self.p1 = QtCore.QPointF(p1)
+        self.p0 = QtCore.QPointF(p0)
+        self.p1 = QtCore.QPointF(p1)
         self.px_per_ft = px_per_ft
-        pen = QtGui.QPen(QtGui.QColor("#e0e0e0")); pen.setCosmetic(True)
+        pen = QtGui.QPen(QtGui.QColor("#e0e0e0"))
+        pen.setCosmetic(True)
         self.line = QtWidgets.QGraphicsLineItem(self.p0.x(), self.p0.y(), self.p1.x(), self.p1.y())
-        self.line.setPen(pen); self.addToGroup(self.line)
+        self.line.setPen(pen)
+        self.addToGroup(self.line)
         mid = (self.p0 + self.p1) / 2
         txt = fmt_ft_inches(QtCore.QLineF(self.p0, self.p1).length(), self.px_per_ft)
         self.label = QtWidgets.QGraphicsSimpleTextItem(txt)
@@ -21,6 +28,7 @@ class LinearDimension(QtWidgets.QGraphicsItemGroup):
         self.label.setBrush(QtGui.QBrush(QtGui.QColor("#c0caf5")))
         self.label.setPos(mid + QtCore.QPointF(8, -8))
         self.addToGroup(self.label)
+
 
 class DimensionTool:
     def __init__(self, window, overlay_layer):

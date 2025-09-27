@@ -10,4 +10,3 @@
 Coordination
 - One branch per task; link PR to the issue.
 - Avoid editing the same module across tasks.
-

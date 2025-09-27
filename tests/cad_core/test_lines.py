@@ -1,8 +1,8 @@
 from cad_core.lines import (
     Line,
     Point,
-    intersection_line_line,
     extend_line_to_intersection,
+    intersection_line_line,
     trim_line_by_cut,
 )
 
@@ -39,4 +39,3 @@ def test_trim_line_by_cut_same_as_extend_here():
     assert trimmed is not None
     assert trimmed.a == base.a
     assert abs(trimmed.b.x - 5.0) < 1e-9
-

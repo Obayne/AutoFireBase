@@ -4,6 +4,7 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 BACKUP_DIR = os.path.join(APP_ROOT, "_backups")
 VERSION_FILE = os.path.join(APP_ROOT, "VERSION.txt")
 
+
 def read_version():
     if os.path.exists(VERSION_FILE):
         try:
@@ -13,12 +14,14 @@ def read_version():
             return ""
     return ""
 
+
 def write_version(v):
     try:
         with open(VERSION_FILE, "w", encoding="utf-8") as f:
             f.write(str(v).strip() + "\n")
     except Exception as e:
         print("[warn] could not write VERSION.txt:", e)
+
 
 def backup_current():
     os.makedirs(BACKUP_DIR, exist_ok=True)
@@ -37,10 +40,12 @@ def backup_current():
                 z.write(p, rel)
     return backup_path
 
+
 def apply_zip(update_zip):
     print("[update] applying", update_zip)
     with zipfile.ZipFile(update_zip, "r") as z:
         z.extractall(APP_ROOT)
+
 
 def verify_post_update():
     p = os.path.join(APP_ROOT, "app", "main.py")
@@ -48,11 +53,13 @@ def verify_post_update():
         raise RuntimeError("post-update verification failed: app/main.py missing")
     print("[verify] ok")
 
+
 def rollback_to(backup_zip):
     print("[rollback] using", backup_zip)
     with zipfile.ZipFile(backup_zip, "r") as z:
         z.extractall(APP_ROOT)
     print("[rollback] done")
+
 
 def main():
     parser = argparse.ArgumentParser(description="AutoFire updater")
@@ -61,15 +68,20 @@ def main():
     args = parser.parse_args()
 
     if args.rollback:
-        rollback_to(args.rollback); return
+        rollback_to(args.rollback)
+        return
 
     if not args.update:
-        print("Usage:\n  python apply_update.py --update C:\\AutoFireUpdates\\AutoFire_patch.zip\n"
-              "or rollback:\n  python apply_update.py --rollback .\\_backups\\autofire_backup_YYYYMMDD_HHMMSS.zip"); return
+        print(
+            "Usage:\n  python apply_update.py --update C:\\AutoFireUpdates\\AutoFire_patch.zip\n"
+            "or rollback:\n  python apply_update.py --rollback .\\_backups\\autofire_backup_YYYYMMDD_HHMMSS.zip"
+        )
+        return
 
     update_zip = args.update
     if not os.path.exists(update_zip):
-        print("[error] update zip not found:", update_zip); sys.exit(1)
+        print("[error] update zip not found:", update_zip)
+        sys.exit(1)
 
     cur_ver = read_version() or "(unknown)"
     print("[version] current:", cur_ver)
@@ -80,12 +92,19 @@ def main():
         apply_zip(update_zip)
         verify_post_update()
         with zipfile.ZipFile(update_zip, "r") as z:
-            new_ver = z.read("VERSION.txt").decode("utf-8").strip() if "VERSION.txt" in z.namelist() else "0.0.0"
+            new_ver = (
+                z.read("VERSION.txt").decode("utf-8").strip()
+                if "VERSION.txt" in z.namelist()
+                else "0.0.0"
+            )
         write_version(new_ver)
         print("[done] update complete. new version:", new_ver)
     except Exception as e:
         print("[error] update failed:", e)
-        print("[info] rolling back..."); rollback_to(backup_zip); sys.exit(2)
+        print("[info] rolling back...")
+        rollback_to(backup_zip)
+        sys.exit(2)
+
 
 if __name__ == "__main__":
     main()

@@ -2,21 +2,22 @@
 # Fixes "minimal window" by ensuring packages & import path are correct.
 # Safe to run multiple times.
 
-import sys, os, textwrap, time
+import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-APP  = ROOT / "app"
+APP = ROOT / "app"
 CORE = ROOT / "core"
-TOOLS= APP / "tools"
-UPD  = ROOT / "updater"
+TOOLS = APP / "tools"
+UPD = ROOT / "updater"
 
 REQ_DIRS = [APP, CORE, TOOLS, UPD]
 NEEDED_INITS = [d / "__init__.py" for d in REQ_DIRS]
 
 BOOT = APP / "boot.py"
 
-BOOT_SAFE = r'''# app/boot.py — hardened entry that avoids "minimal window" fallback surprises.
+BOOT_SAFE = r"""# app/boot.py — hardened entry that avoids "minimal window" fallback surprises.
 import os, sys, traceback, time
 
 # Ensure project root is on sys.path when running from source
@@ -78,7 +79,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''
+"""
+
 
 def ensure_inits():
     made = []
@@ -89,9 +91,10 @@ def ensure_inits():
             made.append(init)
     return made
 
+
 def maybe_patch_boot():
     # Only overwrite if missing or obviously not hardened
-    need = (not BOOT.exists())
+    need = not BOOT.exists()
     if not need:
         txt = BOOT.read_text(encoding="utf-8", errors="ignore")
         need = ("from app.main import create_window" not in txt) or ("log_startup_error" not in txt)
@@ -103,6 +106,7 @@ def maybe_patch_boot():
         BOOT.write_text(BOOT_SAFE, encoding="utf-8")
         return True
     return False
+
 
 def main():
     print("== AutoFireBase Repo Doctor v0.6.1 ==")
@@ -120,7 +124,7 @@ def main():
 
     changed_boot = maybe_patch_boot()
     if changed_boot:
-        print(f"[patch] wrote hardened: app/boot.py")
+        print("[patch] wrote hardened: app/boot.py")
     else:
         print("[ok] app/boot.py already hardened")
 
@@ -139,6 +143,7 @@ def main():
     print("  2) If it still falls back, open newest file in:")
     print("       %USERPROFILE%\\AutoFire\\logs\\startup_error_*.log")
     print("     and paste the latest traceback here.")
+
 
 if __name__ == "__main__":
     main()

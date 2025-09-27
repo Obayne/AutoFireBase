@@ -31,4 +31,3 @@ jobs:
                 await github.rest.issues.addLabels({ owner, repo, issue_number: i.number, labels: ['agent:auto'] });
               }
             }
-

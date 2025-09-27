@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+
 from PySide6 import QtGui
 
 from cad_core.arc import Arc
@@ -24,4 +25,3 @@ def path_from_arc(arc: Arc) -> QtGui.QPainterPath:
     path.moveTo(sx, sy)
     path.arcTo(rect, start_deg, sweep)
     return path
-

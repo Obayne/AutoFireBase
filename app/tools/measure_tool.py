@@ -31,11 +31,14 @@ class MeasureTool:
 
     def _show_temp(self, a: QtCore.QPointF, b: QtCore.QPointF):
         from app.tools.dimension import fmt_ft_inches
+
         if self.temp is None:
             group = QtWidgets.QGraphicsItemGroup()
-            pen = QtGui.QPen(QtGui.QColor("#e0e0e0")); pen.setCosmetic(True)
+            pen = QtGui.QPen(QtGui.QColor("#e0e0e0"))
+            pen.setCosmetic(True)
             line = QtWidgets.QGraphicsLineItem()
-            line.setPen(pen); group.addToGroup(line)
+            line.setPen(pen)
+            group.addToGroup(line)
             txt = QtWidgets.QGraphicsSimpleTextItem("")
             txt.setBrush(QtGui.QBrush(QtGui.QColor("#ffd166")))
             txt.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations, True)
@@ -44,7 +47,7 @@ class MeasureTool:
             self.temp = (group, line, txt)
         group, line, txt = self.temp
         line.setLine(a.x(), a.y(), b.x(), b.y())
-        mid = (a + b)/2
+        mid = (a + b) / 2
         txt.setText(fmt_ft_inches(QtCore.QLineF(a, b).length(), self.win.px_per_ft))
         txt.setPos(mid + QtCore.QPointF(8, -8))
 
@@ -58,4 +61,3 @@ class MeasureTool:
         self.active = False
         self.start_pt = None
         return True
-

@@ -15,7 +15,9 @@ STAMP = time.strftime("%Y%m%d_%H%M%S")
 
 FILES = {}
 
-FILES["app/device.py"] = r'''
+FILES[
+    "app/device.py"
+] = r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 
 class DeviceItem(QtWidgets.QGraphicsItemGroup):
@@ -188,9 +190,11 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
             try: it.setRotation(float(rot))
             except Exception: pass
         return it
-'''
+"""
 
-FILES["app/tools/transform.py"] = r'''
+FILES[
+    "app/tools/transform.py"
+] = r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 from app.device import DeviceItem
 
@@ -262,9 +266,11 @@ def align_selected_to_grid(scene, px_per_ft: float, snap_step_px: float, grid_si
         p = it.pos()
         it.setPos(QtCore.QPointF(_snap(p.x()), _snap(p.y())))
     return len(sel)
-'''
+"""
 
-FILES["app/main.py"] = r'''
+FILES[
+    "app/main.py"
+] = r"""
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -935,7 +941,8 @@ class MainWindow(QMainWindow):
     def _on_selection_changed(self):
         self.selection_count = len(self.scene.selectedItems())
         # status text updates from CanvasView mouse move
-'''
+"""
+
 
 def write_file(rel, content):
     path = ROOT / rel
@@ -950,11 +957,13 @@ def write_file(rel, content):
     path.write_text(content.lstrip("\n"), encoding="utf-8")
     print(f"wrote   -> {path}")
 
+
 def main():
     print("== Auto-Fire CAD Step 1b (0.6.5) ==")
     for rel, content in FILES.items():
         write_file(rel, content)
     print("Done. Launch with:  py -3 -m app.boot")
+
 
 if __name__ == "__main__":
     main()

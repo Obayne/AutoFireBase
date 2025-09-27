@@ -53,4 +53,3 @@ jobs:
             const pr = await github.rest.pulls.create({ owner, repo, title, head, base, body, draft: false });
             core.info(`Opened PR #${pr.data.number}`);
             core.setOutput('pr_number', pr.data.number);
-

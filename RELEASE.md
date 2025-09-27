@@ -15,7 +15,8 @@ Workflow
 - Push commit and tag. CI creates a GitHub Release and attaches the Windows build.
 
 Artifacts
-- GitHub Actions builds on Windows and uploads `AutoFire.exe` from `dist/AutoFire/AutoFire/`.
+- GitHub Actions builds on Windows and uploads `AutoFire.exe` from `dist/**/AutoFire.exe` (supports fallback timestamped dist paths).
+- Release includes a SHA256 checksum file alongside the EXE.
 
 Notes
 - Do not tag from a dirty tree. Ensure CI is green before tagging.

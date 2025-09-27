@@ -1,6 +1,6 @@
-from PySide6 import QtGui, QtWidgets, QtCore
+from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QPointF, QRectF
-from PySide6.QtGui import QPen, QBrush, QPainterPath
+from PySide6.QtGui import QPainterPath
 
 try:
     # For type hints only (avoid hard import cycles)
@@ -8,11 +8,14 @@ try:
 except Exception:
     pass
 
-def rebuild_overlay(devices_group: QtWidgets.QGraphicsItemGroup,
-                    overlay_group: QtWidgets.QGraphicsItemGroup,
-                    size: float = 120.0,
-                    pen: QtGui.QPen | None = None,
-                    brush: QtGui.QBrush | None = None) -> None:
+
+def rebuild_overlay(
+    devices_group: QtWidgets.QGraphicsItemGroup,
+    overlay_group: QtWidgets.QGraphicsItemGroup,
+    size: float = 120.0,
+    pen: QtGui.QPen | None = None,
+    brush: QtGui.QBrush | None = None,
+) -> None:
     """Rebuilds simple coverage glyphs (square with inner circle) centered on each device.
     - size: outer square width/height (scene units)
     """
@@ -43,7 +46,7 @@ def rebuild_overlay(devices_group: QtWidgets.QGraphicsItemGroup,
         path = QPainterPath()
         rect = QRectF(c.x() - half, c.y() - half, size, size)
         path.addRect(rect)
-        path.addEllipse(QRectF(c.x() - inner_r, c.y() - inner_r, inner_r*2, inner_r*2))
+        path.addEllipse(QRectF(c.x() - inner_r, c.y() - inner_r, inner_r * 2, inner_r * 2))
 
         gp = QtWidgets.QGraphicsPathItem(path)
         gp.setPen(pen)

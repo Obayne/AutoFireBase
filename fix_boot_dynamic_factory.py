@@ -2,8 +2,8 @@
 # Make app/boot.py resilient: it will use app.main.create_window if present,
 # otherwise instantiate app.main.MainWindow.
 
-from pathlib import Path
 import time
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 BOOT = ROOT / "app" / "boot.py"
@@ -93,6 +93,7 @@ if __name__ == "__main__":
     main()
 '''
 
+
 def main():
     BOOT.parent.mkdir(parents=True, exist_ok=True)
     if BOOT.exists():
@@ -102,6 +103,7 @@ def main():
     BOOT.write_text(CODE, encoding="utf-8")
     print(f"[write]  {BOOT}")
     print("\nDone. Launch with:  py -3 -m app.boot")
+
 
 if __name__ == "__main__":
     main()

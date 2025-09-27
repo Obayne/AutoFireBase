@@ -24,5 +24,4 @@ body:
         - label: Black/Ruff clean
         - label: Tests added (round-trip, CRUD)
         - label: No module side effects
-        - label: ≤300 LOC changed
-
+        - label: <= 300 LOC changed

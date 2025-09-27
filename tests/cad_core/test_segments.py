@@ -1,8 +1,8 @@
 from cad_core.lines import (
     Line,
     Point,
-    is_point_on_segment,
     intersection_segment_segment,
+    is_point_on_segment,
     trim_segment_by_cutter,
 )
 
@@ -26,4 +26,3 @@ def test_segment_segment_intersection_and_trim():
     assert trimmed is not None
     assert trimmed.a == s1.a
     assert abs(trimmed.b.x - 5.0) < 1e-9
-

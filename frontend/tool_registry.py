@@ -1,32 +1,31 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Dict, Optional
 
 
 @dataclass(frozen=True)
 class ToolSpec:
     name: str
     command: str
-    shortcut: Optional[str] = None
-    icon: Optional[str] = None
-    factory: Optional[Callable[..., object]] = None  # UI-level construction
+    shortcut: str | None = None
+    icon: str | None = None
+    factory: Callable[..., object] | None = None  # UI-level construction
 
 
-_REGISTRY: Dict[str, ToolSpec] = {}
+_REGISTRY: dict[str, ToolSpec] = {}
 
 
 def register(spec: ToolSpec) -> None:
     _REGISTRY[spec.command] = spec
 
 
-def get(command: str) -> Optional[ToolSpec]:
+def get(command: str) -> ToolSpec | None:
     return _REGISTRY.get(command)
 
 
-def all_tools() -> Dict[str, ToolSpec]:
+def all_tools() -> dict[str, ToolSpec]:
     return dict(_REGISTRY)
 
 
 __all__ = ["ToolSpec", "register", "get", "all_tools"]
-

@@ -24,5 +24,4 @@ body:
         - label: Black/Ruff clean
         - label: Tests added/updated (signals, handlers)
         - label: No side effects in imports
-        - label: ≤300 LOC changed
-
+        - label: <= 300 LOC changed

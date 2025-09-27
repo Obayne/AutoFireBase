@@ -58,7 +58,9 @@ class LayerStyleRegistry:
 STYLES = LayerStyleRegistry()
 
 
-def ensure_parent(item: QtWidgets.QGraphicsItem, parent_group: QtWidgets.QGraphicsItemGroup, z: float) -> None:
+def ensure_parent(
+    item: QtWidgets.QGraphicsItem, parent_group: QtWidgets.QGraphicsItemGroup, z: float
+) -> None:
     """Attach item to a parent group and set Z-order. Safe no-op if already attached."""
     try:
         if item.parentItem() is not parent_group:
@@ -77,10 +79,9 @@ def _valid_point(p: QtCore.QPointF) -> bool:
     return _finite(p.x()) and _finite(p.y())
 
 
-def add_line(layer: QtWidgets.QGraphicsItemGroup,
-             a: QtCore.QPointF,
-             b: QtCore.QPointF,
-             style: str = "sketch") -> QtWidgets.QGraphicsLineItem | None:
+def add_line(
+    layer: QtWidgets.QGraphicsItemGroup, a: QtCore.QPointF, b: QtCore.QPointF, style: str = "sketch"
+) -> QtWidgets.QGraphicsLineItem | None:
     if not (_valid_point(a) and _valid_point(b)):
         return None
     it = QtWidgets.QGraphicsLineItem(a.x(), a.y(), b.x(), b.y())
@@ -89,10 +90,12 @@ def add_line(layer: QtWidgets.QGraphicsItemGroup,
     return it
 
 
-def add_rect(layer: QtWidgets.QGraphicsItemGroup,
-             p0: QtCore.QPointF,
-             p1: QtCore.QPointF,
-             style: str = "sketch") -> QtWidgets.QGraphicsRectItem | None:
+def add_rect(
+    layer: QtWidgets.QGraphicsItemGroup,
+    p0: QtCore.QPointF,
+    p1: QtCore.QPointF,
+    style: str = "sketch",
+) -> QtWidgets.QGraphicsRectItem | None:
     if not (_valid_point(p0) and _valid_point(p1)):
         return None
     rect = QtCore.QRectF(p0, p1).normalized()
@@ -103,25 +106,31 @@ def add_rect(layer: QtWidgets.QGraphicsItemGroup,
     return it
 
 
-def add_circle(layer: QtWidgets.QGraphicsItemGroup,
-               center: QtCore.QPointF,
-               radius: float,
-               style: str = "sketch") -> QtWidgets.QGraphicsEllipseItem | None:
+def add_circle(
+    layer: QtWidgets.QGraphicsItemGroup,
+    center: QtCore.QPointF,
+    radius: float,
+    style: str = "sketch",
+) -> QtWidgets.QGraphicsEllipseItem | None:
     r = float(radius)
     if not _valid_point(center) or not _finite(r) or r <= 0.0:
         return None
-    it = QtWidgets.QGraphicsEllipseItem(center.x()-r, center.y()-r, 2*r, 2*r)
+    it = QtWidgets.QGraphicsEllipseItem(center.x() - r, center.y() - r, 2 * r, 2 * r)
     it.setPen(STYLES.get(style).pen())
     it.setBrush(QtCore.Qt.NoBrush)
     ensure_parent(it, layer, Z_SKETCH)
     return it
 
 
-def add_polyline(layer: QtWidgets.QGraphicsItemGroup,
-                 points: Iterable[QtCore.QPointF],
-                 style: str = "sketch",
-                 close: bool = False) -> QtWidgets.QGraphicsPathItem | None:
-    pts: List[QtCore.QPointF] = [QtCore.QPointF(p) for p in points if _valid_point(QtCore.QPointF(p))]
+def add_polyline(
+    layer: QtWidgets.QGraphicsItemGroup,
+    points: Iterable[QtCore.QPointF],
+    style: str = "sketch",
+    close: bool = False,
+) -> QtWidgets.QGraphicsPathItem | None:
+    pts: List[QtCore.QPointF] = [
+        QtCore.QPointF(p) for p in points if _valid_point(QtCore.QPointF(p))
+    ]
     if len(pts) < 2:
         return None
     path = QtGui.QPainterPath(pts[0])
@@ -136,9 +145,9 @@ def add_polyline(layer: QtWidgets.QGraphicsItemGroup,
     return it
 
 
-def add_wire(layer: QtWidgets.QGraphicsItemGroup,
-             a: QtCore.QPointF,
-             b: QtCore.QPointF) -> QtWidgets.QGraphicsPathItem | None:
+def add_wire(
+    layer: QtWidgets.QGraphicsItemGroup, a: QtCore.QPointF, b: QtCore.QPointF
+) -> QtWidgets.QGraphicsPathItem | None:
     """Add a thicker, green cosmetic wire segment with guardrails."""
     if not (_valid_point(a) and _valid_point(b)):
         return None
@@ -149,4 +158,3 @@ def add_wire(layer: QtWidgets.QGraphicsItemGroup,
     it.setBrush(QtCore.Qt.NoBrush)
     ensure_parent(it, layer, Z_WIRES)
     return it
-

@@ -5,7 +5,7 @@ from cad_core.lines import Line as CoreLine, Point as CorePoint, intersection_li
 
 
 def _nearest_line_item(scene: QtWidgets.QGraphicsScene, p: QtCore.QPointF):
-    box = QtCore.QRectF(p.x()-4, p.y()-4, 8, 8)
+    box = QtCore.QRectF(p.x() - 4, p.y() - 4, 8, 8)
     for it in scene.items(box):
         if isinstance(it, QtWidgets.QGraphicsLineItem):
             return it
@@ -20,12 +20,13 @@ def _intersection_point(l1: QtCore.QLineF, l2: QtCore.QLineF):
     # Compute intersection of infinite lines using vector math
     x1, y1, x2, y2 = l1.x1(), l1.y1(), l1.x2(), l1.y2()
     x3, y3, x4, y4 = l2.x1(), l2.y1(), l2.x2(), l2.y2()
-    den = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4)
+    den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
     if abs(den) < 1e-9:
         return None
-    px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4)) / den
-    py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4)) / den
+    px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / den
+    py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / den
     return QtCore.QPointF(px, py)
+
 
 def _to_core(seg: QtCore.QLineF) -> CoreLine:
     return CoreLine(CorePoint(seg.x1(), seg.y1()), CorePoint(seg.x2(), seg.y2()))
@@ -91,4 +92,3 @@ class TrimTool:
         self.active = False
         self.cut_item = None
         return True
-

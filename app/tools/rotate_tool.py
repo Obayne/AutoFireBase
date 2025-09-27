@@ -25,15 +25,19 @@ class RotateTool:
         if self.base is None:
             self.base = p
             # Prompt for angle degrees
-            val, ok = QtWidgets.QInputDialog.getDouble(self.win, "Rotate", "Angle (deg)", 90.0, -360.0, 360.0, 2)
+            val, ok = QtWidgets.QInputDialog.getDouble(
+                self.win, "Rotate", "Angle (deg)", 90.0, -360.0, 360.0, 2
+            )
             if not ok:
-                self.active = False; self.base = None
+                self.active = False
+                self.base = None
                 return False
             ang = float(val)
             rad = ang * 3.141592653589793 / 180.0
             sel = list(self.win.scene.selectedItems())
             if not sel:
-                self.active = False; self.base = None
+                self.active = False
+                self.base = None
                 return False
             cx, cy = self.base.x(), self.base.y()
             t = QtGui.QTransform()
@@ -45,7 +49,7 @@ class RotateTool:
                     it.setTransform(t, combine=True)
                 except Exception:
                     pass
-            self.active = False; self.base = None
+            self.active = False
+            self.base = None
             return True
         return False
-

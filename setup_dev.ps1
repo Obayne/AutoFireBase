@@ -39,5 +39,3 @@ if (Test-Path "requirements-dev.txt") {
 }
 
 Write-Host "[dev-setup] Done. To activate later: . .venv/Scripts/Activate.ps1"
-
-

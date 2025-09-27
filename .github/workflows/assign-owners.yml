@@ -72,4 +72,3 @@ jobs:
             const login = process.env.DEFAULT_PR_OWNER || owner;
             core.info(`Assigning @${login} to PR #${pr.number}`);
             await github.rest.issues.addAssignees({ owner, repo, issue_number: pr.number, assignees: [login] });
-

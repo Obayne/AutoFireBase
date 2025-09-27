@@ -12,10 +12,14 @@ MAIN = APP / "main.py"
 MINWIN = APP / "minwin.py"
 SPEC = ROOT / "AutoFire.spec"
 
+
 def backup(p: Path):
     if p.exists():
         ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        p.with_suffix(p.suffix + f".bak_{ts}").write_text(p.read_text(encoding="utf-8"), encoding="utf-8")
+        p.with_suffix(p.suffix + f".bak_{ts}").write_text(
+            p.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+
 
 # 1) app/__init__.py  (turn app into a proper package)
 APP.mkdir(parents=True, exist_ok=True)
@@ -40,7 +44,9 @@ def main():
     w = create_window()
     w.show()
     app.exec()
-""", encoding="utf-8")
+""",
+        encoding="utf-8",
+    )
     print("created minimal", MAIN)
 else:
     txt = MAIN.read_text(encoding="utf-8")
@@ -80,7 +86,9 @@ def run_minimal():
     w.show()
     if not QtWidgets.QApplication.instance().startingUp():
         app.exec()
-""", encoding="utf-8")
+""",
+        encoding="utf-8",
+    )
     print("created", MINWIN)
 else:
     print("ok:", MINWIN)
@@ -92,12 +100,14 @@ if SPEC.exists():
         # Replace the list contents with a known-good set
         s2 = re.sub(
             r"hiddenimports\s*=\s*\[[^\]]*\]",
-            ("hiddenimports=["
-             "'app','app.main','app.minwin','app.scene','app.device','app.catalog',"
-             "'app.tools','app.tools.array','app.tools.draw','app.tools.dimension',"
-             "'core.logger','core.error_hook','core.logger_bridge','updater.auto_update'"+
-             "]"),
-            s, count=1
+            (
+                "hiddenimports=["
+                "'app','app.main','app.minwin','app.scene','app.device','app.catalog',"
+                "'app.tools','app.tools.array','app.tools.draw','app.tools.dimension',"
+                "'core.logger','core.error_hook','core.logger_bridge','updater.auto_update'" + "]"
+            ),
+            s,
+            count=1,
         )
         if s2 != s:
             backup(SPEC)
@@ -109,12 +119,15 @@ if SPEC.exists():
         # Insert hiddenimports argument into the Analysis(…) call
         s2 = re.sub(
             r"Analysis\(",
-            ("Analysis(hiddenimports=["
-             "'app','app.main','app.minwin','app.scene','app.device','app.catalog',"
-             "'app.tools','app.tools.array','app.tools.draw','app.tools.dimension',"
-             "'core.logger','core.error_hook','core.logger_bridge','updater.auto_update'"
-             "], "),
-            s, count=1
+            (
+                "Analysis(hiddenimports=["
+                "'app','app.main','app.minwin','app.scene','app.device','app.catalog',"
+                "'app.tools','app.tools.array','app.tools.draw','app.tools.dimension',"
+                "'core.logger','core.error_hook','core.logger_bridge','updater.auto_update'"
+                "], "
+            ),
+            s,
+            count=1,
         )
         if s2 != s:
             backup(SPEC)
@@ -123,6 +136,8 @@ if SPEC.exists():
         else:
             print("NOTE: could not find Analysis(…) in spec to inject hiddenimports.")
 else:
-    print("WARNING: AutoFire.spec not found; build will still work, but bundling may be incomplete.")
+    print(
+        "WARNING: AutoFire.spec not found; build will still work, but bundling may be incomplete."
+    )
 
 print("Done.")

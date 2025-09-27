@@ -1,4 +1,4 @@
-from frontend.tool_registry import ToolSpec, register, get, all_tools
+from frontend.tool_registry import ToolSpec, all_tools, get, register
 
 
 def test_register_and_get_tool():
@@ -8,4 +8,3 @@ def test_register_and_get_tool():
     assert got is not None
     assert got.name == "Trim"
     assert all_tools()["trim"].shortcut == "T"
-

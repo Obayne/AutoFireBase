@@ -27,4 +27,3 @@ Branching
 
 Reviews
 - HAL reviews and requests changes as needed. At least one human approval to merge.
-

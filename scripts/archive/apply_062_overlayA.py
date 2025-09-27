@@ -13,7 +13,8 @@ from pathlib import Path
 import time, shutil
 
 STAMP = time.strftime("%Y%m%d_%H%M%S")
-ROOT  = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent
+
 
 def backup_write(path: Path, content: str):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -24,8 +25,9 @@ def backup_write(path: Path, content: str):
     path.write_text(content.strip() + "\n", encoding="utf-8")
     print(f"[write ] {path}")
 
+
 # ---------------- app/scene.py ----------------
-SCENE_PY = r'''
+SCENE_PY = r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 
 DEFAULT_GRID_SIZE = 24  # pixels between minor lines
@@ -91,7 +93,7 @@ class GridScene(QtWidgets.QGraphicsScene):
         painter.drawLine(0, int(rect.top()), 0, int(rect.bottom()))
         painter.drawLine(int(rect.left()), 0, int(rect.right()), 0)
         painter.restore()
-'''
+"""
 
 # ---------------- app/device.py ----------------
 DEVICE_PY = r'''
@@ -258,7 +260,7 @@ class CoverageDialog(QtWidgets.QDialog):
 
         # load existing
         if existing:
-            mode = existing.get("mode","none"); i = self.cmb_mode.findText(mode); 
+            mode = existing.get("mode","none"); i = self.cmb_mode.findText(mode);
             if i>=0: self.cmb_mode.setCurrentIndex(i)
             mnt = existing.get("mount","ceiling"); j = self.cmb_mount.findText(mnt);
             if j>=0: self.cmb_mount.setCurrentIndex(j)
@@ -365,7 +367,7 @@ class ArrayTool(QtCore.QObject):
 '''
 
 # ---------------- app/main.py (patch-in minimal, self-contained features) ----------------
-MAIN_PATCH = r'''
+MAIN_PATCH = r"""
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -760,10 +762,10 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''
+"""
 
 # ---------------- CHANGELOG.md append ----------------
-CHANGELOG_ADD = r'''
+CHANGELOG_ADD = r"""
 ## v0.6.2 – overlayA (stability + coverage, {date})
 - **Grid**: always-on draw; major/minor lines; origin cross; tuned contrast for dark theme.
 - **Selection**: high-contrast selection halo for devices.
@@ -778,28 +780,30 @@ CHANGELOG_ADD = r'''
 - **Persistence**: overlays and settings persist via `.autofire` save files and user preferences.
 - **Notes**: NFPA/manufacturer tables will be wired next; current coverage helpers are conservative visual aids.
 
-'''
+"""
+
 
 def main():
     # write files
-    backup_write(ROOT/"app"/"scene.py", SCENE_PY)
-    backup_write(ROOT/"app"/"device.py", DEVICE_PY)
-    backup_write(ROOT/"app"/"dialogs"/"coverage.py", COVERAGE_PY)
-    backup_write(ROOT/"app"/"tools"/"array.py", ARRAY_PY)
+    backup_write(ROOT / "app" / "scene.py", SCENE_PY)
+    backup_write(ROOT / "app" / "device.py", DEVICE_PY)
+    backup_write(ROOT / "app" / "dialogs" / "coverage.py", COVERAGE_PY)
+    backup_write(ROOT / "app" / "tools" / "array.py", ARRAY_PY)
 
     # main.py: only overwrite if project is in flux; we provide a full working main
-    backup_write(ROOT/"app"/"main.py", MAIN_PATCH)
+    backup_write(ROOT / "app" / "main.py", MAIN_PATCH)
 
     # changelog append
-    cl = ROOT/"CHANGELOG.md"
+    cl = ROOT / "CHANGELOG.md"
     existing = ""
     if cl.exists():
         existing = cl.read_text(encoding="utf-8")
     entry = CHANGELOG_ADD.replace("{date}", time.strftime("%Y-%m-%d"))
-    cl.write_text(existing.rstrip()+"\n\n"+entry, encoding="utf-8")
+    cl.write_text(existing.rstrip() + "\n\n" + entry, encoding="utf-8")
     print(f"[append] {cl} v0.6.2 entry added")
 
     print("\nDone. Launch with:\n  py -3 -m app.boot")
+
 
 if __name__ == "__main__":
     main()

@@ -1,8 +1,8 @@
 import math
 
-from cad_core.lines import Line, Point
 from cad_core.circle import Circle
-from cad_core.fillet import fillet_line_line, fillet_line_circle, fillet_circle_circle
+from cad_core.fillet import fillet_circle_circle, fillet_line_circle, fillet_line_line
+from cad_core.lines import Line, Point
 
 
 def dist(a: Point, b: Point) -> float:

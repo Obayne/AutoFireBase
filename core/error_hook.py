@@ -1,6 +1,10 @@
-import sys, traceback, datetime
+import datetime
+import sys
+import traceback
 from pathlib import Path
+
 from PySide6 import QtWidgets
+
 
 def write_crash_log(tb_text: str) -> str:
     base = Path.home() / "AutoFire" / "logs"
@@ -12,6 +16,7 @@ def write_crash_log(tb_text: str) -> str:
         pass
     return str(path)
 
+
 def excepthook(exctype, value, tb):
     tb_text = "".join(traceback.format_exception(exctype, value, tb))
     p = write_crash_log(tb_text)
@@ -19,6 +24,7 @@ def excepthook(exctype, value, tb):
         QtWidgets.QMessageBox.critical(None, "Auto-Fire Error", f"{tb_text}\n\nSaved: {p}")
     except Exception:
         pass
+
 
 def install():
     sys.excepthook = excepthook

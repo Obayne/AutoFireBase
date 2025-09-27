@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 
 @dataclass(frozen=True)
@@ -9,7 +8,7 @@ class Point:
     x: float
     y: float
 
-    def as_tuple(self) -> Tuple[float, float]:
+    def as_tuple(self) -> tuple[float, float]:
         return (float(self.x), float(self.y))
 
 
@@ -18,8 +17,17 @@ class Line:
     a: Point
     b: Point
 
-    def as_tuple(self) -> Tuple[Tuple[float, float], Tuple[float, float]]:
+    def as_tuple(self) -> tuple[tuple[float, float], tuple[float, float]]:
         return (self.a.as_tuple(), self.b.as_tuple())
+
+    # Backwards-compatible aliases used in some modules/tests
+    @property
+    def p1(self) -> Point:  # type: ignore[override]
+        return self.a
+
+    @property
+    def p2(self) -> Point:  # type: ignore[override]
+        return self.b
 
 
 def _sub(p: Point, q: Point) -> Point:
@@ -42,7 +50,7 @@ def _dot(p: Point, q: Point) -> float:
     return p.x * q.x + p.y * q.y
 
 
-def intersection_line_line(l1: Line, l2: Line, tol: float = 1e-9) -> Optional[Point]:
+def intersection_line_line(l1: Line, l2: Line, tol: float = 1e-9) -> Point | None:
     """Return intersection point of two infinite lines, or None if parallel.
 
     Uses a 2D cross-product formulation. Treats lines as infinite; trimming is separate.
@@ -76,6 +84,16 @@ def nearest_point_on_line(line: Line, p: Point) -> Point:
     return _add(a, _scale(ab, t))
 
 
+def is_parallel(l1: Line, l2: Line, tol: float = 1e-9) -> bool:
+    """Return True if two infinite lines are parallel within tolerance.
+
+    Checks whether the 2D cross product of the direction vectors is near zero.
+    """
+    r = _sub(l1.b, l1.a)
+    s = _sub(l2.b, l2.a)
+    return abs(_cross(r, s)) < tol
+
+
 def is_point_on_segment(p: Point, seg: Line, tol: float = 1e-9) -> bool:
     """Check if point p lies on the segment seg within tolerance."""
     a, b = seg.a, seg.b
@@ -89,7 +107,7 @@ def is_point_on_segment(p: Point, seg: Line, tol: float = 1e-9) -> bool:
     return _dot(ap, ab) >= -tol and _dot(bp, _sub(a, b)) >= -tol
 
 
-def intersection_segment_segment(s1: Line, s2: Line, tol: float = 1e-9) -> Optional[Point]:
+def intersection_segment_segment(s1: Line, s2: Line, tol: float = 1e-9) -> Point | None:
     """Intersection point of two finite segments, or None."""
     ip = intersection_line_line(s1, s2, tol=tol)
     if ip is None:
@@ -112,7 +130,9 @@ def extend_line_end_to_point(line: Line, target: Point, end: str = "b") -> Line:
     return Line(a=line.a, b=target)
 
 
-def extend_line_to_intersection(line: Line, other: Line, end: str = "b", tol: float = 1e-9) -> Optional[Line]:
+def extend_line_to_intersection(
+    line: Line, other: Line, end: str = "b", tol: float = 1e-9
+) -> Line | None:
     """Extend one end of 'line' to meet the infinite intersection with 'other'.
 
     Returns a new Line or None if lines are parallel (no intersection).
@@ -124,7 +144,7 @@ def extend_line_to_intersection(line: Line, other: Line, end: str = "b", tol: fl
     return extend_line_end_to_point(line, ip, end=end)
 
 
-def trim_line_by_cut(line: Line, cutter: Line, end: str = "b", tol: float = 1e-9) -> Optional[Line]:
+def trim_line_by_cut(line: Line, cutter: Line, end: str = "b", tol: float = 1e-9) -> Line | None:
     """Trim a line segment towards its intersection with a cutter.
 
     If the infinite lines intersect, this moves the chosen endpoint of `line`
@@ -138,7 +158,9 @@ def trim_line_by_cut(line: Line, cutter: Line, end: str = "b", tol: float = 1e-9
     return extend_line_end_to_point(line, ip, end=end)
 
 
-def trim_segment_by_cutter(seg: Line, cutter: Line, end: str = "b", tol: float = 1e-9) -> Optional[Line]:
+def trim_segment_by_cutter(
+    seg: Line, cutter: Line, end: str = "b", tol: float = 1e-9
+) -> Line | None:
     """Trim a finite segment to the intersection with a cutter segment.
 
     Returns new segment or None if no valid intersection lies on both segments.
@@ -149,17 +171,26 @@ def trim_segment_by_cutter(seg: Line, cutter: Line, end: str = "b", tol: float =
     return extend_line_end_to_point(seg, ip, end=end)
 
 
+def intersection(l1: Line, l2: Line) -> Point | None:
+    """Segment-segment intersection convenience wrapper.
+
+    Uses the consistent Line API (a/b endpoints). Returns None if segments
+    do not intersect or are parallel within tolerance.
+    """
+    return intersection_segment_segment(l1, l2)
+
+
 __all__ = [
     "Point",
     "Line",
-    "is_parallel",
+    "_sub",
+    "intersection",
     "intersection_line_line",
+    "intersection_segment_segment",
     "extend_line_end_to_point",
     "extend_line_to_intersection",
     "trim_line_by_cut",
-    "nearest_point_on_line",
-    "is_point_on_segment",
-    "intersection_segment_segment",
     "trim_segment_by_cutter",
+    "is_parallel",
+    "nearest_point_on_line",
 ]
-

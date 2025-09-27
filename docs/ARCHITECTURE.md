@@ -23,4 +23,3 @@ Testing
 
 See Also
 - Data Model and serialization details: `docs/DATA_MODEL.md`
-

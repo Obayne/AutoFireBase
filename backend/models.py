@@ -27,4 +27,3 @@ class FilletArcDTO:
     r: float
     t1: PointDTO
     t2: PointDTO
-

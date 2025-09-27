@@ -18,6 +18,7 @@ def test_simple_intersection():
     assert abs(ip.x - 5.0) < 1e-9
     assert abs(ip.y - 5.0) < 1e-9
 
+
 def test_horizontal_vertical_intersection():
     l1 = Line(Point(0, 5), Point(10, 5))
     l2 = Line(Point(5, 0), Point(5, 10))
@@ -26,11 +27,13 @@ def test_horizontal_vertical_intersection():
     assert abs(ip.x - 5.0) < 1e-9
     assert abs(ip.y - 5.0) < 1e-9
 
+
 def test_collinear_lines():
     l1 = Line(Point(0, 0), Point(10, 0))
     l2 = Line(Point(20, 0), Point(30, 0))
     ip = intersection_line_line(l1, l2)
     assert ip is None
+
 
 def test_intersection_at_endpoint():
     l1 = Line(Point(0, 0), Point(10, 10))
@@ -39,6 +42,7 @@ def test_intersection_at_endpoint():
     assert ip is not None
     assert abs(ip.x - 10.0) < 1e-9
     assert abs(ip.y - 10.0) < 1e-9
+
 
 def test_large_coordinates():
     l1 = Line(Point(1e6, 1e6), Point(1e6 + 10, 1e6 + 10))

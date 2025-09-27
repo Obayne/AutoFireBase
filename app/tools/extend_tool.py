@@ -5,7 +5,7 @@ from cad_core.lines import Line as CoreLine, Point as CorePoint, intersection_li
 
 
 def _nearest_line_item(scene: QtWidgets.QGraphicsScene, p: QtCore.QPointF):
-    box = QtCore.QRectF(p.x()-4, p.y()-4, 8, 8)
+    box = QtCore.QRectF(p.x() - 4, p.y() - 4, 8, 8)
     for it in scene.items(box):
         if isinstance(it, QtWidgets.QGraphicsLineItem):
             return it
@@ -26,6 +26,7 @@ class ExtendTool:
     Limitations: operates on QGraphicsLineItem only; extends the endpoint
     closest to the pick point.
     """
+
     def __init__(self, window):
         self.win = window
         self.active = False
@@ -64,7 +65,8 @@ class ExtendTool:
         ip = None if ip_core is None else QtCore.QPointF(ip_core.x, ip_core.y)
         if ip is None:
             self.win.statusBar().showMessage("Extend: lines do not intersect")
-            self.active = False; self.boundary = None
+            self.active = False
+            self.boundary = None
             return False
         d1 = QtCore.QLineF(p, QtCore.QPointF(ltar.x1(), ltar.y1())).length()
         d2 = QtCore.QLineF(p, QtCore.QPointF(ltar.x2(), ltar.y2())).length()
@@ -72,7 +74,7 @@ class ExtendTool:
             it.setLine(ip.x(), ip.y(), ltar.x2(), ltar.y2())
         else:
             it.setLine(ltar.x1(), ltar.y1(), ip.x(), ip.y())
-        self.active = False; self.boundary = None
+        self.active = False
+        self.boundary = None
         self.win.statusBar().showMessage("Extended")
         return True
-
