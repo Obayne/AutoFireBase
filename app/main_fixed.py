@@ -1109,7 +1109,8 @@ class CanvasView(QGraphicsView):
             if self.current_proto:
                 d = self.current_proto
                 layer_obj = next(
-                    (layer for layer in self.win.layers if layer["id"] == self.win.active_layer_id), None
+                    (layer for layer in self.win.layers if layer["id"] == self.win.active_layer_id),
+                    None,
                 )
                 it = DeviceItem(
                     sp.x(),
@@ -2249,6 +2250,7 @@ class MainWindow(QMainWindow):
                 # Get the configured panels
                 panels = dialog.get_panel_configurations()
                 import logging
+
                 logging.getLogger(__name__).debug("Panels from wizard: %s", panels)
 
                 for panel in panels:
@@ -2264,7 +2266,8 @@ class MainWindow(QMainWindow):
 
                     # Create the device item
                     layer_obj = next(
-                        (layer for layer in self.layers if layer["id"] == self.active_layer_id), None
+                        (layer for layer in self.layers if layer["id"] == self.active_layer_id),
+                        None,
                     )
                     device_item = DeviceItem(
                         x, y, symbol, name, manufacturer, part_number, layer_obj
@@ -3097,6 +3100,7 @@ class MainWindow(QMainWindow):
             self._update_selection_visuals()
         except Exception as ex:
             import logging
+
             logging.getLogger(__name__).exception("Error in _select_similar_from: %s", ex)
 
     def _update_selection_visuals(self):
@@ -3506,8 +3510,8 @@ class MainWindow(QMainWindow):
         except Exception as ex:
             QMessageBox.critical(self, "Offset Error", str(ex))
 
-    # ---------- view tools ----------
-    # Duplicate fit_view_to_content removed (kept earlier definition)
+            # ---------- view tools ----------
+            # Duplicate fit_view_to_content removed (kept earlier definition)
             self.statusBar().showMessage("Fit view to default area")
 
     # ---------- import/export ----------

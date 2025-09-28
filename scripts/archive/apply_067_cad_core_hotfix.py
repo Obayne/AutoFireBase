@@ -2,11 +2,13 @@
 # Fixes: real Space-hand pan (bypass placement), legible dark theme, clearer selection,
 # lighter grid, keeps device placement working. Writes app/main.py, app/scene.py, app/device.py
 
+import shutil
+import time
 from pathlib import Path
-import time, shutil
 
 ROOT = Path(__file__).resolve().parent
 STAMP = time.strftime("%Y%m%d_%H%M%S")
+
 
 def backup_write(target: Path, text: str):
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -14,11 +16,14 @@ def backup_write(target: Path, text: str):
         bak = target.with_suffix(target.suffix + f".bak-{STAMP}")
         shutil.copy2(target, bak)
         import logging
+
         from app.logging_config import setup_logging
+
         setup_logging()
         logging.getLogger(__name__).info("[backup] %s", bak)
     target.write_text(text.strip() + "\n", encoding="utf-8")
     logging.getLogger(__name__).info("[write ] %s", target)
+
 
 # ---------------- app/scene.py ----------------
 SCENE = r"""
@@ -579,13 +584,15 @@ class MainWindow(QMainWindow):
         pal.setColor(QtGui.QPalette.ColorRole.HighlightedText, QtGui.QColor(255,255,255))
         app.setPalette(pal)
         # Ensure menu/toolbar read well
-        app.setStyleSheet("""
+        # Use triple-single-quotes here to avoid terminating the outer
+        # triple-double-quoted MAIN string that contains this block.
+        app.setStyleSheet('''
             QMenuBar, QToolBar { background: #2a2b2f; color:#e6e6eb; }
             QMenuBar::item:selected { background:#3a3b40; }
             QMenu { background:#2a2b2f; color:#e6e6eb; }
             QMenu::item:selected { background:#3a3b40; }
             QStatusBar { background:#222326; color:#d7d7dc; }
-        """)
+        ''')
 
     # ---------- UI building ----------
     def _build_left_panel(self):
@@ -915,11 +922,13 @@ if __name__ == "__main__":
     main()
 """
 
+
 def main():
     backup_write(ROOT / "app" / "scene.py", SCENE)
     backup_write(ROOT / "app" / "device.py", DEVICE)
     backup_write(ROOT / "app" / "main.py", MAIN)
     print("\nDone. Launch with:\n  py -3 -m app.boot\n")
+
 
 if __name__ == "__main__":
     main()

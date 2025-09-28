@@ -1,14 +1,15 @@
 # apply_065_props_toggles.py
 # Restores a right-side "Layers & Properties" dock with layer toggles, grid size,
 # and basic device properties editor. Keeps prior Tools menu + grid opacity slider.
+import shutil
+import time
 from pathlib import Path
-import time, shutil
 
 STAMP = time.strftime("%Y%m%d_%H%M%S")
-ROOT  = Path(__file__).resolve().parent
-TGT   = ROOT / "app" / "main.py"
+ROOT = Path(__file__).resolve().parent
+TGT = ROOT / "app" / "main.py"
 
-NEW_MAIN = r'''
+NEW_MAIN = r"""
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -625,24 +626,26 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''
+"""
+
 
 def main():
     if TGT.exists():
         bak = TGT.with_suffix(TGT.suffix + f".bak-{STAMP}")
         shutil.copy2(TGT, bak)
-        from app.logging_config import setup_logging
         import logging
+
+        from app.logging_config import setup_logging
+
         setup_logging()
         logging.getLogger(__name__).info("[backup] %s", bak)
     TGT.parent.mkdir(parents=True, exist_ok=True)
-<<<<<<< Updated upstream
-    TGT.write_text(NEW_MAIN.strip()+"\n", encoding="utf-8")
-    print(f"[write ] {TGT}\n\nDone. Launch with:\n  py -3 -m app.boot\n")
-=======
     TGT.write_text(NEW_MAIN.strip() + "\n", encoding="utf-8")
-    logging.getLogger(__name__).info("[write ] %s\n\nDone. Launch with:\n  py -3 -m app.boot", TGT)
->>>>>>> Stashed changes
+    logging.getLogger(__name__).info(
+        "[write ] %s\n\nDone. Launch with:\n  py -3 -m app.boot",
+        TGT,
+    )
+
 
 if __name__ == "__main__":
     main()

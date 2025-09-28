@@ -2,12 +2,6 @@
 
 This document outlines suggested roles, priorities, and tasks to get device placement and paperspace working reliably.
 
-<<<<<<< Updated upstream
-Coordination
-- One branch per task; link PR to the issue.
-- Avoid editing the same module across tasks.
-
-=======
 Roles
 - Frontend Lead: fix palette, placement UX, ghost device, paperspace integration, and run GUI smoke tests.
 - Backend Lead: audit `db/loader.py` and `catalog` APIs, add compatibility shims if schema changed, and provide deterministic fixtures for QA.
@@ -27,4 +21,3 @@ Work flow
 
 Contact
 - Assign tasks in the PR description and tag the appropriate lead.
->>>>>>> Stashed changes

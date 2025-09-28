@@ -1,6 +1,7 @@
 # apply_arrayfix.py  — writes app/tools/array.py and hardens main.py import
+import datetime
+import re
 from pathlib import Path
-import re, datetime
 
 ROOT = Path(".")
 ARR = ROOT / "app" / "tools" / "array.py"
@@ -61,10 +62,14 @@ except Exception:
         return pts
 """
 
+
 def backup(p: Path):
     if p.exists():
         ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        p.with_suffix(p.suffix + f".bak_{ts}").write_text(p.read_text(encoding="utf-8"), encoding="utf-8")
+        p.with_suffix(p.suffix + f".bak_{ts}").write_text(
+            p.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+
 
 # 1) Ensure app/tools/array.py exists with ArraySpec
 ARR.parent.mkdir(parents=True, exist_ok=True)

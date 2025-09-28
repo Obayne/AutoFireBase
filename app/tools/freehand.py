@@ -20,8 +20,10 @@ class FreehandTool:
     def cancel(self):
         self.active = False
         if self.path_item and self.path_item.scene():
-            try: self.path_item.scene().removeItem(self.path_item)
-            except Exception: pass
+            try:
+                self.path_item.scene().removeItem(self.path_item)
+            except Exception:
+                pass
         self.path_item = None
         self.last_pt = None
         self.drawing = False
@@ -33,8 +35,11 @@ class FreehandTool:
         self.last_pt = QtCore.QPointF(p)
         path = QtGui.QPainterPath(p)
         self.path_item = QtWidgets.QGraphicsPathItem(path)
-        pen = QtGui.QPen(QtGui.QColor("#e0e0e0")); pen.setCosmetic(True)
-        self.path_item.setPen(pen); self.path_item.setZValue(20); self.path_item.setParentItem(self.layer)
+        pen = QtGui.QPen(QtGui.QColor("#e0e0e0"))
+        pen.setCosmetic(True)
+        self.path_item.setPen(pen)
+        self.path_item.setZValue(20)
+        self.path_item.setParentItem(self.layer)
         return False
 
     def on_mouse_move(self, p: QtCore.QPointF):
@@ -61,4 +66,3 @@ class FreehandTool:
         self.active = False
         self.win.statusBar().showMessage("Freehand path created")
         return True
-

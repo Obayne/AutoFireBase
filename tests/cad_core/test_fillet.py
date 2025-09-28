@@ -1,8 +1,8 @@
 import math
 
-from cad_core.lines import Line, Point
 from cad_core.circle import Circle
-from cad_core.fillet import fillet_line_line, fillet_line_circle, fillet_circle_circle
+from cad_core.fillet import fillet_circle_circle, fillet_line_circle, fillet_line_line
+from cad_core.lines import Line, Point
 
 
 def dist(a: Point, b: Point) -> float:
@@ -17,11 +17,11 @@ def test_fillet_perpendicular_lines_radius2():
     assert res is not None
     p1, p2, c = res
     # Both tangent points must be at the same distance from intersection (t = r * tan(45°) = r)
-    I = Point(0.0, 0.0)
-    assert abs(dist(p1, I) - r) < 1e-6
-    assert abs(dist(p2, I) - r) < 1e-6
+    Ipt = Point(0.0, 0.0)
+    assert abs(dist(p1, Ipt) - r) < 1e-6
+    assert abs(dist(p2, Ipt) - r) < 1e-6
     # Center should be at distance r / sin(45°) = r * sqrt(2)
-    assert abs(dist(c, I) - r * math.sqrt(2)) < 1e-6
+    assert abs(dist(c, Ipt) - r * math.sqrt(2)) < 1e-6
 
 
 def test_fillet_parallel_returns_none():
@@ -32,8 +32,8 @@ def test_fillet_parallel_returns_none():
 
 def test_fillet_line_circle_candidates_nonempty():
     c = Circle(Point(0, 0), 5.0)
-    l = Line(Point(-10, 0), Point(10, 0))
-    out = fillet_line_circle(l, c, 2.0)
+    ln = Line(Point(-10, 0), Point(10, 0))
+    out = fillet_line_circle(ln, c, 2.0)
     assert isinstance(out, list) and len(out) >= 1
 
 

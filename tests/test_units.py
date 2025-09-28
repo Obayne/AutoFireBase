@@ -1,4 +1,4 @@
-from app.units import ft_to_px, px_to_ft, fmt_ft_inches
+from app.units import fmt_ft_inches, ft_to_px, px_to_ft
 
 
 def test_ft_px_roundtrip():
@@ -17,4 +17,3 @@ def test_px_to_ft_zero_scale():
 def test_fmt_ft_inches_sign_and_precision():
     assert fmt_ft_inches(5.0) == "5'-0.0\""
     assert fmt_ft_inches(-1.25) == "-1'-3.0\""
-

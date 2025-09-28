@@ -2,16 +2,16 @@
 # Makes devices use distinct shapes/colors by "symbol" and improves theme contrast.
 # Safe: backs up edited files with timestamp suffixes.
 
-from pathlib import Path
 import time
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 STAMP = time.strftime("%Y%m%d_%H%M%S")
 
 DEVICE_PY = ROOT / "app" / "device.py"
-MAIN_PY   = ROOT / "app" / "main.py"
+MAIN_PY = ROOT / "app" / "main.py"
 
-DEVICE_PATCH = r'''
+DEVICE_PATCH = r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 
@@ -56,8 +56,11 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
 
         # A soft selection ring for visibility
         self._selring = QtWidgets.QGraphicsEllipseItem(-9, -9, 18, 18)
-        sel_pen = QtGui.QPen(QtGui.QColor("#FFD166")); sel_pen.setCosmetic(True); sel_pen.setWidthF(2.0); sel_pen.setStyle(Qt.DashLine)
-        self._selring.setPen(sel_pen)
+    sel_pen = QtGui.QPen(QtGui.QColor("#FFD166"))
+    sel_pen.setCosmetic(True)
+    sel_pen.setWidthF(2.0)
+    sel_pen.setStyle(Qt.DashLine)
+    self._selring.setPen(sel_pen)
         self._selring.setBrush(QtCore.Qt.NoBrush)
         self._selring.setZValue(-1)
         self._selring.setVisible(False)
@@ -130,17 +133,32 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
 
     def _ensure_cov_items(self):
         if self._cov_circle is None:
-            self._cov_circle = QtWidgets.QGraphicsEllipseItem(); self._cov_circle.setParentItem(self); self._cov_circle.setZValue(-5)
-            pen = QtGui.QPen(QtGui.QColor(50,120,255,200)); pen.setStyle(QtCore.Qt.DashLine); pen.setCosmetic(True)
-            self._cov_circle.setPen(pen); self._cov_circle.setBrush(QtGui.QColor(50,120,255,40))
+            self._cov_circle = QtWidgets.QGraphicsEllipseItem()
+            self._cov_circle.setParentItem(self)
+            self._cov_circle.setZValue(-5)
+            pen = QtGui.QPen(QtGui.QColor(50,120,255,200))
+            pen.setStyle(QtCore.Qt.DashLine)
+            pen.setCosmetic(True)
+            self._cov_circle.setPen(pen)
+            self._cov_circle.setBrush(QtGui.QColor(50,120,255,40))
         if self._cov_square is None:
-            self._cov_square = QtWidgets.QGraphicsRectItem(); self._cov_square.setParentItem(self); self._cov_square.setZValue(-6)
-            pen = QtGui.QPen(QtGui.QColor(50,120,255,120)); pen.setStyle(QtCore.Qt.DotLine); pen.setCosmetic(True)
-            self._cov_square.setPen(pen); self._cov_square.setBrush(QtGui.QColor(50,120,255,25))
+            self._cov_square = QtWidgets.QGraphicsRectItem()
+            self._cov_square.setParentItem(self)
+            self._cov_square.setZValue(-6)
+            pen = QtGui.QPen(QtGui.QColor(50,120,255,120))
+            pen.setStyle(QtCore.Qt.DotLine)
+            pen.setCosmetic(True)
+            self._cov_square.setPen(pen)
+            self._cov_square.setBrush(QtGui.QColor(50,120,255,25))
         if self._cov_rect is None:
-            self._cov_rect = QtWidgets.QGraphicsRectItem(); self._cov_rect.setParentItem(self); self._cov_rect.setZValue(-6)
-            pen = QtGui.QPen(QtGui.QColor(50,120,255,120)); pen.setStyle(QtCore.Qt.DotLine); pen.setCosmetic(True)
-            self._cov_rect.setPen(pen); self._cov_rect.setBrush(QtGui.QColor(50,120,255,25))
+            self._cov_rect = QtWidgets.QGraphicsRectItem()
+            self._cov_rect.setParentItem(self)
+            self._cov_rect.setZValue(-6)
+            pen = QtGui.QPen(QtGui.QColor(50,120,255,120))
+            pen.setStyle(QtCore.Qt.DotLine)
+            pen.setCosmetic(True)
+            self._cov_rect.setPen(pen)
+            self._cov_rect.setBrush(QtGui.QColor(50,120,255,25))
 
     def _update_coverage_items(self):
         mode = self.coverage.get("mode","none")
@@ -151,7 +169,8 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
         if mode=="none" or r_px <= 0:
             return
         self._ensure_cov_items()
-        self._cov_circle.setRect(-r_px, -r_px, 2*r_px, 2*r_px); self._cov_circle.setVisible(True)
+    self._cov_circle.setRect(-r_px, -r_px, 2*r_px, 2*r_px)
+    self._cov_circle.setVisible(True)
         if mount=="ceiling" and mode=="strobe":
             side = 2*r_px
             self._cov_square.setRect(-side/2, -side/2, side, side); self._cov_square.setVisible(True)
@@ -181,9 +200,9 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
         cov = d.get("coverage")
         if cov: it.set_coverage(cov)
         return it
-'''
+"""
 
-THEMES_PATCH = r'''
+THEMES_PATCH = r"""
 THEMES = {
     "dark": {
         "window": (26,26,28), "base": (20,20,22), "text": (238,240,244),
@@ -201,17 +220,19 @@ THEMES = {
         "bg_brush": (236,240,244)
     }
 }
-'''
+"""
+
 
 def patch_device():
     if not DEVICE_PY.exists():
         print(f"[!] missing {DEVICE_PY}")
         return
-    bak = DEVICE_PY.with_suffix(".py.bak-"+STAMP)
+    bak = DEVICE_PY.with_suffix(".py.bak-" + STAMP)
     bak.write_text(DEVICE_PY.read_text(encoding="utf-8"), encoding="utf-8")
     DEVICE_PY.write_text(DEVICE_PATCH.lstrip(), encoding="utf-8")
     print(f"[backup] {bak}")
     print(f"[write ] {DEVICE_PY}")
+
 
 def patch_themes():
     if not MAIN_PY.exists():
@@ -221,7 +242,7 @@ def patch_themes():
     if "THEMES =" not in src:
         print("[i] THEMES block not found; skipping theme patch.")
         return
-    bak = MAIN_PY.with_suffix(".py.bak-"+STAMP)
+    bak = MAIN_PY.with_suffix(".py.bak-" + STAMP)
     bak.write_text(src, encoding="utf-8")
     # Replace the THEMES dict (simple heuristic)
     start = src.find("THEMES =")
@@ -234,6 +255,7 @@ def patch_themes():
     MAIN_PY.write_text(new_src, encoding="utf-8")
     print(f"[backup] {bak}")
     print(f"[write ] {MAIN_PY}")
+
 
 if __name__ == "__main__":
     patch_device()

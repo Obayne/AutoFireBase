@@ -1,7 +1,7 @@
 # apply_hotfix_palette_062.py
 # Fix QPalette usage: replace pal.setColor(pal.X, ...) -> pal.setColor(QtGui.QPalette.X, ...)
-from pathlib import Path
 import time
+from pathlib import Path
 
 root = Path(".").resolve()
 target = root / "app" / "main.py"

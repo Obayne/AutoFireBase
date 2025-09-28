@@ -1,6 +1,20 @@
 # Changelog
 
 
+## [Unreleased] - 2025-09-26
+- Added: Centralized structured logging via `app/logging_config.py`; entrypoints now use structured loggers.
+- Added: Headless palette → placement simulation harness (`run_logs/run_all_simulations.py`) to validate placement flows without the GUI.
+- Added: Canonical stash/pop conflict resolver with safe wrapper scripts (`scripts/tools/_auto_resolve_conflicts.py` and delegates). Automatic edits create `.bak-*` backups to preserve originals.
+- Added: Comprehensive DXF import tests (`tests/test_dxf_import.py`) validating color mapping, unit conversion, and file import functionality.
+- Added: Draw tools tests (`tests/test_draw_tools.py`) validating controller logic, geometry calculations, and mode handling for all draw operations (line, rect, circle, polyline, arc, wire).
+- Added: Modify tools tests (`tests/test_trim_tool.py`, `tests/test_move_tool.py`) validating trim and move operations with intersection calculations and item manipulation.
+- Validated: OSNAP (Object Snap) features are implemented with menu toggles for endpoint, midpoint, center, intersection, and perpendicular snaps; functionality confirmed through menu integration and core geometry logic.
+- Planned: **Summary Window** - Third window for project management with progress tracking, notes, milestones, AI assistance, and live project analytics (multiview settings integration).
+- Planned: **Separate Windows Architecture** - Model space and paperspace as independent windows instead of scene switching for cleaner workflow and better multi-monitor support.
+- Fix: Multiple small conservative fixes to unblock imports and linting (renamed ambiguous single-letter variables in tests and tools; removed unused local assignments; fixed a nested triple-quote parse error in an archive hotfix file so Black can run).
+- Fix: Corrected `simulate_palette_selection.py` to properly use local fallback device tree when Qt widgets are not available in headless mode.
+- Note: `scripts/archive/` contains local-only snapshot scripts that were temporarily restored during a GUI rollback; these files should be treated as local-only and excluded from repo-wide lint/format passes (we will document and configure that exclusion).
+
 ## [0.4.7] - 2025-09-12
 - Fillet radius UI + CAD core geometry (lines, circles, fillets)
 

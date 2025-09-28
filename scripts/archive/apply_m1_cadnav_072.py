@@ -2,20 +2,22 @@
 # M1: CAD feel – zoom-to-cursor, middle-mouse pan, major/minor grid.
 # Safe: timestamped backups of app/main.py and app/scene.py
 
+import re
+import time
 from pathlib import Path
-import time, re
 
 ROOT = Path(__file__).resolve().parent
 STAMP = time.strftime("%Y%m%d_%H%M%S")
 MAIN = ROOT / "app" / "main.py"
 SCENE = ROOT / "app" / "scene.py"
 
+
 def patch_main():
     if not MAIN.exists():
         print(f"[!] missing {MAIN}")
         return False
     src = MAIN.read_text(encoding="utf-8")
-    bak = MAIN.with_suffix(".py.bak-"+STAMP)
+    bak = MAIN.with_suffix(".py.bak-" + STAMP)
 
     changed = False
     out = src
@@ -23,11 +25,12 @@ def patch_main():
     # 1) CanvasView.__init__: ensure AnchorUnderMouse and flags for pan state
     if "class CanvasView" in out and "AnchorUnderMouse" not in out:
         out = re.sub(
-            r'(class\s+CanvasView\([^)]+\):\s*def\s+__init__\([^)]*\):\s*super\(\).__init__\(scene\)\s*)',
-            r'\1        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)\n'
-            r'        self._space_panning = False\n'
-            r'        self._mid_panning = False\n',
-            out, flags=re.S
+            r"(class\s+CanvasView\([^)]+\):\s*def\s+__init__\([^)]*\):\s*super\(\).__init__\(scene\)\s*)",
+            r"\1        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)\n"
+            r"        self._space_panning = False\n"
+            r"        self._mid_panning = False\n",
+            out,
+            flags=re.S,
         )
         changed = True
 
@@ -37,7 +40,7 @@ def patch_main():
     # 3) middle-mouse pan + spacebar pan (robust)
     if "def mousePressEvent(self, e: QtGui.QMouseEvent)" in out and "Qt.MiddleButton" not in out:
         out = re.sub(
-            r'def mousePressEvent\(self, e: QtGui\.QMouseEvent\):\s*',
+            r"def mousePressEvent\(self, e: QtGui\.QMouseEvent\):\s*",
             (
                 "def mousePressEvent(self, e: QtGui.QMouseEvent):\n"
                 "        if e.button() == Qt.MiddleButton and not self._mid_panning:\n"
@@ -49,13 +52,16 @@ def patch_main():
                 "            super().mousePressEvent(fake)\n"
                 "            e.accept(); return\n"
             ),
-            out
+            out,
         )
         changed = True
 
-    if "def mouseReleaseEvent(self, e: QtGui.QMouseEvent)" in out and "self._mid_panning" not in out:
+    if (
+        "def mouseReleaseEvent(self, e: QtGui.QMouseEvent)" in out
+        and "self._mid_panning" not in out
+    ):
         out = re.sub(
-            r'def mouseReleaseEvent\(self, e: QtGui\.QMouseEvent\):\s*',
+            r"def mouseReleaseEvent\(self, e: QtGui\.QMouseEvent\):\s*",
             (
                 "def mouseReleaseEvent(self, e: QtGui.QMouseEvent):\n"
                 "        if self._mid_panning and e.button() == Qt.MiddleButton:\n"
@@ -67,13 +73,13 @@ def patch_main():
                 "            self.setCursor(Qt.ArrowCursor)\n"
                 "            e.accept(); return\n"
             ),
-            out
+            out,
         )
         changed = True
 
     if "def keyPressEvent(self, e: QtGui.QKeyEvent)" in out and "Key_Space" not in out:
         out = re.sub(
-            r'def keyPressEvent\(self, e: QtGui\.QKeyEvent\):\s*',
+            r"def keyPressEvent\(self, e: QtGui\.QKeyEvent\):\s*",
             (
                 "def keyPressEvent(self, e: QtGui.QKeyEvent):\n"
                 "        if e.key() == Qt.Key_Space and not self._space_panning:\n"
@@ -82,13 +88,13 @@ def patch_main():
                 "            self.setCursor(Qt.OpenHandCursor)\n"
                 "            e.accept(); return\n"
             ),
-            out
+            out,
         )
         changed = True
 
     if "def keyReleaseEvent(self, e: QtGui.QKeyEvent)" in out and "Key_Space" not in out:
         out = re.sub(
-            r'def keyReleaseEvent\(self, e: QtGui\.QKeyEvent\):\s*',
+            r"def keyReleaseEvent\(self, e: QtGui\.QKeyEvent\):\s*",
             (
                 "def keyReleaseEvent(self, e: QtGui.QKeyEvent):\n"
                 "        if e.key() == Qt.Key_Space and self._space_panning:\n"
@@ -97,7 +103,7 @@ def patch_main():
                 "            self.setCursor(Qt.ArrowCursor)\n"
                 "            e.accept(); return\n"
             ),
-            out
+            out,
         )
         changed = True
 
@@ -110,16 +116,17 @@ def patch_main():
         print("[ok] app/main.py already has CAD nav hooks or patterns not found.")
     return changed
 
+
 def patch_scene():
     if not SCENE.exists():
         print(f"[!] missing {SCENE}")
         return False
     src = SCENE.read_text(encoding="utf-8")
-    bak = SCENE.with_suffix(".py.bak-"+STAMP)
+    bak = SCENE.with_suffix(".py.bak-" + STAMP)
 
     # Replace/insert drawBackground with major/minor grid
-    pattern = r'def\s+drawBackground\(\s*self,\s*painter,\s*rect\s*\):.*?(?=\n\s*def|\Z)'
-    new_func = r'''
+    pattern = r"def\s+drawBackground\(\s*self,\s*painter,\s*rect\s*\):.*?(?=\n\s*def|\Z)"
+    new_func = r"""
 def drawBackground(self, painter, rect):
     # CAD-like grid: minor every grid_size, major every 5*grid_size
     from PySide6 import QtGui, QtCore
@@ -178,15 +185,16 @@ def drawBackground(self, painter, rect):
     painter.drawLine(0, -10, 0, 10)
 
     painter.restore()
-'''
+"""
     if re.search(pattern, src, flags=re.S):
         out = re.sub(pattern, new_func, src, flags=re.S)
     else:
         # try to append method inside class GridScene
         out = re.sub(
-            r'(class\s+GridScene\([^)]+\):.*?)(\n\s*def\s+\w+\(self,.*)',
-            r'\1\n' + new_func + r'\2',
-            src, flags=re.S
+            r"(class\s+GridScene\([^)]+\):.*?)(\n\s*def\s+\w+\(self,.*)",
+            r"\1\n" + new_func + r"\2",
+            src,
+            flags=re.S,
         )
         if out == src:
             # fallback: just append the func (assumes name matches, Python will use class method if indented; if not, user can compare)
@@ -201,6 +209,7 @@ def drawBackground(self, painter, rect):
     else:
         print("[ok] app/scene.py grid already customized or pattern not found.")
         return False
+
 
 if __name__ == "__main__":
     a = patch_main()

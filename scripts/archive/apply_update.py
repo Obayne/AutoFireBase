@@ -1,25 +1,26 @@
 import argparse
+import datetime
+import logging
 import os
 import sys
 import zipfile
-import shutil
-import datetime
-import logging
-from app.logging_config import setup_logging
 
+from app.logging_config import setup_logging
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 BACKUP_DIR = os.path.join(APP_ROOT, "_backups")
 VERSION_FILE = os.path.join(APP_ROOT, "VERSION.txt")
 
+
 def read_version():
     if os.path.exists(VERSION_FILE):
         try:
-            with open(VERSION_FILE, "r", encoding="utf-8") as f:
+            with open(VERSION_FILE, encoding="utf-8") as f:
                 return f.read().strip()
         except Exception:
             return ""
     return ""
+
 
 def write_version(v):
     try:
@@ -28,6 +29,7 @@ def write_version(v):
     except Exception as e:
         logger = logging.getLogger(__name__)
         logger.warning("could not write VERSION.txt: %s", e)
+
 
 def backup_current():
     os.makedirs(BACKUP_DIR, exist_ok=True)
@@ -47,11 +49,13 @@ def backup_current():
                 z.write(p, rel)
     return backup_path
 
+
 def apply_zip(update_zip):
     logger = logging.getLogger(__name__)
     logger.info("[update] applying %s", update_zip)
     with zipfile.ZipFile(update_zip, "r") as z:
         z.extractall(APP_ROOT)
+
 
 def verify_post_update():
     p = os.path.join(APP_ROOT, "app", "main.py")
@@ -60,12 +64,14 @@ def verify_post_update():
     logger = logging.getLogger(__name__)
     logger.info("[verify] ok")
 
+
 def rollback_to(backup_zip):
     logger = logging.getLogger(__name__)
     logger.info("[rollback] using %s", backup_zip)
     with zipfile.ZipFile(backup_zip, "r") as z:
         z.extractall(APP_ROOT)
     logger.info("[rollback] done")
+
 
 def main():
     setup_logging()
@@ -77,28 +83,22 @@ def main():
     args = parser.parse_args()
 
     if args.rollback:
-        rollback_to(args.rollback); return
+        rollback_to(args.rollback)
+        return
 
     if not args.update:
-<<<<<<< Updated upstream
-        print("Usage:\n  python apply_update.py --update C:\\AutoFireUpdates\\AutoFire_patch.zip\n"
-              "or rollback:\n  python apply_update.py --rollback .\\_backups\\autofire_backup_YYYYMMDD_HHMMSS.zip"); return
-
-    update_zip = args.update
-    if not os.path.exists(update_zip):
-        print("[error] update zip not found:", update_zip); sys.exit(1)
-=======
         logger.info(
-            "Usage:\n  python apply_update.py --update C:\\AutoFireUpdates\\AutoFire_patch.zip\n"
-            "or rollback:\n  python apply_update.py --rollback .\\_backups\\autofire_backup_YYYYMMDD_HHMMSS.zip"
+            "Usage:\n"
+            "  python apply_update.py --update C:\\AutoFireUpdates\\AutoFire_patch.zip\n"
+            "or rollback:\n"
+            "  python apply_update.py --rollback .\\_backups\\autofire_backup_YYYYMMDD_HHMMSS.zip"
         )
         return
 
     update_zip = args.update
     if not os.path.exists(update_zip):
-        logger.error("[error] update zip not found: %s", update_zip)
+        logger.error("update zip not found: %s", update_zip)
         sys.exit(1)
->>>>>>> Stashed changes
 
     cur_ver = read_version() or "(unknown)"
     logger.info("[version] current: %s", cur_ver)
@@ -109,23 +109,19 @@ def main():
         apply_zip(update_zip)
         verify_post_update()
         with zipfile.ZipFile(update_zip, "r") as z:
-            new_ver = z.read("VERSION.txt").decode("utf-8").strip() if "VERSION.txt" in z.namelist() else "0.0.0"
+            new_ver = (
+                z.read("VERSION.txt").decode("utf-8").strip()
+                if "VERSION.txt" in z.namelist()
+                else "0.0.0"
+            )
         write_version(new_ver)
-<<<<<<< Updated upstream
-        print("[done] update complete. new version:", new_ver)
-    except Exception as e:
-        print("[error] update failed:", e)
-        print("[info] rolling back..."); rollback_to(backup_zip); sys.exit(2)
-=======
         logger.info("[done] update complete. new version: %s", new_ver)
     except Exception:
-        logger = logging.getLogger(__name__)
         logger.exception("[error] update failed")
         logger.info("[info] rolling back...")
         rollback_to(backup_zip)
         sys.exit(2)
 
->>>>>>> Stashed changes
 
 if __name__ == "__main__":
     main()

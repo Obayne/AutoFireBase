@@ -1,0 +1,58 @@
+# CI Global Tasklist for AutoFire
+# Generated: consolidated from existing run_logs and logging scan
+
+tasks:
+  - id: sims-headless
+    name: Run headless simulators
+    description: Run `run_logs/run_all_simulations.py` to exercise palette->placement flow headlessly.
+    command: python -m run_logs.run_all_simulations
+    timeout-minutes: 5
+    success:
+      exit_code: 0
+      logs_contains: "All simulators passed"
+
+  - id: lint-ruff
+    name: Ruff lint
+    description: Run ruff with the project's config and fail on errors other than approved E501 exemptions.
+    command: ruff check .
+    timeout-minutes: 10
+
+  - id: pytests
+    name: Run pytest
+    description: Run unit tests under `tests/`.
+    command: pytest -q
+    timeout-minutes: 10
+
+  - id: print-scan
+    name: Prevent new prints
+    description: Fail the build if raw `print(` statements are present outside allowed paths (e.g., scripts/archive, .venv).
+    command: |
+      python - <<'PY'
+      import sys, subprocess, pathlib
+      root=pathlib.Path(r"c:\Dev\Autofire")
+      allowed = [root / 'scripts' / 'archive', root / '.venv']
+      res = subprocess.run(['git','ls-files'], capture_output=True, text=True)
+      files = [root / p for p in res.stdout.splitlines()]
+      offenders = []
+      for f in files:
+          try:
+              txt = f.read_text(encoding='utf-8')
+          except Exception:
+              continue
+          if 'print(' in txt:
+              if any(str(f).startswith(str(a)) for a in allowed):
+                  continue
+              offenders.append(str(f.relative_to(root)))
+      if offenders:
+          print('print() found in:', '\n'.join(offenders))
+          sys.exit(2)
+      print('no offending prints found')
+      PY
+    timeout-minutes: 5
+
+  - id: update-logs-doc
+    name: Update consolidated logs doc
+    description: Regenerate `docs/LOG_CONSOLIDATED.md` from automated scan (manual step allowed).
+    command: echo "See docs/LOG_CONSOLIDATED.md"
+
+# End of task list

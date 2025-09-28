@@ -3,14 +3,14 @@
 # Writes a hardened app/main.py (keeps CAD step features), with stubs for
 # CoverageDialog and ArrayTool if their modules are missing.
 
-from pathlib import Path
 import time
+from pathlib import Path
 
 ROOT = Path(".").resolve()
 STAMP = time.strftime("%Y%m%d_%H%M%S")
 TARGET = ROOT / "app" / "main.py"
 
-MAIN_CODE = r'''
+MAIN_CODE = r"""
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -606,9 +606,12 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self,"DXF Import Error","DXF support (ezdxf) not available.\n\nInstall: pip install ezdxf\n\n"+str(ex))
             return
         try:
-            doc = ezdxf.readfile(path); msp = doc.modelspace(); p = self._build_underlay_path(msp); self._apply_underlay_path(p)
+            doc = ezdxf.readfile(path)
+            msp = doc.modelspace()
+            p = self._build_underlay_path(msp)
+            self._apply_underlay_path(p)
         except Exception as ex:
-            QMessageBox.critical(self,"DXF Import Error", str(ex))
+            QMessageBox.critical(self, "DXF Import Error", str(ex))
 
     def import_dxf_underlay(self):
         p,_ = QFileDialog.getOpenFileName(self,"Import DXF Underlay","","DXF Files (*.dxf)")
@@ -653,9 +656,13 @@ class MainWindow(QMainWindow):
         p,_=QFileDialog.getOpenFileName(self,"Open Project","","AutoFire Bundle (*.autofire)")
         if not p: return
         try:
-            with zipfile.ZipFile(p,"r") as z:
-                data=json.loads(z.read("project.json").decode("utf-8"))
-            self.load_state(data); self.push_history(); self.statusBar().showMessage(f"Opened: {os.path.basename(p)}")
+                with zipfile.ZipFile(p, "r") as z:
+                    raw = z.read("project.json")
+                    data = json.loads(raw.decode("utf-8"))
+
+                self.load_state(data)
+                self.push_history()
+                self.statusBar().showMessage(f"Opened: {os.path.basename(p)}")
         except Exception as ex:
             QMessageBox.critical(self,"Open Project Error", str(ex))
 
@@ -679,7 +686,8 @@ class MainWindow(QMainWindow):
     def _on_selection_changed(self):
         self.selection_count = len(self.scene.selectedItems())
         # status text updates from CanvasView mouse move
-'''
+"""
+
 
 def main():
     TARGET.parent.mkdir(parents=True, exist_ok=True)
@@ -690,6 +698,7 @@ def main():
     TARGET.write_text(MAIN_CODE.lstrip("\n"), encoding="utf-8")
     print(f"wrote   -> {TARGET}")
     print("\nDone. Launch with:  py -3 -m app.boot")
+
 
 if __name__ == "__main__":
     main()

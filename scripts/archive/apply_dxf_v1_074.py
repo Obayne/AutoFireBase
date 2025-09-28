@@ -3,9 +3,10 @@
 # Safe: writes app/dxf_import.py, injects a new menu action + handler in app/main.py.
 # Backups with timestamp suffixes are created.
 
-from pathlib import Path
-import time, re
 import logging
+import re
+import time
+from pathlib import Path
 
 from app.logging_config import setup_logging
 
@@ -14,7 +15,7 @@ STAMP = time.strftime("%Y%m%d_%H%M%S")
 DXF = ROOT / "app" / "dxf_import.py"
 MAIN = ROOT / "app" / "main.py"
 
-DXF_CODE = r'''
+DXF_CODE = r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 
 def _aci_to_qcolor(aci: int) -> QtGui.QColor:
@@ -138,18 +139,20 @@ def import_dxf_into_group(path: str, target_group: QtWidgets.QGraphicsItemGroup,
         bounds = bounds.united(p.controlPointRect())
 
     return bounds
-'''
+"""
+
 
 def write_dxf():
     DXF.parent.mkdir(parents=True, exist_ok=True)
     if DXF.exists():
-        bak = DXF.with_suffix(".py.bak-"+STAMP)
+        bak = DXF.with_suffix(".py.bak-" + STAMP)
         bak.write_text(DXF.read_text(encoding="utf-8"), encoding="utf-8")
         logger = logging.getLogger(__name__)
         logger.info("[backup] %s", bak)
     DXF.write_text(DXF_CODE.lstrip(), encoding="utf-8")
     logger = logging.getLogger(__name__)
     logger.info("[write ] %s", DXF)
+
 
 def patch_main():
     if not MAIN.exists():
@@ -161,13 +164,17 @@ def patch_main():
     if "from app import dxf_import" not in src:
         # insert after other "from app import ..." lines if present
         new_src = re.sub(
-            r'(\nfrom app[^\n]*\n)(?!.*from app import dxf_import)',
-            r'\1from app import dxf_import\n',
-            src, count=1, flags=re.S
+            r"(\nfrom app[^\n]*\n)(?!.*from app import dxf_import)",
+            r"\1from app import dxf_import\n",
+            src,
+            count=1,
+            flags=re.S,
         )
         if new_src == src:
             # fallback: append near top after first imports block
-            new_src = src.replace("from app import catalog", "from app import catalog\nfrom app import dxf_import")
+            new_src = src.replace(
+                "from app import catalog", "from app import catalog\nfrom app import dxf_import"
+            )
         src = new_src
 
     # 2) inject new menu action under File menu
@@ -175,7 +182,8 @@ def patch_main():
         src = re.sub(
             r'(m_file\s*=\s*menubar\.addMenu\([^\)]+\)\s*.*?)(m_file\.addSeparator\(\)\s*.*?m_file\.addAction\("Quit",.*?\)\s*)',
             r'\1m_file.addAction("Import DXF Underlay (v1)…", self.import_dxf_underlay_v1)\n        \2',
-            src, flags=re.S
+            src,
+            flags=re.S,
         )
 
     # 3) add handler method into MainWindow if missing
@@ -183,7 +191,7 @@ def patch_main():
         insert_point = src.rfind("def show_about(self):")
         if insert_point == -1:
             insert_point = len(src)
-        handler = r'''
+        handler = r"""
 
     def import_dxf_underlay_v1(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Import DXF Underlay (v1)", "", "DXF Files (*.dxf)")
@@ -202,16 +210,17 @@ def patch_main():
             self.statusBar().showMessage(f"Imported underlay: {path}")
         except Exception as ex:
             QtWidgets.QMessageBox.critical(self, "DXF Import Error", str(ex))
-'''
+"""
         src = src[:insert_point] + handler + src[insert_point:]
 
     # write out
-    bak = MAIN.with_suffix(".py.bak-"+STAMP)
+    bak = MAIN.with_suffix(".py.bak-" + STAMP)
     bak.write_text(MAIN.read_text(encoding="utf-8"), encoding="utf-8")
     MAIN.write_text(src, encoding="utf-8")
     logger = logging.getLogger(__name__)
     logger.info("[backup] %s", bak)
     logger.info("[write ] %s", MAIN)
+
 
 if __name__ == "__main__":
     # initialize structured logging for scripts
