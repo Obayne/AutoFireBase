@@ -515,8 +515,10 @@ def show_device(
     device_id: int | None = None,
     name: str | None = None,
     part_number: str | None = None,
+    contains: str | None = None,
     *,
     first_only: bool = True,
+    all_matches: bool = False,
 ) -> None:
     # Show device details by id, or exact name/part number
     db_connection.initialize_database(in_memory=False)
@@ -568,12 +570,28 @@ def show_device(
                 (name,),
             )
             rows = cur.fetchall()
+        elif contains:
+            like = f"%{contains}%"
+            cur.execute(
+                (
+                    "SELECT d.id, d.name, d.symbol, dt.code AS type, "
+                    "m.name AS manufacturer, d.model AS part_number "
+                    "FROM devices d "
+                    "LEFT JOIN manufacturers m ON m.id=d.manufacturer_id "
+                    "LEFT JOIN device_types dt ON dt.id=d.type_id "
+                    "WHERE d.name LIKE ? OR d.model LIKE ? OR m.name LIKE ? "
+                    "ORDER BY d.id"
+                ),
+                (like, like, like),
+            )
+            rows = cur.fetchall()
 
         if not rows:
             print("No matching device found.")
             return
 
-        items = rows if not first_only else [rows[0]]
+        use_all = all_matches or not first_only
+        items = rows if use_all else [rows[0]]
         for row in items:
             d = dict(row)
             print("Device:")
@@ -587,7 +605,9 @@ def show_device(
         db_connection.close_connection()
 
 
-def count_cli(group_by: str = "type") -> None:
+def count_cli(
+    group_by: str = "type", *, json_output: bool = False, output_file: str | None = None
+) -> None:
     # Show counts grouped by type or manufacturer
     group_by = (group_by or "type").lower().strip()
     if group_by not in {"type", "manufacturer"}:
@@ -618,9 +638,19 @@ def count_cli(group_by: str = "type") -> None:
             )
             header = "Counts by manufacturer:"
 
-        print(header)
-        for r in cur.fetchall():
-            print(f"  {r['label']}: {r['c']}")
+        rows = cur.fetchall()
+        if json_output:
+            payload = {r["label"]: int(r["c"]) for r in rows}
+            if output_file:
+                with open(output_file, "w", encoding="utf-8") as f:
+                    json.dump(payload, f, indent=2, ensure_ascii=False)
+                print(f"Exported counts to {output_file}")
+            else:
+                print(json.dumps(payload, indent=2))
+        else:
+            print(header)
+            for r in rows:
+                print(f"  {r['label']}: {r['c']}")
     finally:
         db_connection.close_connection()
 
@@ -700,12 +730,16 @@ def main() -> None:
     mex.add_argument("--id", type=int, help="Device ID")
     mex.add_argument("--name", help="Exact device name")
     mex.add_argument("--part-number", help="Exact part number/model")
+    mex.add_argument("--contains", help="Partial match in name/part/manufacturer")
+    show_parser.add_argument("--all", action="store_true", help="Print all matches")
 
     # Count command
     count_parser = subparsers.add_parser("count", help="Count devices by group")
     count_parser.add_argument(
         "--by", choices=["type", "manufacturer"], default="type", help="Group field"
     )
+    count_parser.add_argument("--json", action="store_true", help="Output JSON to stdout")
+    count_parser.add_argument("--output", help="Write JSON to file (UTF-8)")
 
     # (duplicate removed)
 
@@ -744,9 +778,15 @@ def main() -> None:
     elif args.command == "manufacturers":
         list_manufacturers_cli()
     elif args.command == "show":
-        show_device(args.id, args.name, args.part_number)
+        show_device(
+            args.id,
+            args.name,
+            args.part_number,
+            args.contains,
+            all_matches=args.all,
+        )
     elif args.command == "count":
-        count_cli(args.by)
+        count_cli(args.by, json_output=args.json, output_file=args.output)
     elif args.command == "types":
         list_types_cli()
     elif args.command == "manufacturers":
