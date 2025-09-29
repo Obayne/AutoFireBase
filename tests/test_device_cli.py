@@ -1,7 +1,7 @@
 import io
 from contextlib import redirect_stdout
 
-from scripts.device_cli import export_devices, list_devices, search_devices
+from autofire.cli.device import export_devices, list_devices, search_devices
 
 
 def capture_output(fn, *args, **kwargs):
@@ -12,11 +12,11 @@ def capture_output(fn, *args, **kwargs):
 
 
 def test_list_devices_formats_table():
-    out = capture_output(list_devices, device_type="Detector")
+    out = capture_output(list_devices, device_type="Smoke Detector")
     # Header present
     assert "Name" in out and "Manufacturer" in out and "Part #" in out
     # At least one known device row
-    assert "Smoke Detector" in out or "Heat Detector" in out
+    assert "Smoke Detector" in out
 
 
 def test_search_devices_formats_table():

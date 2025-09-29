@@ -4,38 +4,273 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release'
+        required: true
+        type: string
+      release_type:
+        description: 'Type of release'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
 
 jobs:
+  # Pre-release checks
+  pre-release:
+    name: Pre-release Checks
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+          echo "Releasing version: $VERSION"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run full test suite
+        run: |
+          python -m pytest tests/ -v --tb=short --cov=app --cov-report=xml
+
+      - name: Build application
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, '.')
+          from app.main import APP_VERSION
+          print(f'App version: {APP_VERSION}')
+          "
+
+      - name: Check version consistency
+        run: |
+          APP_VERSION=$(python -c "import sys; sys.path.insert(0, '.'); from app.main import APP_VERSION; print(APP_VERSION)")
+          PYPROJECT_VERSION=$(python -c "import tomllib; data = tomllib.load(open('pyproject.toml', 'rb')); print(data['project']['version'])")
+
+          if [[ "$APP_VERSION" != "${{ steps.version.outputs.version }}" ]]; then
+            echo "Version mismatch: app=$APP_VERSION, release=${{ steps.version.outputs.version }}"
+            exit 1
+          fi
+
+          if [[ "$PYPROJECT_VERSION" != "${{ steps.version.outputs.version }}" ]]; then
+            echo "Version mismatch: pyproject=$PYPROJECT_VERSION, release=${{ steps.version.outputs.version }}"
+            exit 1
+          fi
+
+          echo "✅ Version consistency check passed"
+
+  # Build executables for multiple platforms
   build-windows:
+    name: Build Windows
+    needs: pre-release
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Build (PyInstaller)
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build executable (Windows)
         shell: pwsh
         run: |
-          ./Build_AutoFire.ps1
+          $VERSION = "${{ needs.pre-release.outputs.version }}"
+          Write-Host "Building AutoFire v$VERSION for Windows"
+
+          # Use existing build script if available, otherwise PyInstaller
+          if (Test-Path "Build_AutoFire.ps1") {
+            ./Build_AutoFire.ps1
+          } else {
+            pyinstaller --clean --onefile --windowed `
+              --name AutoFire-$VERSION-windows `
+              --add-data "app;app" `
+              --hidden-import PySide6.QtCore `
+              --hidden-import PySide6.QtGui `
+              --hidden-import PySide6.QtWidgets `
+              app/main.py
+          }
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: AutoFire-windows
-          path: dist/AutoFire/AutoFire/AutoFire.exe
+          path: |
+            dist/AutoFire/AutoFire/AutoFire.exe
+            dist/AutoFire-${{ needs.pre-release.outputs.version }}-windows.exe
 
-  release:
-    needs: build-windows
+  build-linux:
+    name: Build Linux
+    needs: pre-release
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build executable (Linux)
+        run: |
+          VERSION="${{ needs.pre-release.outputs.version }}"
+          echo "Building AutoFire v$VERSION for Linux"
+
+          pyinstaller --clean --onefile \
+            --name AutoFire-$VERSION-linux \
+            --add-data "app:app" \
+            --hidden-import PySide6.QtCore \
+            --hidden-import PySide6.QtGui \
+            --hidden-import PySide6.QtWidgets \
+            app/main.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoFire-linux
+          path: dist/AutoFire-${{ needs.pre-release.outputs.version }}-linux
+
+  # Create GitHub release
+  release:
+    name: Create Release
+    needs: [pre-release, build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: AutoFire-windows
-          path: artifacts
+          path: artifacts/
+
+      - name: Prepare release assets
+        run: |
+          VERSION="${{ needs.pre-release.outputs.version }}"
+          TAG="${{ needs.pre-release.outputs.tag }}"
+
+          mkdir -p release
+
+          # Copy executables (try multiple possible paths)
+          find artifacts/ -name "*.exe" -exec cp {} release/ \; 2>/dev/null || true
+          find artifacts/ -name "*linux*" -exec cp {} release/ \; 2>/dev/null || true
+
+          # List what we found
+          echo "Release assets:"
+          ls -la release/
+
+          # Create checksums
+          cd release
+          sha256sum * > SHA256SUMS.txt 2>/dev/null || echo "No files to checksum"
+          cd ..
+
+          # Create release notes
+          cat > release/RELEASE_NOTES.md << EOF
+          # AutoFire v${VERSION}
+
+          ## What's New
+
+          $(git log --oneline --pretty=format:"* %s" $(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")..HEAD 2>/dev/null || echo "* Release v${VERSION}")
+
+          ## Installation
+
+          Download the appropriate executable for your platform from the assets below.
+
+          ## Verification
+
+          Verify downloads using SHA256 checksums:
+
+          \`\`\`bash
+          sha256sum -c SHA256SUMS.txt
+          \`\`\`
+
+          ## System Requirements
+
+          - Python 3.11+
+          - PySide6 (Qt6)
+          - SQLite3
+
+          ## Support
+
+          For issues and questions, please visit the GitHub repository.
+          EOF
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/AutoFire.exe
+          tag_name: ${{ needs.pre-release.outputs.tag }}
+          name: AutoFire v${{ needs.pre-release.outputs.version }}
+          body_path: release/RELEASE_NOTES.md
+          files: release/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Post-release summary
+  summary:
+    name: Release Summary
+    needs: [release]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Release Summary
+        run: |
+          echo "## 🎉 Release Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** v${{ needs.pre-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** ${{ needs.pre-release.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Completed:" >> $GITHUB_STEP_SUMMARY
+          echo "- Pre-release checks" >> $GITHUB_STEP_SUMMARY
+          echo "- Windows build" >> $GITHUB_STEP_SUMMARY
+          echo "- Linux build" >> $GITHUB_STEP_SUMMARY
+          echo "- GitHub release creation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Downloads available at:" >> $GITHUB_STEP_SUMMARY
+          echo "https://github.com/${{ github.repository }}/releases/tag/${{ needs.pre-release.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
 

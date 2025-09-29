@@ -2,3 +2,6 @@ PySide6
 ezdxf
 reportlab
 shapely
+PyPDF2
+Pillow
+pdf2image

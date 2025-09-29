@@ -39,6 +39,11 @@ def _load_app_main():
     available). If that fails, probe common locations (PyInstaller's _MEIPASS
     and build/exe directories) and load via importlib.util.
     """
+    # Ensure the app directory is in sys.path for development
+    app_dir = os.path.dirname(__file__)
+    if app_dir not in sys.path:
+        sys.path.insert(0, app_dir)
+
     try:
         return importlib.import_module("app.main")
     except Exception:

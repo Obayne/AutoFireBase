@@ -30,6 +30,11 @@ class GridScene(QtWidgets.QGraphicsScene):
             self.major_every = max(2, int(major_every))
         self.update()
 
+    def set_grid_size(self, size: int):
+        """Set the grid size in pixels."""
+        self.grid_size = max(2, int(size))
+        self.update()
+
     # simple grid snap
     def snap(self, pt: QtCore.QPointF) -> QtCore.QPointF:
         if not self.snap_enabled:

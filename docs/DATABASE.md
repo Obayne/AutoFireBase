@@ -48,3 +48,15 @@ Notes
 - Exports use UTF-8 when writing files; JSON printed to console uses ASCII-safe escapes for Windows shells.
 - The CLI seeds demo data if the database is empty to ensure commands work out of the box.
 - Programmatic access is available via `db/loader.py` (connect, ensure_schema, seed_demo, fetch/search APIs).
+
+Environment Override
+- Set `AUTOFIRE_DB_PATH` to point CLI and code to a custom SQLite path.
+  - PowerShell: `$env:AUTOFIRE_DB_PATH = "C:\\temp\\af_catalog.db"`
+  - Bash: `export AUTOFIRE_DB_PATH=/tmp/af_catalog.db`
+  - Code: `db_loader.connect()` will pick it up automatically.
+
+Migration Strategy (Guidance)
+- Prefer additive, backward-compatible schema changes.
+- Use `ensure_schema(con)` for idempotent table creation; for changes, use `ALTER TABLE` guarded by existence checks.
+- Back up first: `device_cli.py db-backup` and restore if needed.
+- If a breaking change is unavoidable, add a one-time migration in `db/loader.py` gated by a feature flag or schema marker.

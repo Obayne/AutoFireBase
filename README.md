@@ -52,3 +52,10 @@ Database
 - Storage: SQLite catalog at `~\AutoFire\catalog.db` (created on first use).
 - Tasks: init/seed/backup/restore, list/search/show/count, and export/import via `scripts\device_cli.py`.
 - Details: see `docs/DATABASE.md` for schema and CLI examples, and `docs/CLI.md` for quick CLI usage.
+
+NFPA 170 Support
+- AutoFire includes NFPA 170 fire safety and emergency symbols for professional fire alarm system design.
+- Available symbols: fire extinguishers, exit signs, emergency equipment, fire alarm devices, and safety markings.
+- Symbols are placed from the Device Palette under "NFPA 170" type filter.
+- Symbols automatically scale and display with proper colors according to NFPA standards.
+- Export to PDF/PNG includes all NFPA symbols with correct sizing and visibility.

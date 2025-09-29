@@ -1,4 +1,4 @@
-"""
+﻿"""
 AutoFire Device Manager CLI Tool
 
 A command-line interface for managing AutoFire device catalog and database.
@@ -63,6 +63,91 @@ def list_devices(device_type: str | None = None, manufacturer: str | None = None
             print(f"{dev_id:<5} {name:<30} {dev_type:<15} {mfg:<15} {part:<12}")
     finally:
         db_connection.close_connection()
+
+
+def report_bom(format_type: str = "csv", output_file: str | None = None) -> None:
+    """Generate Bill of Materials from devices table."""
+    db_connection.initialize_database(in_memory=False)
+    con = db_connection.get_connection()
+    con.row_factory = sqlite3.Row
+    try:
+        db_loader.ensure_schema(con)
+        db_loader.seed_demo(con)
+        cur = con.cursor()
+        cur.execute(
+            "SELECT m.name AS manufacturer, dt.code AS type, d.name, "
+            "d.model AS part_number, COUNT(*) AS qty "
+            "FROM devices d "
+            "LEFT JOIN manufacturers m ON m.id=d.manufacturer_id "
+            "LEFT JOIN device_types dt ON dt.id=d.type_id "
+            "GROUP BY manufacturer, type, d.name, part_number "
+            "ORDER BY manufacturer, type, d.name"
+        )
+        rows = [dict(r) for r in cur.fetchall()]
+    finally:
+        db_connection.close_connection()
+
+    if format_type == "json":
+        payload = rows
+        if output_file:
+            with open(output_file, "w", encoding="utf-8") as f:
+                json.dump(payload, f, indent=2, ensure_ascii=False)
+            print(f"Exported BOM to {output_file}")
+        else:
+            print(json.dumps(payload, indent=2))
+    elif format_type == "csv":
+        out = output_file or "bom.csv"
+        with open(out, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(
+                f, fieldnames=["manufacturer", "type", "name", "part_number", "qty"]
+            )
+            writer.writeheader()
+            writer.writerows(rows)
+        print(f"Exported BOM to {out}")
+    else:
+        print(f"Unsupported format: {format_type}")
+
+
+def report_device_schedule(format_type: str = "csv", output_file: str | None = None) -> None:
+    """Generate Device Schedule (unique device rows with quantity)."""
+    db_connection.initialize_database(in_memory=False)
+    con = db_connection.get_connection()
+    con.row_factory = sqlite3.Row
+    try:
+        db_loader.ensure_schema(con)
+        cur = con.cursor()
+        cur.execute(
+            "SELECT d.name, d.model AS part_number, m.name AS manufacturer, "
+            "dt.code AS type, COUNT(*) AS qty "
+            "FROM devices d "
+            "LEFT JOIN manufacturers m ON m.id=d.manufacturer_id "
+            "LEFT JOIN device_types dt ON dt.id=d.type_id "
+            "GROUP BY d.name, part_number, manufacturer, type "
+            "ORDER BY type, manufacturer, d.name"
+        )
+        rows = [dict(r) for r in cur.fetchall()]
+    finally:
+        db_connection.close_connection()
+
+    if format_type == "json":
+        payload = rows
+        if output_file:
+            with open(output_file, "w", encoding="utf-8") as f:
+                json.dump(payload, f, indent=2, ensure_ascii=False)
+            print(f"Exported Device Schedule to {output_file}")
+        else:
+            print(json.dumps(payload, indent=2))
+    elif format_type == "csv":
+        out = output_file or "device_schedule.csv"
+        with open(out, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(
+                f, fieldnames=["type", "manufacturer", "name", "part_number", "qty"]
+            )
+            writer.writeheader()
+            writer.writerows(rows)
+        print(f"Exported Device Schedule to {out}")
+    else:
+        print(f"Unsupported format: {format_type}")
 
 
 def list_types_cli() -> None:
@@ -741,6 +826,18 @@ Examples:
     count_parser.add_argument("--json", action="store_true", help="Output JSON to stdout")
     count_parser.add_argument("--output", help="Write JSON to file (UTF-8)")
 
+    # Report command
+    report_parser = subparsers.add_parser("report", help="Generate device reports")
+    report_parser.add_argument(
+        "name",
+        choices=["bom", "device-schedule"],
+        help="Report to generate (bom or device-schedule)",
+    )
+    report_parser.add_argument(
+        "--format", choices=["csv", "json"], default="csv", help="Output format"
+    )
+    report_parser.add_argument("--output", help="Output file path (defaults to stdout for JSON)")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -785,6 +882,14 @@ Examples:
         )
     elif args.command == "count":
         count_cli(args.by, json_output=args.json, output_file=args.output)
+    elif args.command == "report":
+        if args.name == "bom":
+            report_bom(args.format, args.output)
+        elif args.name == "device-schedule":
+            report_device_schedule(args.format, args.output)
+        else:
+            print(f"Unknown report: {args.name}")
+            sys.exit(2)
 
 
 if __name__ == "__main__":

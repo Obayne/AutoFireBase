@@ -11,6 +11,8 @@ Device Commands
 - `autofire-cli device export [--format json|csv] [--output FILE]`
 - `autofire-cli device import INPUT [--format json|csv]`
 - `autofire-cli device stats`
+- `autofire-cli device report bom --format csv|json [--output FILE]`
+- `autofire-cli device report device-schedule --format csv|json [--output FILE]`
 - `autofire-cli device types` — list device types
 - `autofire-cli device manufacturers` — list manufacturers
 - `autofire-cli device show (--id ID | --name NAME | --part-number PN | --contains TEXT) [--all]`

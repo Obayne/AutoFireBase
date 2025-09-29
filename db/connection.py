@@ -18,18 +18,20 @@ def initialize_database(in_memory: bool = True):
         # This path can be configured later
         _connection = sqlite3.connect("autofire.db")
 
+    _connection.row_factory = sqlite3.Row
+
     schema.create_schema_tables(_connection)
     coverage_tables.create_tables(_connection)
     coverage_tables.populate_tables(_connection)
     _connection.commit()
 
+
 def get_connection() -> sqlite3.Connection:
     """Returns the shared database connection."""
     if not _connection:
-        raise RuntimeError(
-            "Database not initialized. Call initialize_database() first."
-        )
+        raise RuntimeError("Database not initialized. Call initialize_database() first.")
     return _connection
+
 
 def close_connection():
     """Closes the shared database connection."""
