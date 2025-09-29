@@ -511,6 +511,120 @@ def show_stats() -> None:
         db_connection.close_connection()
 
 
+def show_device(
+    device_id: int | None = None,
+    name: str | None = None,
+    part_number: str | None = None,
+    *,
+    first_only: bool = True,
+) -> None:
+    # Show device details by id, or exact name/part number
+    db_connection.initialize_database(in_memory=False)
+    con = db_connection.get_connection()
+    con.row_factory = sqlite3.Row
+
+    try:
+        db_loader.ensure_schema(con)
+        db_loader.seed_demo(con)
+        cur = con.cursor()
+        rows: list[sqlite3.Row] = []
+        if device_id is not None:
+            cur.execute(
+                (
+                    "SELECT d.id, d.name, d.symbol, dt.code AS type, "
+                    "m.name AS manufacturer, d.model AS part_number "
+                    "FROM devices d "
+                    "LEFT JOIN manufacturers m ON m.id=d.manufacturer_id "
+                    "LEFT JOIN device_types dt ON dt.id=d.type_id "
+                    "WHERE d.id = ?"
+                ),
+                (device_id,),
+            )
+            r = cur.fetchone()
+            rows = [r] if r else []
+        elif part_number:
+            cur.execute(
+                (
+                    "SELECT d.id, d.name, d.symbol, dt.code AS type, "
+                    "m.name AS manufacturer, d.model AS part_number "
+                    "FROM devices d "
+                    "LEFT JOIN manufacturers m ON m.id=d.manufacturer_id "
+                    "LEFT JOIN device_types dt ON dt.id=d.type_id "
+                    "WHERE d.model = ? ORDER BY d.id"
+                ),
+                (part_number,),
+            )
+            rows = cur.fetchall()
+        elif name:
+            cur.execute(
+                (
+                    "SELECT d.id, d.name, d.symbol, dt.code AS type, "
+                    "m.name AS manufacturer, d.model AS part_number "
+                    "FROM devices d "
+                    "LEFT JOIN manufacturers m ON m.id=d.manufacturer_id "
+                    "LEFT JOIN device_types dt ON dt.id=d.type_id "
+                    "WHERE d.name = ? ORDER BY d.id"
+                ),
+                (name,),
+            )
+            rows = cur.fetchall()
+
+        if not rows:
+            print("No matching device found.")
+            return
+
+        items = rows if not first_only else [rows[0]]
+        for row in items:
+            d = dict(row)
+            print("Device:")
+            print(f"  ID           : {d.get('id','')}")
+            print(f"  Name         : {d.get('name','')}")
+            print(f"  Type         : {d.get('type','')}")
+            print(f"  Manufacturer : {d.get('manufacturer','')}")
+            print(f"  Part #       : {d.get('part_number','')}")
+            print(f"  Symbol       : {d.get('symbol','')}")
+    finally:
+        db_connection.close_connection()
+
+
+def count_cli(group_by: str = "type") -> None:
+    # Show counts grouped by type or manufacturer
+    group_by = (group_by or "type").lower().strip()
+    if group_by not in {"type", "manufacturer"}:
+        print("Unsupported group. Use 'type' or 'manufacturer'.")
+        return
+
+    db_connection.initialize_database(in_memory=False)
+    con = db_connection.get_connection()
+    con.row_factory = sqlite3.Row
+    try:
+        db_loader.ensure_schema(con)
+        db_loader.seed_demo(con)
+        cur = con.cursor()
+        if group_by == "type":
+            cur.execute(
+                "SELECT dt.code AS label, COUNT(*) AS c "
+                "FROM devices d "
+                "LEFT JOIN device_types dt ON dt.id=d.type_id "
+                "GROUP BY dt.code ORDER BY dt.code"
+            )
+            header = "Counts by type:"
+        else:
+            cur.execute(
+                "SELECT m.name AS label, COUNT(*) AS c "
+                "FROM devices d "
+                "LEFT JOIN manufacturers m ON m.id=d.manufacturer_id "
+                "GROUP BY m.name ORDER BY m.name"
+            )
+            header = "Counts by manufacturer:"
+
+        print(header)
+        for r in cur.fetchall():
+            print(f"  {r['label']}: {r['c']}")
+    finally:
+        db_connection.close_connection()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="AutoFire Device Manager CLI",
@@ -580,6 +694,21 @@ def main() -> None:
     subparsers.add_parser("types", help="List available device types")
     subparsers.add_parser("manufacturers", help="List available manufacturers")
 
+    # Show command
+    show_parser = subparsers.add_parser("show", help="Show device details")
+    mex = show_parser.add_mutually_exclusive_group(required=True)
+    mex.add_argument("--id", type=int, help="Device ID")
+    mex.add_argument("--name", help="Exact device name")
+    mex.add_argument("--part-number", help="Exact part number/model")
+
+    # Count command
+    count_parser = subparsers.add_parser("count", help="Count devices by group")
+    count_parser.add_argument(
+        "--by", choices=["type", "manufacturer"], default="type", help="Group field"
+    )
+
+    # (duplicate removed)
+
     args = parser.parse_args()
 
     if not args.command:
@@ -610,6 +739,14 @@ def main() -> None:
         db_restore(args.input)
     elif args.command == "stats":
         show_stats()
+    elif args.command == "types":
+        list_types_cli()
+    elif args.command == "manufacturers":
+        list_manufacturers_cli()
+    elif args.command == "show":
+        show_device(args.id, args.name, args.part_number)
+    elif args.command == "count":
+        count_cli(args.by)
     elif args.command == "types":
         list_types_cli()
     elif args.command == "manufacturers":
