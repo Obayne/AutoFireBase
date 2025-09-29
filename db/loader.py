@@ -2,6 +2,7 @@ import json
 import os
 import sqlite3
 from pathlib import Path
+
 from db import coverage_tables
 
 # This loader contains long SQL schema strings and seed data; allow E501 here.
@@ -12,7 +13,9 @@ DB_DEFAULT = os.path.join(os.path.expanduser("~"), "AutoFire", "catalog.db")
 
 
 def connect(db_path: str | None = None):
-    path = db_path or DB_DEFAULT
+    # Allow override via env var for flexibility in CI/dev
+    env_path = os.environ.get("AUTOFIRE_DB_PATH")
+    path = db_path or env_path or DB_DEFAULT
     Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(path)
     con.row_factory = sqlite3.Row
@@ -63,7 +66,7 @@ def _id_for(cur, table, key, value):
     cur.execute(f"SELECT id FROM {table} WHERE {key}=?", (value,))
     row = cur.fetchone()
     if row:
-        return row["id"]
+        return row[0]
     cur.execute(f"INSERT INTO {table}({key}) VALUES(?)", (value,))
     return cur.lastrowid
 
@@ -71,7 +74,8 @@ def _id_for(cur, table, key, value):
 def seed_demo(con: sqlite3.Connection):
     cur = con.cursor()
     cur.execute("SELECT COUNT(*) AS c FROM devices")
-    if cur.fetchone()["c"] > 0:
+    result = cur.fetchone()
+    if result and result[0] > 0:
         return
     types = {
         "Detector": "Smokes/Heat",
@@ -115,6 +119,40 @@ def seed_demo(con: sqlite3.Connection):
         },
         {"name": "Speaker", "symbol": "SPK", "type": "Notification", "part_number": "GEN-SPK"},
         {"name": "Pull Station", "symbol": "PS", "type": "Initiating", "part_number": "GEN-PS"},
+        # NFPA 170 Fire Safety Symbols
+        {"name": "Exit Sign", "symbol": "EXIT", "type": "NFPA 170", "part_number": "NFPA-EXIT"},
+        {
+            "name": "Directional Arrow Right",
+            "symbol": "\u2192",
+            "type": "NFPA 170",
+            "part_number": "NFPA-ARROW-R",
+        },
+        {
+            "name": "Directional Arrow Left",
+            "symbol": "\u2190",
+            "type": "NFPA 170",
+            "part_number": "NFPA-ARROW-L",
+        },
+        {
+            "name": "Directional Arrow Up",
+            "symbol": "\u2191",
+            "type": "NFPA 170",
+            "part_number": "NFPA-ARROW-U",
+        },
+        {
+            "name": "Directional Arrow Down",
+            "symbol": "\u2193",
+            "type": "NFPA 170",
+            "part_number": "NFPA-ARROW-D",
+        },
+        {
+            "name": "Fire Extinguisher",
+            "symbol": "EXT",
+            "type": "NFPA 170",
+            "part_number": "NFPA-EXT",
+        },
+        {"name": "Fire Hose", "symbol": "HOSE", "type": "NFPA 170", "part_number": "NFPA-HOSE"},
+        {"name": "Fire Alarm", "symbol": "ALARM", "type": "NFPA 170", "part_number": "NFPA-ALARM"},
     ]
     for d in demo:
         add(d)
@@ -146,29 +184,84 @@ def strobe_radius_for_candela(con: sqlite3.Connection, cand: int) -> float | Non
     cur = con.cursor()
     cur.execute("SELECT radius_ft FROM strobe_candela WHERE candela=?", (int(cand),))
     r = cur.fetchone()
-    return float(r["radius_ft"]) if r else None
+    return float(r[0]) if r else None
 
 
 def list_manufacturers(con: sqlite3.Connection):
     cur = con.cursor()
     cur.execute("SELECT name FROM manufacturers ORDER BY name")
-    return ["(Any)"] + [r["name"] for r in cur.fetchall()]
+    return ["(Any)"] + [r[0] for r in cur.fetchall()]
 
 
 def list_types(con: sqlite3.Connection):
     cur = con.cursor()
     cur.execute("SELECT code FROM device_types ORDER BY code")
-    return ["(Any)"] + [r["code"] for r in cur.fetchall()]
+    return ["(Any)"] + [r[0] for r in cur.fetchall()]
+
+
+def get_device_types(con: sqlite3.Connection):
+    """Get all available device types."""
+    cur = con.cursor()
+    cur.execute("SELECT DISTINCT code FROM device_types ORDER BY code")
+    return [r["code"] for r in cur.fetchall()]
+
+
+def get_devices_by_type(con: sqlite3.Connection, device_type: str):
+    """Get devices of a specific type."""
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT d.name, d.symbol, dt.code AS type, m.name AS manufacturer, d.model AS part_number
+        FROM devices d
+        LEFT JOIN manufacturers m ON m.id=d.manufacturer_id
+        LEFT JOIN device_types dt ON dt.id=d.type_id
+        WHERE dt.code = ?
+        ORDER BY d.name
+        """,
+        (device_type,),
+    )
+    return [dict(row) for row in cur.fetchall()]
+
 
 def get_wall_strobe_candela(con: sqlite3.Connection, room_size: int) -> int | None:
     cur = con.cursor()
-    cur.execute(f"SELECT candela FROM {coverage_tables.WALL_STROBE_TABLE_NAME} WHERE room_size >= ? ORDER BY room_size ASC LIMIT 1", (room_size,))
+    cur.execute(
+        f"SELECT candela FROM {coverage_tables.WALL_STROBE_TABLE_NAME} WHERE room_size >= ? ORDER BY room_size ASC LIMIT 1",
+        (room_size,),
+    )
     r = cur.fetchone()
-    return int(r["candela"]) if r else None
+    return int(r[0]) if r else None
 
-def get_ceiling_strobe_candela(con: sqlite3.Connection, ceiling_height: int, room_size: int) -> int | None:
+
+def search_devices(
+    con: sqlite3.Connection, search_text: str = "", device_type: str = "", manufacturer: str = ""
+):
+    """Search devices by name, manufacturer, model, and optionally filter by type and manufacturer."""
     cur = con.cursor()
-    cur.execute(f"SELECT candela FROM {coverage_tables.CEILING_STROBE_TABLE_NAME} WHERE ceiling_height >= ? AND room_size >= ? ORDER BY ceiling_height ASC, room_size ASC LIMIT 1", (ceiling_height, room_size,))
-    r = cur.fetchone()
-    return int(r["candela"]) if r else None
 
+    query = """
+        SELECT d.id, d.name, d.symbol, dt.code AS type, m.name AS manufacturer, d.model
+        FROM devices d
+        LEFT JOIN manufacturers m ON m.id=d.manufacturer_id
+        LEFT JOIN device_types dt ON dt.id=d.type_id
+        WHERE 1=1
+    """
+    params = []
+
+    if search_text:
+        query += " AND (d.name LIKE ? OR m.name LIKE ? OR d.model LIKE ?)"
+        search_param = f"%{search_text}%"
+        params.extend([search_param, search_param, search_param])
+
+    if device_type:
+        query += " AND dt.code = ?"
+        params.append(device_type)
+
+    if manufacturer:
+        query += " AND m.name = ?"
+        params.append(manufacturer)
+
+    query += " ORDER BY dt.code, d.name"
+
+    cur.execute(query, params)
+    return [dict(row) for row in cur.fetchall()]

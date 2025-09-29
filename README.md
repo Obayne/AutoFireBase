@@ -51,4 +51,4 @@ Contributing
 Database
 - Storage: SQLite catalog at `~\AutoFire\catalog.db` (created on first use).
 - Tasks: init/seed/backup/restore, list/search/show/count, and export/import via `scripts\device_cli.py`.
-- Details: see `docs/DATABASE.md` for schema and CLI examples.
+- Details: see `docs/DATABASE.md` for schema and CLI examples, and `docs/CLI.md` for quick CLI usage.
