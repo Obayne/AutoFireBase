@@ -1,3 +1,4 @@
+import math
 from enum import IntEnum
 
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -54,13 +55,28 @@ class DrawController:
             return
         p0 = self.points[0]
         p1 = QtCore.QPointF(pt_scene)
+
+        # Enhanced geometric constraints
         if shift_ortho:
+            # Ortho mode: horizontal/vertical
             dx = abs(p1.x() - p0.x())
             dy = abs(p1.y() - p0.y())
             if dx > dy:
                 p1.setY(p0.y())
             else:
                 p1.setX(p0.x())
+        else:
+            # Angle snapping at 45-degree increments when close to angles
+            vec = QtCore.QLineF(p0, p1)
+            if vec.length() > 10:  # Only snap when line is long enough
+                angle = vec.angle()
+                # Snap to nearest 45-degree increment
+                snapped_angle = round(angle / 45.0) * 45.0
+                if abs(angle - snapped_angle) < 5.0:  # Within 5 degrees
+                    length = vec.length()
+                    rad_angle = math.radians(snapped_angle)
+                    p1.setX(p0.x() + length * math.cos(rad_angle))
+                    p1.setY(p0.y() - length * math.sin(rad_angle))  # Qt Y is down
 
         if self.mode in (DrawMode.LINE, DrawMode.WIRE):
             if self.temp_item is None:
@@ -224,6 +240,7 @@ def _circle_from_3pts(a: QtCore.QPointF, b: QtCore.QPointF, c: QtCore.QPointF):
     a0 = ang(ax, ay)
     a1 = ang(bx, by)
     a2 = ang(cx, cy)
+
     # sweep from a0->a2 passing near a1; choose smaller abs sweep that still passes a1 heuristically
     def norm(x):
         while x <= -180:

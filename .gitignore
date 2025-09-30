@@ -22,6 +22,7 @@ dist/
 *.old
 *.tmp
 *.log
+backups/
 
 # Tool caches
 .mypy_cache/
