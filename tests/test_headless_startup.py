@@ -3,6 +3,9 @@ import sys
 
 
 def test_headless_startup():
+    """
+    Smoke test to verify that the application can start up in a headless environment.
+    """
     # Ensure minimal platform for headless startup
     os.environ.setdefault("QT_QPA_PLATFORM", "minimal")
 
