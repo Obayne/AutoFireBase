@@ -77,7 +77,6 @@ jobs:
             test_placement_settings_persistence.py \
             test_device_device_id_roundtrip.py \
             test_place_into_drawing_adds_devices.py \
-            test_device_device_palette_thumbnail.py \
             test_device_palette_thumbnail.py \
             test_save_load_integration.py; do
             f1="tests/$base"
