@@ -58,8 +58,12 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -y
-          # install X virtual framebuffer and common Mesa/EGL libraries required by Qt/PySide/pytest-qt
-          sudo apt-get install -y xvfb libegl1-mesa libgl1-mesa-glx libgl1-mesa-dri
+          # install X virtual framebuffer and try multiple common Mesa/EGL runtime package names
+          # (different GitHub runner images / Ubuntu releases may provide different package names)
+          for pkg in xvfb libegl1-mesa libegl-mesa0 libgl1-mesa-glx libgl1 libgl1-mesa-dri libgles2-mesa; do
+            echo "Attempting to install $pkg (if available)"
+            sudo apt-get install -y "$pkg" || echo "Package $pkg not available on this runner, continuing"
+          done
           xvfb-run -s '-screen 0 1024x768x24' pytest -q \
             tests/test_placement_settings_persistence.py \
             tests/test_device_device_id_roundtrip.py \
