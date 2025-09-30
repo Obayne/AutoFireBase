@@ -59,71 +59,38 @@ jobs:
           fi
         shell: bash
 
-      - name: Run focused tests (Linux uses xvfb)
-        # Note: headless startup test (tests/test_headless_startup.py) intentionally included for CI smoke-start
+      - name: Run headless startup smoke test (Linux uses xvfb)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -y
-          # install X virtual framebuffer and try multiple common Mesa/EGL runtime package names
-          # (different GitHub runner images / Ubuntu releases may provide different package names)
-          for pkg in xvfb libegl1-mesa libegl-mesa0 libgl1-mesa-glx libgl1 libgl1-mesa-dri libgles2-mesa; do
-            echo "Attempting to install $pkg (if available)"
+          # Install a small, known set of packages that provide headless Qt support
+          # libegl-mesa0 and libgl1-mesa-dri were available in prior CI runs.
+          for pkg in xvfb libegl-mesa0 libgl1-mesa-dri; do
+            echo "Ensuring package $pkg is installed (if available)"
             sudo apt-get install -y "$pkg" || echo "Package $pkg not available on this runner, continuing"
           done
-          # Build a list of test files to run. If any of the desired focused tests are missing,
-          # fall back to running the headless startup test which is available and acts as a smoke test.
-          ARGS=""
-          for base in \
-            test_placement_settings_persistence.py \
-            test_device_device_id_roundtrip.py \
-            test_place_into_drawing_adds_devices.py \
-            test_device_palette_thumbnail.py \
-            test_save_load_integration.py; do
-            f1="tests/$base"
-            f2="AutoFireBase/tests/$base"
-            if [ -f "$f1" ]; then
-              ARGS="$ARGS $f1"
-            elif [ -f "$f2" ]; then
-              ARGS="$ARGS $f2"
-            else
-              echo "Optional test $base not found in tests/ or AutoFireBase/tests/; skipping"
-            fi
-          done
-          # Always include the headless startup smoke test from whichever location exists
+          # Determine the headless startup test location and run it.
           if [ -f "tests/test_headless_startup.py" ]; then
-            ARGS="$ARGS tests/test_headless_startup.py"
+            TEST_PATH="tests/test_headless_startup.py"
           elif [ -f "AutoFireBase/tests/test_headless_startup.py" ]; then
-            ARGS="$ARGS AutoFireBase/tests/test_headless_startup.py"
+            TEST_PATH="AutoFireBase/tests/test_headless_startup.py"
           else
             echo "ERROR: headless startup test missing in both tests/ and AutoFireBase/tests/ - aborting"
             exit 1
           fi
-          echo "Running pytest on: $ARGS"
-          xvfb-run -s '-screen 0 1024x768x24' pytest -q $ARGS
+          echo "Running pytest on: $TEST_PATH"
+          xvfb-run -s '-screen 0 1024x768x24' pytest -q $TEST_PATH
         shell: bash
 
-      - name: Run focused tests (Windows)
+      - name: Run headless startup smoke test (Windows)
         if: runner.os == 'Windows'
         run: |
           # Ensure Qt runs headless on Windows runners
           $env:QT_QPA_PLATFORM = 'minimal'
-          # Build a list of optional focused tests; include the headless startup smoke test always.
-          $args = ""
-          $optional = @( \
-            'test_placement_settings_persistence.py', \
-            'test_device_device_id_roundtrip.py', \
-            'test_place_into_drawing_adds_devices.py', \
-            'test_device_palette_thumbnail.py', \
-            'test_save_load_integration.py' \
-          )
-          foreach ($b in $optional) {
-            $t1 = Join-Path 'tests' $b
-            $t2 = Join-Path 'AutoFireBase/tests' $b
-            if (Test-Path $t1) { $args = "$args $t1" } elseif (Test-Path $t2) { $args = "$args $t2" } else { Write-Host "Optional test $b not found; skipping" }
-          }
+          # Prefer tests/test_headless_startup.py, fall back to AutoFireBase/tests/
           $h1 = 'tests/test_headless_startup.py'
           $h2 = 'AutoFireBase/tests/test_headless_startup.py'
-          if (Test-Path $h1) { $args = "$args $h1" } elseif (Test-Path $h2) { $args = "$args $h2" } else { Write-Host "ERROR: headless startup test missing in both locations"; exit 1 }
-          Write-Host "Running pytest on: $args"
-          pytest -q $args
+          if (Test-Path $h1) { $test = $h1 } elseif (Test-Path $h2) { $test = $h2 } else { Write-Host "ERROR: headless startup test missing in both locations"; exit 1 }
+          Write-Host "Running pytest on: $test"
+          pytest -q $test
         shell: powershell
