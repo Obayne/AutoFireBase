@@ -27,6 +27,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Avoid recursive submodule update — some runners fail when .gitmodules
+          # references paths without urls. Keep a full fetch so tests can import
+          # local packages if needed.
+          submodules: false
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
