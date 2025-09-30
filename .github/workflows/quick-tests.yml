@@ -57,6 +57,9 @@ jobs:
           else
             pip install pytest
           fi
+          # Ensure GUI bindings and pytest-qt are available for headless Qt tests
+          # Install unconditionally after requirements to keep behavior predictable.
+          pip install PySide6 pytest-qt
         shell: bash
 
       - name: Run headless startup smoke test (Linux uses xvfb)
