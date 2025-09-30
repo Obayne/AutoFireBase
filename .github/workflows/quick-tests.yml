@@ -76,6 +76,8 @@ jobs:
       - name: Run focused tests (Windows)
         if: runner.os == 'Windows'
         run: |
+          # Ensure Qt runs headless on Windows runners
+          $env:QT_QPA_PLATFORM = 'minimal'
           pytest -q \
             tests/test_placement_settings_persistence.py \
             tests/test_device_device_id_roundtrip.py \
