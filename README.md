@@ -44,6 +44,9 @@ Repo Hygiene
 - Do not commit virtual envs, caches, `build/`, `dist/`, or backup files. Patterns are covered in `.gitignore`.
 - Samples: the `Projects/` folder currently contains example assets (DXF/PDF/.autofire). Keep or move into a dedicated `samples/` folder in future if desired.
 
+Safety & Recovery
+- Before making large or cross-cutting changes, run the backup script (`.\scripts\backup_repo.ps1`) and see `RECOVERY.md` for recovery steps and best practices.
+
 Contributing
 - Branch from `main` using feature branches: `feat/<topic>` or `fix/<topic>`.
 - Create small, focused PRs. The CI/tooling will enforce formatting and linting locally via pre-commit.
