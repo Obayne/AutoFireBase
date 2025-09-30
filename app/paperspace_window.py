@@ -1,24 +1,18 @@
 """
 Paperspace Window - Print layout workspace with sheets and viewports
 """
-import json
-import math
+
 import os
 import sys
-from pathlib import Path
-from typing import Any
 
 # Allow running as `python app\main.py` by fixing sys.path for absolute `app.*` imports
 if __package__ in (None, ""):
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import QPointF, Qt
 from PySide6.QtWidgets import (
-    QApplication,
     QMainWindow,
     QMessageBox,
-    QInputDialog,
 )
 
 from app.layout import PageFrame, TitleBlock, ViewportItem
@@ -128,7 +122,7 @@ class PaperspaceWindow(QMainWindow):
         lay.addWidget(self.lst_sheets)
         lay.addLayout(btns)
         dock.setWidget(w)
-        self.addDockWidget(Qt.RightDockWidgetArea, dock)
+        self.addDockWidget(QtCore.Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
         # Connect buttons
         b_add.clicked.connect(self.add_sheet)
@@ -148,7 +142,7 @@ class PaperspaceWindow(QMainWindow):
         lay.addWidget(self.viewport_label)
 
         dock.setWidget(w)
-        self.addDockWidget(Qt.LeftDockWidgetArea, dock)
+        self.addDockWidget(QtCore.Qt.DockWidgetArea.LeftDockWidgetArea, dock)
 
     def _setup_status_bar(self):
         """Setup the status bar."""
@@ -192,7 +186,7 @@ class PaperspaceWindow(QMainWindow):
             # Update all viewports to reflect model space changes
             for sheet in self.sheets:
                 for item in sheet["scene"].items():
-                    if hasattr(item, 'update_viewport'):
+                    if hasattr(item, "update_viewport"):
                         item.update_viewport()
 
     def on_paperspace_changed(self, change_data):
@@ -318,9 +312,10 @@ class PaperspaceWindow(QMainWindow):
             return
 
         reply = QMessageBox.question(
-            self, "Delete Sheet",
+            self,
+            "Delete Sheet",
             f"Delete '{self.sheets[self.current_sheet_index]['name']}'?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
 
         if reply == QMessageBox.StandardButton.Yes:
@@ -335,8 +330,10 @@ class PaperspaceWindow(QMainWindow):
         new_index = self.current_sheet_index + delta
         if 0 <= new_index < len(self.sheets):
             # Swap sheets
-            self.sheets[self.current_sheet_index], self.sheets[new_index] = \
-                self.sheets[new_index], self.sheets[self.current_sheet_index]
+            self.sheets[self.current_sheet_index], self.sheets[new_index] = (
+                self.sheets[new_index],
+                self.sheets[self.current_sheet_index],
+            )
             self.current_sheet_index = new_index
             self._refresh_sheets_list()
 
@@ -357,18 +354,157 @@ class PaperspaceWindow(QMainWindow):
     def get_sheets_state(self):
         """Get sheets state for serialization."""
         # This will be implemented when we add project save/load
-        return {
-            "sheets": self.sheets.copy() if self.sheets else []
-        }
+        return {"sheets": self.sheets.copy() if self.sheets else []}
 
     def load_sheets_state(self, data):
         """Load sheets state from serialized data."""
         # This will be implemented when we add project save/load
         pass
 
+    # Stub methods for CanvasView compatibility
+    def cancel_active_tool(self):
+        """Cancel any active tool (stub for paperspace)."""
+        pass
+
+    @property
+    def draw(self):
+        """Drawing tools (stub for paperspace)."""
+        return None
+
+    @property
+    def dim_tool(self):
+        """Dimension tool (stub for paperspace)."""
+        return None
+
+    @property
+    def text_tool(self):
+        """Text tool (stub for paperspace)."""
+        return None
+
+    @property
+    def mtext_tool(self):
+        """Multiline text tool (stub for paperspace)."""
+        return None
+
+    @property
+    def freehand_tool(self):
+        """Freehand tool (stub for paperspace)."""
+        return None
+
+    @property
+    def measure_tool(self):
+        """Measure tool (stub for paperspace)."""
+        return None
+
+    def canvas_menu(self, global_pos):
+        """Show canvas context menu (stub for paperspace)."""
+        # For now, just show a simple message
+        from PySide6.QtWidgets import QMessageBox
+
+        QMessageBox.information(
+            self, "Paperspace Context Menu", "Context menu not yet implemented for paperspace."
+        )
+
+    def export_pdf(self):
+        """Export current paperspace sheet as PDF."""
+        if not self.paper_scene:
+            QMessageBox.warning(self, "PDF Export", "No active sheet to export.")
+            return
+
+        try:
+            from PySide6.QtWidgets import QFileDialog
+
+            path, _ = QFileDialog.getSaveFileName(
+                self, "Export PDF", "", "PDF Files (*.pdf);;All Files (*)"
+            )
+            if not path:
+                return
+
+            # Import reportlab
+            from PySide6.QtCore import QRectF
+            from PySide6.QtGui import QImage, QPainter
+            from reportlab.lib.pagesizes import letter
+            from reportlab.pdfgen import canvas
+
+            # Get scene bounding rect
+            scene_rect = self.paper_scene.sceneRect()
+
+            # Create PDF
+            c = canvas.Canvas(path, pagesize=letter)
+            width, height = letter
+
+            # Calculate scale to fit content
+            scale_x = width / scene_rect.width()
+            scale_y = height / scene_rect.height()
+            scale = min(scale_x, scale_y) * 0.95  # Leave some margin
+
+            # Center content
+            offset_x = (width - scene_rect.width() * scale) / 2
+            offset_y = (height - scene_rect.height() * scale) / 2
+
+            # Create a QImage to render the scene
+            img_width = int(scene_rect.width() * scale)
+            img_height = int(scene_rect.height() * scale)
+
+            image = QImage(img_width, img_height, QImage.Format.Format_ARGB32)
+            image.fill(QtCore.Qt.GlobalColor.white)
+
+            # Render scene to image
+            painter = QPainter(image)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+            # Set up transformation
+            painter.translate(-scene_rect.left() * scale, -scene_rect.top() * scale)
+            painter.scale(scale, scale)
+
+            # Render scene
+            self.paper_scene.render(
+                painter, QRectF(0, 0, scene_rect.width(), scene_rect.height()), scene_rect
+            )
+            painter.end()
+
+            # Save image temporarily
+            import tempfile
+
+            temp_path = tempfile.mktemp(suffix=".png")
+            if not image.save(temp_path):
+                raise Exception("Failed to save temporary image")
+
+            # Add image to PDF
+            c.drawImage(temp_path, offset_x, offset_y, width=img_width, height=img_height)
+
+            # Add title/metadata
+            c.setFont("Helvetica", 12)
+            sheet_name = self.sheets[self.current_sheet_index]["name"] if self.sheets else "Sheet"
+            c.drawString(0.5 * 72, height - 0.5 * 72, f"AutoFire - {sheet_name}")
+            c.drawString(
+                0.5 * 72,
+                height - 0.7 * 72,
+                f"Exported: {QtCore.QDateTime.currentDateTime().toString()}",
+            )
+
+            c.save()
+
+            # Clean up temp file
+            import os
+
+            os.unlink(temp_path)
+
+            self.statusBar().showMessage(f"PDF exported to {path}")
+            QMessageBox.information(self, "PDF Export", f"PDF exported successfully to {path}")
+
+        except ImportError:
+            QMessageBox.critical(
+                self,
+                "PDF Export Error",
+                "ReportLab library not available. Please install reportlab.",
+            )
+        except Exception as ex:
+            QMessageBox.critical(self, "PDF Export Error", str(ex))
+
     def closeEvent(self, event):
         """Handle window close event."""
         # Notify controller about window closing
-        if hasattr(self.app_controller, 'on_paperspace_closed'):
+        if hasattr(self.app_controller, "on_paperspace_closed"):
             self.app_controller.on_paperspace_closed()
         event.accept()

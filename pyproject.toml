@@ -18,3 +18,20 @@ select = [
 [tool.ruff.format]
 quote-style = "double"
 
+[project]
+name = "autofire"
+version = "0.6.3"
+description = "Fire Alarm System Design Application"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "PySide6>=6.5.0",
+    "ezdxf>=1.1.0",
+    "reportlab>=4.0.0",
+]
+
+[project.scripts]
+autofire-cli = "autofire.cli.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["autofire*"]
