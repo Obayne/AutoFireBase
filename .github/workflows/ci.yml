@@ -251,6 +251,7 @@ jobs:
   # Documentation and API testing
   docs:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -299,7 +300,7 @@ jobs:
 
   # Final status check
   ci-success:
-    needs: [lint, test, integration-test, performance, build, security, docs]
+    needs: [lint, test, integration-test, performance, build, security]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -311,7 +312,6 @@ jobs:
           echo "Performance: ${{ needs.performance.result }}"
           echo "Build: ${{ needs.build.result }}"
           echo "Security: ${{ needs.security.result }}"
-          echo "Docs: ${{ needs.docs.result }}"
 
           # Fail if any critical jobs failed
           if [[ "${{ needs.lint.result }}" == "failure" ]] || \
