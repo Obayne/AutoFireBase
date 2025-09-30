@@ -66,34 +66,35 @@ jobs:
           done
           # Build a list of test files to run. If any of the desired focused tests are missing,
           # fall back to running the headless startup test which is available and acts as a smoke test.
-          TEST_FILES=()
+          ARGS=""
           for base in \
             test_placement_settings_persistence.py \
             test_device_device_id_roundtrip.py \
             test_place_into_drawing_adds_devices.py \
+            test_device_device_palette_thumbnail.py \
             test_device_palette_thumbnail.py \
             test_save_load_integration.py; do
             f1="tests/$base"
             f2="AutoFireBase/tests/$base"
             if [ -f "$f1" ]; then
-              TEST_FILES+=("$f1")
+              ARGS="$ARGS $f1"
             elif [ -f "$f2" ]; then
-              TEST_FILES+=("$f2")
+              ARGS="$ARGS $f2"
             else
               echo "Optional test $base not found in tests/ or AutoFireBase/tests/; skipping"
             fi
           done
-          # Always include the headless startup smoke test from either location
+          # Always include the headless startup smoke test from whichever location exists
           if [ -f "tests/test_headless_startup.py" ]; then
-            TEST_FILES+=("tests/test_headless_startup.py")
+            ARGS="$ARGS tests/test_headless_startup.py"
           elif [ -f "AutoFireBase/tests/test_headless_startup.py" ]; then
-            TEST_FILES+=("AutoFireBase/tests/test_headless_startup.py")
+            ARGS="$ARGS AutoFireBase/tests/test_headless_startup.py"
           else
             echo "ERROR: headless startup test missing in both tests/ and AutoFireBase/tests/ - aborting"
             exit 1
           fi
-          echo "Running pytest on: ${TEST_FILES[*]}"
-          xvfb-run -s '-screen 0 1024x768x24' pytest -q "${TEST_FILES[@]}"
+          echo "Running pytest on: $ARGS"
+          xvfb-run -s '-screen 0 1024x768x24' pytest -q $ARGS
         shell: bash
 
       - name: Run focused tests (Windows)
@@ -102,7 +103,7 @@ jobs:
           # Ensure Qt runs headless on Windows runners
           $env:QT_QPA_PLATFORM = 'minimal'
           # Build a list of optional focused tests; include the headless startup smoke test always.
-          $testFiles = @()
+          $args = ""
           $optional = @( \
             'test_placement_settings_persistence.py', \
             'test_device_device_id_roundtrip.py', \
@@ -113,12 +114,11 @@ jobs:
           foreach ($b in $optional) {
             $t1 = Join-Path 'tests' $b
             $t2 = Join-Path 'AutoFireBase/tests' $b
-            if (Test-Path $t1) { $testFiles += $t1 } elseif (Test-Path $t2) { $testFiles += $t2 } else { Write-Host "Optional test $b not found; skipping" }
+            if (Test-Path $t1) { $args = "$args $t1" } elseif (Test-Path $t2) { $args = "$args $t2" } else { Write-Host "Optional test $b not found; skipping" }
           }
-          # Pick the headless startup test from whichever location exists
           $h1 = 'tests/test_headless_startup.py'
           $h2 = 'AutoFireBase/tests/test_headless_startup.py'
-          if (Test-Path $h1) { $testFiles += $h1 } elseif (Test-Path $h2) { $testFiles += $h2 } else { Write-Host "ERROR: headless startup test missing in both locations"; exit 1 }
-          Write-Host "Running pytest on: $($testFiles -join ', ')"
-          pytest -q $testFiles
+          if (Test-Path $h1) { $args = "$args $h1" } elseif (Test-Path $h2) { $args = "$args $h2" } else { Write-Host "ERROR: headless startup test missing in both locations"; exit 1 }
+          Write-Host "Running pytest on: $args"
+          pytest -q $args
         shell: powershell
