@@ -3,3 +3,5 @@ black
 ruff
 mypy
 pytest
+PySide6
+pytest-qt
