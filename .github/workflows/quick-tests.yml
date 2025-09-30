@@ -1,0 +1,86 @@
+name: quick-tests
+
+# Trigger only when files under `app/` or `tests/` (or this workflow) change to save CI cycles.
+on:
+  push:
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - '.github/workflows/quick-tests.yml'
+    branches: ['main', 'feat/**', '*']
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - '.github/workflows/quick-tests.yml'
+    branches: ['main']
+
+jobs:
+  quick-tests:
+    name: Quick focused tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: [3.11]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements-dev.txt ]; then
+            pip install -r requirements-dev.txt
+          elif [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            pip install pytest
+          fi
+        shell: bash
+
+      - name: Run focused tests (Linux uses xvfb)
+        # Note: headless startup test (tests/test_headless_startup.py) intentionally included for CI smoke-start
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -y
+          # install X virtual framebuffer and try multiple common Mesa/EGL runtime package names
+          # (different GitHub runner images / Ubuntu releases may provide different package names)
+          for pkg in xvfb libegl1-mesa libegl-mesa0 libgl1-mesa-glx libgl1 libgl1-mesa-dri libgles2-mesa; do
+            echo "Attempting to install $pkg (if available)"
+            sudo apt-get install -y "$pkg" || echo "Package $pkg not available on this runner, continuing"
+          done
+          xvfb-run -s '-screen 0 1024x768x24' pytest -q \
+            tests/test_placement_settings_persistence.py \
+            tests/test_device_device_id_roundtrip.py \
+            tests/test_place_into_drawing_adds_devices.py \
+            tests/test_device_palette_thumbnail.py \
+            tests/test_headless_startup.py \
+            tests/test_save_load_integration.py -q
+        shell: bash
+
+      - name: Run focused tests (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pytest -q \
+            tests/test_placement_settings_persistence.py \
+            tests/test_device_device_id_roundtrip.py \
+            tests/test_place_into_drawing_adds_devices.py \
+            tests/test_device_palette_thumbnail.py \
+            tests/test_headless_startup.py \
+            tests/test_save_load_integration.py -q
+        shell: powershell
