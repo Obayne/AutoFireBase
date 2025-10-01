@@ -43,18 +43,25 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          # Hash both the full dev requirements and the minimal requirements so
+          # cache is reused if either file changes. This keeps quick-tests fast.
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev-minimal.txt','**/requirements-dev.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install dependencies
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
         run: |
           python -m pip install --upgrade pip
-          # Keep quick-tests lightweight: install only minimal Python deps for this run.
-          # This reduces Windows install time (PySide6 is large); the full dev deps
-          # remain in requirements-dev.txt for full CI runs.
-          pip install pytest PySide6 pytest-qt
+          python -m pip install -r requirements-dev-minimal.txt
         shell: bash
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev-minimal.txt
+        shell: powershell
 
       - name: Run headless startup smoke test (Linux uses xvfb)
         if: runner.os == 'Linux'
