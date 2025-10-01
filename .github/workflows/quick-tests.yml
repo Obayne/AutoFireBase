@@ -50,16 +50,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements-dev.txt ]; then
-            pip install -r requirements-dev.txt
-          elif [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          else
-            pip install pytest
-          fi
-          # Ensure GUI bindings and pytest-qt are available for headless Qt tests
-          # Install unconditionally after requirements to keep behavior predictable.
-          pip install PySide6 pytest-qt
+          # Keep quick-tests lightweight: install only minimal Python deps for this run.
+          # This reduces Windows install time (PySide6 is large); the full dev deps
+          # remain in requirements-dev.txt for full CI runs.
+          pip install pytest PySide6 pytest-qt
         shell: bash
 
       - name: Run headless startup smoke test (Linux uses xvfb)
@@ -67,8 +61,9 @@ jobs:
         run: |
           sudo apt-get update -y
           # Install a small, known set of packages that provide headless Qt support
-          # libegl-mesa0 and libgl1-mesa-dri were available in prior CI runs.
-          for pkg in xvfb libegl-mesa0 libgl1-mesa-dri; do
+          # Try a fuller set of candidate packages that provide libEGL and OpenGL
+          # artifacts across different Ubuntu images.
+          for pkg in xvfb libegl1-mesa libegl-mesa0 libgl1 libgl1-mesa-glx libgl1-mesa-dri libgles2-mesa; do
             echo "Ensuring package $pkg is installed (if available)"
             sudo apt-get install -y "$pkg" || echo "Package $pkg not available on this runner, continuing"
           done
