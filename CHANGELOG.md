@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.7.0] - 2025-10-03 - **MAJOR ARCHITECTURAL RESTRUCTURE**
+- **BREAKING**: Complete project restructure to modular architecture following AGENTS.md guidelines
+- **REFACTOR**: Moved from monolithic `app/` structure to clean layered architecture:
+  - `frontend/` - UI Layer (PySide6/Qt): windows, dialogs, controllers, views
+  - `backend/` - Business Logic Layer: catalog, persistence, import/export services
+  - `cad_core/` - CAD Algorithms Layer: tools, geometry, unit conversions
+- **REMOVED**: Eliminated obsolete monolithic files (`app/main.py`, `app/main_fixed.py`, `app/main_startup_safety.py`, etc.)
+- **ADDED**: `AutoFireController` class for multi-window application management
+- **ADDED**: Qt signal system for cross-window communication (`model_space_changed`, `paperspace_changed`, `project_changed`)
+- **FIXED**: `CanvasView` constructor corrected to match window instantiation requirements
+- **ADDED**: Clean application entry point (`main.py` → `frontend/app.py`)
+- **MOVED**: All UI components relocated to `frontend/` (windows, dialogs, assistants, coverage, wiring, settings)
+- **MOVED**: CAD tools and algorithms moved to `cad_core/tools/`
+- **MOVED**: Business logic moved to `backend/` (catalog, logging, DXF import, data services)
+- **UPDATED**: All import statements updated to reflect new modular structure
+- **MAINTAINED**: Full backward compatibility - application runs identically with same features
+- **IMPROVED**: Clear separation of concerns enabling better testing, maintenance, and development
+- **DOCUMENTED**: Comprehensive documentation added (`docs/ARCHITECTURE.md`, `docs/API_REFERENCE.md`, `docs/DEVELOPMENT_SETUP.md`, `docs/TROUBLESHOOTING.md`)
+- **COMMIT**: `feat: Complete project restructure to modular architecture` (70 files changed, 715 insertions, 9034 deletions)
 
 ## [Unreleased] - 2025-09-26
 - Added: Separate Windows Architecture - Model space and paperspace as independent windows for better multi-monitor support and cleaner workflow.

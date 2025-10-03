@@ -1,0 +1,110 @@
+{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 AutoFire Design Suite\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Master Design Document & Product Vision\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 1. Vision\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 AutoFire is a {\b CAD-first, fire-alarm design suite} that takes a designer from an imported floorplan to a fully engineered, AHJ-ready submittal packet \u8212- with {\b real-time calculations, circuit-aware design, BOM generation, and compliance checking}.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Unlike competitors that rely on AutoCAD/Revit or provide static blocks with no engineering intelligence, AutoFire is {\b purpose-built} for life safety, with:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b System Builder} to stage panels/devices/wire before layout.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Scoped Device Palette} for only the parts you plan to use.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Wire Spool & Connection Manager} to track every circuit and spool consumption.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Live Calculations} (voltage drop, battery AH, conduit fill, wire length).\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Coverage Overlays} to visualize candela/dB/detector spacing.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b AI Assistant} that learns your preferences and helps you fix problems.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b One-click submittal export} (BOM, riser, reports, cut sheets, ROC).\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 2. GUI & Menus\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 2.1 Top Menu Bar\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b File}: New Project, Open, Save, Import (DXF/PDF/SVG), Export (DWG, PDF, XLSX, CSV, Submittal), Print, Archive.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Edit}: Undo, Redo, Cut, Copy, Paste, Duplicate, Align, Distribute, Rotate, Snap Settings.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b View}: Zoom, Pan, Fit to Screen, Grid On/Off, Snap On/Off, Layer Manager, Coverage Overlays, Heatmap (VD/Fill).\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Insert}: Place Device, Place Panel, Place RPS, Place Junction, Insert Text/Note, Import Block.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Tools}: Array Fill, Coverage Radius, Wire Routing, AutoRoute, Auto-Address.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b System Builder}: Stage Panels, Devices, Wire Spools, Templates.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Connections}: Connection Manager (live circuits, VD, wire totals).\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Reports}: BOM, Cable Schedule, Voltage Drop, Battery, Loop Summary, Conduit Fill, Submittal Packet, ROC.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Compliance}: Run AHJ Check, NFPA Rules, ADA Rules, AI QA Assistant.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Window}: Dock/Undock, Reset Layout, Switch to CAD Classic.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Help}: Tutorials, Ask AiHJ, Version, Changelog.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 2.2 Left Dock (Palettes)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Device Palette}: Filter by Manufacturer, Type, Properties. Only shows staged kit items. Drag/drop to canvas.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Wire Spool}: Active spools, reel counts, usage %.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 2.3 Right Dock (Inspector)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Properties Tab}: Context-sensitive. Device (UID, type, candela, address, mount height), Circuit (length, VD, devices, load), Segment (length, slack, conduit).\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Connections Tab}: Tree view of circuits (Panel \u8594? Board \u8594? Circuit \u8594? Devices). Real-time load & VD status.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b AI Suggestions Tab}: Contextual fixes & optimizations.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 2.4 Bottom Bar\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Coordinates, Current Layer, Snap status, Active Wire SKU, Warnings banner.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 2.5 Layer Manager\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Layers: Architectural (locked), Devices\u8211-Detection, Devices\u8211-Notification, Devices\u8211-Power, Wiring\u8211-SLC, Wiring\u8211-NAC, Wiring\u8211-Power, Wiring\u8211-Control, Conduit, Coverage, Annotations.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Toggle visibility, lock/unlock, color overrides.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Save layer states (AHJ view, Installer view).\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 3. Workflow\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab {\b New Project} \u8594? enter metadata, import floorplan, set scale, lock background layers.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab {\b System Builder} \u8594? stage panels, boards, devices, and wire spools. Palette now scoped.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab {\b Place Panels} \u8594? drop FACPs, RPS, annunciators.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab {\b Place Devices} \u8594? drag detectors, strobes, modules. Coverage overlays visualize spacing.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab {\b Wire Routing} \u8594? select spool, enter Connect Mode, draw polylines or AutoRoute. Each segment stores length, slack, conduit.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 6.\tx360\tab {\b Connection Manager} \u8594? see circuits live: devices, VD, load, wire usage.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 7.\tx360\tab {\b Auto-Addressing} \u8594? assigns addresses to SLC loops, following policy.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 8.\tx360\tab {\b Reports} \u8594? BOM, riser, cable schedule, VD/battery/conduit fill, device schedules.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 9.\tx360\tab {\b Compliance Check} \u8594? run NFPA/ADA/AHJ rules, AI suggests fixes.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 10.\tx360\tab {\b Export} \u8594? one-click Submittal Packet (drawings + BOM + calcs + cut sheets).\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 11.\tx360\tab {\b Commissioning} \u8594? push address/labels to TechPoint mobile app, import test results, auto-fill Record of Completion.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 4. Calculations\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Wire Length}: Each segment = 3D length + slack + service loop + waste %.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Voltage Drop}: R = (ohms/1000ft) * (2 * length); V_drop = I_downstream * R.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b SLC Loops}: length/device count vs manufacturer specs; capacitance checks.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Battery Sizing}: AH = standby current{\i hours + alarm current}hours, derated.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Conduit Fill}: % fill = \u931?(cable area) / conduit area.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Coverage}: detectors (30 ft radius), strobes (candela tables), speakers (20 log loss).\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 5. Settings\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b General}: Units, snap, autosave, theme.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Project Defaults}: AHJ profile, occupancy, loops, slack, conduit fill, addressing policy.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Device Defaults}: heights, candela/tone, zone auto-assign.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Wire Defaults}: preferred gauges, splice rules, reel length.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Reports}: templates, logos.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b AI}: suggest/fix, learning, explainability.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 6. Reports\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab BOM, Cable Schedule, Voltage Drop Table, Battery Calc, SLC Summary, Conduit Fill Report, Riser Diagram, ROC, Submittal Packet.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 7. Competitors\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab AutoCAD: generic blocks, no calcs.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab AlarmCAD: outdated, AutoCAD-dependent.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Revit: powerful, overkill, slow.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Bluebeam: markup only, no engineering.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Vendor tools: brand-locked.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b AutoFire advantage}: fast, standalone, live calcs, AI help, multi-vendor.\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 8. Integrations\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Now}: LibreCAD, SQLite, Excel/PDF, TechPoint field app.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Future}: Bluebeam export, Revit IFC, DWG export, ERP integration, cloud sync, programming exports.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 9. AI Assistant\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Ask AiHJ} compliance Q&A.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Placement nudges} for coverage gaps.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Routing fixes} to reduce VD.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Procurement help} for reels/splices.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Learning loop} remembers preferences.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 10. Improvements & Future Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Smart array placement.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Auto conduit builder.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Cost estimator with labor.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Cloud/multiuser.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Installer view mode.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Error heatmaps.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Procurement APIs.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab As-built scanner.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab AR/VR overlays.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Conclusion\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 AutoFire is the {\b all-in-one fire alarm design suite}: stage, place, connect, calculate, export, and commission.\line It replaces fragmented CAD + spreadsheets + vendor tools with a {\b circuit-aware, AI-assisted, AHJ-ready platform}.\par}
+}
