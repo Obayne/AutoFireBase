@@ -11,8 +11,9 @@ Quick Start (Windows, PowerShell)
 - Clone and open this repo.
 - Run: `./setup_dev.ps1` (creates `.venv`, installs requirements, sets up pre-commit).
 - Activate later: `. .venv/Scripts/Activate.ps1`
-- Run the app: `python app/main.py`
-  - Alternative (new entry): `python -m frontend.app`
+- Run the app: `python main.py`
+  - Alternative: `run_autofire.bat` or `.\run_autofire.ps1`
+  - Legacy: `python app/main.py`
 
 Features
 - Separate Windows: Model Space and Paperspace as independent windows for better multi-monitor support.

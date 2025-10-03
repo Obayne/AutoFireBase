@@ -107,5 +107,34 @@ def ensure_db(path: str):
     );
     """
     )
+    # Wire catalog tables
+    cur.execute(
+        """
+    CREATE TABLE IF NOT EXISTS wire_types(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code TEXT UNIQUE NOT NULL,
+        description TEXT
+    );
+    """
+    )
+    cur.execute(
+        """
+    CREATE TABLE IF NOT EXISTS wires(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        manufacturer_id INTEGER,
+        type_id INTEGER,
+        gauge INTEGER,
+        color TEXT,
+        insulation TEXT,
+        ohms_per_1000ft REAL,
+        max_current_a REAL,
+        model TEXT,
+        name TEXT,
+        properties_json TEXT,
+        FOREIGN KEY(manufacturer_id) REFERENCES manufacturers(id),
+        FOREIGN KEY(type_id) REFERENCES wire_types(id)
+    );
+    """
+    )
     con.commit()
     con.close()

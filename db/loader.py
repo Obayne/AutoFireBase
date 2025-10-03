@@ -54,6 +54,26 @@ def ensure_schema(con: sqlite3.Connection):
             notes TEXT,
             FOREIGN KEY(device_id) REFERENCES devices(id)
         );
+        CREATE TABLE IF NOT EXISTS wire_types(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            code TEXT UNIQUE NOT NULL,
+            description TEXT
+        );
+        CREATE TABLE IF NOT EXISTS wires(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            manufacturer_id INTEGER,
+            type_id INTEGER,
+            gauge INTEGER,
+            color TEXT,
+            insulation TEXT,
+            ohms_per_1000ft REAL,
+            max_current_a REAL,
+            model TEXT,
+            name TEXT,
+            properties_json TEXT,
+            FOREIGN KEY(manufacturer_id) REFERENCES manufacturers(id),
+            FOREIGN KEY(type_id) REFERENCES wire_types(id)
+        );
         """
     )
     coverage_tables.create_tables(con)
@@ -119,6 +139,93 @@ def seed_demo(con: sqlite3.Connection):
     ]
     for d in demo:
         add(d)
+
+    # Seed wire types
+    wire_types = {
+        "NAC": "Notification Appliance Circuit",
+        "SLC": "Signaling Line Circuit",
+        "Power": "Power Limited Circuit",
+    }
+    for code, desc in wire_types.items():
+        _id_for(cur, "wire_types", "code", code)
+
+    def add_wire(wire):
+        t_id = _id_for(cur, "wire_types", "code", wire["type"])
+        cur.execute(
+            "INSERT INTO wires(manufacturer_id,type_id,gauge,color,insulation,ohms_per_1000ft,max_current_a,model,name,properties_json) VALUES(?,?,?,?,?,?,?,?,?,?)",
+            (
+                mfr_id,
+                t_id,
+                wire["gauge"],
+                wire["color"],
+                wire.get("insulation", "THHN"),
+                wire["ohms_per_1000ft"],
+                wire["max_current_a"],
+                wire.get("part_number", ""),
+                wire["name"],
+                json.dumps(wire.get("props", {})),
+            ),
+        )
+
+    wire_demo = [
+        {
+            "name": "14 AWG Red THHN",
+            "gauge": 14,
+            "color": "Red",
+            "type": "NAC",
+            "ohms_per_1000ft": 2.525,
+            "max_current_a": 15,
+            "part_number": "14THHN-RED",
+        },
+        {
+            "name": "14 AWG Black THHN",
+            "gauge": 14,
+            "color": "Black",
+            "type": "NAC",
+            "ohms_per_1000ft": 2.525,
+            "max_current_a": 15,
+            "part_number": "14THHN-BLK",
+        },
+        {
+            "name": "16 AWG Red THHN",
+            "gauge": 16,
+            "color": "Red",
+            "type": "SLC",
+            "ohms_per_1000ft": 4.016,
+            "max_current_a": 10,
+            "part_number": "16THHN-RED",
+        },
+        {
+            "name": "16 AWG Yellow THHN",
+            "gauge": 16,
+            "color": "Yellow",
+            "type": "SLC",
+            "ohms_per_1000ft": 4.016,
+            "max_current_a": 10,
+            "part_number": "16THHN-YEL",
+        },
+        {
+            "name": "18 AWG Red THHN",
+            "gauge": 18,
+            "color": "Red",
+            "type": "Power",
+            "ohms_per_1000ft": 6.385,
+            "max_current_a": 7,
+            "part_number": "18THHN-RED",
+        },
+        {
+            "name": "18 AWG Black THHN",
+            "gauge": 18,
+            "color": "Black",
+            "type": "Power",
+            "ohms_per_1000ft": 6.385,
+            "max_current_a": 7,
+            "part_number": "18THHN-BLK",
+        },
+    ]
+    for w in wire_demo:
+        add_wire(w)
+
     coverage_tables.populate_tables(con)
     con.commit()
 
@@ -132,6 +239,21 @@ def fetch_devices(con: sqlite3.Connection):
         LEFT JOIN manufacturers m ON m.id=d.manufacturer_id
         LEFT JOIN device_types dt ON dt.id=d.type_id
         ORDER BY d.name
+        """
+    )
+    return [dict(row) for row in cur.fetchall()]
+
+
+def fetch_wires(con: sqlite3.Connection):
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT w.name, w.gauge, w.color, wt.code AS type, m.name AS manufacturer,
+               w.ohms_per_1000ft, w.max_current_a, w.model AS part_number
+        FROM wires w
+        LEFT JOIN manufacturers m ON m.id=w.manufacturer_id
+        LEFT JOIN wire_types wt ON wt.id=w.type_id
+        ORDER BY w.gauge, w.name
         """
     )
     return [dict(row) for row in cur.fetchall()]
