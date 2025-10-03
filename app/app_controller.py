@@ -537,8 +537,8 @@ class AppController(QMainWindow):
 
     def run(self):
         """Start the application (called by boot.py)."""
-        # The boot.py will call app.exec(), so we just return self
-        return self
+        # Start the Qt event loop
+        return self.app.exec()
 
 
 def main():
