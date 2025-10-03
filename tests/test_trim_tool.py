@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import Mock
+
 from PySide6 import QtCore, QtWidgets
 
 from app.tools.trim_tool import TrimTool, _intersection_point, _nearest_line_item
@@ -26,7 +26,9 @@ class TestTrimTool:
 
         assert tool.active is True
         assert tool.cut_item is None
-        mock_window.statusBar().showMessage.assert_called_with("Trim: click cutting line, then target line to trim")
+        mock_window.statusBar().showMessage.assert_called_with(
+            "Trim: click cutting line, then target line to trim"
+        )
 
     def test_cancel(self):
         """Test canceling trim tool."""
@@ -77,7 +79,9 @@ class TestTrimTool:
 
         assert result is False
         assert tool.cut_item == mock_line_item
-        mock_window.statusBar().showMessage.assert_called_with("Trim: now click target line to trim")
+        mock_window.statusBar().showMessage.assert_called_with(
+            "Trim: now click target line to trim"
+        )
 
     def test_intersection_point_basic(self):
         """Test basic line intersection calculation."""

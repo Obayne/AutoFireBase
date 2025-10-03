@@ -40,13 +40,28 @@ class AssistantDock(QtWidgets.QDockWidget):
         self.input.returnPressed.connect(self._on_suggest)
 
     def _on_suggest(self):
-        q = self.input.text().strip()
+        q = self.input.text().strip().lower()
         if not q:
             q = "(no prompt)"
-        # Just echo for now; real logic will be added later
+        # Log the user input
         self.log.append(f"<b>You:</b> {q}")
-        self.log.append(
-            "Assistant (stub): I would create a grid/line array based on your spacing and corridor length."
-        )
-        self.log.append("→ Try the upcoming Array tool under Tools (soon).")
+
+        # Basic command parsing (safe simulation only - no actual changes)
+        response = self._parse_command(q)
+        self.log.append(f"Assistant: {response}")
         self.input.clear()
+
+    def _parse_command(self, command):
+        """Parse and simulate responses to safe commands. No actual modifications."""
+        if "place" in command and "detector" in command:
+            return "Simulation: Would place a detector device at the current cursor position or default location. (Use Device Palette to place manually for now.)"
+        elif "draw" in command and "line" in command:
+            return "Simulation: Would start the Draw Line tool. (Use Tools → Draw Line to draw manually.)"
+        elif "grid" in command:
+            return "Simulation: Would toggle grid visibility. (Use View → Grid to toggle manually.)"
+        elif "array" in command or "spacing" in command:
+            return "Simulation: Would create an array placement with specified spacing. (Array tool coming soon - use manual placement for now.)"
+        elif "help" in command or "what" in command:
+            return "I can simulate commands like 'place detector', 'draw line', 'toggle grid'. Try one! (Full AI manipulation coming in future updates.)"
+        else:
+            return "I understand your request but am in simulation mode. Try commands like 'place detector' or 'draw line' to see what I would do. (No actual changes made.)"

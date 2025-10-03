@@ -1,6 +1,6 @@
 import tempfile
 from pathlib import Path
-import pytest
+
 from scripts.tools._auto_resolve_conflicts import _split_conflict_blocks, resolve_file
 
 

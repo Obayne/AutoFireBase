@@ -2,6 +2,10 @@
 
 
 ## [Unreleased] - 2025-09-26
+- Added: Separate Windows Architecture - Model space and paperspace as independent windows for better multi-monitor support and cleaner workflow.
+- Added: Project Overview Window - Central hub for project management with organizer sections (notes, milestones, progress), calendar for scheduling, and AI assistance for manipulation.
+- Added: AI Assistant docks integrated throughout the application (Model Space, Paperspace, Project Overview) for natural language queries to manipulate plans/drawings.
+- Updated: GUI main structure refactored to use AppController for multi-window management; main.py delegates to controller.
 - Added: Centralized structured logging via `app/logging_config.py`; entrypoints now use structured loggers.
 - Added: Headless palette → placement simulation harness (`run_logs/run_all_simulations.py`) to validate placement flows without the GUI.
 - Added: Canonical stash/pop conflict resolver with safe wrapper scripts (`scripts/tools/_auto_resolve_conflicts.py` and delegates). Automatic edits create `.bak-*` backups to preserve originals.
@@ -73,5 +77,3 @@
   - **Alt+[ / Alt+]** → speaker **target dB −/+ 1 dB**
 - **Grid** is lighter by default; added **View → Grid Style…** for opacity, line width, and major-line interval (saved in prefs).
 - Persisted grid style in project saves; status bar messages clarify current adjustments.
-
-

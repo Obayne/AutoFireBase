@@ -3,6 +3,7 @@
 Provide a small helper to configure basic logging consistently for
 headless tests, simulators, and the running application.
 """
+
 from __future__ import annotations
 
 import logging

@@ -1,6 +1,6 @@
 # tests/test_coverage_service.py
-import sqlite3
 import unittest
+
 from backend.coverage_service import (
     get_required_ceiling_strobe_candela,
     get_required_wall_strobe_candela,

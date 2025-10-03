@@ -2,16 +2,16 @@
 
 Downloads files for REPO_ID@REVISION into C:/Dev/Models/<repo>-<revision>.
 """
+
 from __future__ import annotations
 
+import shutil
 import sys
 import time
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, Optional
 
-import shutil
 from huggingface_hub import HfApi, hf_hub_download
-
 
 REPO_ID = "nomic-ai/gpt4all-j"
 REVISION = "v1.2-jazzy"
@@ -23,10 +23,14 @@ def ensure_dir(p: Path) -> None:
     p.mkdir(parents=True, exist_ok=True)
 
 
-def download_with_retries(repo_id: str, filename: str, revision: str, cache_dir: Path, attempts: int = 4) -> Optional[Path]:
+def download_with_retries(
+    repo_id: str, filename: str, revision: str, cache_dir: Path, attempts: int = 4
+) -> Path | None:
     for attempt in range(1, attempts + 1):
         try:
-            local = hf_hub_download(repo_id=repo_id, filename=filename, revision=revision, cache_dir=str(cache_dir))
+            local = hf_hub_download(
+                repo_id=repo_id, filename=filename, revision=revision, cache_dir=str(cache_dir)
+            )
             return Path(local)
         except Exception as exc:
             print(f"attempt {attempt} error: {exc}")

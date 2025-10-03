@@ -1,32 +1,40 @@
 # db/coverage_tables.py
 
-WALL_STROBE_TABLE_NAME = 'wall_strobe_coverage'
-CEILING_STROBE_TABLE_NAME = 'ceiling_strobe_coverage'
+WALL_STROBE_TABLE_NAME = "wall_strobe_coverage"
+CEILING_STROBE_TABLE_NAME = "ceiling_strobe_coverage"
+
 
 def create_tables(con):
     cur = con.cursor()
-    cur.execute(f'''
+    cur.execute(
+        f"""
         CREATE TABLE IF NOT EXISTS {WALL_STROBE_TABLE_NAME} (
             room_size INTEGER PRIMARY KEY,
             candela INTEGER NOT NULL
         )
-    ''')
-    cur.execute(f'''
+    """
+    )
+    cur.execute(
+        f"""
         CREATE TABLE IF NOT EXISTS {CEILING_STROBE_TABLE_NAME} (
             ceiling_height INTEGER,
             room_size INTEGER,
             candela INTEGER NOT NULL,
             PRIMARY KEY (ceiling_height, room_size)
         )
-    ''')
+    """
+    )
     # Strobe radius table for coverage calculations
-    cur.execute('''
+    cur.execute(
+        """
         CREATE TABLE IF NOT EXISTS strobe_candela (
             candela INTEGER PRIMARY KEY,
             radius_ft REAL NOT NULL
         )
-    ''')
+    """
+    )
     con.commit()
+
 
 def populate_tables(con):
     cur = con.cursor()
@@ -62,7 +70,9 @@ def populate_tables(con):
         (30, 55, 115),
         (30, 65, 150),
     ]
-    cur.executemany(f"INSERT OR REPLACE INTO {CEILING_STROBE_TABLE_NAME} VALUES (?, ?, ?)", ceiling_data)
+    cur.executemany(
+        f"INSERT OR REPLACE INTO {CEILING_STROBE_TABLE_NAME} VALUES (?, ?, ?)", ceiling_data
+    )
     # Strobe radius data
     radius_data = [
         (15, 15.0),

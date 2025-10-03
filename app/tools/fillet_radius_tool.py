@@ -92,6 +92,7 @@ class FilletRadiusTool:
             return False
         r_px = self.r_ft * float(self.win.px_per_ft)
         d = r_px * math.tan(theta / 2.0)
+
         # Trim back along each line from ip by distance d
         def trim_point(line: QtCore.QLineF):
             a = QtCore.QPointF(line.x1(), line.y1())
@@ -111,6 +112,7 @@ class FilletRadiusTool:
 
         p1 = trim_point(l1)
         p2 = trim_point(l2)
+
         # Update original lines to end at p1/p2 from their far endpoints
         def update_line(
             orig: QtWidgets.QGraphicsLineItem, line: QtCore.QLineF, trim_pt: QtCore.QPointF

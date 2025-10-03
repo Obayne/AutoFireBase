@@ -115,7 +115,7 @@ def fillet_line_circle(line: Line, circle: Circle, radius: float, tol: float = 1
     normals = [(nx, ny), (-nx, -ny)]
 
     results = []
-    for (nx, ny) in normals:
+    for nx, ny in normals:
         # Offset line for centers: any point C must satisfy n·(C - A) = r
         # We parametrize center candidates along the original line direction
         # and solve intersection with the circle of radius R' around circle.center.

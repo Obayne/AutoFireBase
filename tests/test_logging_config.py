@@ -67,5 +67,6 @@ def test_emission_after_setup_writes_records(caplog):
         with caplog.at_level(logging.INFO):
             logger.info("hello world")
         # Ensure a record was emitted at INFO level from our logger
-        assert any(rec.name == "app.test.logger" and rec.levelno == logging.INFO for rec in caplog.records)
-
+        assert any(
+            rec.name == "app.test.logger" and rec.levelno == logging.INFO for rec in caplog.records
+        )

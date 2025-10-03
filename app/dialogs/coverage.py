@@ -1,5 +1,4 @@
 from PySide6 import QtWidgets
-from db import loader
 
 # UI/dialog strings may be long for clarity. Allow E501 in this dialog.
 # ruff: noqa: E501
@@ -113,7 +112,6 @@ class CoverageDialog(QtWidgets.QDialog):
         except Exception as e:
             self.lbl_suggested_candela.setText(f"Error: {e}")
 
-
         # load existing
         if existing:
             mode = existing.get("mode", "none")
@@ -169,7 +167,7 @@ class CoverageDialog(QtWidgets.QDialog):
                     95: 50,
                     135: 60,
                     185: 70,
-                    115: 60, # Ceiling values
+                    115: 60,  # Ceiling values
                     150: 70,
                     177: 80,
                 }

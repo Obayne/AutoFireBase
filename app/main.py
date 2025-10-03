@@ -1,4 +1,4 @@
-﻿import json
+import json
 import math
 import os
 import sys
@@ -16,7 +16,6 @@ if __package__ in (None, ""):
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtWidgets import (
-    QApplication,
     QCheckBox,
     QComboBox,
     QDockWidget,
@@ -41,7 +40,7 @@ from app import catalog, dxf_import
 from app.logging_config import setup_logging
 
 # Grid scene and defaults used by the main window
-from app.scene import GridScene, DEFAULT_GRID_SIZE
+from app.scene import DEFAULT_GRID_SIZE, GridScene
 
 # Ensure logging is configured early so module-level loggers emit during
 # headless simulators and when the app starts from __main__.
@@ -54,14 +53,13 @@ from app.tools.chamfer_tool import ChamferTool
 from app.tools.extend_tool import ExtendTool
 
 _logger = logging.getLogger(__name__)
+from app.layout import PageFrame, TitleBlock, ViewportItem
 from app.tools.fillet_radius_tool import FilletRadiusTool
 from app.tools.fillet_tool import FilletTool
 from app.tools.freehand import FreehandTool
 from app.tools.leader import LeaderTool
 from app.tools.measure_tool import MeasureTool
 from app.tools.mirror_tool import MirrorTool
-from app.tools.text_tool import MTextTool, TextTool
-from app.layout import PageFrame, TitleBlock, ViewportItem
 from app.tools.move_tool import MoveTool
 from app.tools.revision_cloud import RevisionCloudTool
 from app.tools.rotate_tool import RotateTool
@@ -71,6 +69,7 @@ from app.tools.scale_underlay import (
     ScaleUnderlayRefTool,
     scale_underlay_by_factor,
 )
+from app.tools.text_tool import MTextTool, TextTool
 from app.tools.trim_tool import TrimTool
 
 try:
@@ -974,6 +973,7 @@ class MainWindow(QMainWindow):
 
         # Initialize global database connection for coverage calculations
         from db import connection
+
         connection.initialize_database(in_memory=True)
 
         # Theme
@@ -1280,6 +1280,7 @@ class MainWindow(QMainWindow):
         self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
         self.statusBar().addPermanentWidget(self.space_badge)
         self._init_sheet_manager()
+
     def _on_space_combo_changed(self, idx: int):
         if self.space_lock.isChecked():
             # Revert change if locked
@@ -2153,6 +2154,7 @@ class MainWindow(QMainWindow):
         # subset of the QTreeWidget API used by headless simulators.
         if getattr(self, "device_tree", None) is None:
             try:
+
                 class SimpleTreeItem:
                     def __init__(self, text):
                         self._text = text
@@ -2800,6 +2802,7 @@ class MainWindow(QMainWindow):
                 "color": color_hex,
                 "orig_color": grp.data(2002),
             }
+
         # sketch geometry
         def _line_json(it: QtWidgets.QGraphicsLineItem):
             l = it.line()
@@ -4194,7 +4197,7 @@ class MainWindow(QMainWindow):
         self._show_text_dialog("Keyboard Shortcuts", _SHORTCUTS_TEXT)
 
     def show_about(self):
-        txt = f"Auto-Fire CAD Base\nVersion: {APP_VERSION}\n\nA lightweight CAD base inspired by LibreCAD, with paper space and DXF/PDF underlays."
+        txt = f"Auto-Fire CAD Base\nVersion: {APP_VERSION}\n\nA lightweight CAD base inspired by LibreCAD, with paper space and DXF/PDF underlays.\n\nNew Features:\n- Separate Windows Architecture\n- Project Overview Hub\n- AI Assistant (simulation mode)"
         self._show_text_dialog("About Auto-Fire", txt)
 
     def _show_text_dialog(self, title: str, text: str):
@@ -4299,6 +4302,31 @@ Paper Space: Layout â†’ Add Page Frame, Print Scale presets, Export PNG/PDF
 Settings: File â†’ Settings â†’ Theme
 """
 
+_USER_GUIDE_TEXT = """
+Auto-Fire User Guide
+
+Getting Started:
+- Use File > New to start a new project
+- Import DXF/PDF underlays via File > Import
+- Place devices from the Devices dock (left panel)
+- Draw geometry using Tools menu
+
+Windows:
+- Model Space: Main design canvas for device placement and CAD operations
+- Paperspace: Layout sheets with viewports for printing
+- Project Overview: Central hub for notes, milestones, progress, calendar, and AI assistance
+
+AI Assistant:
+- Available in all windows as a dock (bottom panel)
+- Type natural language commands like "place detector" or "draw line"
+- Currently in simulation mode - shows what it would do without changes
+
+Keyboard Shortcuts:
+See Help > Keyboard Shortcuts for full list.
+
+For more help, visit the project repository.
+"""
+
 _SHORTCUTS_TEXT = """
 Keyboard Shortcuts
 
@@ -4317,15 +4345,20 @@ Keyboard Shortcuts
 â€¢ F2 Fit View
 """
 
+
 # factory for boot.py
 def create_window():
     from app.app_controller import AppController
+
     return AppController()
 
 
 def main():
-    from app.app_controller import main as app_main
-    return app_main()
+    from app.app_controller import AppController
+
+    controller = AppController()
+    # Start the Qt event loop
+    return controller.app.exec()
 
 
 if __name__ == "__main__":

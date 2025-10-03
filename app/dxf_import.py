@@ -59,7 +59,7 @@ def _build_paths(doc, px_per_ft: float):
         p, pen, _ = get_layer_pack(layer_name)
         x0, y0 = pts[0]
         p.moveTo(x0 * S, -y0 * S)
-        for (x, y) in pts[1:]:
+        for x, y in pts[1:]:
             p.lineTo(x * S, -y * S)
 
     def emit_entity(e):
@@ -83,7 +83,7 @@ def _build_paths(doc, px_per_ft: float):
                     p, pen, _ = get_layer_pack(e.dxf.layer)
                     x0, y0 = points[0]
                     p.moveTo(x0 * S, -y0 * S)
-                    for (x, y) in points[1:]:
+                    for x, y in points[1:]:
                         p.lineTo(x * S, -y * S)
                     if closed:
                         p.closeSubpath()

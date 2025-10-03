@@ -1,30 +1,25 @@
 """
 Model Space Window - CAD workspace for device placement and design
 """
-import json
-import math
+
 import os
 import sys
-from pathlib import Path
-from typing import Any
 
 # Allow running as `python app\main.py` by fixing sys.path for absolute `app.*` imports
 if __package__ in (None, ""):
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import QPointF, Qt
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QApplication,
     QMainWindow,
-    QMessageBox,
 )
 
-from app import catalog, dxf_import
+from app.assistant import AssistantDock
 from app.logging_config import setup_logging
 
 # Grid scene and defaults used by the main window
-from app.scene import GridScene, DEFAULT_GRID_SIZE
+from app.scene import DEFAULT_GRID_SIZE, GridScene
 
 # Ensure logging is configured early so module-level loggers emit during
 # headless simulators and when the app starts from __main__.
@@ -122,6 +117,9 @@ class ModelSpaceWindow(QMainWindow):
         # Properties dock
         self._setup_properties_dock()
 
+        # AI Assistant dock
+        self._setup_ai_dock()
+
     def _setup_device_palette(self):
         """Setup the device palette dock."""
         dock = QtWidgets.QDockWidget("Devices", self)
@@ -176,6 +174,11 @@ class ModelSpaceWindow(QMainWindow):
 
         dock.setWidget(w)
         self.addDockWidget(Qt.RightDockWidgetArea, dock)
+
+    def _setup_ai_dock(self):
+        """Setup the AI Assistant dock."""
+        dock = AssistantDock(self)
+        self.addDockWidget(Qt.BottomDockWidgetArea, dock)
 
     def _setup_status_bar(self):
         """Setup the status bar."""
@@ -292,8 +295,8 @@ class ModelSpaceWindow(QMainWindow):
         return {
             "scene_type": "model_space",
             "devices": [],  # Will be populated
-            "wires": [],    # Will be populated
-            "sketch": [],   # Will be populated
+            "wires": [],  # Will be populated
+            "sketch": [],  # Will be populated
         }
 
     def load_scene_state(self, data):
@@ -304,6 +307,6 @@ class ModelSpaceWindow(QMainWindow):
     def closeEvent(self, event):
         """Handle window close event."""
         # Notify controller about window closing
-        if hasattr(self.app_controller, 'on_model_space_closed'):
+        if hasattr(self.app_controller, "on_model_space_closed"):
             self.app_controller.on_model_space_closed()
         event.accept()

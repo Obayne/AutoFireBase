@@ -1,26 +1,22 @@
 """
 Paperspace Window - Print layout workspace with sheets and viewports
 """
-import json
-import math
+
 import os
 import sys
-from pathlib import Path
-from typing import Any
 
 # Allow running as `python app\main.py` by fixing sys.path for absolute `app.*` imports
 if __package__ in (None, ""):
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import QPointF, Qt
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QApplication,
     QMainWindow,
     QMessageBox,
-    QInputDialog,
 )
 
+from app.assistant import AssistantDock
 from app.layout import PageFrame, TitleBlock, ViewportItem
 from app.logging_config import setup_logging
 
@@ -101,6 +97,9 @@ class PaperspaceWindow(QMainWindow):
         # Viewport properties dock
         self._setup_viewport_dock()
 
+        # AI Assistant dock
+        self._setup_ai_dock()
+
     def _setup_sheets_dock(self):
         """Setup the sheets management dock."""
         dock = QtWidgets.QDockWidget("Sheets", self)
@@ -150,6 +149,11 @@ class PaperspaceWindow(QMainWindow):
         dock.setWidget(w)
         self.addDockWidget(Qt.LeftDockWidgetArea, dock)
 
+    def _setup_ai_dock(self):
+        """Setup the AI Assistant dock."""
+        dock = AssistantDock(self)
+        self.addDockWidget(Qt.BottomDockWidgetArea, dock)
+
     def _setup_status_bar(self):
         """Setup the status bar."""
         self.statusBar().showMessage("Paperspace - Ready")
@@ -192,7 +196,7 @@ class PaperspaceWindow(QMainWindow):
             # Update all viewports to reflect model space changes
             for sheet in self.sheets:
                 for item in sheet["scene"].items():
-                    if hasattr(item, 'update_viewport'):
+                    if hasattr(item, "update_viewport"):
                         item.update_viewport()
 
     def on_paperspace_changed(self, change_data):
@@ -318,9 +322,10 @@ class PaperspaceWindow(QMainWindow):
             return
 
         reply = QMessageBox.question(
-            self, "Delete Sheet",
+            self,
+            "Delete Sheet",
             f"Delete '{self.sheets[self.current_sheet_index]['name']}'?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
 
         if reply == QMessageBox.StandardButton.Yes:
@@ -335,8 +340,10 @@ class PaperspaceWindow(QMainWindow):
         new_index = self.current_sheet_index + delta
         if 0 <= new_index < len(self.sheets):
             # Swap sheets
-            self.sheets[self.current_sheet_index], self.sheets[new_index] = \
-                self.sheets[new_index], self.sheets[self.current_sheet_index]
+            self.sheets[self.current_sheet_index], self.sheets[new_index] = (
+                self.sheets[new_index],
+                self.sheets[self.current_sheet_index],
+            )
             self.current_sheet_index = new_index
             self._refresh_sheets_list()
 
@@ -357,9 +364,7 @@ class PaperspaceWindow(QMainWindow):
     def get_sheets_state(self):
         """Get sheets state for serialization."""
         # This will be implemented when we add project save/load
-        return {
-            "sheets": self.sheets.copy() if self.sheets else []
-        }
+        return {"sheets": self.sheets.copy() if self.sheets else []}
 
     def load_sheets_state(self, data):
         """Load sheets state from serialized data."""
@@ -369,6 +374,6 @@ class PaperspaceWindow(QMainWindow):
     def closeEvent(self, event):
         """Handle window close event."""
         # Notify controller about window closing
-        if hasattr(self.app_controller, 'on_paperspace_closed'):
+        if hasattr(self.app_controller, "on_paperspace_closed"):
             self.app_controller.on_paperspace_closed()
         event.accept()

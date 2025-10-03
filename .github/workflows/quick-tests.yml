@@ -1,0 +1,101 @@
+name: quick-tests
+
+# Trigger only when files under `app/` or `tests/` (or this workflow) change to save CI cycles.
+on:
+  push:
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - '.github/workflows/quick-tests.yml'
+    branches: ['main', 'feat/**', '*']
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - '.github/workflows/quick-tests.yml'
+    branches: ['main']
+
+jobs:
+  quick-tests:
+    name: Quick focused tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: [3.11]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Avoid recursive submodule update — some runners fail when .gitmodules
+          # references paths without urls. Keep a full fetch so tests can import
+          # local packages if needed.
+          submodules: false
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          # Hash both the full dev requirements and the minimal requirements so
+          # cache is reused if either file changes. This keeps quick-tests fast.
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev-minimal.txt','**/requirements-dev.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev-minimal.txt
+        shell: bash
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev-minimal.txt
+        shell: powershell
+
+      - name: Run headless startup smoke test (Linux uses xvfb)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -y
+          # Install a small, known set of packages that provide headless Qt support
+          # Try a fuller set of candidate packages that provide libEGL and OpenGL
+          # artifacts across different Ubuntu images.
+          for pkg in xvfb libegl1-mesa libegl-mesa0 libgl1 libgl1-mesa-glx libgl1-mesa-dri libgles2-mesa; do
+            echo "Ensuring package $pkg is installed (if available)"
+            sudo apt-get install -y "$pkg" || echo "Package $pkg not available on this runner, continuing"
+          done
+          # Determine the headless startup test location and run it.
+          if [ -f "tests/test_headless_startup.py" ]; then
+            TEST_PATH="tests/test_headless_startup.py"
+          elif [ -f "AutoFireBase/tests/test_headless_startup.py" ]; then
+            TEST_PATH="AutoFireBase/tests/test_headless_startup.py"
+          else
+            echo "ERROR: headless startup test missing in both tests/ and AutoFireBase/tests/ - aborting"
+            exit 1
+          fi
+          echo "Running pytest on: $TEST_PATH"
+          xvfb-run -s '-screen 0 1024x768x24' pytest -q $TEST_PATH
+        shell: bash
+
+      - name: Run headless startup smoke test (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # Ensure Qt runs headless on Windows runners
+          $env:QT_QPA_PLATFORM = 'minimal'
+          # Prefer tests/test_headless_startup.py, fall back to AutoFireBase/tests/
+          $h1 = 'tests/test_headless_startup.py'
+          $h2 = 'AutoFireBase/tests/test_headless_startup.py'
+          if (Test-Path $h1) { $test = $h1 } elseif (Test-Path $h2) { $test = $h2 } else { Write-Host "ERROR: headless startup test missing in both locations"; exit 1 }
+          Write-Host "Running pytest on: $test"
+          pytest -q $test
+        shell: powershell

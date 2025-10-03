@@ -14,6 +14,12 @@ Quick Start (Windows, PowerShell)
 - Run the app: `python app/main.py`
   - Alternative (new entry): `python -m frontend.app`
 
+Features
+- Separate Windows: Model Space and Paperspace as independent windows for better multi-monitor support.
+- Project Overview: Central hub for notes, milestones, progress tracking, calendar, and AI assistance.
+- AI Assistant: Natural language queries for drawing manipulation (currently simulation mode).
+- CAD Tools: Draw, modify, measure, OSNAP, DXF/PDF import, device placement, coverage overlays.
+
 Daily Workflow
 - Activate venv: `. .venv/Scripts/Activate.ps1`
 - Sync: `git pull` (ensure you’re on the correct branch).

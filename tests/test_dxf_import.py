@@ -1,8 +1,8 @@
-import pytest
-import tempfile
 import os
 from unittest.mock import Mock, patch
-from PySide6 import QtWidgets, QtCore
+
+import pytest
+from PySide6 import QtCore
 
 import app.dxf_import as dxf_import
 
@@ -34,7 +34,7 @@ class TestDXFImport:
         # Test default/fallback
         assert dxf_import._insunits_to_feet(999) == 1.0
 
-    @patch('ezdxf.readfile')
+    @patch("ezdxf.readfile")
     def test_build_paths_basic(self, mock_readfile):
         """Test basic path building from DXF document."""
         # Create mock DXF document
@@ -51,7 +51,7 @@ class TestDXFImport:
 
     def test_import_dxf_into_group_missing_ezdxf(self):
         """Test that import fails gracefully when ezdxf is not available."""
-        with patch.dict('sys.modules', {'ezdxf': None}):
+        with patch.dict("sys.modules", {"ezdxf": None}):
             with pytest.raises(RuntimeError, match="DXF support not available"):
                 dxf_import.import_dxf_into_group("dummy.dxf", Mock(), 96.0)
 
@@ -65,6 +65,7 @@ class TestDXFImport:
         # Skip this test if running in headless environment without Qt
         try:
             from PySide6 import QtWidgets
+
             app = QtWidgets.QApplication.instance()
             if app is None:
                 app = QtWidgets.QApplication([])
@@ -74,9 +75,7 @@ class TestDXFImport:
         try:
             # Create a real graphics group for testing
             group = QtWidgets.QGraphicsItemGroup()
-            bounds, layer_groups = dxf_import.import_dxf_into_group(
-                sample_file, group, 96.0
-            )
+            bounds, layer_groups = dxf_import.import_dxf_into_group(sample_file, group, 96.0)
 
             # Should return a valid bounds rect and layer groups dict
             assert isinstance(bounds, QtCore.QRectF)

@@ -5,6 +5,7 @@ Backs up each file to <file>.bak-conflict-clean before modifying.
 Usage:
     & .venv/Scripts/python.exe scripts/tools/clean_conflict_artifacts.py
 """
+
 import re
 from pathlib import Path
 

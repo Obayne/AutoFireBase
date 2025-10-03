@@ -6,6 +6,7 @@ with `hf_hub_download`, verifies size and sha256, and saves to C:\Dev\Models\gpt
 Usage: run from the repo root using the repo venv:
   .\.venv\Scripts\python.exe .\scripts\tools\hf_download_gpt4all.py
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -16,7 +17,6 @@ import time
 from pathlib import Path
 
 from huggingface_hub import HfApi, hf_hub_download
-
 
 REPO_ID = "nomic-ai/gpt4all-j"
 REVISION = "v1.2-jazzy"
@@ -50,7 +50,11 @@ def main() -> int:
     candidates = []
     for fn in files:
         lower = fn.lower()
-        if lower.endswith((".gguf", ".bin", ".ggml")) or "gpt4all-j" in lower or "ggml-gpt4all" in lower:
+        if (
+            lower.endswith((".gguf", ".bin", ".ggml"))
+            or "gpt4all-j" in lower
+            or "ggml-gpt4all" in lower
+        ):
             candidates.append(fn)
 
     if not candidates:
@@ -68,7 +72,9 @@ def main() -> int:
     for fn in candidates:
         print(f"Attempting to download '{fn}' ...")
         try:
-            local = hf_hub_download(repo_id=REPO_ID, filename=fn, revision=REVISION, cache_dir=str(CACHE_DIR))
+            local = hf_hub_download(
+                repo_id=REPO_ID, filename=fn, revision=REVISION, cache_dir=str(CACHE_DIR)
+            )
         except Exception as exc:
             print(f"  Download failed for {fn}: {exc}")
             continue
@@ -111,7 +117,9 @@ def main() -> int:
         if saved_sha != sha:
             print("WARNING: SHA mismatch between cached file and saved file.")
 
-        print("All done. You can now run .\\venv\\Scripts\\python.exe .\\scripts\\tools\\local_llm_test.py to validate the model load.")
+        print(
+            "All done. You can now run .\\venv\\Scripts\\python.exe .\\scripts\\tools\\local_llm_test.py to validate the model load."
+        )
         return 0
 
     print("Tried all candidates but none produced a valid model file.")
