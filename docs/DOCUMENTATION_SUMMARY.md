@@ -14,6 +14,7 @@ This documentation suite was created following the major architectural restructu
 - **`CHANGELOG.md`** - Version history and feature tracking (updated with restructure details)
 
 ### Developer Documentation
+- **`docs/VS_CODE_SETUP_GUIDE.md`** - **COMPLETE SETUP GUIDE** - Step-by-step VS Code configuration, AI project management, and automated workflows for non-programmers
 - **`docs/PROJECT_SPECIFICATION.md`** - **COMPREHENSIVE PROJECT SPEC** - Complete technical specification with file paths, structure, classes, relationships, and usage guide
 - **`docs/DEVELOPMENT_COMMANDS.md`** - **DEVELOPMENT COMMAND SHEET** - Complete command reference for setup, development, testing, building, and deployment
 - **`docs/DEVELOPMENT_WORKFLOW.md`** - **Continuous development practices** (what, when, who, how)

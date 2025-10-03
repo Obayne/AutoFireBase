@@ -1,0 +1,255 @@
+{
+    "folders": [
+        {
+            "name": "AutoFire",
+            "path": "C:\\Dev\\Autofire"
+        }
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+        "python.terminal.activateEnvironment": true,
+        "python.linting.enabled": true,
+        "python.linting.ruffEnabled": true,
+        "python.formatting.provider": "black",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["-q"],
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit"
+        },
+        "files.associations": {
+            "*.spec": "python",
+            "*.md": "markdown"
+        },
+        "git.autofetch": true,
+        "git.enableSmartCommit": true,
+        "workbench.editor.enablePreview": false,
+        "explorer.confirmDelete": false,
+        "workbench.startupEditor": "none",
+        "window.title": "AutoFire Development - ${workspaceFolderBasename}"
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Python: AutoFire Main",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${workspaceFolder}/main.py",
+                "console": "integratedTerminal",
+                "justMyCode": false,
+                "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+                "cwd": "${workspaceFolder}"
+            },
+            {
+                "name": "Python: Debug Application",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${workspaceFolder}/tools/run_app_debug.py",
+                "console": "integratedTerminal",
+                "justMyCode": false,
+                "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+                "cwd": "${workspaceFolder}"
+            },
+            {
+                "name": "Python: Test Current File",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${workspaceFolder}/${file}",
+                "console": "integratedTerminal",
+                "justMyCode": false,
+                "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+                "cwd": "${workspaceFolder}"
+            }
+        ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "Setup Development Environment",
+                "type": "shell",
+                "command": "${workspaceFolder}/setup_dev.ps1",
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "problemMatcher": [],
+                "windows": {
+                    "options": {
+                        "shell": {
+                            "executable": "powershell.exe"
+                        }
+                    }
+                }
+            },
+            {
+                "label": "Run AutoFire",
+                "type": "shell",
+                "command": "python",
+                "args": ["main.py"],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                    "env": {
+                        "PYTHONPATH": "${workspaceFolder}"
+                    }
+                }
+            },
+            {
+                "label": "Run Tests",
+                "type": "shell",
+                "command": "pytest",
+                "args": ["-q"],
+                "group": "test",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                    "env": {
+                        "PYTHONPATH": "${workspaceFolder}"
+                    }
+                }
+            },
+            {
+                "label": "Format Code",
+                "type": "shell",
+                "command": "black",
+                "args": ["."],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}"
+                }
+            },
+            {
+                "label": "Lint Code",
+                "type": "shell",
+                "command": "ruff",
+                "args": ["check", "--fix", "."],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}"
+                }
+            },
+            {
+                "label": "Build Production",
+                "type": "shell",
+                "command": "${workspaceFolder}/Build_AutoFire.ps1",
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "windows": {
+                    "options": {
+                        "shell": {
+                            "executable": "powershell.exe"
+                        }
+                    }
+                }
+            },
+            {
+                "label": "Quality Check All",
+                "type": "shell",
+                "command": "black . ; ruff check --fix . ; pytest -q",
+                "group": "build",
+                "dependsOn": ["Format Code", "Lint Code", "Run Tests"],
+                "dependsOrder": "sequence",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                    "env": {
+                        "PYTHONPATH": "${workspaceFolder}"
+                    }
+                }
+            },
+            {
+                "label": "Update Dependencies",
+                "type": "shell",
+                "command": "python",
+                "args": ["-m", "pip", "install", "-r", "requirements.txt", "--upgrade"],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}"
+                }
+            },
+            {
+                "label": "Open Documentation",
+                "type": "shell",
+                "command": "start",
+                "args": ["docs/DOCUMENTATION_SUMMARY.md"],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                }
+            }
+        ]
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.black-formatter",
+            "charliermarsh.ruff",
+            "ms-python.pylint",
+            "ms-python.mypy-type-checker",
+            "ms-vscode.vscode-json",
+            "redhat.vscode-yaml",
+            "ms-vscode.powershell",
+            "github.copilot",
+            "github.copilot-chat",
+            "gruntfuggly.todo-tree",
+            "ms-vscode.test-adapter-converter",
+            "hbenl.vscode-test-explorer",
+            "ms-vscode.vscode-github-issue-notebooks",
+            "ms-vscode.vscode-markdown-notebook",
+            "christian-kohler.path-intellisense",
+            "ms-vscode-remote.remote-wsl",
+            "ms-vscode.vscode-typescript-next"
+        ]
+    }
+}
