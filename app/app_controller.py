@@ -1,19 +1,18 @@
 """
 App Controller - Central coordinator for multi-window AutoFire application
 """
+
 import json
 import os
 import sys
 import zipfile
-from pathlib import Path
-from typing import Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 # Allow running as `python app\main.py` by fixing sys.path for absolute `app.*` imports
 if __package__ in (None, ""):
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import QPointF, Qt
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -26,7 +25,9 @@ from app.logging_config import setup_logging
 if TYPE_CHECKING:
     from app.model_space_window import ModelSpaceWindow
     from app.paperspace_window import PaperspaceWindow
+
     # from app.summary_window import SummaryWindow  # Not yet implemented
+    from app.project_overview_window import ProjectOverviewWindow
 
 # Ensure logging is configured early
 setup_logging()
@@ -44,7 +45,7 @@ class AppController(QMainWindow):
     # Signals for inter-window communication
     model_space_changed = QtCore.Signal(dict)  # Emitted when model space content changes
     paperspace_changed = QtCore.Signal(dict)  # Emitted when paperspace content changes
-    project_changed = QtCore.Signal(str)      # Emitted when project state changes
+    project_changed = QtCore.Signal(str)  # Emitted when project state changes
 
     def __init__(self):
         # Initialize Qt application first
@@ -65,12 +66,13 @@ class AppController(QMainWindow):
         self.devices_all = catalog.load_catalog()
 
         # Window management
-        self.model_space_window: Optional['ModelSpaceWindow'] = None
-        self.paperspace_window: Optional['PaperspaceWindow'] = None
-        self.summary_window: Optional[Any] = None  # SummaryWindow not yet implemented
+        self.model_space_window: ModelSpaceWindow | None = None
+        self.paperspace_window: PaperspaceWindow | None = None
+        self.summary_window: Any | None = None  # SummaryWindow not yet implemented
+        self.project_overview_window: ProjectOverviewWindow | None = None
 
         # Application state
-        self.current_project_path: Optional[str] = None
+        self.current_project_path: str | None = None
         self.is_modified = False
 
         # Setup global menus first
@@ -98,6 +100,10 @@ class AppController(QMainWindow):
         self.action_save_project_as.setShortcut(QtGui.QKeySequence.StandardKey.SaveAs)
         self.action_save_project_as.triggered.connect(self.save_project_as)
 
+        # Settings menu actions
+        self.action_open_settings = QtGui.QAction("Preferences...", self)
+        self.action_open_settings.triggered.connect(self.open_settings)
+
         # Window menu actions
         self.action_show_model_space = QtGui.QAction("Model Space", self)
         self.action_show_model_space.triggered.connect(self.show_model_space)
@@ -107,6 +113,9 @@ class AppController(QMainWindow):
 
         self.action_show_summary = QtGui.QAction("Summary", self)
         self.action_show_summary.triggered.connect(self.show_summary_window)
+
+        self.action_show_project_overview = QtGui.QAction("Project Overview", self)
+        self.action_show_project_overview.triggered.connect(self.show_project_overview_window)
 
         self.action_arrange_windows = QtGui.QAction("Arrange Windows", self)
         self.action_arrange_windows.triggered.connect(self.arrange_windows)
@@ -123,11 +132,16 @@ class AppController(QMainWindow):
         file_menu.addAction(self.action_save_project)
         file_menu.addAction(self.action_save_project_as)
 
+        # Settings menu
+        settings_menu = menubar.addMenu("&Settings")
+        settings_menu.addAction(self.action_open_settings)
+
         # Window menu
         window_menu = menubar.addMenu("&Window")
         window_menu.addAction(self.action_show_model_space)
         window_menu.addAction(self.action_show_paperspace)
         window_menu.addAction(self.action_show_summary)
+        window_menu.addAction(self.action_show_project_overview)
         window_menu.addSeparator()
         window_menu.addAction(self.action_arrange_windows)
 
@@ -135,21 +149,30 @@ class AppController(QMainWindow):
 
     def _initialize_windows(self):
         """Initialize and show the main application windows."""
-        # Show initial windows
-        self.show_model_space()
-        self.show_paperspace()
+        try:
+            # Show initial windows
+            self.show_model_space()
+            self.show_paperspace()
 
-        if self.prefs.get("show_summary_window", False):
-            self.show_summary_window()
+            if self.prefs.get("show_summary_window", False):
+                self.show_summary_window()
 
-        # Arrange windows
-        QtCore.QTimer.singleShot(100, self.arrange_windows)
+            if self.prefs.get("show_project_overview_window", False):
+                self.show_project_overview_window()
+
+            # Arrange windows
+            QtCore.QTimer.singleShot(100, self.arrange_windows)
+        except Exception as e:
+            _logger.error(f"Failed to initialize windows: {e}")
+            # Fallback: show a message box
+            QtWidgets.QMessageBox.critical(None, "Startup Error", f"Failed to start AutoFire: {e}")
+            self.app.quit()
 
     def _load_prefs(self):
         """Load user preferences."""
         prefs_path = os.path.join(os.path.expanduser("~"), "AutoFire", "prefs.json")
         try:
-            with open(prefs_path, 'r') as f:
+            with open(prefs_path) as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return self._get_default_prefs()
@@ -179,7 +202,28 @@ class AppController(QMainWindow):
             # Multi-window settings
             "multiview_enabled": True,
             "show_summary_window": False,
+            "show_project_overview_window": False,
             "window_positions": {},
+            # AI settings
+            "ai_enabled": True,
+            "ai_model": "stub",
+            # Project overview data
+            "project_notes": "",
+            "project_progress": 0,
+            "project_milestones": [],
+            # CAD Functionality
+            "units": "Imperial (feet)",
+            "drawing_scale": "1:1",
+            "default_line_weight": 1,
+            "default_color": "#000000",
+            # Menus and Tables
+            "show_device_palette": True,
+            "show_properties_dock": True,
+            "show_status_bar": True,
+            # Additional
+            "auto_save_interval": 5,
+            "enable_osnap": True,
+            "show_grid": True,
         }
 
     def save_prefs(self):
@@ -187,7 +231,7 @@ class AppController(QMainWindow):
         prefs_path = os.path.join(os.path.expanduser("~"), "AutoFire", "prefs.json")
         os.makedirs(os.path.dirname(prefs_path), exist_ok=True)
         try:
-            with open(prefs_path, 'w') as f:
+            with open(prefs_path, "w") as f:
                 json.dump(self.prefs, f, indent=2)
         except Exception as e:
             _logger.error(f"Failed to save preferences: {e}")
@@ -195,24 +239,34 @@ class AppController(QMainWindow):
     def show_model_space(self):
         """Show or create the model space window."""
         if self.model_space_window is None:
-            from app.model_space_window import ModelSpaceWindow
-            self.model_space_window = ModelSpaceWindow(self)
-            self.model_space_window.show()
-        else:
-            self.model_space_window.raise_()
-            self.model_space_window.activateWindow()
+            try:
+                from app.model_space_window import ModelSpaceWindow
+
+                self.model_space_window = ModelSpaceWindow(self)
+            except Exception as e:
+                _logger.error(f"Failed to create model space window: {e}")
+                QtWidgets.QMessageBox.critical(
+                    None, "Error", f"Failed to create Model Space window: {e}"
+                )
+                return
+        self.model_space_window.show()
 
     def show_paperspace(self):
         """Show or create the paperspace window."""
         if self.paperspace_window is None:
-            from app.paperspace_window import PaperspaceWindow
-            # Pass the model space scene to paperspace
-            model_scene = self.model_space_window.scene if self.model_space_window else None
-            self.paperspace_window = PaperspaceWindow(self, model_scene)
-            self.paperspace_window.show()
-        else:
-            self.paperspace_window.raise_()
-            self.paperspace_window.activateWindow()
+            try:
+                from app.paperspace_window import PaperspaceWindow
+
+                # Pass the model space scene to paperspace
+                model_scene = self.model_space_window.scene if self.model_space_window else None
+                self.paperspace_window = PaperspaceWindow(self, model_scene)
+            except Exception as e:
+                _logger.error(f"Failed to create paperspace window: {e}")
+                QtWidgets.QMessageBox.critical(
+                    None, "Error", f"Failed to create Paperspace window: {e}"
+                )
+                return
+        self.paperspace_window.show()
 
     def show_summary_window(self):
         """Show or create the summary window."""
@@ -223,8 +277,24 @@ class AppController(QMainWindow):
             # SummaryWindow will be implemented later
             _logger.info("Summary window not yet implemented")
         else:
+            self.summary_window.show()
             self.summary_window.raise_()
             self.summary_window.activateWindow()
+
+    def show_project_overview_window(self):
+        """Show or create the project overview window."""
+        if self.project_overview_window is None:
+            try:
+                from app.project_overview_window import ProjectOverviewWindow
+
+                self.project_overview_window = ProjectOverviewWindow(self)
+            except Exception as e:
+                _logger.error(f"Failed to create project overview window: {e}")
+                QtWidgets.QMessageBox.critical(
+                    None, "Error", f"Failed to create Project Overview window: {e}"
+                )
+                return
+        self.project_overview_window.show()
 
     def arrange_windows(self):
         """Arrange windows for optimal multi-monitor workflow."""
@@ -245,12 +315,7 @@ class AppController(QMainWindow):
             # Summary window overlay if enabled
             if self.summary_window:
                 # Position summary window on secondary monitor
-                summary_geom = QtCore.QRect(
-                    secondary.x() + 50,
-                    secondary.y() + 50,
-                    400,
-                    600
-                )
+                summary_geom = QtCore.QRect(secondary.x() + 50, secondary.y() + 50, 400, 600)
                 self.summary_window.setGeometry(summary_geom)
         else:
             # Single monitor - tile windows
@@ -264,15 +329,11 @@ class AppController(QMainWindow):
 
             # Paperspace - right half, top
             if self.paperspace_window:
-                self.paperspace_window.setGeometry(
-                    width // 2, 0, width // 2, height // 2
-                )
+                self.paperspace_window.setGeometry(width // 2, 0, width // 2, height // 2)
 
             # Summary - right half, bottom
             if self.summary_window:
-                self.summary_window.setGeometry(
-                    width // 2, height // 2, width // 2, height // 2
-                )
+                self.summary_window.setGeometry(width // 2, height // 2, width // 2, height // 2)
 
     def new_project(self):
         """Create a new project."""
@@ -322,7 +383,9 @@ class AppController(QMainWindow):
 
         try:
             data = self.serialize_project_state()
-            with zipfile.ZipFile(self.current_project_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+            with zipfile.ZipFile(
+                self.current_project_path, "w", compression=zipfile.ZIP_DEFLATED
+            ) as z:
                 z.writestr("project.json", json.dumps(data, indent=2))
 
             self.is_modified = False
@@ -410,10 +473,14 @@ class AppController(QMainWindow):
         modified_indicator = " *" if self.is_modified else ""
 
         if self.model_space_window:
-            self.model_space_window.setWindowTitle(f"AutoFire - Model Space - {project_name}{modified_indicator}")
+            self.model_space_window.setWindowTitle(
+                f"AutoFire - Model Space - {project_name}{modified_indicator}"
+            )
 
         if self.paperspace_window:
-            self.paperspace_window.setWindowTitle(f"AutoFire - Paperspace - {project_name}{modified_indicator}")
+            self.paperspace_window.setWindowTitle(
+                f"AutoFire - Paperspace - {project_name}{modified_indicator}"
+            )
 
     def on_model_space_closed(self):
         """Handle model space window closure."""
@@ -434,7 +501,7 @@ class AppController(QMainWindow):
         change_data = {
             "type": change_type,
             "data": data or {},
-            "timestamp": QtCore.QDateTime.currentDateTime().toString()
+            "timestamp": QtCore.QDateTime.currentDateTime().toString(),
         }
         self.model_space_changed.emit(change_data)
 
@@ -443,7 +510,7 @@ class AppController(QMainWindow):
         change_data = {
             "type": change_type,
             "data": data or {},
-            "timestamp": QtCore.QDateTime.currentDateTime().toString()
+            "timestamp": QtCore.QDateTime.currentDateTime().toString(),
         }
         self.paperspace_changed.emit(change_data)
 
@@ -452,9 +519,21 @@ class AppController(QMainWindow):
         change_data = {
             "type": change_type,
             "data": data or {},
-            "timestamp": QtCore.QDateTime.currentDateTime().toString()
+            "timestamp": QtCore.QDateTime.currentDateTime().toString(),
         }
         self.project_changed.emit(change_data)
+
+    def open_settings(self):
+        """Open the settings dialog."""
+        from app.settings import SettingsDialog
+
+        dialog = SettingsDialog(self, self.prefs)
+        if dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            new_prefs = dialog.values()
+            self.prefs.update(new_prefs)
+            self.save_prefs()
+            # Notify windows of settings change
+            self.notify_project_changed("settings_changed", new_prefs)
 
     def run(self):
         """Start the application (called by boot.py)."""
@@ -465,7 +544,8 @@ class AppController(QMainWindow):
 def main():
     """Main application entry point."""
     controller = AppController()
-    return controller.run()
+    controller.run()
+    return 0
 
 
 if __name__ == "__main__":
