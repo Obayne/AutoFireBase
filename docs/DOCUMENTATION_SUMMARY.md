@@ -17,6 +17,9 @@ This documentation suite was created following the major architectural restructu
 - **`docs/ARCHITECTURE.md`** - Detailed architectural documentation explaining the modular design
 - **`docs/API_REFERENCE.md`** - Complete API documentation for all major classes and interfaces
 - **`docs/DEVELOPMENT_SETUP.md`** - Comprehensive development environment setup guide
+- **`docs/DEVELOPMENT_WORKFLOW.md`** - **Continuous development practices** (what, when, who, how)
+- **`docs/SPRINT_PLANNING.md`** - Sprint planning template and process
+- **`docs/RELEASE_PROCESS.md`** - Release management and versioning process
 - **`docs/TROUBLESHOOTING.md`** - Troubleshooting guide for common issues and solutions
 
 ### Project Guidelines

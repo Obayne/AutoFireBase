@@ -6,3 +6,21 @@
 AGENTS.md @Obayne
 docs/ @Obayne
 
+# Master specification - product authority
+docs/MASTER_SPECIFICATION.rtf @Obayne
+
+# Architecture ownership by layer
+frontend/ @Obayne
+backend/ @Obayne
+cad_core/ @Obayne
+
+# Critical infrastructure files
+pyproject.toml @Obayne
+requirements*.txt @Obayne
+setup_dev.ps1 @Obayne
+Build_AutoFire*.ps1 @Obayne
+AutoFire*.spec @Obayne
+
+# Testing and quality
+tests/ @Obayne
+.pre-commit-config.yaml @Obayne
