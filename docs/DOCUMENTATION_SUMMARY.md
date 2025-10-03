@@ -14,6 +14,7 @@ This documentation suite was created following the major architectural restructu
 - **`CHANGELOG.md`** - Version history and feature tracking (updated with restructure details)
 
 ### Developer Documentation
+- **`docs/PROJECT_SPECIFICATION.md`** - **COMPREHENSIVE PROJECT SPEC** - Complete technical specification with file paths, structure, classes, relationships, and usage guide
 - **`docs/ARCHITECTURE.md`** - Detailed architectural documentation explaining the modular design
 - **`docs/API_REFERENCE.md`** - Complete API documentation for all major classes and interfaces
 - **`docs/DEVELOPMENT_SETUP.md`** - Comprehensive development environment setup guide
