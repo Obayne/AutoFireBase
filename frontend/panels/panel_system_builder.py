@@ -117,9 +117,10 @@ class PanelSelectionDialog(QtWidgets.QDialog):
     def _setup_ui(self):
         """Setup the user interface."""
         layout = QtWidgets.QVBoxLayout(self)
-        
+
         # Apply dialog styling for better contrast
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            """
             QDialog {
                 background-color: #ffffff;
                 color: #000000;
@@ -244,7 +245,8 @@ class PanelSelectionDialog(QtWidgets.QDialog):
                 background-color: #6c757d;
                 color: #adb5bd;
             }
-        """)
+        """
+        )
 
         # Manufacturer filter
         filter_layout = QtWidgets.QHBoxLayout()
@@ -414,9 +416,10 @@ class SystemBuilderPanel(QtWidgets.QDockWidget):
     def _setup_ui(self):
         widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout(widget)
-        
+
         # Apply styling for better visibility
-        widget.setStyleSheet("""
+        widget.setStyleSheet(
+            """
             QWidget {
                 background-color: #f8f9fa;
                 color: #212529;
@@ -490,7 +493,8 @@ class SystemBuilderPanel(QtWidgets.QDockWidget):
                 border-radius: 4px;
                 padding: 4px 8px;
             }
-        """)
+        """
+        )
 
         # Create tab widget for staging
         self.tab_widget = QtWidgets.QTabWidget()

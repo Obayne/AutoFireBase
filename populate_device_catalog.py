@@ -161,7 +161,7 @@ def populate_devices():
         # Check if device already exists
         cursor.execute(
             """
-            SELECT COUNT(*) FROM devices 
+            SELECT COUNT(*) FROM devices
             WHERE model = ? AND manufacturer_id = ?
         """,
             (device["model"], manufacturers.get(device["manufacturer"], 1)),

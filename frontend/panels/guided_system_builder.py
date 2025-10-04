@@ -247,7 +247,7 @@ class GuidedSystemBuilderWidget(QWidget):
         welcome = QLabel(
             """
         <h3>🏢 Welcome to the Fire Alarm System Builder!</h3>
-        <p>This guided workflow will help you design a complete fire alarm system 
+        <p>This guided workflow will help you design a complete fire alarm system
         tailored to your building's specific requirements and code compliance needs.</p>
         <p><b>Step 1:</b> Let's assess your building to determine the right system components.</p>
         """
@@ -417,7 +417,7 @@ class GuidedSystemBuilderWidget(QWidget):
         guidance = QLabel(
             """
         <h3>🔍 Detection & Notification Device Planning</h3>
-        <p>Now we'll plan the detection devices (smoke/heat detectors) and notification devices 
+        <p>Now we'll plan the detection devices (smoke/heat detectors) and notification devices
         (horns/strobes) based on your building type and selected panel capabilities.</p>
         """
         )
@@ -469,7 +469,7 @@ class GuidedSystemBuilderWidget(QWidget):
         guidance = QLabel(
             """
         <h3>✅ System Review & Completion</h3>
-        <p>Review your complete fire alarm system design. We'll verify code compliance 
+        <p>Review your complete fire alarm system design. We'll verify code compliance
         and provide a complete bill of materials.</p>
         """
         )

@@ -173,9 +173,9 @@ class ImprovedGuidedSystemBuilder(QWidget):
         title = QLabel("🚨 Fire Alarm System Builder")
         title.setStyleSheet(
             """
-            color: #ffffff; 
-            font-size: 20px; 
-            font-weight: 900; 
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 900;
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         """
@@ -293,9 +293,9 @@ class ImprovedGuidedSystemBuilder(QWidget):
         building_group = QGroupBox("Building Information")
         building_group.setStyleSheet(
             """
-            QGroupBox { 
-                font-weight: 900; 
-                padding-top: 18px; 
+            QGroupBox {
+                font-weight: 900;
+                padding-top: 18px;
                 color: #1a252f;
                 font-size: 16px;
                 font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
@@ -368,8 +368,8 @@ class ImprovedGuidedSystemBuilder(QWidget):
         building_type_label = QLabel("Building Type:")
         building_type_label.setStyleSheet(
             """
-            color: #1a252f; 
-            font-weight: 900; 
+            color: #1a252f;
+            font-weight: 900;
             font-size: 15px;
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
         """
@@ -431,8 +431,8 @@ class ImprovedGuidedSystemBuilder(QWidget):
         size_label = QLabel("Size:")
         size_label.setStyleSheet(
             """
-            color: #1a252f; 
-            font-weight: 900; 
+            color: #1a252f;
+            font-weight: 900;
             font-size: 15px;
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
         """
@@ -440,8 +440,8 @@ class ImprovedGuidedSystemBuilder(QWidget):
         floors_label = QLabel("Floors:")
         floors_label.setStyleSheet(
             """
-            color: #1a252f; 
-            font-weight: 900; 
+            color: #1a252f;
+            font-weight: 900;
             font-size: 15px;
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
         """
@@ -457,8 +457,8 @@ class ImprovedGuidedSystemBuilder(QWidget):
         size_floors_label = QLabel("Building Size & Floors:")
         size_floors_label.setStyleSheet(
             """
-            color: #1a252f; 
-            font-weight: 900; 
+            color: #1a252f;
+            font-weight: 900;
             font-size: 15px;
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
         """
@@ -511,8 +511,8 @@ class ImprovedGuidedSystemBuilder(QWidget):
         occupancy_label = QLabel("Occupant Load:")
         occupancy_label.setStyleSheet(
             """
-            color: #1a252f; 
-            font-weight: 900; 
+            color: #1a252f;
+            font-weight: 900;
             font-size: 15px;
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
         """
@@ -525,9 +525,9 @@ class ImprovedGuidedSystemBuilder(QWidget):
         special_group = QGroupBox("⚠️ Special Areas - Check All That Apply")
         special_group.setStyleSheet(
             """
-            QGroupBox { 
-                font-weight: 900; 
-                padding-top: 20px; 
+            QGroupBox {
+                font-weight: 900;
+                padding-top: 20px;
                 color: #8b2635;
                 font-size: 16px;
                 font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
@@ -615,9 +615,9 @@ class ImprovedGuidedSystemBuilder(QWidget):
         rec_group = QGroupBox("💡 System Recommendations")
         rec_group.setStyleSheet(
             """
-            QGroupBox { 
-                font-weight: 900; 
-                padding-top: 18px; 
+            QGroupBox {
+                font-weight: 900;
+                padding-top: 18px;
                 color: #0d5016;
                 font-size: 16px;
                 font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
@@ -988,8 +988,8 @@ class ImprovedGuidedSystemBuilder(QWidget):
         self.status_info = QLabel("Step 1 of 6: Welcome")
         self.status_info.setStyleSheet(
             """
-            color: #1a252f; 
-            font-size: 15px; 
+            color: #1a252f;
+            font-size: 15px;
             font-style: normal;
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
             font-weight: 700;
@@ -1141,8 +1141,8 @@ class ImprovedGuidedSystemBuilder(QWidget):
         Welcome to Professional Fire Alarm System Design
         </h3>
         <p style="color: #2c3e50; font-size: 16px; line-height: 1.6; font-weight: 600;">
-        This guided workflow will help you design a complete fire alarm system that meets NFPA 72 
-        standards and local code requirements. We'll assess your building, recommend appropriate 
+        This guided workflow will help you design a complete fire alarm system that meets NFPA 72
+        standards and local code requirements. We'll assess your building, recommend appropriate
         equipment, and generate professional documentation.
         </p>
         <div style="background-color: #d5f4e6; padding: 15px; border-radius: 8px; border-left: 5px solid #27ae60; margin: 15px 0;">
@@ -1351,8 +1351,8 @@ class ImprovedGuidedSystemBuilder(QWidget):
         note_label = QLabel(
             """
         <div style="background-color: #fef9e7; padding: 12px; border-radius: 6px; border-left: 4px solid #f39c12;">
-        <strong style="color: #d68910;">💡 Quick Start:</strong> 
-        <span style="color: #8b6914;">You can start the assessment immediately and add project details later, 
+        <strong style="color: #d68910;">💡 Quick Start:</strong>
+        <span style="color: #8b6914;">You can start the assessment immediately and add project details later,
         or fill in the information now for better documentation.</span>
         </div>
         """
@@ -1802,9 +1802,10 @@ class ImprovedGuidedSystemBuilder(QWidget):
 
             cursor.execute(
                 """
-                SELECT id, manufacturer, name, model, description
-                FROM panels
-                ORDER BY manufacturer, model
+                SELECT p.id, m.name as manufacturer, p.name, p.model, p.properties_json as description
+                FROM panels p
+                LEFT JOIN manufacturers m ON m.id = p.manufacturer_id
+                ORDER BY m.name, p.model
             """
             )
 
@@ -1949,7 +1950,7 @@ TYPICAL DEVICE COVERAGE ESTIMATES:
 • Smoke Detectors: ~{estimated_smoke} units
   (900 sq ft coverage each)
 
-• Heat Detectors: ~{estimated_heat} units  
+• Heat Detectors: ~{estimated_heat} units
   (special areas + backup)
 
 • Horn/Strobes: ~{estimated_notification} units
@@ -1958,8 +1959,8 @@ TYPICAL DEVICE COVERAGE ESTIMATES:
 • Pull Stations: ~{estimated_pulls} units
   (exit routes + code requirements)
 
-NOTE: These are planning estimates only. 
-Final device count depends on specific layout, 
+NOTE: These are planning estimates only.
+Final device count depends on specific layout,
 code requirements, and engineering judgment."""
 
         msg = QMessageBox(self)
@@ -1984,7 +1985,7 @@ NFPA 72 - Required Monitoring:
 🔧 TAMPER SWITCHES (Required):
 • Monitor valve positions
 • Main control valve supervision
-• Sectional valve supervision  
+• Sectional valve supervision
 • Prevents unauthorized system shutdown
 
 💨 PRESSURE/AIR SWITCHES:
@@ -2025,7 +2026,7 @@ Always check local codes and amendments."""
 
             cursor.execute(
                 """
-                SELECT p.id, m.name as manufacturer, p.model, p.name, p.panel_type, 
+                SELECT p.id, m.name as manufacturer, p.model, p.name, p.panel_type,
                        p.max_devices, p.properties_json
                 FROM panels p
                 LEFT JOIN manufacturers m ON m.id = p.manufacturer_id
@@ -2161,7 +2162,7 @@ Always check local codes and amendments."""
         option.setStyleSheet(
             """
             QFrame {
-                border: 2px solid #d5dbdb;
+                border: 2px solid #2c3e50;
                 border-radius: 8px;
                 padding: 15px;
                 margin: 8px;
@@ -2169,8 +2170,7 @@ Always check local codes and amendments."""
             }
             QFrame:hover {
                 border-color: #3498db;
-                background-color: #ebf5fb;
-                box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+                background-color: #f8f9fa;
             }
         """
         )
@@ -2183,20 +2183,22 @@ Always check local codes and amendments."""
         name_label = QLabel(f"<b>{panel['name']}</b>")
         name_label.setStyleSheet(
             """
-            font-size: 15px;
-            color: #2c3e50;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 16px;
+            color: #1a1a1a;
+            font-family: 'Arial', sans-serif;
             font-weight: bold;
+            background-color: #ffffff;
         """
         )
 
         details_label = QLabel(f"Model: {panel['model']} | {panel['manufacturer']}")
         details_label.setStyleSheet(
             """
-            color: #7f8c8d; 
-            font-size: 12px;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #333333;
+            font-size: 14px;
+            font-family: 'Arial', sans-serif;
             margin-top: 4px;
+            background-color: #ffffff;
         """
         )
 
@@ -2208,10 +2210,10 @@ Always check local codes and amendments."""
         reason_label = QLabel(f"ℹ️ {application_info}")
         reason_label.setStyleSheet(
             """
-            color: #6c757d; 
-            font-size: 13px; 
+            color: #333333;
+            font-size: 13px;
             font-style: normal;
-            font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             font-weight: 500;
             margin-top: 8px;
         """
@@ -2223,9 +2225,9 @@ Always check local codes and amendments."""
         capacity_label = QLabel(f"📊 {capacity_info}")
         capacity_label.setStyleSheet(
             """
-            color: #495057; 
+            color: #444444;
             font-size: 12px;
-            font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             font-weight: 600;
             margin-top: 4px;
         """
@@ -2289,8 +2291,8 @@ Always check local codes and amendments."""
             info = QLabel("Please select a control panel first.")
             info.setStyleSheet(
                 """
-                padding: 25px; 
-                color: #e67e22; 
+                padding: 25px;
+                color: #e67e22;
                 font-style: italic;
                 font-size: 16px;
                 font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
@@ -2596,8 +2598,8 @@ Always check local codes and amendments."""
             info = QLabel("Please select devices first to see wire requirements.")
             info.setStyleSheet(
                 """
-                padding: 25px; 
-                color: #e67e22; 
+                padding: 25px;
+                color: #e67e22;
                 font-style: italic;
                 font-size: 16px;
                 font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
