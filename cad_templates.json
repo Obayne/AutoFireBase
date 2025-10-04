@@ -1,0 +1,84 @@
+{
+  "fire_alarm_plan": {
+    "name": "Fire Alarm Plan Template",
+    "layers": [
+      {
+        "name": "FIRE-DETECTION",
+        "color": "BLUE",
+        "linetype": "CONTINUOUS"
+      },
+      {
+        "name": "FIRE-NOTIFICATION",
+        "color": "MAGENTA",
+        "linetype": "CONTINUOUS"
+      },
+      {
+        "name": "FIRE-MANUAL",
+        "color": "GREEN",
+        "linetype": "CONTINUOUS"
+      },
+      {
+        "name": "FIRE-PANEL",
+        "color": "RED",
+        "linetype": "CONTINUOUS"
+      },
+      {
+        "name": "FIRE-WIRING",
+        "color": "CYAN",
+        "linetype": "DASHED"
+      },
+      {
+        "name": "FIRE-TEXT",
+        "color": "WHITE",
+        "linetype": "CONTINUOUS"
+      }
+    ],
+    "text_styles": [
+      {
+        "name": "FIRE_NOTES",
+        "height": 0.125,
+        "font": "Arial"
+      },
+      {
+        "name": "FIRE_LABELS",
+        "height": 0.1,
+        "font": "Arial"
+      },
+      {
+        "name": "FIRE_TITLE",
+        "height": 0.25,
+        "font": "Arial Bold"
+      }
+    ],
+    "dimension_style": {
+      "name": "FIRE_DIM",
+      "text_height": 0.125,
+      "arrow_size": 0.125
+    }
+  },
+  "riser_diagram": {
+    "name": "Fire Alarm Riser Diagram Template",
+    "layers": [
+      {
+        "name": "RISER-PANELS",
+        "color": "RED",
+        "linetype": "CONTINUOUS"
+      },
+      {
+        "name": "RISER-LOOPS",
+        "color": "BLUE",
+        "linetype": "CONTINUOUS"
+      },
+      {
+        "name": "RISER-NAC",
+        "color": "MAGENTA",
+        "linetype": "CONTINUOUS"
+      },
+      {
+        "name": "RISER-TEXT",
+        "color": "WHITE",
+        "linetype": "CONTINUOUS"
+      }
+    ]
+  }
+}

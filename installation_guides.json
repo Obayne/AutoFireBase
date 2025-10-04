@@ -1,0 +1,38 @@
+{
+  "firelite_simple": {
+    "title": "FIRELITE Simple Installation Guide",
+    "complexity": 1,
+    "steps": [
+      "1. Mount panel 60\" AFF in secure location",
+      "2. Run 18 AWG SLC wiring to device locations",
+      "3. Install devices with proper addressing",
+      "4. Connect NAC circuits for notification devices",
+      "5. Program panel using front panel controls",
+      "6. Test system per NFPA 72 requirements"
+    ],
+    "wiring_notes": [
+      "Use 18-22 AWG wire for SLC circuits",
+      "Install EOL resistors at end of each circuit",
+      "Maintain proper wire supervision",
+      "Label all circuits clearly"
+    ]
+  },
+  "gamewell_advanced": {
+    "title": "GAMEWELL Advanced Installation Guide",
+    "complexity": 4,
+    "steps": [
+      "1. Design system using CamWorks CAD",
+      "2. Configure modular cabinet with interface cards",
+      "3. Install custom interface modules per design",
+      "4. Program complex cause-and-effect logic",
+      "5. Integrate with building management systems",
+      "6. Commission and test advanced features"
+    ],
+    "camworks_integration": [
+      "3D cabinet design and layout",
+      "Automated wire routing documentation",
+      "Integration with building CAD",
+      "Professional drawing generation"
+    ]
+  }
+}

@@ -5,7 +5,7 @@ Implements the specification's "System Builder (Staging Warehouse)" workflow
 
 from dataclasses import asdict, dataclass
 
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtWidgets
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QComboBox,
@@ -23,8 +23,6 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-
-from backend.catalog import load_catalog
 
 
 @dataclass
@@ -78,7 +76,7 @@ class StagingPolicies:
     """System staging policies."""
 
     addressing_scheme: str = "sequential"  # sequential, zone_based, custom
-    reserved_ranges: list[tuple] = None
+    reserved_ranges: list[tuple] | None = None
     routing_preference: str = "manual"  # manual, follow_path, auto_route
     auto_sizing: bool = True
     wire_derating: float = 1.25
@@ -276,82 +274,370 @@ class SystemBuilderWidget(QWidget):
         widget = QWidget()
         layout = QVBoxLayout(widget)
 
-        # Add device form
-        form_group = QGroupBox("Add Device Type")
+        # Add device form with database integration
+        form_group = QGroupBox("Add Device Type from Catalog")
         form_layout = QFormLayout(form_group)
 
-        self.device_type = QComboBox()
-        self.device_type.addItems(
-            [
-                "Smoke Detector",
-                "Heat Detector",
-                "Pull Station",
-                "Notification Appliance",
-                "Monitor Module",
-                "Control Module",
-                "Input Module",
-                "Output Module",
-                "Annunciator",
-            ]
+        # Load from database
+        self.device_catalog = self._load_device_catalog()
+
+        # Filtering controls
+        filter_layout = QHBoxLayout()
+
+        self.device_type_filter = QComboBox()
+        self.device_type_filter.addItem("All Types")
+        types = set()
+        for device in self.device_catalog:
+            if device.get("type"):
+                types.add(device["type"])
+        self.device_type_filter.addItems(sorted(types))
+        self.device_type_filter.currentTextChanged.connect(self._filter_devices)
+
+        self.device_mfr_filter = QComboBox()
+        self.device_mfr_filter.addItem("All Manufacturers")
+        manufacturers = set()
+        for device in self.device_catalog:
+            if device.get("manufacturer"):
+                manufacturers.add(device["manufacturer"])
+        self.device_mfr_filter.addItems(sorted(manufacturers))
+        self.device_mfr_filter.currentTextChanged.connect(self._filter_devices)
+
+        filter_layout.addWidget(QLabel("Type:"))
+        filter_layout.addWidget(self.device_type_filter)
+        filter_layout.addWidget(QLabel("Manufacturer:"))
+        filter_layout.addWidget(self.device_mfr_filter)
+        filter_layout.addStretch()
+
+        form_layout.addRow(filter_layout)
+
+        # Search field for model/name filtering
+        search_layout = QHBoxLayout()
+        self.device_search = QLineEdit()
+        self.device_search.setPlaceholderText(
+            "Search by model, name, or symbol (e.g., 'NFS2-3030', 'GEN-SD', 'Smoke')"
         )
-        form_layout.addRow("Type:", self.device_type)
+        self.device_search.textChanged.connect(self._filter_devices)
 
-        self.device_manufacturer = QComboBox()
-        self.device_manufacturer.addItems(
-            [
-                "System Sensor",
-                "EST",
-                "Fire-Lite",
-                "Notifier",
-                "Honeywell",
-                "Edwards",
-                "Siemens",
-                "Other",
-            ]
+        clear_search_btn = QPushButton("Clear")
+        clear_search_btn.setStyleSheet(
+            "padding: 4px 8px; border-radius: 3px; background-color: #6c757d; color: white;"
         )
-        form_layout.addRow("Manufacturer:", self.device_manufacturer)
+        clear_search_btn.clicked.connect(lambda: self.device_search.clear())
 
-        self.device_model = QLineEdit()
-        self.device_model.setPlaceholderText("e.g., 2WT-B")
-        form_layout.addRow("Model:", self.device_model)
+        search_layout.addWidget(QLabel("Search:"))
+        search_layout.addWidget(self.device_search)
+        search_layout.addWidget(clear_search_btn)
 
-        self.device_quantity = QSpinBox()
-        self.device_quantity.setRange(1, 9999)
-        self.device_quantity.setValue(10)
-        form_layout.addRow("Quantity:", self.device_quantity)
+        form_layout.addRow(search_layout)
 
-        add_device_btn = QPushButton("Add Device Type")
-        add_device_btn.clicked.connect(self._add_device)
+        # Device selection from catalog
+        self.device_catalog_list = QtWidgets.QListWidget()
+        self.device_catalog_list.setMaximumHeight(120)
+        self._populate_device_list()
+        form_layout.addRow("Available Devices:", self.device_catalog_list)
+
+        # Add button
+        add_device_btn = QPushButton("🔹 Stage Selected Device")
+        add_device_btn.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #0078d4;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #106ebe;
+            }
+        """
+        )
+        add_device_btn.clicked.connect(self._add_device_from_catalog)
         form_layout.addWidget(add_device_btn)
 
         layout.addWidget(form_group)
 
         # Staged devices table
         self.devices_table = QTableWidget()
-        self.devices_table.setColumnCount(6)
+        self.devices_table.setColumnCount(7)
         self.devices_table.setHorizontalHeaderLabels(
-            ["Type", "Manufacturer", "Model", "Planned", "Placed", "Connected"]
+            ["Type", "Manufacturer", "Model", "Symbol", "Planned", "Placed", "Actions"]
         )
         self.devices_table.horizontalHeader().setStretchLastSection(True)
         layout.addWidget(self.devices_table)
 
         self.tab_widget.addTab(widget, "Devices")
 
+    def _load_device_catalog(self):
+        """Load device catalog from database."""
+        try:
+            import sqlite3
+
+            conn = sqlite3.connect("autofire.db")
+            cursor = conn.cursor()
+
+            cursor.execute(
+                """
+                SELECT d.id, m.name as manufacturer, dt.code as type, d.model, d.name, d.symbol
+                FROM devices d
+                LEFT JOIN manufacturers m ON m.id = d.manufacturer_id
+                LEFT JOIN device_types dt ON dt.id = d.type_id
+                WHERE d.name IS NOT NULL AND d.name != ''
+                ORDER BY m.name, dt.code, d.name
+            """
+            )
+
+            devices = []
+            for row in cursor.fetchall():
+                devices.append(
+                    {
+                        "id": row[0],
+                        "manufacturer": row[1] or "Unknown",
+                        "type": row[2] or "Unknown",
+                        "model": row[3] or "",
+                        "name": row[4] or "Unnamed Device",
+                        "symbol": row[5] or "?",
+                    }
+                )
+
+            conn.close()
+            return devices
+        except Exception as e:
+            print(f"Error loading device catalog: {e}")
+            return self._get_fallback_devices()
+
+    def _get_fallback_devices(self):
+        """Fallback device list if database fails."""
+        return [
+            {
+                "id": 1,
+                "manufacturer": "System Sensor",
+                "type": "Detector",
+                "model": "2WT-B",
+                "name": "Smoke Detector",
+                "symbol": "SD",
+            },
+            {
+                "id": 2,
+                "manufacturer": "System Sensor",
+                "type": "Detector",
+                "model": "5602",
+                "name": "Heat Detector",
+                "symbol": "HD",
+            },
+            {
+                "id": 3,
+                "manufacturer": "Fire-Lite",
+                "type": "Panel",
+                "model": "MS-9600LS",
+                "name": "Fire Alarm Control Panel",
+                "symbol": "FACP",
+            },
+            {
+                "id": 4,
+                "manufacturer": "System Sensor",
+                "type": "Notification",
+                "model": "HS24-15/75W",
+                "name": "Horn Strobe",
+                "symbol": "HS",
+            },
+            {
+                "id": 5,
+                "manufacturer": "Fire-Lite",
+                "type": "Initiating",
+                "model": "BG-12",
+                "name": "Pull Station",
+                "symbol": "PS",
+            },
+        ]
+
+    def _populate_device_list(self):
+        """Populate the device list based on current filters and search."""
+        self.device_catalog_list.clear()
+
+        selected_type = self.device_type_filter.currentText()
+        selected_mfr = self.device_mfr_filter.currentText()
+        search_text = (
+            self.device_search.text().lower().strip() if hasattr(self, "device_search") else ""
+        )
+
+        for device in self.device_catalog:
+            # Apply dropdown filters
+            if selected_type != "All Types" and device.get("type") != selected_type:
+                continue
+            if selected_mfr != "All Manufacturers" and device.get("manufacturer") != selected_mfr:
+                continue
+
+            # Apply search filter (search across name, model, symbol)
+            if search_text:
+                searchable_text = " ".join(
+                    [
+                        device.get("name", "").lower(),
+                        device.get("model", "").lower(),
+                        device.get("symbol", "").lower(),
+                        device.get("manufacturer", "").lower(),
+                    ]
+                )
+                if search_text not in searchable_text:
+                    continue
+
+            # Create list item
+            display_text = f"{device['name']} ({device['symbol']}) - {device['manufacturer']} {device['model']}"
+            item = QtWidgets.QListWidgetItem(display_text)
+            item.setData(Qt.ItemDataRole.UserRole, device)
+            self.device_catalog_list.addItem(item)
+
+    def _filter_devices(self):
+        """Handle device filtering when dropdowns change."""
+        self._populate_device_list()
+
+    def _add_device_from_catalog(self):
+        """Add selected device from catalog to staging."""
+        current_item = self.device_catalog_list.currentItem()
+        if not current_item:
+            QMessageBox.warning(
+                self, "No Selection", "Please select a device from the catalog first."
+            )
+            return
+
+        device_data = current_item.data(Qt.ItemDataRole.UserRole)
+
+        # Create staged device (quantity will be determined by canvas placement)
+        staged_device = StagedDevice(
+            uid=f"{device_data['type']}_{len(self.staged_devices) + 1}",
+            device_type=device_data["type"],
+            model=device_data["model"],
+            manufacturer=device_data["manufacturer"],
+            symbol=device_data["symbol"],
+            quantity_planned=1,  # Default to 1, real quantity comes from canvas placement
+        )
+
+        self.staged_devices.append(staged_device)
+        self._refresh_devices_table()
+        self.staging_changed.emit()
+
+        # Show success message
+        self.status_label.setText(
+            f"✅ Added {device_data['name']} to staging (quantity determined by canvas placement)"
+        )
+        self.status_label.setStyleSheet("color: #28a745; font-style: normal; font-weight: bold;")
+
+    def _refresh_devices_table(self):
+        """Refresh the staged devices table."""
+        self.devices_table.setRowCount(len(self.staged_devices))
+
+        for row, device in enumerate(self.staged_devices):
+            self.devices_table.setItem(row, 0, QTableWidgetItem(device.device_type))
+            self.devices_table.setItem(row, 1, QTableWidgetItem(device.manufacturer))
+            self.devices_table.setItem(row, 2, QTableWidgetItem(device.model))
+            self.devices_table.setItem(row, 3, QTableWidgetItem(device.symbol))
+            self.devices_table.setItem(row, 4, QTableWidgetItem(str(device.quantity_planned)))
+            self.devices_table.setItem(row, 5, QTableWidgetItem(str(device.quantity_placed)))
+
+            # Actions column
+            remove_btn = QPushButton("Remove")
+            remove_btn.setStyleSheet(
+                "background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px;"
+            )
+            remove_btn.clicked.connect(lambda checked, r=row: self._remove_staged_device(r))
+            self.devices_table.setCellWidget(row, 6, remove_btn)
+
+    def _remove_staged_device(self, row):
+        """Remove a staged device."""
+        if 0 <= row < len(self.staged_devices):
+            removed_device = self.staged_devices.pop(row)
+            self._refresh_devices_table()
+            self.staging_changed.emit()
+            self.status_label.setText(f"🗑️ Removed {removed_device.device_type} from staging")
+            self.status_label.setStyleSheet("color: #ffc107; font-style: normal;")
+
     def _setup_wires_tab(self):
-        """Setup the Wire tab for adding wire SKUs, resistance, capacitance, etc."""
+        """Setup the Wire tab with intelligent wire selection for fire alarm circuits."""
         widget = QWidget()
         layout = QVBoxLayout(widget)
 
-        # Add wire form
-        form_group = QGroupBox("Add Wire Type")
+        # Intelligent wire recommendation section
+        recommend_group = QGroupBox("🔧 Intelligent Wire Recommendations")
+        recommend_layout = QVBoxLayout(recommend_group)
+
+        # Circuit type selector
+        circuit_layout = QHBoxLayout()
+        circuit_layout.addWidget(QLabel("Circuit Type:"))
+
+        self.circuit_type_selector = QComboBox()
+        self.circuit_type_selector.addItems(
+            [
+                "SLC (Signaling Line Circuit) - 18-22 AWG",
+                "NAC (Notification Appliance Circuit) - 14-16 AWG",
+                "Power Supply - 12-14 AWG",
+                "IDC (Initiating Device Circuit) - 18 AWG",
+                "Telephone/Data - 22-24 AWG",
+            ]
+        )
+        self.circuit_type_selector.currentTextChanged.connect(self._recommend_wire)
+        circuit_layout.addWidget(self.circuit_type_selector)
+
+        circuit_layout.addStretch()
+        recommend_layout.addLayout(circuit_layout)
+
+        # Recommendation display
+        self.wire_recommendation = QLabel("Select a circuit type for wire recommendations")
+        self.wire_recommendation.setStyleSheet(
+            """
+            QLabel {
+                background-color: #f8f9fa;
+                border: 2px solid #007bff;
+                border-radius: 6px;
+                padding: 12px;
+                margin: 8px 0;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                font-size: 11px;
+                font-weight: 500;
+                color: #212529;
+                line-height: 1.4;
+            }
+        """
+        )
+        recommend_layout.addWidget(self.wire_recommendation)
+
+        # Quick add recommended wire button
+        self.quick_add_wire_btn = QPushButton("📦 Add Recommended Wire to Spool")
+        self.quick_add_wire_btn.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #28a745;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 6px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+            QPushButton:hover {
+                background-color: #218838;
+            }
+        """
+        )
+        self.quick_add_wire_btn.clicked.connect(self._add_recommended_wire)
+        recommend_layout.addWidget(self.quick_add_wire_btn)
+
+        layout.addWidget(recommend_group)
+
+        # Manual wire entry form
+        form_group = QGroupBox("Manual Wire Entry")
         form_layout = QFormLayout(form_group)
 
         self.wire_sku = QLineEdit()
         self.wire_sku.setPlaceholderText("e.g., THHN-14-2C-RED")
         form_layout.addRow("SKU:", self.wire_sku)
 
+        self.wire_description = QLineEdit()
+        self.wire_description.setPlaceholderText("e.g., 14 AWG 2-Conductor Red THHN")
+        form_layout.addRow("Description:", self.wire_description)
+
         self.wire_gauge = QComboBox()
-        self.wire_gauge.addItems(["22", "20", "18", "16", "14", "12", "10"])
+        self.wire_gauge.addItems(["24", "22", "20", "18", "16", "14", "12", "10"])
         self.wire_gauge.setCurrentText("14")
         form_layout.addRow("Gauge (AWG):", self.wire_gauge)
 
@@ -367,28 +653,194 @@ class SystemBuilderWidget(QWidget):
         self.wire_resistance.setSuffix(" Ω/1000ft")
         form_layout.addRow("Resistance:", self.wire_resistance)
 
+        self.wire_capacitance = QtWidgets.QDoubleSpinBox()
+        self.wire_capacitance.setRange(10.0, 200.0)
+        self.wire_capacitance.setValue(58.0)
+        self.wire_capacitance.setDecimals(1)
+        self.wire_capacitance.setSuffix(" pF/1000ft")
+        form_layout.addRow("Capacitance:", self.wire_capacitance)
+
         self.wire_reel = QSpinBox()
         self.wire_reel.setRange(100, 10000)
         self.wire_reel.setValue(1000)
         self.wire_reel.setSuffix(" ft")
         form_layout.addRow("Reel Length:", self.wire_reel)
 
-        add_wire_btn = QPushButton("Add Wire Type")
-        add_wire_btn.clicked.connect(self._add_wire)
+        add_wire_btn = QPushButton("Add Custom Wire Type")
+        add_wire_btn.clicked.connect(self._add_custom_wire)
         form_layout.addWidget(add_wire_btn)
 
         layout.addWidget(form_group)
 
         # Staged wires table
         self.wires_table = QTableWidget()
-        self.wires_table.setColumnCount(6)
+        self.wires_table.setColumnCount(7)
         self.wires_table.setHorizontalHeaderLabels(
-            ["SKU", "Gauge", "Conductors", "Resistance (Ω/1000ft)", "Reel (ft)", "Remaining"]
+            [
+                "SKU",
+                "Description",
+                "Gauge",
+                "Conductors",
+                "Resistance (Ω/1000ft)",
+                "Reel (ft)",
+                "Actions",
+            ]
         )
         self.wires_table.horizontalHeader().setStretchLastSection(True)
         layout.addWidget(self.wires_table)
 
-        self.tab_widget.addTab(widget, "Wire")
+        self.tab_widget.addTab(widget, "Wire Spool")
+
+        # Initialize with default recommendation
+        self._recommend_wire()
+
+    def _recommend_wire(self):
+        """Provide intelligent wire recommendations based on circuit type."""
+        circuit_type = self.circuit_type_selector.currentText()
+
+        recommendations = {
+            "SLC (Signaling Line Circuit) - 18-22 AWG": {
+                "description": "🔍 SLC Circuit: 18 AWG 2-conductor shielded cable for reliable data communication",
+                "sku": "SLC-18-2C-SHIELD",
+                "gauge": "18",
+                "conductors": 2,
+                "resistance": 6.4,
+                "capacitance": 42.0,
+                "reel": 1000,
+                "details": "Recommended for smoke detectors, heat detectors, and other addressable devices",
+            },
+            "NAC (Notification Appliance Circuit) - 14-16 AWG": {
+                "description": "🔊 NAC Circuit: 14 AWG 2-conductor for notification appliances (horns, strobes)",
+                "sku": "NAC-14-2C-RED",
+                "gauge": "14",
+                "conductors": 2,
+                "resistance": 2.5,
+                "capacitance": 58.0,
+                "reel": 1000,
+                "details": "Higher current capacity for horns, strobes, and speakers",
+            },
+            "Power Supply - 12-14 AWG": {
+                "description": "⚡ Power: 12 AWG 2-conductor for main power distribution",
+                "sku": "PWR-12-2C-BLACK",
+                "gauge": "12",
+                "conductors": 2,
+                "resistance": 1.6,
+                "capacitance": 65.0,
+                "reel": 500,
+                "details": "High current capacity for power panels and main distribution",
+            },
+            "IDC (Initiating Device Circuit) - 18 AWG": {
+                "description": "🚨 IDC Circuit: 18 AWG 2-conductor for conventional pull stations",
+                "sku": "IDC-18-2C-BLUE",
+                "gauge": "18",
+                "conductors": 2,
+                "resistance": 6.4,
+                "capacitance": 42.0,
+                "reel": 1000,
+                "details": "For conventional fire alarm initiating devices",
+            },
+            "Telephone/Data - 22-24 AWG": {
+                "description": "📞 Comm: 22 AWG 4-conductor for telephone and data circuits",
+                "sku": "TEL-22-4C-GRAY",
+                "gauge": "22",
+                "conductors": 4,
+                "resistance": 16.2,
+                "capacitance": 38.0,
+                "reel": 1000,
+                "details": "For telephone circuits and low-power data communication",
+            },
+        }
+
+        if circuit_type in recommendations:
+            rec = recommendations[circuit_type]
+            self.wire_recommendation.setText(f"{rec['description']}\n\n{rec['details']}")
+            self.current_recommendation = rec
+        else:
+            self.wire_recommendation.setText("Select a circuit type for wire recommendations")
+            self.current_recommendation = None
+
+    def _add_recommended_wire(self):
+        """Add the currently recommended wire to the spool."""
+        if not hasattr(self, "current_recommendation") or not self.current_recommendation:
+            return
+
+        rec = self.current_recommendation
+
+        wire = StagedWire(
+            sku=rec["sku"],
+            description=rec["description"].split("\n")[0],  # First line only
+            gauge=int(rec["gauge"]),
+            conductor_count=rec["conductors"],
+            resistance_per_1000ft=rec["resistance"],
+            capacitance_per_1000ft=rec["capacitance"],
+            reel_length=rec["reel"],
+        )
+
+        self.staged_wires.append(wire)
+        self._refresh_wires_table()
+        self.staging_changed.emit()
+
+        # Show success message
+        self.status_label.setText(f"📦 Added recommended {rec['gauge']} AWG wire to spool")
+        self.status_label.setStyleSheet("color: #28a745; font-style: normal; font-weight: bold;")
+
+    def _add_custom_wire(self):
+        """Add a custom wire type to staging."""
+        if not self.wire_sku.text().strip():
+            QMessageBox.warning(self, "Missing Information", "Please enter a wire SKU.")
+            return
+
+        wire = StagedWire(
+            sku=self.wire_sku.text(),
+            description=self.wire_description.text()
+            or f"{self.wire_gauge.currentText()} AWG {self.wire_conductors.value()}-Conductor",
+            gauge=int(self.wire_gauge.currentText()),
+            conductor_count=self.wire_conductors.value(),
+            resistance_per_1000ft=self.wire_resistance.value(),
+            capacitance_per_1000ft=self.wire_capacitance.value(),
+            reel_length=self.wire_reel.value(),
+        )
+
+        self.staged_wires.append(wire)
+        self._refresh_wires_table()
+        self.staging_changed.emit()
+
+        # Clear form
+        self.wire_sku.clear()
+        self.wire_description.clear()
+
+        # Show success message
+        self.status_label.setText(f"📦 Added custom wire {wire.sku} to spool")
+        self.status_label.setStyleSheet("color: #28a745; font-style: normal; font-weight: bold;")
+
+    def _refresh_wires_table(self):
+        """Refresh the staged wires table."""
+        self.wires_table.setRowCount(len(self.staged_wires))
+
+        for row, wire in enumerate(self.staged_wires):
+            self.wires_table.setItem(row, 0, QTableWidgetItem(wire.sku))
+            self.wires_table.setItem(row, 1, QTableWidgetItem(wire.description))
+            self.wires_table.setItem(row, 2, QTableWidgetItem(str(wire.gauge)))
+            self.wires_table.setItem(row, 3, QTableWidgetItem(str(wire.conductor_count)))
+            self.wires_table.setItem(row, 4, QTableWidgetItem(f"{wire.resistance_per_1000ft:.2f}"))
+            self.wires_table.setItem(row, 5, QTableWidgetItem(f"{wire.reel_length}"))
+
+            # Actions column
+            remove_btn = QPushButton("Remove")
+            remove_btn.setStyleSheet(
+                "background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px;"
+            )
+            remove_btn.clicked.connect(lambda checked, r=row: self._remove_staged_wire(r))
+            self.wires_table.setCellWidget(row, 6, remove_btn)
+
+    def _remove_staged_wire(self, row):
+        """Remove a staged wire."""
+        if 0 <= row < len(self.staged_wires):
+            removed_wire = self.staged_wires.pop(row)
+            self._refresh_wires_table()
+            self.staging_changed.emit()
+            self.status_label.setText(f"🗑️ Removed wire {removed_wire.sku} from spool")
+            self.status_label.setStyleSheet("color: #ffc107; font-style: normal;")
 
     def _setup_policies_tab(self):
         """Setup the Policies tab for addressing schemes, routing preferences."""
@@ -436,142 +888,126 @@ class SystemBuilderWidget(QWidget):
         self.tab_widget.addTab(widget, "Policies")
 
     def _load_defaults(self):
-        """Load default staging items from database."""
-        # Add default panel (still hardcoded for now - panels will come from database later)
-        default_panel = StagedPanel(
-            uid="FACP-1",
-            model="MS-9600LS",
-            manufacturer="Fire-Lite",
-            slots=8,
-            psu_capacity=3.0,
-            battery_ah=18.0,
-            outputs=4,
-        )
-        self.staged_panels.append(default_panel)
-
-        # Load devices from database
-        try:
-            db_devices = load_catalog()
-            for device in db_devices:
-                staged_device = StagedDevice(
-                    symbol=device.get("symbol", "DEV"),
-                    name=device.get("name", "Unknown Device"),
-                    model=device.get("model", "Unknown"),
-                    manufacturer=device.get("manufacturer", "Unknown"),
-                    device_type=device.get("type", "Device"),
-                    voltage=24.0,  # Default voltage
-                    current_sleep=0.05,  # Default sleep current
-                    current_alarm=0.1,  # Default alarm current
-                    quantity=1,  # Default quantity
-                )
-                self.staged_devices.append(staged_device)
-        except Exception as e:
-            print(f"Warning: Could not load devices from database: {e}")
-            # Fallback to hardcoded devices if database fails
-            default_devices = [
-                StagedDevice(
-                    "SD",
-                    "Smoke Detector",
-                    "2WT-B",
-                    "System Sensor",
-                    "Detector",
-                    24.0,
-                    0.05,
-                    0.1,
-                    20,
-                ),
-                StagedDevice(
-                    "HD", "Heat Detector", "5601P", "System Sensor", "Detector", 24.0, 0.05, 0.1, 5
-                ),
-                StagedDevice(
-                    "PS", "Pull Station", "270A", "Fire-Lite", "Initiating", 24.0, 0.0, 0.0, 8
-                ),
-                StagedDevice(
-                    "HS", "Horn/Strobe", "HSR", "System Sensor", "Notification", 24.0, 0.02, 0.1, 15
-                ),
-            ]
-            self.staged_devices.extend(default_devices)
-
-        # Load wires from database
-        try:
-            from db import loader as db_loader
-
-            con = db_loader.connect()
-            db_wires = db_loader.fetch_wires(con)
-            con.close()
-
-            for wire in db_wires:
-                staged_wire = StagedWire(
-                    sku=wire.get("part_number", "UNKNOWN"),
-                    name=wire.get("name", "Unknown Wire"),
-                    gauge=wire.get("gauge", 14),
-                    conductors=2,  # Default to 2 conductors
-                    ohms_per_1000ft=wire.get("ohms_per_1000ft", 2.5),
-                    ampacity=wire.get("max_current_a", 15.0),
-                    reel_length=1000,  # Default reel length
-                    cost_per_ft=0.12,  # Default cost
-                )
-                self.staged_wires.append(staged_wire)
-        except Exception as e:
-            print(f"Warning: Could not load wires from database: {e}")
-            # Fallback to hardcoded wires if database fails
-            default_wires = [
-                StagedWire("THHN-14-2C-RED", "14 AWG 2C THHN Red", 14, 2, 2.5, 25.0, 1000, 0.12),
-                StagedWire("THHN-12-2C-RED", "12 AWG 2C THHN Red", 12, 2, 1.6, 25.0, 1000, 0.18),
-                StagedWire("FPLR-16-2C", "16 AWG 2C FPLR", 16, 2, 4.0, 30.0, 1000, 0.08),
-            ]
-            self.staged_wires.extend(default_wires)
+        """Load default staging items and refresh tables."""
+        # Load initial data but don't populate with defaults
+        # The user will use the System Builder to stage what they need
 
         self._refresh_tables()
 
+    def _refresh_tables(self):
+        """Refresh all staging tables."""
+        self._refresh_panels_table()
+        self._refresh_devices_table()
+        self._refresh_wires_table()
+
+    def _refresh_panels_table(self):
+        """Refresh the staged panels table."""
+        self.panels_table.setRowCount(len(self.staged_panels))
+
+        for row, panel in enumerate(self.staged_panels):
+            self.panels_table.setItem(row, 0, QTableWidgetItem(panel.uid))
+            self.panels_table.setItem(row, 1, QTableWidgetItem(panel.manufacturer))
+            self.panels_table.setItem(row, 2, QTableWidgetItem(panel.model))
+            self.panels_table.setItem(row, 3, QTableWidgetItem(str(panel.slots)))
+            self.panels_table.setItem(row, 4, QTableWidgetItem(f"{panel.psu_capacity:.1f}"))
+            self.panels_table.setItem(row, 5, QTableWidgetItem(f"{panel.battery_ah:.1f}"))
+
+            # Actions column
+            remove_btn = QPushButton("Remove")
+            remove_btn.setStyleSheet(
+                "background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px;"
+            )
+            remove_btn.clicked.connect(lambda checked, r=row: self._remove_staged_panel(r))
+            self.panels_table.setCellWidget(row, 6, remove_btn)
+
+    def _remove_staged_panel(self, row):
+        """Remove a staged panel."""
+        if 0 <= row < len(self.staged_panels):
+            removed_panel = self.staged_panels.pop(row)
+            self._refresh_panels_table()
+            self.staging_changed.emit()
+            self.status_label.setText(f"🗑️ Removed panel {removed_panel.uid} from staging")
+            self.status_label.setStyleSheet("color: #ffc107; font-style: normal;")
+
     def _add_panel(self):
-        """Add a new panel to staging."""
+        """Add a panel to staging."""
+        if not self.panel_uid.text().strip():
+            QMessageBox.warning(self, "Missing Information", "Please enter a Panel UID.")
+            return
+
         panel = StagedPanel(
-            uid=self.panel_uid.text() or f"FACP-{len(self.staged_panels)+1}",
-            model=self.panel_model.text(),
+            uid=self.panel_uid.text(),
+            model=self.panel_model.text() or "Unknown Model",
             manufacturer=self.panel_manufacturer.currentText(),
             slots=self.panel_slots.value(),
             psu_capacity=float(self.panel_psu.value()),
             battery_ah=float(self.panel_battery.value()),
             outputs=4,  # Default
         )
+
         self.staged_panels.append(panel)
-        self._refresh_tables()
+        self._refresh_panels_table()
         self.staging_changed.emit()
 
         # Clear form
         self.panel_uid.clear()
         self.panel_model.clear()
 
-    def _add_device(self):
-        """Add a new device type to staging."""
-        device_type = self.device_type.currentText()
-        symbol_map = {
-            "Smoke Detector": "SD",
-            "Heat Detector": "HD",
-            "Pull Station": "PS",
-            "Notification Appliance": "NA",
-            "Monitor Module": "MM",
-            "Control Module": "CM",
-            "Input Module": "IM",
-            "Output Module": "OM",
-            "Annunciator": "AN",
+        # Show success message
+        self.status_label.setText(f"✅ Added panel {panel.uid} to staging")
+        self.status_label.setStyleSheet("color: #28a745; font-style: normal; font-weight: bold;")
+
+    def _assemble_system(self):
+        """Assemble the staged system into a working fire alarm system."""
+        if not self.staged_panels:
+            QMessageBox.warning(
+                self, "No Panels", "Please add at least one fire alarm panel before assembling."
+            )
+            return
+
+        if not self.staged_devices:
+            QMessageBox.warning(
+                self, "No Devices", "Please add at least one device type before assembling."
+            )
+            return
+
+        # Create assembled system data
+        assembled_data = {
+            "panels": [asdict(panel) for panel in self.staged_panels],
+            "devices": [asdict(device) for device in self.staged_devices],
+            "wires": [asdict(wire) for wire in self.staged_wires],
+            "policies": asdict(self.policies),
         }
 
-        device = StagedDevice(
-            uid=symbol_map.get(device_type, "DV"),
-            device_type=device_type,
-            model=self.device_model.text(),
-            manufacturer=self.device_manufacturer.currentText(),
-            symbol=symbol_map.get(device_type, "DV"),
-            quantity_planned=self.device_quantity.value(),
+        # Emit assembled signal
+        self.assembled.emit(assembled_data)
+
+        # Update status
+        total_devices = sum(device.quantity_planned for device in self.staged_devices)
+        self.status_label.setText(
+            f"🎉 System Assembled! {len(self.staged_panels)} panels, "
+            f"{total_devices} devices, {len(self.staged_wires)} wire types"
         )
-        self.staged_devices.append(device)
-        self._refresh_tables()
+        self.status_label.setStyleSheet("color: #28a745; font-style: normal; font-weight: bold;")
+
+        # Show assembly summary
+        summary_msg = f"""
+        System Assembly Complete!
+
+        Panels: {len(self.staged_panels)}
+        Device Types: {len(self.staged_devices)}
+        Total Devices: {total_devices}
+        Wire Types: {len(self.staged_wires)}
+
+        The system is now ready for device placement and circuit design.
+        """
+
+        QMessageBox.information(self, "System Assembled", summary_msg)
         self.staging_changed.emit()
 
         # Clear form
-        self.device_model.clear()
+        self.panel_uid.clear()
+        self.panel_model.clear()
 
     def _add_wire(self):
         """Add a new wire type to staging."""
@@ -593,103 +1029,6 @@ class SystemBuilderWidget(QWidget):
 
         # Clear form
         self.wire_sku.clear()
-
-    def _refresh_tables(self):
-        """Refresh all staging tables."""
-        # Refresh panels table
-        self.panels_table.setRowCount(len(self.staged_panels))
-        for i, panel in enumerate(self.staged_panels):
-            self.panels_table.setItem(i, 0, QTableWidgetItem(panel.uid))
-            self.panels_table.setItem(i, 1, QTableWidgetItem(panel.manufacturer))
-            self.panels_table.setItem(i, 2, QTableWidgetItem(panel.model))
-            self.panels_table.setItem(i, 3, QTableWidgetItem(str(panel.slots)))
-            self.panels_table.setItem(i, 4, QTableWidgetItem(f"{panel.psu_capacity:.1f}"))
-            self.panels_table.setItem(i, 5, QTableWidgetItem(f"{panel.battery_ah:.1f}"))
-
-            # Remove button
-            remove_btn = QPushButton("Remove")
-            remove_btn.clicked.connect(lambda checked, idx=i: self._remove_panel(idx))
-            self.panels_table.setCellWidget(i, 6, remove_btn)
-
-        # Refresh devices table
-        self.devices_table.setRowCount(len(self.staged_devices))
-        for i, device in enumerate(self.staged_devices):
-            self.devices_table.setItem(i, 0, QTableWidgetItem(device.device_type))
-            self.devices_table.setItem(i, 1, QTableWidgetItem(device.manufacturer))
-            self.devices_table.setItem(i, 2, QTableWidgetItem(device.model))
-            self.devices_table.setItem(i, 3, QTableWidgetItem(str(device.quantity_planned)))
-            self.devices_table.setItem(i, 4, QTableWidgetItem(str(device.quantity_placed)))
-            self.devices_table.setItem(i, 5, QTableWidgetItem(str(device.quantity_connected)))
-
-        # Refresh wires table
-        self.wires_table.setRowCount(len(self.staged_wires))
-        for i, wire in enumerate(self.staged_wires):
-            self.wires_table.setItem(i, 0, QTableWidgetItem(wire.sku))
-            self.wires_table.setItem(i, 1, QTableWidgetItem(str(wire.gauge)))
-            self.wires_table.setItem(i, 2, QTableWidgetItem(str(wire.conductor_count)))
-            self.wires_table.setItem(i, 3, QTableWidgetItem(f"{wire.resistance_per_1000ft:.2f}"))
-            self.wires_table.setItem(i, 4, QTableWidgetItem(str(wire.reel_length)))
-            self.wires_table.setItem(i, 5, QTableWidgetItem(str(wire.remaining_length)))
-
-    def _remove_panel(self, index: int):
-        """Remove a panel from staging."""
-        if 0 <= index < len(self.staged_panels):
-            del self.staged_panels[index]
-            self._refresh_tables()
-            self.staging_changed.emit()
-
-    def _assemble_system(self):
-        """Assemble the staged system - populates Device Palette and Wire Spool."""
-        if not self.staged_panels:
-            QMessageBox.warning(
-                self, "Assembly Error", "Please add at least one panel before assembling."
-            )
-            return
-
-        if not self.staged_devices:
-            QMessageBox.warning(
-                self, "Assembly Error", "Please add at least one device type before assembling."
-            )
-            return
-
-        # Update policies
-        self.policies.addressing_scheme = self.addr_scheme.currentText().lower().replace("-", "_")
-        self.policies.routing_preference = (
-            self.route_preference.currentText().lower().replace(" ", "_")
-        )
-        self.policies.auto_sizing = self.auto_sizing.isChecked()
-        self.policies.wire_derating = self.wire_derating.value()
-
-        # Create assembly data
-        assembly_data = {
-            "panels": [asdict(panel) for panel in self.staged_panels],
-            "devices": [asdict(device) for device in self.staged_devices],
-            "wires": [asdict(wire) for wire in self.staged_wires],
-            "policies": asdict(self.policies),
-            "timestamp": QtCore.QDateTime.currentDateTime().toString(Qt.DateFormat.ISODate),
-        }
-
-        # Update status
-        device_count = sum(d.quantity_planned for d in self.staged_devices)
-        wire_count = len(self.staged_wires)
-        self.status_label.setText(
-            f"✅ System assembled: {len(self.staged_panels)} panels, "
-            f"{device_count} devices, {wire_count} wire types"
-        )
-        self.status_label.setStyleSheet("color: #238636; font-weight: bold;")
-
-        # Emit assembled signal
-        self.assembled.emit(assembly_data)
-
-        QMessageBox.information(
-            self,
-            "System Assembled",
-            f"System successfully assembled!\n\n"
-            f"• {len(self.staged_panels)} panels staged\n"
-            f"• {device_count} devices planned\n"
-            f"• {wire_count} wire types available\n\n"
-            f"Device Palette and Wire Spool have been populated.",
-        )
 
     def get_assembly_data(self) -> dict:
         """Get the current assembly data."""

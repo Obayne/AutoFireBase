@@ -31,11 +31,13 @@ from cad_core.tools.draw import (
 )
 from frontend.assistant import AssistantDock
 
+# System builder for panel-based system design
+from frontend.panels.improved_system_builder import (
+    ImprovedGuidedSystemBuilder as SystemBuilderWidget,
+)
+
 # Layers panel for advanced layer management
 from frontend.panels.layer_manager import LayerManager
-
-# System builder for panel-based system design
-from frontend.panels.staging_system_builder import SystemBuilderWidget
 
 # Status widgets
 from frontend.widgets.canvas_status_summary import CanvasStatusSummary
@@ -1200,7 +1202,12 @@ class ModelSpaceWindow(QMainWindow):
         """Show System Builder and switch to specific tab."""
         self._show_system_builder()
         if hasattr(self, "system_builder_panel"):
-            self.system_builder_panel.tab_widget.setCurrentIndex(tab_index)
+            # New system builder uses content_stack instead of tab_widget
+            if hasattr(self.system_builder_panel, "content_stack"):
+                self.system_builder_panel.content_stack.setCurrentIndex(tab_index)
+            # Fallback for backward compatibility
+            elif hasattr(self.system_builder_panel, "tab_widget"):
+                self.system_builder_panel.tab_widget.setCurrentIndex(tab_index)
 
     def _assemble_system_from_menu(self):
         """Trigger system assembly from menu."""

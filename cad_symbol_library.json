@@ -1,0 +1,624 @@
+{
+  "1": {
+    "id": 1,
+    "model": "GEN-SD",
+    "name": "Smoke Detector",
+    "symbol": "SD",
+    "cad_properties": {
+      "layer": "FIRE-DETECTION",
+      "color": "BLUE",
+      "line_weight": 0.35,
+      "block_name": "AF_GEN_SD"
+    },
+    "geometry": {
+      "type": "circle",
+      "radius": 6,
+      "center": [
+        0,
+        0
+      ],
+      "text": "SD",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "GEN-SD",
+      "description": "Smoke Detector",
+      "manufacturer": "TBD",
+      "installation_height": "CEILING"
+    }
+  },
+  "2": {
+    "id": 2,
+    "model": "GEN-HD",
+    "name": "Heat Detector",
+    "symbol": "HD",
+    "cad_properties": {
+      "layer": "FIRE-DETECTION",
+      "color": "BLUE",
+      "line_weight": 0.35,
+      "block_name": "AF_GEN_HD"
+    },
+    "geometry": {
+      "type": "square",
+      "size": 8,
+      "center": [
+        0,
+        0
+      ],
+      "text": "HD",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "GEN-HD",
+      "description": "Heat Detector",
+      "manufacturer": "TBD",
+      "installation_height": "CEILING"
+    }
+  },
+  "3": {
+    "id": 3,
+    "model": "GEN-S",
+    "name": "Strobe",
+    "symbol": "S",
+    "cad_properties": {
+      "layer": "FIRE-NOTIFICATION",
+      "color": "MAGENTA",
+      "line_weight": 0.35,
+      "block_name": "AF_GEN_S"
+    },
+    "geometry": {
+      "type": "triangle",
+      "size": 10,
+      "center": [
+        0,
+        0
+      ],
+      "text": "HS",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "GEN-S",
+      "description": "Strobe",
+      "manufacturer": "TBD",
+      "installation_height": "80\" AFF"
+    }
+  },
+  "4": {
+    "id": 4,
+    "model": "GEN-HS",
+    "name": "Horn Strobe",
+    "symbol": "HS",
+    "cad_properties": {
+      "layer": "FIRE-NOTIFICATION",
+      "color": "MAGENTA",
+      "line_weight": 0.35,
+      "block_name": "AF_GEN_HS"
+    },
+    "geometry": {
+      "type": "triangle",
+      "size": 10,
+      "center": [
+        0,
+        0
+      ],
+      "text": "HS",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "GEN-HS",
+      "description": "Horn Strobe",
+      "manufacturer": "TBD",
+      "installation_height": "80\" AFF"
+    }
+  },
+  "5": {
+    "id": 5,
+    "model": "GEN-SPK",
+    "name": "Speaker",
+    "symbol": "SPK",
+    "cad_properties": {
+      "layer": "FIRE-NOTIFICATION",
+      "color": "WHITE",
+      "line_weight": 0.35,
+      "block_name": "AF_GEN_SPK"
+    },
+    "geometry": {
+      "type": "circle",
+      "radius": 4,
+      "center": [
+        0,
+        0
+      ],
+      "text": "?",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "GEN-SPK",
+      "description": "Speaker",
+      "manufacturer": "TBD",
+      "installation_height": "TBD"
+    }
+  },
+  "6": {
+    "id": 6,
+    "model": "GEN-PS",
+    "name": "Pull Station",
+    "symbol": "PS",
+    "cad_properties": {
+      "layer": "FIRE-MANUAL",
+      "color": "GREEN",
+      "line_weight": 0.35,
+      "block_name": "AF_GEN_PS"
+    },
+    "geometry": {
+      "type": "rectangle",
+      "width": 12,
+      "height": 8,
+      "center": [
+        0,
+        0
+      ],
+      "text": "PS",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "GEN-PS",
+      "description": "Pull Station",
+      "manufacturer": "TBD",
+      "installation_height": "48\" AFF"
+    }
+  },
+  "7": {
+    "id": 7,
+    "model": "NFS2-3030",
+    "name": "Fire Alarm Control Panel",
+    "symbol": "FACP",
+    "cad_properties": {
+      "layer": "FIRE-PANEL",
+      "color": "RED",
+      "line_weight": 0.7,
+      "block_name": "AF_NFS2_3030"
+    },
+    "geometry": {
+      "type": "rectangle",
+      "width": 24,
+      "height": 16,
+      "center": [
+        0,
+        0
+      ],
+      "text": "FACP",
+      "text_size": 6
+    },
+    "attributes": {
+      "model": "NFS2-3030",
+      "description": "Fire Alarm Control Panel",
+      "manufacturer": "TBD",
+      "installation_height": "60\" AFF"
+    }
+  },
+  "8": {
+    "id": 8,
+    "model": "2WT-B",
+    "name": "Photoelectric Smoke Detector",
+    "symbol": "SD",
+    "cad_properties": {
+      "layer": "FIRE-DETECTION",
+      "color": "BLUE",
+      "line_weight": 0.35,
+      "block_name": "AF_2WT_B"
+    },
+    "geometry": {
+      "type": "circle",
+      "radius": 6,
+      "center": [
+        0,
+        0
+      ],
+      "text": "SD",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "2WT-B",
+      "description": "Photoelectric Smoke Detector",
+      "manufacturer": "TBD",
+      "installation_height": "CEILING"
+    }
+  },
+  "9": {
+    "id": 9,
+    "model": "5602",
+    "name": "Fixed Temperature Heat Detector",
+    "symbol": "HD",
+    "cad_properties": {
+      "layer": "FIRE-DETECTION",
+      "color": "BLUE",
+      "line_weight": 0.35,
+      "block_name": "AF_5602"
+    },
+    "geometry": {
+      "type": "square",
+      "size": 8,
+      "center": [
+        0,
+        0
+      ],
+      "text": "HD",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "5602",
+      "description": "Fixed Temperature Heat Detector",
+      "manufacturer": "TBD",
+      "installation_height": "CEILING"
+    }
+  },
+  "10": {
+    "id": 10,
+    "model": "SD365",
+    "name": "Ionization Smoke Detector",
+    "symbol": "SD",
+    "cad_properties": {
+      "layer": "FIRE-DETECTION",
+      "color": "BLUE",
+      "line_weight": 0.35,
+      "block_name": "AF_SD365"
+    },
+    "geometry": {
+      "type": "circle",
+      "radius": 6,
+      "center": [
+        0,
+        0
+      ],
+      "text": "SD",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "SD365",
+      "description": "Ionization Smoke Detector",
+      "manufacturer": "TBD",
+      "installation_height": "CEILING"
+    }
+  },
+  "11": {
+    "id": 11,
+    "model": "HD135F",
+    "name": "Rate-of-Rise Heat Detector",
+    "symbol": "HD",
+    "cad_properties": {
+      "layer": "FIRE-DETECTION",
+      "color": "BLUE",
+      "line_weight": 0.35,
+      "block_name": "AF_HD135F"
+    },
+    "geometry": {
+      "type": "square",
+      "size": 8,
+      "center": [
+        0,
+        0
+      ],
+      "text": "HD",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "HD135F",
+      "description": "Rate-of-Rise Heat Detector",
+      "manufacturer": "TBD",
+      "installation_height": "CEILING"
+    }
+  },
+  "12": {
+    "id": 12,
+    "model": "P2R",
+    "name": "Red Horn Strobe",
+    "symbol": "HS",
+    "cad_properties": {
+      "layer": "FIRE-NOTIFICATION",
+      "color": "MAGENTA",
+      "line_weight": 0.35,
+      "block_name": "AF_P2R"
+    },
+    "geometry": {
+      "type": "triangle",
+      "size": 10,
+      "center": [
+        0,
+        0
+      ],
+      "text": "HS",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "P2R",
+      "description": "Red Horn Strobe",
+      "manufacturer": "TBD",
+      "installation_height": "80\" AFF"
+    }
+  },
+  "13": {
+    "id": 13,
+    "model": "P2W",
+    "name": "White Horn Strobe",
+    "symbol": "HS",
+    "cad_properties": {
+      "layer": "FIRE-NOTIFICATION",
+      "color": "MAGENTA",
+      "line_weight": 0.35,
+      "block_name": "AF_P2W"
+    },
+    "geometry": {
+      "type": "triangle",
+      "size": 10,
+      "center": [
+        0,
+        0
+      ],
+      "text": "HS",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "P2W",
+      "description": "White Horn Strobe",
+      "manufacturer": "TBD",
+      "installation_height": "80\" AFF"
+    }
+  },
+  "14": {
+    "id": 14,
+    "model": "AS-24MCW",
+    "name": "Ceiling Mount Speaker Strobe",
+    "symbol": "SS",
+    "cad_properties": {
+      "layer": "FIRE-NOTIFICATION",
+      "color": "MAGENTA",
+      "line_weight": 0.35,
+      "block_name": "AF_AS_24MCW"
+    },
+    "geometry": {
+      "type": "triangle",
+      "size": 10,
+      "center": [
+        0,
+        0
+      ],
+      "text": "HS",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "AS-24MCW",
+      "description": "Ceiling Mount Speaker Strobe",
+      "manufacturer": "TBD",
+      "installation_height": "80\" AFF"
+    }
+  },
+  "15": {
+    "id": 15,
+    "model": "NS-24MCW",
+    "name": "Wall Mount Speaker Strobe",
+    "symbol": "SS",
+    "cad_properties": {
+      "layer": "FIRE-NOTIFICATION",
+      "color": "MAGENTA",
+      "line_weight": 0.35,
+      "block_name": "AF_NS_24MCW"
+    },
+    "geometry": {
+      "type": "triangle",
+      "size": 10,
+      "center": [
+        0,
+        0
+      ],
+      "text": "HS",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "NS-24MCW",
+      "description": "Wall Mount Speaker Strobe",
+      "manufacturer": "TBD",
+      "installation_height": "80\" AFF"
+    }
+  },
+  "16": {
+    "id": 16,
+    "model": "4906-9356",
+    "name": "High Candela Strobe",
+    "symbol": "S",
+    "cad_properties": {
+      "layer": "FIRE-NOTIFICATION",
+      "color": "MAGENTA",
+      "line_weight": 0.35,
+      "block_name": "AF_4906_9356"
+    },
+    "geometry": {
+      "type": "triangle",
+      "size": 10,
+      "center": [
+        0,
+        0
+      ],
+      "text": "HS",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "4906-9356",
+      "description": "High Candela Strobe",
+      "manufacturer": "TBD",
+      "installation_height": "80\" AFF"
+    }
+  },
+  "17": {
+    "id": 17,
+    "model": "BG-12",
+    "name": "Single Action Pull Station",
+    "symbol": "PS",
+    "cad_properties": {
+      "layer": "FIRE-MANUAL",
+      "color": "GREEN",
+      "line_weight": 0.35,
+      "block_name": "AF_BG_12"
+    },
+    "geometry": {
+      "type": "rectangle",
+      "width": 12,
+      "height": 8,
+      "center": [
+        0,
+        0
+      ],
+      "text": "PS",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "BG-12",
+      "description": "Single Action Pull Station",
+      "manufacturer": "TBD",
+      "installation_height": "48\" AFF"
+    }
+  },
+  "18": {
+    "id": 18,
+    "model": "PS-6",
+    "name": "Dual Action Pull Station",
+    "symbol": "PS",
+    "cad_properties": {
+      "layer": "FIRE-MANUAL",
+      "color": "GREEN",
+      "line_weight": 0.35,
+      "block_name": "AF_PS_6"
+    },
+    "geometry": {
+      "type": "rectangle",
+      "width": 12,
+      "height": 8,
+      "center": [
+        0,
+        0
+      ],
+      "text": "PS",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "PS-6",
+      "description": "Dual Action Pull Station",
+      "manufacturer": "TBD",
+      "installation_height": "48\" AFF"
+    }
+  },
+  "19": {
+    "id": 19,
+    "model": "NFS2-640",
+    "name": "Intelligent Fire Alarm Control Panel",
+    "symbol": "FACP",
+    "cad_properties": {
+      "layer": "FIRE-PANEL",
+      "color": "RED",
+      "line_weight": 0.7,
+      "block_name": "AF_NFS2_640"
+    },
+    "geometry": {
+      "type": "rectangle",
+      "width": 24,
+      "height": 16,
+      "center": [
+        0,
+        0
+      ],
+      "text": "FACP",
+      "text_size": 6
+    },
+    "attributes": {
+      "model": "NFS2-640",
+      "description": "Intelligent Fire Alarm Control Panel",
+      "manufacturer": "TBD",
+      "installation_height": "60\" AFF"
+    }
+  },
+  "20": {
+    "id": 20,
+    "model": "4100ES",
+    "name": "Essential Fire Alarm Control Panel",
+    "symbol": "FACP",
+    "cad_properties": {
+      "layer": "FIRE-PANEL",
+      "color": "RED",
+      "line_weight": 0.7,
+      "block_name": "AF_4100ES"
+    },
+    "geometry": {
+      "type": "rectangle",
+      "width": 24,
+      "height": 16,
+      "center": [
+        0,
+        0
+      ],
+      "text": "FACP",
+      "text_size": 6
+    },
+    "attributes": {
+      "model": "4100ES",
+      "description": "Essential Fire Alarm Control Panel",
+      "manufacturer": "TBD",
+      "installation_height": "60\" AFF"
+    }
+  },
+  "21": {
+    "id": 21,
+    "model": "VLS-500",
+    "name": "Very Early Smoke Detection Aspirating",
+    "symbol": "ASD",
+    "cad_properties": {
+      "layer": "FIRE-DETECTION",
+      "color": "BLUE",
+      "line_weight": 0.35,
+      "block_name": "AF_VLS_500"
+    },
+    "geometry": {
+      "type": "circle",
+      "radius": 6,
+      "center": [
+        0,
+        0
+      ],
+      "text": "SD",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "VLS-500",
+      "description": "Very Early Smoke Detection Aspirating",
+      "manufacturer": "TBD",
+      "installation_height": "CEILING"
+    }
+  },
+  "22": {
+    "id": 22,
+    "model": "X3302",
+    "name": "UV/IR Flame Detector",
+    "symbol": "FD",
+    "cad_properties": {
+      "layer": "FIRE-DETECTION",
+      "color": "WHITE",
+      "line_weight": 0.35,
+      "block_name": "AF_X3302"
+    },
+    "geometry": {
+      "type": "circle",
+      "radius": 4,
+      "center": [
+        0,
+        0
+      ],
+      "text": "?",
+      "text_size": 3
+    },
+    "attributes": {
+      "model": "X3302",
+      "description": "UV/IR Flame Detector",
+      "manufacturer": "TBD",
+      "installation_height": "TBD"
+    }
+  }
+}
