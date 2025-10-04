@@ -1835,33 +1835,37 @@ class ImprovedGuidedSystemBuilder(QWidget):
         card.setStyleSheet(
             """
             QFrame {
-                border: 2px solid #e9ecef;
+                border: 3px solid #000000;
                 border-radius: 8px;
-                background-color: white;
+                background-color: #F0F0F0;
                 padding: 12px;
                 margin: 4px;
             }
             QFrame:hover {
-                border-color: #007bff;
-                background-color: #f8f9fa;
-                box-shadow: 0 2px 4px rgba(0,123,255,0.25);
+                border-color: #0066CC;
+                background-color: #E0E0E0;
             }
         """
         )
-        card.setFixedSize(220, 140)
+        card.setFixedSize(260, 180)
 
         layout = QVBoxLayout(card)
-        layout.setSpacing(6)
+        layout.setSpacing(8)
+        layout.setContentsMargins(8, 8, 8, 8)
 
         # Model name
         model_label = QLabel(panel["model"])
         model_label.setStyleSheet(
             """
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            color: #2c3e50;
+            color: #000000;
+            background-color: #FFFFFF;
+            border: 1px solid #000000;
+            padding: 4px;
         """
         )
+        model_label.setWordWrap(True)
         layout.addWidget(model_label)
 
         # Manufacturer
@@ -1869,9 +1873,14 @@ class ImprovedGuidedSystemBuilder(QWidget):
         mfg_label.setStyleSheet(
             """
             font-size: 12px;
-            color: #6c757d;
+            color: #000000;
+            background-color: #FFFFFF;
+            border: 1px solid #000000;
+            padding: 3px;
+            font-weight: bold;
         """
         )
+        mfg_label.setWordWrap(True)
         layout.addWidget(mfg_label)
 
         # Capacity
@@ -1879,8 +1888,12 @@ class ImprovedGuidedSystemBuilder(QWidget):
         capacity_label = QLabel(capacity)
         capacity_label.setStyleSheet(
             """
-            font-size: 11px;
-            color: #495057;
+            font-size: 10px;
+            color: #000000;
+            background-color: #FFFFFF;
+            border: 1px solid #000000;
+            padding: 2px;
+            font-weight: normal;
         """
         )
         capacity_label.setWordWrap(True)
@@ -2162,15 +2175,15 @@ Always check local codes and amendments."""
         option.setStyleSheet(
             """
             QFrame {
-                border: 2px solid #2c3e50;
+                border: 3px solid #000000;
                 border-radius: 8px;
                 padding: 15px;
                 margin: 8px;
-                background-color: #ffffff;
+                background-color: #F0F0F0;
             }
             QFrame:hover {
-                border-color: #3498db;
-                background-color: #f8f9fa;
+                border-color: #0066CC;
+                background-color: #E0E0E0;
             }
         """
         )
@@ -2183,22 +2196,27 @@ Always check local codes and amendments."""
         name_label = QLabel(f"<b>{panel['name']}</b>")
         name_label.setStyleSheet(
             """
-            font-size: 16px;
-            color: #1a1a1a;
-            font-family: 'Arial', sans-serif;
+            font-size: 18px;
+            color: #000000;
+            font-family: 'Arial Black', sans-serif;
             font-weight: bold;
-            background-color: #ffffff;
+            background-color: #FFFFFF;
+            border: 1px solid #000000;
+            padding: 5px;
         """
         )
 
         details_label = QLabel(f"Model: {panel['model']} | {panel['manufacturer']}")
         details_label.setStyleSheet(
             """
-            color: #333333;
-            font-size: 14px;
+            color: #000000;
+            font-size: 16px;
             font-family: 'Arial', sans-serif;
             margin-top: 4px;
-            background-color: #ffffff;
+            background-color: #FFFFFF;
+            font-weight: bold;
+            border: 1px solid #000000;
+            padding: 3px;
         """
         )
 
@@ -2210,12 +2228,15 @@ Always check local codes and amendments."""
         reason_label = QLabel(f"ℹ️ {application_info}")
         reason_label.setStyleSheet(
             """
-            color: #333333;
-            font-size: 13px;
+            color: #000000;
+            font-size: 14px;
             font-style: normal;
             font-family: 'Arial', sans-serif;
-            font-weight: 500;
+            font-weight: bold;
             margin-top: 8px;
+            background-color: #FFFFFF;
+            border: 1px solid #000000;
+            padding: 3px;
         """
         )
         reason_label.setWordWrap(True)
@@ -2225,11 +2246,14 @@ Always check local codes and amendments."""
         capacity_label = QLabel(f"📊 {capacity_info}")
         capacity_label.setStyleSheet(
             """
-            color: #444444;
-            font-size: 12px;
+            color: #000000;
+            font-size: 14px;
             font-family: 'Arial', sans-serif;
-            font-weight: 600;
+            font-weight: bold;
             margin-top: 4px;
+            background-color: #FFFFFF;
+            border: 1px solid #000000;
+            padding: 3px;
         """
         )
 
