@@ -2,11 +2,11 @@
 
 
 a = Analysis(
-    ['app\\boot.py'],
+    ['main.py'],
     pathex=['.'],
     binaries=[],
-    datas=[('app', 'app'), ('core', 'core'), ('updater', 'updater')],
-    hiddenimports=['shapely','shapely.geometry','app.main', 'app.minwin', 'app.tools.array', 'app.tools.draw', 'app.tools.dimension', 'app.tools.text_tool', 'app.tools.trim_tool', 'app.tools.measure_tool', 'app.tools.extend_tool', 'app.tools.fillet_tool', 'app.tools.fillet_radius_tool', 'app.tools.rotate_tool', 'app.tools.mirror_tool', 'app.tools.scale_tool', 'app.tools.chamfer_tool', 'app.layout', 'app.dxf_import'],
+    datas=[('frontend', 'frontend'), ('backend', 'backend'), ('cad_core', 'cad_core'), ('db', 'db'), ('core', 'core'), ('updater', 'updater')],
+    hiddenimports=['shapely','shapely.geometry','frontend.app', 'frontend.controller', 'frontend.windows.model_space', 'frontend.windows.paperspace', 'frontend.panels.panel_system_builder', 'frontend.panels.panel_device_palette', 'backend.catalog', 'backend.persistence', 'cad_core.geometry', 'cad_core.tools', 'db.loader'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -42,4 +42,3 @@ coll = COLLECT(
     upx_exclude=[],
     name='AutoFire',
 )
-

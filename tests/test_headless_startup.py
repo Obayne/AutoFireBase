@@ -19,9 +19,9 @@ def test_headless_startup():
         app = QApplication.instance() or QApplication(sys.argv)
 
         # Import and construct the AppController (should be headless-safe)
-        from app.app_controller import AppController
+        from frontend.controller import AutoFireController
 
-        ctrl = AppController()
+        ctrl = AutoFireController()
 
         # Basic assertion: controller exists and exposes the expected attributes
         assert hasattr(ctrl, "model_space_window")
@@ -37,7 +37,7 @@ def test_headless_startup():
         # If we can't import PySide6, that's okay for some environments
         # but we should still try to import the core components
         try:
-            from app.app_controller import AppController
+            from frontend.controller import AutoFireController
 
             # If we get here, at least the core components can be imported
             print("Core components import test passed!")

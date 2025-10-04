@@ -1,0 +1,97 @@
+{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 AutoFire \u8212- Visual Workflow of the Design Process\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 1. Launch \u8594? Project Setup\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Open AutoFire \u8594? splash screen with recent projects and \u8220"New Project\u8221" button.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Create new project \u8594? dialog with name, client, AHJ, units, sheet size.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Floorplan (DXF/PDF) imports into gray CAD grid background.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Grid scales with calibration; architectural layer locks with padlock icon.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Workspace layout:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Top: menu bar + toolbar.\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Left: Device Palette + Wire Spool (empty initially).\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Right: Inspector (Properties, Connections, AI Suggestions).\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Bottom: XY coordinates, Snap toggle, Active Layer, Warnings banner.\sa180\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 2. System Builder \u8594? Staging\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Open System Builder \u8594? wizard tabs: Panels, Devices, Wire, Policies.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Select panel, add boards/batteries.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Add devices (detectors, strobes, pulls) with quantity fields.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Add wire SKUs with \u937?/1000ft, reel length, cost.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Set addressing policy (Zone\u8594?XY, Manual, etc.).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u8220"Assemble & Stage\u8221" populates:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Device Palette (NFPA 170 symbols with Planned/Placed/Connected counters).\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Wire Spool (wire types with remaining ft and \u937?/1000ft).\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Connections tab with panel circuits seeded.\sa180\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 3. Placing Panels & Devices\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Place panel: cursor changes to panel icon, drop into floorplan \u8594? black rectangle with ID appears.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Place devices: drag from palette, snap to grid.\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Smoke detector: circle-S with translucent blue coverage radius.\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Multiple detectors overlap \u8594? compliant areas green, gaps red.\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Strobes: rectangles with candela shading, translucent overlays.\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Array placement: drag rectangle \u8594? preview ghost grid \u8594? release to place devices.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 4. Wiring Circuits\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Select wire in Wire Spool (radio button highlights).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Activate Wire Routing tool (cursor shows spool).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Click panel \u8594? device \u8594? red/blue line draws segment with length label.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Each vertex click = new polyline corner.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Connections tab updates: circuit length, load, VD %.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab AutoRoute preview follows corridors with dashed preview line \u8594? accept \u10003? or adjust manually.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Reel exhaustion triggers splice warning popup.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 5. Inspector Properties\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Selecting device opens card in right dock:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab UID, Type, Model, Room/Floor.\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Zone, Candela, Tone, Address (blank until committed).\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Circuit ID field fills after connection.\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Selecting wire opens segment card:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Endpoints, 3D length, SKU, slack %, conduit fill bar.\sa180\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 6. Live Calculations & Warnings\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Bottom warning banner lights up yellow/red:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u8220"\u9888? NAC-2 VD exceeds 10%.\u8221"\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Tooltip shows NFPA clause + values.\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab AI Suggestions tab shows fixes:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u8220"\u9745? Upsize to 12 AWG.\u8221"\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u8220"\u9745? Split NAC-2 into two circuits.\u8221"\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Applying fix redraws wire, updates Connections tab.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 7. Reports & Exports\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Reports menu \u8594? Riser Diagram = crisp schematic view.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Cable Schedule = spreadsheet of circuits, wire types, lengths.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab BOM = table of devices, wire totals, costs.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Export dialog = checkboxes for reports (Riser, BOM, VD, Battery, ROC).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Export \u8594? PDF/XLSX \u8594? confirmation toast.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 8. Compliance\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Compliance run = side checklist of Pass/Warning/Fail.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Clicking fail zooms canvas to issue.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Example: corridor strobes red highlight.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab AI suggests candela increase \u8594? accept \u8594? compliance re-check \u8594? green.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 9. Commissioning\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Export labels (UID, Address, Circuit ID).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Sync to TechPoint mobile app \u8594? devices appear as checklist.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Field tech marks pass/fail, adds photos.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Failed devices sync back \u8594? flagged red in AutoFire canvas.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 10. Project Closeout\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Record of Completion auto-filled with system data.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Archive Project dialog \u8594? includes drawings, reports, cut sheets, manifest.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Creates ZIP archive in /Projects/Final.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Confirmation popup \u8220"Archive complete.\u8221"\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Visual TL;DR\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab New Project \u8594? floorplan on CAD grid.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab System Builder \u8594? stage \u8594? Palette/Spool populate.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Place devices/panels \u8594? coverage overlays (blue/green/red).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab Wire circuits \u8594? colored lines with lengths.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab Live calcs \u8594? warnings + AI fix-its.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 6.\tx360\tab Reports \u8594? riser, BOM, VD, battery.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 7.\tx360\tab Compliance check \u8594? fail highlights + fixes.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 8.\tx360\tab Commissioning \u8594? mobile sync + pass/fail feedback.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 9.\tx360\tab Archive \u8594? zipped package with manifest + ROC.\sa180\par}
+}

@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 from PySide6 import QtCore, QtWidgets
 
-from app.main import CanvasView
+from frontend.windows.scene import CanvasView
 
 
 class TestOSNAP:
@@ -32,7 +32,7 @@ class TestOSNAP:
         assert view.osnap_marker is not None
         assert isinstance(view.osnap_marker, QtWidgets.QGraphicsEllipseItem)
 
-    @patch("app.main.QtWidgets.QGraphicsLineItem")
+    @patch("frontend.windows.scene.QtWidgets.QGraphicsLineItem")
     def test_compute_osnap_line_endpoints(self, mock_line_item):
         """Test OSNAP finds line endpoints."""
         mock_scene = Mock()
@@ -67,7 +67,7 @@ class TestOSNAP:
         assert abs(result.x() - 0.0) < 1e-6
         assert abs(result.y() - 0.0) < 1e-6
 
-    @patch("app.main.QtWidgets.QGraphicsEllipseItem")
+    @patch("frontend.windows.scene.QtWidgets.QGraphicsEllipseItem")
     def test_compute_osnap_circle_center(self, mock_ellipse_item):
         """Test OSNAP finds circle centers."""
         mock_scene = Mock()
@@ -98,7 +98,7 @@ class TestOSNAP:
         assert abs(result.x() - 5.0) < 1e-6
         assert abs(result.y() - 5.0) < 1e-6
 
-    @patch("app.main.QtWidgets.QGraphicsLineItem")
+    @patch("frontend.windows.scene.QtWidgets.QGraphicsLineItem")
     def test_compute_osnap_line_intersection(self, mock_line_item):
         """Test OSNAP finds line intersections."""
         mock_scene = Mock()

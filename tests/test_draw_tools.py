@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 from PySide6 import QtCore
 
-from app.tools.draw import DrawController, DrawMode, _circle_from_3pts
+from cad_core.tools.draw import DrawController, DrawMode, _circle_from_3pts
 
 
 class TestDrawTools:
@@ -95,7 +95,7 @@ class TestDrawTools:
         assert len(controller.points) == 1
         assert controller.points[0] == QtCore.QPointF(10, 20)
 
-    @patch("app.tools.draw.QtWidgets.QGraphicsLineItem")
+    @patch("cad_core.tools.draw.QtWidgets.QGraphicsLineItem")
     def test_add_point_command_line_commit(self, mock_line_item):
         """Test add_point_command committing a line."""
         mock_window = Mock()
@@ -114,7 +114,7 @@ class TestDrawTools:
         assert controller.points == []  # Should clear points
         mock_item.setParentItem.assert_called_with(mock_layer)
 
-    @patch("app.tools.draw.QtWidgets.QGraphicsPathItem")
+    @patch("cad_core.tools.draw.QtWidgets.QGraphicsPathItem")
     def test_finish_polyline_commit(self, mock_path_item):
         """Test finishing polyline with multiple points."""
         mock_window = Mock()
@@ -148,7 +148,7 @@ class TestDrawTools:
 
         assert controller.temp_item is None
 
-    @patch("app.tools.draw.QtWidgets.QGraphicsLineItem")
+    @patch("cad_core.tools.draw.QtWidgets.QGraphicsLineItem")
     def test_on_mouse_move_creates_temp_line_item(self, mock_line_item):
         """Test that mouse move creates temporary line preview."""
         mock_window = Mock()
@@ -166,7 +166,7 @@ class TestDrawTools:
         assert controller.temp_item is not None
         mock_item.setParentItem.assert_called_with(mock_layer)
 
-    @patch("app.tools.draw.QtWidgets.QGraphicsLineItem")
+    @patch("cad_core.tools.draw.QtWidgets.QGraphicsLineItem")
     def test_wire_mode_special_styling(self, mock_line_item):
         """Test that wire mode gets special pen styling."""
         mock_window = Mock()

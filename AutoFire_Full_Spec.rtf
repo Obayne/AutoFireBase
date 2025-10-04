@@ -1,0 +1,136 @@
+{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 AutoFire Design Suite \u8212- Unified Master Specification\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 0) Vision\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 AutoFire Core is a CAD-driven fire alarm design environment. It focuses on device placement, wiring, calculations (VD, battery, conduit, coverage), and export of risers, BOM, and submittals. The Project Manager Suite is a standalone but integrable companion for tasks, RFIs, emails, plan storage, commissioning, and Procore/Autodesk integrations. They communicate via shared manifests and exports but operate independently.\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 1) First Run & Workspace Boot\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Splash screen: version, recent projects, new/open buttons.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Workspace layout:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Top menu bar: File, Edit, View, Insert, Tools, System Builder, Connections, Reports, Compliance, Window, Help.\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Toolbar: selection, pan, place panel, place device, wire routing, coverage overlays, array fill, measure, layers, undo/redo.\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Left dock: Device Palette + Wire Spool.\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Right dock: Inspector tabs (Properties, Connections, AI Suggestions).\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Bottom bar: coordinates, active layer, snap toggle, active wire, warning banner.\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Layer Manager: visibility, lock, color per layer. Presets for Designer, AHJ, Installer.\sa180\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 2) Project Setup\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab File \u8594? New Project:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Name, client, address, AHJ profile, occupancy, sheet size, units, px/ft.\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Import floorplans (DXF or PDF), calibrate scale, lock architectural layers.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Layer structure includes: Devices (Detection/Notification/Power), Wiring (SLC/NAC/Power/Control), Conduit, Coverage, Annotations.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 3) System Builder (Staging Warehouse)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Panels tab: add FACP, boards, PSU, batteries.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Devices tab: stage detectors, modules, pulls, NAs, annunciators, etc.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Wire tab: add wire SKUs, \u937?/1000ft, capacitance, reel length, cost.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Policies tab: addressing schemes, reserved ranges, routing preferences.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Assemble \u8594? populates Device Palette and Wire Spool, seeds Connections.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 4) Device Palette & Wire Spool\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Palette shows staged devices only with NFPA 170 symbols and Planned/Placed/Connected counters.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Wire Spool shows active reels with \u937?/1000ft, remaining length, cost, radio button selection.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 5) Placement\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Place panels first (properties: UID, slots, PSU, outputs).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Place devices with coverage overlays:\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Detectors (circles), strobes (rectangles with candela shading), speakers (SPL heatmaps).\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Array Fill tool auto-generates device grids by spacing or coverage.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Inspector properties: UID, type, model, zone, XY, mount type/height, candela, tone, circuit assignment.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 6) Connections (Wiring)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Pick wire spool (active wire).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Choose routing mode: manual, follow path, AutoRoute.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Create segments: track 2D length, \u916?z, 3D length, wire SKU, slack, service loop, waste, conduit, endpoints.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Connections tab tree: Panel \u8594? Board \u8594? Circuit \u8594? Devices. Displays type, wire, gauge, total length, load, VD, devices, address range. Expand for segments table.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 7) Calculations (Live)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Wire lengths: 3D + loops + slack + waste.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Voltage drop: V = I * R per segment, sum for farthest device.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Battery: AH = (I_standby{\i hrs_stby + I_alarm}hrs_alarm)/1000 * derating.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab SLC: loop length, device count, capacitance limits.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Conduit fill: cable areas \u247? conduit area, warnings at thresholds.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Coverage: overlays update live with compliance checks.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 8) Auto-Addressing\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab When loops complete, addresses assigned per policy.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Duplicate prevention, reserved ranges enforced.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Lock addresses before labels/exports.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 9) AI Assistant\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Placement nudges, coverage hints, over/under-stage warnings.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Routing fixes (upsize gauge, split circuits).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Compliance QA with NFPA/ADA clause references.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Learning loop for designer preferences.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u8220"Ask AiHJ\u8221" natural language guidance.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 10) Reports & Outputs\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Riser diagrams built from actual circuits.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Cable schedule with wire types, lengths, conduit.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab VD reports per segment.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Battery AH reports with SKU recommendations.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab SLC summaries with address maps.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Conduit fill reports.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab BOM with devices, wire, junctions, costs.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Submittal packet with cover, risers, BOM, calcs, ROC, cut sheets.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 11) Compliance\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Runs NFPA/ADA/AHJ rule checks.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Table of pass/warn/fail with zoom to issues and fix suggestions.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab AI-assisted corrections.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 12) Commissioning\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Labels for devices, cables, terminals.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Programming maps for panel upload.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab TechPoint mobile app sync for field tests.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Import test results, mark pass/fail, generate tasks.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Record of Completion prefills all known data.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 13) Project Manager Suite (Standalone)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Tabs: Overview, Tasks, Milestones, Emails, Files, RFIs, Submittals, Contacts, Integrations, ChangeLog, Exports.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Email integration (IMAP/SMTP, link to devices/circuits).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab File vault (plans, cut sheets, photos, exports) with versioning.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab RFIs creation, tracking, syncing with Procore/Autodesk.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Submittal packet management.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Integrations with Procore, Autodesk Build, BuildingsConnect, Drive, Slack/Teams.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Mobile app: offline-first, plan viewer, tasks, RFIs, commissioning, photos, notifications.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 14) Integration Layer\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Project manifest JSON: metadata, devices, circuits, BOM, reports.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab File sync between AutoFire exports and Project Manager vault.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Tasks/RFIs mapped back into AutoFire canvas (highlight devices, circuits).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Commissioning sync: test logs back to AutoFire for ROC completion.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 15) Competitor Comparison\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab AutoCAD blocks: static symbols, no calcs. AutoFire: live compliance.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab AlarmCAD: plugin, clunky. AutoFire: standalone, modern.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Revit: overkill families, steep learning. AutoFire: targeted, simple.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Bluebeam: markups only. AutoFire: full design+calcs.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Vendor tools: brand-locked. AutoFire: multi-vendor, flexible.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 16) Suggested Improvements\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Delta-sync vector plans for mobile.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Auto-generate install packets.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Panel programming exports for major brands.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Cost & labor model integration for estimating.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Permit workflows with watermark and digital seal.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Convert field redlines into CAD annotations.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab AI-assisted RFI summaries and responses.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Telemetry for performance optimization.\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 17) End-to-End Golden Path\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab New Project \u8594? import floorplan \u8594? calibrate scale \u8594? lock layers.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab System Builder \u8594? stage panels/devices/wire.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Device Palette & Wire Spool populate.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab Place panel, devices (with coverage overlays).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab Wire circuits (manual/follow/AutoRoute).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 6.\tx360\tab Calcs live update (VD, battery, SLC, conduit).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 7.\tx360\tab Auto-address SLC loops \u8594? lock addresses.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 8.\tx360\tab Generate reports (riser, BOM, schedules).\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 9.\tx360\tab Run compliance \u8594? fix until green.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 10.\tx360\tab Export submittal packet, labels, ROC.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 11.\tx360\tab Commission with TechPoint \u8594? sync results.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 12.\tx360\tab Archive project with manifest + exports.\sa180\par}
+}

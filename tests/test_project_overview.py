@@ -4,7 +4,7 @@ Tests for Project Overview Window
 
 from PySide6 import QtWidgets
 
-from app.project_overview_window import ProjectOverviewWindow
+from frontend.windows.project_overview import ProjectOverviewWindow
 
 
 def test_project_overview_window_creation(qtbot):
@@ -38,7 +38,7 @@ def test_project_overview_window_creation(qtbot):
 
 def test_ai_assistant_parsing():
     """Test AI assistant command parsing."""
-    from app.assistant import AssistantDock
+    from frontend.assistant import AssistantDock
 
     # Mock parent
     parent = QtWidgets.QWidget()

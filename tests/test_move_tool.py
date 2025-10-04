@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 from PySide6 import QtCore
 
-from app.tools.move_tool import MoveTool
+from cad_core.tools.move_tool import MoveTool
 
 
 class TestMoveTool:

@@ -20,7 +20,7 @@ def preserve_root_logging():
 
 
 def test_setup_logging_idempotent_handlers():
-    from app.logging_config import setup_logging
+    from backend.logging_config import setup_logging
 
     with preserve_root_logging() as root:
         # Start from a clean state
@@ -38,7 +38,7 @@ def test_setup_logging_idempotent_handlers():
 
 
 def test_setup_logging_custom_level_and_format():
-    from app.logging_config import setup_logging
+    from backend.logging_config import setup_logging
 
     with preserve_root_logging() as root:
         # Ensure no pre-existing handlers so custom format is applied
@@ -59,7 +59,7 @@ def test_setup_logging_custom_level_and_format():
 
 
 def test_emission_after_setup_writes_records(caplog):
-    from app.logging_config import setup_logging
+    from backend.logging_config import setup_logging
 
     with preserve_root_logging():
         setup_logging(level=logging.INFO)

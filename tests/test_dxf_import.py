@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 from PySide6 import QtCore
 
-import app.dxf_import as dxf_import
+import backend.dxf_import as dxf_import
 
 
 class TestDXFImport:

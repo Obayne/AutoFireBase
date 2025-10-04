@@ -4,7 +4,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from app.logging_config import setup_logging
+from backend.logging_config import setup_logging
 
 setup_logging()
 _logger = logging.getLogger(__name__)

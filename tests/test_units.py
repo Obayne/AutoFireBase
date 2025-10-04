@@ -1,4 +1,4 @@
-from app.units import fmt_ft_inches, ft_to_px, px_to_ft
+from cad_core.units import fmt_ft_inches, ft_to_px, px_to_ft
 
 
 def test_ft_px_roundtrip():

@@ -88,6 +88,36 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
         self._cov_square.setBrush(QtGui.QColor(80, 170, 255, 25))
         self.addToGroup(self._cov_square)
 
+        # Connection status indicator
+        self.connection_status = "unconnected"  # "unconnected", "connected", "partial"
+        self._connection_indicator = QtWidgets.QGraphicsEllipseItem(-3, -3, 6, 6)
+        self._connection_indicator.setZValue(10)  # Above everything else
+        self._connection_indicator.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, False)
+        self._connection_indicator.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, False)
+        self._connection_indicator.setAcceptedMouseButtons(QtCore.Qt.NoButton)
+
+        # Start with unconnected styling (brighter orange dot)
+        conn_pen = QtGui.QPen(QtGui.QColor(255, 140, 0, 255))  # Brighter orange
+        conn_pen.setCosmetic(True)
+        conn_pen.setWidth(2)  # Thicker border
+        self._connection_indicator.setPen(conn_pen)
+        self._connection_indicator.setBrush(QtGui.QColor(255, 140, 0, 180))  # More opaque
+
+        # Position in top-right corner of device
+        self._connection_indicator.setPos(8, -8)
+        self.addToGroup(self._connection_indicator)
+
+        # Fire alarm circuit properties
+        self.circuit_id = None  # Which circuit this device is on (NAC1, SLC1, etc.)
+        self.panel = None  # Reference to the main fire alarm panel
+        self.device_type = name  # Store device type for circuit validation
+
+        # Timer for blinking effect on unconnected devices
+        self._blink_timer = QtCore.QTimer()
+        self._blink_timer.timeout.connect(self._blink_connection_indicator)
+        self._blink_visible = True
+        self._start_blink_timer()
+
         self.setPos(x, y)
 
     # ---- selection visual
@@ -106,6 +136,95 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
             self._label.setPos(self.label_offset)
         except Exception:
             pass
+
+    # ---- connection status ----
+    def set_connection_status(self, status: str):
+        """Set connection status: 'unconnected', 'connected', 'partial'."""
+        self.connection_status = status
+        self._update_connection_indicator()
+
+    def _update_connection_indicator(self):
+        """Update the visual appearance of the connection indicator."""
+        if self.connection_status == "connected":
+            # Bright green for connected
+            pen = QtGui.QPen(QtGui.QColor(0, 255, 0, 255))
+            brush = QtGui.QColor(0, 255, 0, 200)
+            self._blink_timer.stop()
+            self._connection_indicator.setVisible(True)
+        elif self.connection_status == "partial":
+            # Bright yellow for partially connected
+            pen = QtGui.QPen(QtGui.QColor(255, 255, 0, 255))
+            brush = QtGui.QColor(255, 255, 0, 200)
+            self._blink_timer.stop()
+            self._connection_indicator.setVisible(True)
+        else:  # unconnected
+            # Brighter orange for unconnected with blinking
+            pen = QtGui.QPen(QtGui.QColor(255, 140, 0, 255))
+            brush = QtGui.QColor(255, 140, 0, 180)
+            self._start_blink_timer()
+
+        pen.setCosmetic(True)
+        pen.setWidth(2)  # Thicker border for better visibility
+        self._connection_indicator.setPen(pen)
+        self._connection_indicator.setBrush(brush)
+
+    def _start_blink_timer(self):
+        """Start the blinking timer for unconnected devices."""
+        if self.connection_status == "unconnected":
+            self._blink_timer.start(1000)  # Blink every 1 second
+
+    def _blink_connection_indicator(self):
+        """Toggle visibility of connection indicator for blinking effect."""
+        if self.connection_status == "unconnected":
+            self._blink_visible = not self._blink_visible
+            self._connection_indicator.setVisible(self._blink_visible)
+
+    # ---- fire alarm circuit API ----
+    def connect_to_panel(self, panel, circuit_id=None):
+        """Connect this device to a fire alarm panel on a specific circuit."""
+        if not circuit_id:
+            # Auto-determine circuit based on device type
+            circuit_id = panel.get_available_circuit(self)
+
+        if not circuit_id:
+            return False, "No suitable circuit available"
+
+        if not panel.validate_device_placement(self, circuit_id):
+            return False, f"Device type '{self.device_type}' cannot connect to {circuit_id}"
+
+        # Remove from previous circuit if connected
+        if self.panel and self.circuit_id:
+            self.panel.remove_device_from_circuit(self, self.circuit_id)
+
+        # Connect to new circuit
+        panel.add_device_to_circuit(self, circuit_id)
+        self.set_connection_status("connected")
+
+        return True, f"Connected to {circuit_id}"
+
+    def disconnect_from_panel(self):
+        """Disconnect this device from its current panel/circuit."""
+        if self.panel and self.circuit_id:
+            self.panel.remove_device_from_circuit(self, self.circuit_id)
+            self.set_connection_status("unconnected")
+            return True
+        return False
+
+    def get_circuit_info(self):
+        """Get information about the circuit this device is connected to."""
+        if not self.panel or not self.circuit_id:
+            return None
+
+        circuit = self.panel.circuits.get(self.circuit_id)
+        if circuit:
+            return {
+                "circuit_id": self.circuit_id,
+                "circuit_type": circuit["type"],
+                "status": circuit["status"],
+                "device_count": len(circuit["devices"]),
+                "panel_name": self.panel.name,
+            }
+        return None
 
     # ---- coverage API
     def set_coverage(self, cfg: dict):

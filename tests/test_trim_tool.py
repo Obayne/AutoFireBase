@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 from PySide6 import QtCore, QtWidgets
 
-from app.tools.trim_tool import TrimTool, _intersection_point, _nearest_line_item
+from cad_core.tools.trim_tool import TrimTool, _intersection_point, _nearest_line_item
 
 
 class TestTrimTool:

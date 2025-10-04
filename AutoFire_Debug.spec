@@ -2,11 +2,11 @@
 
 
 a = Analysis(
-    ['app\\boot.py'],
+    ['main.py'],
     pathex=['.'],
     binaries=[],
-    datas=[('VERSION.txt', '.')],
-    hiddenimports=['app', 'app.main', 'app.minwin', 'app.scene', 'app.device', 'app.catalog', 'app.tools', 'app.tools.draw', 'app.tools.text_tool', 'app.tools.dimension', 'app.tools.trim_tool', 'app.tools.measure_tool', 'app.tools.extend_tool', 'app.tools.fillet_tool', 'app.tools.fillet_radius_tool', 'app.tools.rotate_tool', 'app.tools.mirror_tool', 'app.tools.scale_tool', 'app.tools.chamfer_tool', 'app.layout', 'app.dxf_import', 'core.logger', 'core.logger_bridge', 'core.error_hook', 'updater.auto_update'],
+    datas=[('VERSION.txt', '.'), ('frontend', 'frontend'), ('backend', 'backend'), ('cad_core', 'cad_core'), ('db', 'db'), ('core', 'core'), ('updater', 'updater')],
+    hiddenimports=['frontend.app', 'frontend.controller', 'frontend.windows.model_space', 'frontend.windows.paperspace', 'frontend.panels.panel_system_builder', 'frontend.panels.panel_device_palette', 'backend.catalog', 'backend.persistence', 'cad_core.geometry', 'cad_core.tools', 'db.loader', 'core.logger', 'core.logger_bridge', 'core.error_hook', 'updater.auto_update'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
