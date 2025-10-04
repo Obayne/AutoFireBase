@@ -117,10 +117,139 @@ class PanelSelectionDialog(QtWidgets.QDialog):
     def _setup_ui(self):
         """Setup the user interface."""
         layout = QtWidgets.QVBoxLayout(self)
+        
+        # Apply dialog styling for better contrast
+        self.setStyleSheet("""
+            QDialog {
+                background-color: #ffffff;
+                color: #000000;
+                font-size: 11pt;
+            }
+            QLabel {
+                color: #000000;
+                font-weight: bold;
+                font-size: 12pt;
+                background-color: transparent;
+            }
+            QComboBox {
+                background-color: white;
+                color: #000000;
+                border: 2px solid #0078d7;
+                border-radius: 4px;
+                padding: 8px 12px;
+                font-size: 11pt;
+                font-weight: bold;
+            }
+            QComboBox:hover {
+                border-color: #106ebe;
+                background-color: #f8f9fa;
+            }
+            QComboBox::drop-down {
+                border: none;
+                background-color: #0078d7;
+            }
+            QComboBox::down-arrow {
+                image: none;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 8px solid white;
+                width: 0;
+                height: 0;
+            }
+            QListWidget {
+                background-color: white;
+                color: #212529;
+                border: 2px solid #ced4da;
+                border-radius: 4px;
+                font-size: 11pt;
+                font-weight: bold;
+                selection-background-color: #0078d7;
+                selection-color: white;
+            }
+            QListWidget::item {
+                padding: 12px;
+                border-bottom: 1px solid #dee2e6;
+                color: #212529;
+                background-color: white;
+                font-weight: bold;
+                font-size: 11pt;
+            }
+            QListWidget::item:hover {
+                background-color: #f8f9fa;
+                color: #0078d7;
+                font-weight: bold;
+            }
+            QListWidget::item:selected {
+                background-color: #0078d7;
+                color: white;
+                font-weight: bold;
+            }
+            QListWidget::item:selected:hover {
+                background-color: #106ebe;
+                color: white;
+            }
+            QGroupBox {
+                font-weight: bold;
+                font-size: 11pt;
+                color: #495057;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px 0 5px;
+                background-color: #f8f9fa;
+            }
+            QTextEdit {
+                background-color: white;
+                color: #212529;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                font-size: 10pt;
+            }
+            QTableWidget {
+                background-color: white;
+                color: #212529;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                gridline-color: #e9ecef;
+                font-size: 10pt;
+            }
+            QHeaderView::section {
+                background-color: #e9ecef;
+                color: #495057;
+                border: 1px solid #ced4da;
+                padding: 6px;
+                font-weight: bold;
+            }
+            QPushButton {
+                background-color: #0078d7;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+                font-size: 10pt;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #106ebe;
+            }
+            QPushButton:pressed {
+                background-color: #005a9e;
+            }
+            QPushButton:disabled {
+                background-color: #6c757d;
+                color: #adb5bd;
+            }
+        """)
 
         # Manufacturer filter
         filter_layout = QtWidgets.QHBoxLayout()
-        filter_layout.addWidget(QtWidgets.QLabel("Manufacturer:"))
+        filter_label = QtWidgets.QLabel("Manufacturer:")
+        filter_layout.addWidget(filter_label)
         self.manufacturer_combo = QtWidgets.QComboBox()
         self.manufacturer_combo.addItem("All Manufacturers")
         manufacturers = set()
@@ -285,6 +414,83 @@ class SystemBuilderPanel(QtWidgets.QDockWidget):
     def _setup_ui(self):
         widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout(widget)
+        
+        # Apply styling for better visibility
+        widget.setStyleSheet("""
+            QWidget {
+                background-color: #f8f9fa;
+                color: #212529;
+            }
+            QTabWidget::pane {
+                border: 1px solid #ced4da;
+                background-color: white;
+            }
+            QTabBar::tab {
+                background-color: #e9ecef;
+                color: #495057;
+                border: 1px solid #ced4da;
+                border-bottom: none;
+                padding: 8px 16px;
+                margin-right: 2px;
+                font-weight: bold;
+            }
+            QTabBar::tab:selected {
+                background-color: white;
+                color: #0078d7;
+            }
+            QTabBar::tab:hover {
+                background-color: #dee2e6;
+            }
+            QLabel {
+                color: #495057;
+                font-size: 10pt;
+            }
+            QGroupBox {
+                font-weight: bold;
+                color: #495057;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px 0 5px;
+                background-color: #f8f9fa;
+            }
+            QPushButton {
+                background-color: #0078d7;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #106ebe;
+            }
+            QPushButton:pressed {
+                background-color: #005a9e;
+            }
+            QPushButton:disabled {
+                background-color: #6c757d;
+                color: #adb5bd;
+            }
+            QListWidget, QTableWidget, QTextEdit {
+                background-color: white;
+                color: #212529;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+            }
+            QComboBox {
+                background-color: white;
+                color: #212529;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                padding: 4px 8px;
+            }
+        """)
 
         # Create tab widget for staging
         self.tab_widget = QtWidgets.QTabWidget()
