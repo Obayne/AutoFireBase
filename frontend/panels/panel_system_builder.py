@@ -118,32 +118,33 @@ class PanelSelectionDialog(QtWidgets.QDialog):
         """Setup the user interface."""
         layout = QtWidgets.QVBoxLayout(self)
 
-        # Apply dialog styling for better contrast
+        # Apply dialog styling for better contrast - MAXIMUM VISIBILITY
         self.setStyleSheet(
             """
             QDialog {
-                background-color: #ffffff;
-                color: #000000;
-                font-size: 11pt;
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                font-size: 14pt !important;
+                font-weight: bold !important;
             }
             QLabel {
-                color: #000000;
-                font-weight: bold;
-                font-size: 12pt;
-                background-color: transparent;
+                color: #000000 !important;
+                font-weight: bold !important;
+                font-size: 14pt !important;
+                background-color: #ffffff !important;
             }
             QComboBox {
-                background-color: white;
-                color: #000000;
-                border: 2px solid #0078d7;
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                border: 3px solid #ff0000 !important;
                 border-radius: 4px;
-                padding: 8px 12px;
-                font-size: 11pt;
-                font-weight: bold;
+                padding: 12px !important;
+                font-size: 14pt !important;
+                font-weight: bold !important;
             }
             QComboBox:hover {
-                border-color: #106ebe;
-                background-color: #f8f9fa;
+                border-color: #0000ff !important;
+                background-color: #f0f0f0 !important;
             }
             QComboBox::drop-down {
                 border: none;
@@ -158,36 +159,39 @@ class PanelSelectionDialog(QtWidgets.QDialog):
                 height: 0;
             }
             QListWidget {
-                background-color: white;
-                color: #212529;
-                border: 2px solid #ced4da;
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                border: 5px solid #ff0000 !important;
                 border-radius: 4px;
-                font-size: 11pt;
-                font-weight: bold;
-                selection-background-color: #0078d7;
-                selection-color: white;
+                font-size: 16pt !important;
+                font-weight: bold !important;
+                selection-background-color: #0078d7 !important;
+                selection-color: #ffffff !important;
             }
             QListWidget::item {
-                padding: 12px;
-                border-bottom: 1px solid #dee2e6;
-                color: #212529;
-                background-color: white;
-                font-weight: bold;
-                font-size: 11pt;
+                padding: 15px !important;
+                border-bottom: 2px solid #000000 !important;
+                color: #000000 !important;
+                background-color: #ffffff !important;
+                font-weight: bold !important;
+                font-size: 16pt !important;
+                margin: 2px !important;
             }
             QListWidget::item:hover {
-                background-color: #f8f9fa;
-                color: #0078d7;
-                font-weight: bold;
+                background-color: #ffff00 !important;
+                color: #000000 !important;
+                font-weight: bold !important;
+                border: 2px solid #0000ff !important;
             }
             QListWidget::item:selected {
-                background-color: #0078d7;
-                color: white;
-                font-weight: bold;
+                background-color: #0078d7 !important;
+                color: #ffffff !important;
+                font-weight: bold !important;
+                border: 3px solid #ff0000 !important;
             }
             QListWidget::item:selected:hover {
-                background-color: #106ebe;
-                color: white;
+                background-color: #ff0000 !important;
+                color: #ffffff !important;
             }
             QGroupBox {
                 font-weight: bold;
