@@ -2,6 +2,7 @@
 Project Overview Window - Central hub for project management
 """
 
+import logging
 import os
 import sys
 
@@ -31,7 +32,6 @@ from frontend.assistant import AssistantDock
 
 # Ensure logging is configured early
 setup_logging()
-import logging
 
 _logger = logging.getLogger(__name__)
 
@@ -236,7 +236,10 @@ class ProjectOverviewWindow(QMainWindow):
             milestones.append({"text": item.text(), "completed": item.checkState() == Qt.Checked})
         self.prefs["project_milestones"] = milestones
 
-        self.app_controller.save_prefs()
+        # Some tests may use a lightweight MockController without persistence.
+        # Call save_prefs() only if available to avoid AttributeError.
+        if hasattr(self.app_controller, "save_prefs") and callable(self.app_controller.save_prefs):
+            self.app_controller.save_prefs()
 
     def closeEvent(self, event):
         """Handle window close."""
