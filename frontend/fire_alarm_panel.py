@@ -77,6 +77,9 @@ class FireAlarmPanel(DeviceItem):
             terminal.setPen(terminal_pen)
             terminal.setBrush(color)
 
+            # Tag terminal with its circuit id and back-reference to this panel
+            terminal.circuit_id = circuit_id  # type: ignore[attr-defined]
+            terminal.panel_ref = self  # type: ignore[attr-defined]
             self.addToGroup(terminal)
             self._terminals[circuit_id] = terminal
 

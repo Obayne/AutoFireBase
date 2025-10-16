@@ -248,6 +248,34 @@ class CanvasView(QtWidgets.QGraphicsView):
 
         return None
 
+    def _find_nearby_terminals(self, scene_pos: QtCore.QPointF, radius_px: float = 12.0):
+        """Return (terminal_item, panel_ref) if a terminal exists within radius_px of scene_pos."""
+        try:
+            search_rect = QtCore.QRectF(
+                scene_pos.x() - radius_px,
+                scene_pos.y() - radius_px,
+                radius_px * 2,
+                radius_px * 2,
+            )
+            items = self.scene().items(search_rect)
+            for it in items:
+                # Terminals added in FireAlarmPanel are QGraphicsEllipseItem with metadata
+                cid = getattr(it, "circuit_id", None)
+                pref = getattr(it, "panel_ref", None)
+                if cid and pref:
+                    # compute exact distance
+                    try:
+                        pos = it.scenePos()
+                        dx = pos.x() - scene_pos.x()
+                        dy = pos.y() - scene_pos.y()
+                        if (dx * dx + dy * dy) <= (radius_px * radius_px):
+                            return it, pref
+                    except Exception:
+                        return it, pref
+        except Exception:
+            pass
+        return None, None
+
     def wheelEvent(self, event):
         """Handle mouse wheel for zooming."""
         if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
@@ -430,7 +458,21 @@ class CanvasView(QtWidgets.QGraphicsView):
                 if grid_scene.snap_enabled:
                     scene_pos = grid_scene.snap(scene_pos)
 
-            self.win.ghost.setPos(scene_pos)
+            # Port snapping: prefer snapping to nearby panel terminals
+            term_item, panel_ref = self._find_nearby_terminals(scene_pos)
+            if term_item is not None:
+                # snap ghost to terminal exact position
+                term_pos = term_item.scenePos()
+                self.win.ghost.setPos(term_pos)
+                # store metadata for placement
+                setattr(self.win.ghost, "_snapped_terminal", term_item)
+                setattr(self.win.ghost, "_snapped_panel", panel_ref)
+                scene_pos = term_pos
+            else:
+                # normal placement
+                self.win.ghost.setPos(scene_pos)
+                setattr(self.win.ghost, "_snapped_terminal", None)
+                setattr(self.win.ghost, "_snapped_panel", None)
 
             # Update ghost appearance based on placement validity
             if hasattr(self.win, "current_proto") and self.win.current_proto:
@@ -488,6 +530,21 @@ class CanvasView(QtWidgets.QGraphicsView):
 
         if success:
             self._post_placement_actions(device, device_data)
+            # Auto-connect if we snapped to a terminal on the ghost
+            try:
+                snapped = getattr(self.win, "ghost", None)
+                term = getattr(snapped, "_snapped_terminal", None)
+                panel_ref = getattr(snapped, "_snapped_panel", None)
+                if term and panel_ref:
+                    # Determine circuit id and request connection
+                    cid = getattr(term, "circuit_id", None)
+                    if cid and hasattr(panel_ref, "add_device_to_circuit"):
+                        # Use panel API to add device to circuit
+                        panel_ref.add_device_to_circuit(device, cid)
+                        device.set_connection_status("connected")
+            except Exception:
+                # Non-fatal if auto-connect fails
+                pass
             self._show_status(
                 f"Placed: {device_data['name']} at ({scene_pos.x():.0f}, {scene_pos.y():.0f})"
             )
