@@ -267,7 +267,7 @@ class CoverageDialog(QtWidgets.QDialog):
 
         # load existing
         if existing:
-            mode = existing.get("mode","none"); i = self.cmb_mode.findText(mode); 
+            mode = existing.get("mode","none"); i = self.cmb_mode.findText(mode);
             if i>=0: self.cmb_mode.setCurrentIndex(i)
             mnt = existing.get("mount","ceiling"); j = self.cmb_mount.findText(mnt);
             if j>=0: self.cmb_mount.setCurrentIndex(j)

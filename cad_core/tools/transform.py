@@ -17,7 +17,8 @@ def _clone_item(it: QtWidgets.QGraphicsItem) -> QtWidgets.QGraphicsItem | None:
             clone.set_coverage(d["coverage"])
         if "label_offset" in d:
             off = d["label_offset"]
-            if isinstance(off, (list, tuple)) and len(off) == 2:
+            # use union types in isinstance checks per ruff UP038 recommendation
+            if isinstance(off, (list | tuple)) and len(off) == 2:
                 clone.set_label_offset(float(off[0]), float(off[1]))
         if "rotation" in d:
             try:

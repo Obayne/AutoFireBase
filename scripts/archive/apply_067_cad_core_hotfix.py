@@ -682,7 +682,7 @@ class MainWindow(QMainWindow):
     # ---------- toggles ----------
     def toggle_grid(self, on: bool): self.scene.show_grid = bool(on); self.scene.update()
     def toggle_snap(self, on: bool): self.scene.snap_enabled = bool(on)
-    def toggle_crosshair(self, on: bool): 
+    def toggle_crosshair(self, on: bool):
         self.view.show_crosshair = bool(on)
         self.scene.update()
 
@@ -810,7 +810,7 @@ class MainWindow(QMainWindow):
     def _on_selection_changed(self):
         d = self._get_selected_device()
         if not d:
-            self._enable_props(False); 
+            self._enable_props(False);
             return
         self._enable_props(True)
         self.prop_label.setText(d._label.text())

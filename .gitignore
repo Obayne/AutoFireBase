@@ -55,6 +55,6 @@ Models/
 *.bin
 C:/Dev/Models/
 .dev_models/
- 
+
 # Ignore local sample zip bundles moved to artifacts
 /artifacts/zip-samples/

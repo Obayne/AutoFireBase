@@ -1,6 +1,7 @@
 import logging
 
 from app.logging_config import setup_logging
+
 from db import loader
 
 setup_logging()

@@ -25,4 +25,3 @@
     "body": "Centralize key/mouse events in a small handler class and log via signal. Unit test for key mapping. See docs/SPRINT-01.md (Frontend / Input handling). DoD: Black/Ruff; tests; no side-effects."
   }
 ]
-
