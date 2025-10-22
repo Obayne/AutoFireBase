@@ -104,14 +104,28 @@ python app\main.py
 # Activate virtual environment first
 .\.venv\Scripts\Activate.ps1
 
-# Run full test suite
+# Run full test suite (includes GUI tests if PySide6 is available)
 pytest -q
+
+# Run only non-GUI tests (useful in CI without PySide6)
+pytest -q -m "not gui"
+
+# Run only GUI tests (requires PySide6)
+pytest -q -m gui
 
 # Run specific test categories
 pytest tests/frontend/ -v      # UI tests
 pytest tests/cad_core/ -v      # Algorithm tests
 pytest tests/backend/ -v       # Business logic tests
+
+# Run with verbose output
+pytest -v
+
+# Run specific test file
+pytest tests/test_units.py -v
 ```
+
+See [CI_TESTING.md](CI_TESTING.md) for detailed CI/CD testing guide.
 
 ## 🛠️ Development Workflow
 
@@ -169,12 +183,25 @@ git push
 
 ## 🧪 Testing Strategy
 
-### Test Coverage
+### Test Categories
+
+AutoFire tests are organized into two categories:
+1. **Non-GUI Tests** - Pure logic tests (53 tests) that don't require PySide6
+2. **GUI Tests** - Tests marked with `@pytest.mark.gui` that require PySide6/Qt
+
+### Running Tests
+
 ```powershell
-# Run full test suite
+# Run all tests (requires PySide6)
 pytest -q
 
-# Specific test categories
+# Run non-GUI tests only (CI-friendly, no PySide6 required)
+pytest -q -m "not gui"
+
+# Run GUI tests only
+pytest -q -m gui
+
+# Run specific test categories
 pytest tests/frontend/ -v      # UI components (model_space, dialogs)
 pytest tests/cad_core/ -v      # CAD algorithms (drawing, geometry)
 pytest tests/backend/ -v       # Business logic (catalog, models)
@@ -184,10 +211,16 @@ pytest --cov=frontend --cov=cad_core --cov=backend
 ```
 
 ### Test Organization
-- `tests/frontend/` - UI component tests
-- `tests/cad_core/` - Algorithm and geometry tests
-- `tests/backend/` - Business logic and data tests
+- `tests/frontend/` - UI component tests (requires PySide6)
+- `tests/cad_core/` - Algorithm and geometry tests (mostly non-GUI)
+- `tests/backend/` - Business logic and data tests (non-GUI)
 - Test fixtures in `conftest.py` for shared setup
+- GUI tests marked with `@pytest.mark.gui` for selective execution
+
+### CI/CD Testing
+- **Non-GUI Tests**: Run in lightweight CI without PySide6 (53 tests)
+- **GUI Tests**: Run separately with PySide6 in headless mode
+- See [CI_TESTING.md](CI_TESTING.md) for detailed CI setup instructions
 
 ## 🔧 Configuration & Data
 

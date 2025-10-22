@@ -38,4 +38,4 @@ jobs:
       - name: Run all tests
         env:
           PYTHONPATH: ${{ github.workspace }}
-        run: pytest -q
+        run: pytest -q -m "not gui"
