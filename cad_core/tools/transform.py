@@ -1,4 +1,14 @@
-from app.device import DeviceItem
+"""Utility functions for transforming and duplicating QGraphics items.
+
+This module contains small helpers used by editor tools to clone, duplicate,
+rotate, nudge, and align selected items in a QGraphicsScene.
+
+Note: `app.device.DeviceItem` is imported for runtime usage; type checkers in
+some environments may not resolve the local `app` package. Add a type-ignore
+to avoid spurious diagnostics.
+"""
+
+from app.device import DeviceItem  # type: ignore[import]
 from PySide6 import QtCore, QtWidgets
 
 
@@ -21,9 +31,13 @@ def _clone_item(it: QtWidgets.QGraphicsItem) -> QtWidgets.QGraphicsItem | None:
             if isinstance(off, (list | tuple)) and len(off) == 2:
                 clone.set_label_offset(float(off[0]), float(off[1]))
         if "rotation" in d:
+            # conversion to float may raise ValueError or TypeError if the
+            # stored value is invalid; narrow the exception to avoid
+            # catching unrelated issues.
             try:
                 clone.setRotation(float(d["rotation"]))
-            except Exception:
+            except (ValueError, TypeError):
+                # ignore malformed rotation values
                 pass
         return clone
     elif isinstance(it, QtWidgets.QGraphicsPathItem):
@@ -76,7 +90,9 @@ def nudge_selected(scene: QtWidgets.QGraphicsScene, dx_px: float, dy_px: float):
     return len(sel)
 
 
-def align_selected_to_grid(scene, px_per_ft: float, snap_step_px: float, grid_size: int):
+def align_selected_to_grid(
+    scene: QtWidgets.QGraphicsScene, _px_per_ft: float, snap_step_px: float, grid_size: int
+):
     sel = scene.selectedItems()
     if not sel:
         return 0

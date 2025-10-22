@@ -67,3 +67,17 @@ def qapp():
         app.quit()
     except Exception:
         pass
+
+
+def pytest_configure(config):
+    # Register a custom marker for GUI tests so pytest doesn't warn.
+    config.addinivalue_line("markers", "gui: mark test as GUI (requires PySide6/pytest-qt)")
+
+
+@pytest.fixture(autouse=False)
+def skip_if_no_qt():
+    """Skip the test if PySide6 isn't installed on the runner."""
+    try:
+        import PySide6  # noqa: F401
+    except Exception:
+        pytest.skip("PySide6 not available; skipping GUI test")
