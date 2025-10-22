@@ -2,11 +2,13 @@
 Tests for Project Overview Window
 """
 
+import pytest
 from PySide6 import QtWidgets
 
 from frontend.windows.project_overview import ProjectOverviewWindow
 
 
+@pytest.mark.gui
 def test_project_overview_window_creation(qtbot):
     """Test that Project Overview window can be created."""
 

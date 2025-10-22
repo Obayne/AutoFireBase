@@ -1,10 +1,12 @@
 from unittest.mock import Mock, patch
 
+import pytest
 from PySide6 import QtCore
 
 from cad_core.tools.draw import DrawController, DrawMode, _circle_from_3pts
 
 
+@pytest.mark.gui
 class TestDrawTools:
     """Test draw tools functionality."""
 

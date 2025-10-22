@@ -6,6 +6,7 @@ from PySide6 import QtCore
 from cad_core.tools.move_tool import MoveTool
 
 
+@pytest.mark.gui
 class TestMoveTool:
     """Test move tool functionality."""
 

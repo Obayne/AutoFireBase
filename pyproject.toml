@@ -17,3 +17,16 @@ select = [
 
 [tool.ruff.format]
 quote-style = "double"
+
+[tool.pytest.ini_options]
+# Pytest configuration for AutoFire
+markers = [
+    "gui: mark test as GUI (requires PySide6/pytest-qt)",
+]
+# Run non-GUI tests by default in CI (use -m "not gui")
+# Run all tests with: pytest -m ""
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+

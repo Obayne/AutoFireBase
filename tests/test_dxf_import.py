@@ -7,6 +7,7 @@ from PySide6 import QtCore
 import backend.dxf_import as dxf_import
 
 
+@pytest.mark.gui
 class TestDXFImport:
     """Test DXF import functionality."""
 

@@ -1,10 +1,12 @@
 from unittest.mock import Mock, patch
 
+import pytest
 from PySide6 import QtCore, QtWidgets
 
 from frontend.windows.scene import CanvasView
 
 
+@pytest.mark.gui
 class TestOSNAP:
     """Test OSNAP (Object Snap) functionality."""
 

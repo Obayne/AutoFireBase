@@ -1,8 +1,10 @@
+import pytest
 from PySide6 import QtCore, QtWidgets
 
 from frontend.windows.scene import CanvasView
 
 
+@pytest.mark.gui
 class MockLine:
     def __init__(self, x1, y1, x2, y2):
         self._x1, self._y1, self._x2, self._y2 = x1, y1, x2, y2

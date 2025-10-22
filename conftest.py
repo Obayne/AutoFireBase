@@ -3,15 +3,20 @@ Pytest configuration for AutoFire tests.
 Provides Qt application fixture for GUI tests.
 """
 
+import os
 import sys
 
 import pytest
-from PySide6.QtWidgets import QApplication
 
 
 @pytest.fixture(scope="session")
 def qapp():
-    """Provide a Qt application instance for tests."""
+    """Provide a Qt application instance for tests when PySide6 is available."""
+    try:
+        from PySide6.QtWidgets import QApplication
+    except Exception:
+        pytest.skip("PySide6 not available; skipping Qt GUI test")
+
     app = QApplication.instance()
     if app is None:
         app = QApplication(sys.argv)
@@ -20,10 +25,8 @@ def qapp():
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_qt():
-    """Set up Qt for headless testing."""
+    """Set up Qt for headless testing when PySide6 is available."""
     # Set Qt to use offscreen platform for headless testing
-    import os
-
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
@@ -36,10 +39,14 @@ try:  # pragma: no cover - exercised indirectly in tests
         return QtBot()
 
 except Exception:  # pragma: no cover
-    from PySide6 import QtCore
 
     @pytest.fixture
     def qtbot(qapp):
+        try:
+            from PySide6 import QtCore
+        except Exception:
+            pytest.skip("PySide6 not available; skipping Qt GUI test")
+
         class _QtBot:
             def __init__(self) -> None:
                 self._widgets = []

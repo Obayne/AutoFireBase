@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 # Run Qt in headless mode for CI/test runners
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
@@ -11,6 +13,7 @@ from frontend.fire_alarm_panel import FireAlarmPanel
 from frontend.windows.scene import CanvasView, GridScene
 
 
+@pytest.mark.gui
 def test_terminal_detection_and_connect():
     """Verify scene can find nearby panel terminals and devices can connect to panels."""
     app = QApplication.instance() or QApplication([])
