@@ -28,7 +28,11 @@ jobs:
       - name: Install system packages for headless Qt
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y xvfb libegl1-mesa libgl1-mesa-dri libgles2-mesa || true
+          # Install a broad set of packages that commonly provide EGL/OpenGL
+          # and X11 dependencies on Ubuntu runners. Some packages may not be
+          # available on all images; continue on failure to avoid hard CI aborts.
+          sudo apt-get install -y xvfb libegl1-mesa libegl-mesa0 libgl1 libgl1-mesa-glx \
+            libgl1-mesa-dri libgles2-mesa libgbm1 libxrandr2 libx11-xcb1 libxcb1 libx11-6 || true
 
       - name: Install Python dependencies (pytest-qt + PySide6)
         run: |
