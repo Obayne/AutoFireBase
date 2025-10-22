@@ -3,15 +3,28 @@ Pytest configuration for AutoFire tests.
 Provides Qt application fixture for GUI tests.
 """
 
+import os
 import sys
 
 import pytest
-from PySide6.QtWidgets import QApplication
+
+# Set Qt to use offscreen platform for headless testing before importing Qt
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
+try:
+    from PySide6.QtWidgets import QApplication
+
+    QT_AVAILABLE = True
+except Exception:
+    QT_AVAILABLE = False
 
 
 @pytest.fixture(scope="session")
 def qapp():
     """Provide a Qt application instance for tests."""
+    if not QT_AVAILABLE:
+        pytest.skip("PySide6 not available; skipping Qt GUI test")
+
     app = QApplication.instance()
     if app is None:
         app = QApplication(sys.argv)
@@ -21,10 +34,8 @@ def qapp():
 @pytest.fixture(scope="session", autouse=True)
 def setup_qt():
     """Set up Qt for headless testing."""
-    # Set Qt to use offscreen platform for headless testing
-    import os
-
-    os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+    # Already set above before importing Qt
+    pass
 
 
 # Provide a minimal qtbot fixture if pytest-qt is unavailable
@@ -36,7 +47,8 @@ try:  # pragma: no cover - exercised indirectly in tests
         return QtBot()
 
 except Exception:  # pragma: no cover
-    from PySide6 import QtCore
+    if QT_AVAILABLE:
+        from PySide6 import QtCore
 
     @pytest.fixture
     def qtbot(qapp):
@@ -50,6 +62,7 @@ except Exception:  # pragma: no cover
 
             # Minimal helpers used by some tests (no-ops here)
             def wait(self, ms: int):
-                QtCore.QThread.msleep(int(ms))
+                if QT_AVAILABLE:
+                    QtCore.QThread.msleep(int(ms))
 
         return _QtBot()
