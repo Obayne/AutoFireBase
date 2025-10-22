@@ -3,6 +3,10 @@ Simple Fire Alarm Panel Test
 Test without Qt to avoid application startup conflicts.
 """
 
+import sys
+
+import pytest
+
 
 def test_panel_logic():
     """Test the core logic without Qt components."""
@@ -11,8 +15,8 @@ def test_panel_logic():
 
     # Test 1: Check catalog loading
     import os
-    import sys
 
+    # sys already imported at module level
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
     from backend.catalog import load_catalog
@@ -26,8 +30,7 @@ def test_panel_logic():
             break
 
     if not panel_device:
-        print("❌ No fire alarm panel found in catalog")
-        return False
+        pytest.fail("No fire alarm panel found in catalog")
 
     print(f"✅ Found panel: {panel_device['name']}")
     print(f"  Type: {panel_device['type']}")
@@ -97,11 +100,12 @@ def test_panel_logic():
             return False
 
         print("✅ Circuit validation tests:")
-        print(f"  Smoke detector on SLC1: {validate_device_placement('smoke_detector', 'SLC1')}")
-        print(f"  Horn/strobe on NAC1: {validate_device_placement('horn_strobe', 'NAC1')}")
-        print(
-            f"  Horn/strobe on SLC1: {validate_device_placement('horn_strobe', 'SLC1')} (should be False)"
-        )
+        smoke_ok = validate_device_placement("smoke_detector", "SLC1")
+        horn_nac = validate_device_placement("horn_strobe", "NAC1")
+        horn_slc = validate_device_placement("horn_strobe", "SLC1")
+        print(f"  Smoke detector on SLC1: {smoke_ok}")
+        print(f"  Horn/strobe on NAC1: {horn_nac}")
+        print(f"  Horn/strobe on SLC1: {horn_slc} (should be False)")
 
     else:
         print("❌ Would create regular DeviceItem instead of FireAlarmPanel")
@@ -115,10 +119,11 @@ def test_panel_logic():
     print("\nRecommendation: Try placing the panel in the application again.")
     print("The core logic is working correctly now.")
 
-    return True
+    return None
 
 
 if __name__ == "__main__":
-    success = test_panel_logic()
-    if not success:
+    try:
+        test_panel_logic()
+    except Exception:
         sys.exit(1)

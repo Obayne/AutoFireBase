@@ -59,7 +59,7 @@ class Connection:
 
         # Control points for curve
         dx = end_pos.x() - start_pos.x()
-        dy = end_pos.y() - start_pos.y()
+        _dy = end_pos.y() - start_pos.y()
 
         cp1 = QtCore.QPointF(start_pos.x() + dx * 0.4, start_pos.y())
         cp2 = QtCore.QPointF(end_pos.x() - dx * 0.4, end_pos.y())

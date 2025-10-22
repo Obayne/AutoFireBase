@@ -6,6 +6,8 @@ Tests the circuit validation and device connections without GUI.
 import os
 import sys
 
+import pytest
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 
@@ -19,10 +21,12 @@ def test_fire_alarm_logic():
         from frontend.device import DeviceItem
         from frontend.fire_alarm_panel import FireAlarmPanel
 
+        # Mark imports as used for linters (we only check importability here)
+        _ = (DeviceItem, FireAlarmPanel)
+
         print("✅ Successfully imported fire alarm classes")
     except ImportError as e:
-        print(f"❌ Import failed: {e}")
-        return False
+        pytest.fail(f"Import failed: {e}")
 
     # Test 2: Create a mock fire alarm panel (without Qt scene)
     class MockFireAlarmPanel:
@@ -103,7 +107,7 @@ def test_fire_alarm_logic():
         status = "✅" if result == expected else "❌"
         print(f"{status} {device_type} on {circuit}: {result} (expected {expected})")
         if result != expected:
-            return False
+            pytest.fail(f"{device_type} on {circuit}: expected {expected}, got {result}")
 
     # Test 4: Circuit type detection
     print("\nTesting circuit type detection...")
@@ -121,13 +125,14 @@ def test_fire_alarm_logic():
         status = "✅" if result == expected_circuit else "❌"
         print(f"{status} {device_type} -> {result} (expected {expected_circuit})")
         if result != expected_circuit:
-            return False
+            pytest.fail(f"{device_type} -> expected {expected_circuit}, got {result}")
 
     print("\n🎉 All fire alarm circuit logic tests passed!")
-    return True
+    return None
 
 
 if __name__ == "__main__":
-    success = test_fire_alarm_logic()
-    if not success:
+    try:
+        test_fire_alarm_logic()
+    except Exception:
         sys.exit(1)

@@ -103,7 +103,8 @@ class WireSpoolDialog(QDialog):
 
                 for wire in wires:
                     name, gauge, color, wire_type, ohms, max_current = wire
-                    # Mock usage data for now - in real implementation this would come from project data
+                    # Mock usage data for now.
+                    # In a real implementation this would come from project data
                     total_length = 1000 if gauge == 14 else 2000 if gauge == 16 else 1500
                     used_length = int(total_length * 0.25)  # Mock 25% usage
 

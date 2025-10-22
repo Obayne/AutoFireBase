@@ -22,8 +22,9 @@ from frontend.layout import PageFrame, TitleBlock, ViewportItem
 
 # Ensure logging is configured early
 setup_logging()
-import logging
+import logging  # noqa: E402 (setup_logging must run before configuring module logger)
 
+_change_type = None
 _logger = logging.getLogger(__name__)
 
 
@@ -201,9 +202,9 @@ class PaperspaceWindow(QMainWindow):
 
     def on_paperspace_changed(self, change_data):
         """Handle paperspace changes from other windows."""
-        change_type = change_data.get("type", "general")
+        _change_type = change_data.get("type", "general")
         # Handle paperspace-specific changes
-        pass
+        # (placeholder for future handling of different change types)
 
     def on_project_changed(self, change_data):
         """Handle project state changes."""

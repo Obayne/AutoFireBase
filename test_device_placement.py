@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Test device placement workflow."""
 
+import pytest
+
 
 def test_device_placement():
     print("🎯 Testing Device Placement Workflow")
@@ -34,11 +36,10 @@ def test_device_placement():
         print("   Fixed: Database connection, device tree population")
         print("   Ready: Ghost device preview and click placement")
 
-        return True
+        return None
 
     except Exception as e:
-        print(f"❌ Error testing device placement: {e}")
-        return False
+        pytest.fail(f"Error testing device placement: {e}")
 
 
 if __name__ == "__main__":

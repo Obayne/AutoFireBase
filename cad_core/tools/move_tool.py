@@ -39,8 +39,8 @@ class MoveTool:
                     # attempt to duplicate simple items
                     dup = None
                     if isinstance(it, QtWidgets.QGraphicsLineItem):
-                        l = it.line()
-                        dup = QtWidgets.QGraphicsLineItem(l)
+                        line = it.line()
+                        dup = QtWidgets.QGraphicsLineItem(line)
                     elif isinstance(it, QtWidgets.QGraphicsRectItem):
                         r = it.rect()
                         dup = QtWidgets.QGraphicsRectItem(r)

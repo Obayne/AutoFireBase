@@ -1,0 +1,380 @@
+{
+    "folders": [
+        {
+            "name": "AutoFire",
+            "path": "C:/Dev/Autofire"
+        }
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+        "python.terminal.activateEnvironment": true,
+        "python.linting.enabled": true,
+        "python.linting.ruffEnabled": true,
+        "python.formatting.provider": "black",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": [
+            "-q"
+        ],
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit"
+        },
+        "files.associations": {
+            "*.spec": "python",
+            "*.md": "markdown"
+        },
+        "git.autofetch": true,
+        "git.enableSmartCommit": true,
+        "workbench.editor.enablePreview": true,
+        "explorer.confirmDelete": true,
+        "workbench.startupEditor": "none",
+        "window.title": "AutoFire Development - ${workspaceFolderBasename}",
+        "chat.tools.terminal.autoApprove": {
+
+            "cd": true,
+            "echo": true,
+            "ls": true,
+            "pwd": true,
+            "cat": true,
+            "head": true,
+            "tail": true,
+            "findstr": true,
+            "wc": true,
+            "tr": true,
+            "cut": true,
+            "cmp": true,
+            "which": true,
+            "basename": true,
+            "dirname": true,
+            "realpath": true,
+            "readlink": true,
+            "stat": true,
+            "file": true,
+            "du": true,
+            "df": true,
+            "sleep": true,
+            "git status": true,
+            "git log": true,
+            "git show": true,
+            "git diff": true,
+            "Get-ChildItem": true,
+            "Get-Content": true,
+            "Get-Date": true,
+            "Get-Random": true,
+            "Get-Location": true,
+            "Write-Host": true,
+            "Write-Output": true,
+            "Split-Path": true,
+            "Join-Path": true,
+            "Start-Sleep": true,
+            "Where-Object": true,
+            "/^Select-[a-z0-9]/i": true,
+            "/^Measure-[a-z0-9]/i": true,
+            "/^Compare-[a-z0-9]/i": true,
+            "/^Format-[a-z0-9]/i": true,
+            "/^Sort-[a-z0-9]/i": true,
+            "column": true,
+            "/^column\\b.*-c\\s+[0-9]{4,}/": true,
+            "date": true,
+            "/^date\\b.*(-s|--set)\\b/": true,
+            "find": true,
+            "/^find\\b.*-(delete|exec|execdir|fprint|fprintf|fls|ok|okdir)\\b/": true,
+            "grep": true,
+            "/^grep\\b.*-(f|P)\\b/": true,
+            "sort": true,
+            "/^sort\\b.*-(o|S)\\b/": true,
+            "tree": true,
+            "/^tree\\b.*-o\\b/": true,
+            "/\\(.+\\)/": {
+                "approve": true,
+                "matchCommandLine": true
+            },
+            "/\\{.+\\}/": {
+                "approve": true,
+                "matchCommandLine": true
+            },
+            "/`.+`/": {
+                "approve": true,
+                "matchCommandLine": true
+            },
+            "rm": true,
+            "rmdir": true,
+            "del": true,
+            "Remove-Item": true,
+            "ri": true,
+            "rd": true,
+            "erase": true,
+            "dd": true,
+            "kill": true,
+            "ps": true,
+            "top": true,
+            "Stop-Process": true,
+            "spps": true,
+            "taskkill": true,
+            "taskkill.exe": true,
+            "curl": true,
+            "wget": true,
+            "Invoke-RestMethod": true,
+            "Invoke-WebRequest": true,
+            "irm": true,
+            "iwr": true,
+            "chmod": true,
+            "chown": true,
+            "Set-ItemProperty": true,
+            "sp": true,
+            "Set-Acl": true,
+            "jq": true,
+            "xargs": true,
+            "eval": true,
+            "Invoke-Expression": true,
+            "iex": true
+        }
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Python: AutoFire Main",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${workspaceFolder}/main.py",
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+                "cwd": "${workspaceFolder}"
+            },
+            {
+                "name": "Python: Debug Application",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${workspaceFolder}/tools/run_app_debug.py",
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+                "cwd": "${workspaceFolder}"
+            },
+            {
+                "name": "Python: Test Current File",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${workspaceFolder}/${file}",
+                "console": "integratedTerminal",
+                "justMyCode": true,
+                "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+                "cwd": "${workspaceFolder}"
+            }
+        ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "Setup Development Environment",
+                "type": "shell",
+                "command": "${workspaceFolder}/setup_dev.ps1",
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": true,
+                    "panel": "shared"
+                },
+                "problemMatcher": [],
+                "windows": {
+                    "options": {
+                        "shell": {
+                            "executable": "powershell.exe"
+                        }
+                    }
+                }
+            },
+            {
+                "label": "Run AutoFire",
+                "type": "shell",
+                "command": "python",
+                "args": [
+                    "main.py"
+                ],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": true,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                    "env": {
+                        "PYTHONPATH": "${workspaceFolder}"
+                    }
+                }
+            },
+            {
+                "label": "Run Tests",
+                "type": "shell",
+                "command": "pytest",
+                "args": [
+                    "-q"
+                ],
+                "group": "test",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": true,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                    "env": {
+                        "PYTHONPATH": "${workspaceFolder}"
+                    }
+                }
+            },
+            {
+                "label": "Format Code",
+                "type": "shell",
+                "command": "black",
+                "args": [
+                    "."
+                ],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": true,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}"
+                }
+            },
+            {
+                "label": "Lint Code",
+                "type": "shell",
+                "command": "ruff",
+                "args": [
+                    "check",
+                    "--fix",
+                    "."
+                ],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": true,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}"
+                }
+            },
+            {
+                "label": "Build Production",
+                "type": "shell",
+                "command": "${workspaceFolder}/Build_AutoFire.ps1",
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": true,
+                    "panel": "shared"
+                },
+                "windows": {
+                    "options": {
+                        "shell": {
+                            "executable": "powershell.exe"
+                        }
+                    }
+                }
+            },
+            {
+                "label": "Quality Check All",
+                "type": "shell",
+                "command": "black . ; ruff check --fix . ; pytest -q",
+                "group": "build",
+                "dependsOn": [
+                    "Format Code",
+                    "Lint Code",
+                    "Run Tests"
+                ],
+                "dependsOrder": "sequence",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": true,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}",
+                    "env": {
+                        "PYTHONPATH": "${workspaceFolder}"
+                    }
+                }
+            },
+            {
+                "label": "Update Dependencies",
+                "type": "shell",
+                "command": "python",
+                "args": [
+                    "-m",
+                    "pip",
+                    "install",
+                    "-r",
+                    "requirements.txt",
+                    "--upgrade"
+                ],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": true,
+                    "panel": "shared"
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}"
+                }
+            },
+            {
+                "label": "Open Documentation",
+                "type": "shell",
+                "command": "start",
+                "args": [
+                    "docs/DOCUMENTATION_SUMMARY.md"
+                ],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": true,
+                    "panel": "shared"
+                }
+            }
+        ]
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.black-formatter",
+            "charliermarsh.ruff",
+            "ms-python.pylint",
+            "ms-python.mypy-type-checker",
+            "ms-vscode.vscode-json",
+            "redhat.vscode-yaml",
+            "ms-vscode.powershell",
+            "github.copilot",
+            "github.copilot-chat",
+            "gruntfuggly.todo-tree",
+            "ms-vscode.test-adapter-converter",
+            "hbenl.vscode-test-explorer",
+            "ms-vscode.vscode-github-issue-notebooks",
+            "ms-vscode.vscode-markdown-notebook",
+            "christian-kohler.path-intellisense",
+            "ms-vscode-remote.remote-wsl",
+            "ms-vscode.vscode-typescript-next"
+        ]
+    }
+}

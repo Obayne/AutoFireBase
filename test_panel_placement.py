@@ -1,10 +1,11 @@
 """
 Test Fire Alarm Panel Placement
-Simple test to verify panel placement works correctly.
 """
 
 import os
 import sys
+
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
@@ -33,8 +34,7 @@ def test_panel_placement():
             print(f"    ✅ Found fire alarm panel: {name}")
 
     if not panel_found:
-        print("❌ No fire alarm panel found in catalog")
-        return False
+        pytest.fail("No fire alarm panel found in catalog")
 
     # Test 2: Check FireAlarmPanel validation logic (without Qt scene)
     try:
@@ -87,8 +87,7 @@ def test_panel_placement():
         print(f"  Horn/strobe on SLC1 (should be False): {result}")
 
     except Exception as e:
-        print(f"❌ Error testing validation: {e}")
-        return False
+        pytest.fail(f"Error testing validation: {e}")
 
     # Test 3: Check circuit manager basic functionality
     try:
@@ -118,12 +117,10 @@ def test_panel_placement():
             print("✅ Circuit manager integration working")
             print(f"  Main panel: {main_panel.name}")
         else:
-            print("❌ Circuit manager not finding main panel")
-            return False
+            pytest.fail("Circuit manager did not find main panel")
 
     except Exception as e:
-        print(f"❌ Error with circuit manager: {e}")
-        return False
+        pytest.fail(f"Error with circuit manager: {e}")
 
     print("\n🎉 Fire alarm panel placement test completed successfully!")
     print("\nTo test in the application:")
@@ -133,10 +130,11 @@ def test_panel_placement():
     print("4. Click on it and place it on the canvas")
     print("5. Right-click other devices and select 'Connect to...'")
 
-    return True
+    return None
 
 
 if __name__ == "__main__":
-    success = test_panel_placement()
-    if not success:
+    try:
+        test_panel_placement()
+    except Exception:
         sys.exit(1)

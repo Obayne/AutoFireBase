@@ -165,7 +165,15 @@ class LayerManager(QWidget):
             QCheckBox::indicator:checked {
                 background-color: #0078d4;
                 border-color: #0078d4;
-                image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEwIDNMNCA5IDIgNyA0IDUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+);
+                image: url(
+                    "data:image/svg+xml;base64,"
+                    + "PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0i"
+                    + "bm9uZSIg"
+                    + "eG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEwIDNMNCA5"
+                    + "IDIgNyA0IDUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGlu"
+                    + "ZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+"
+                    + ")"
+                ;
             }
             QPushButton {
                 background-color: #3c3c3c;
@@ -286,7 +294,9 @@ class LayerManager(QWidget):
         """Update the table with current layer data."""
         self.layer_table.setRowCount(len(self.layers))
 
-        for row, layer in enumerate(sorted(self.layers.values(), key=lambda l: l.id)):
+        for row, layer in enumerate(
+            sorted(self.layers.values(), key=lambda layer_obj: layer_obj.id)
+        ):
             # Name
             name_item = QTableWidgetItem(layer.name)
             name_item.setData(Qt.ItemDataRole.UserRole, layer.id)

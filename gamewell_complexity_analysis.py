@@ -51,7 +51,9 @@ def analyze_gamewell_advantages():
                 "Industrial process control",
                 "Custom protocol development",
             ],
-            "complexity_benefit": "What seems complex to others is unlimited possibility to experts",
+            "complexity_benefit": (
+                "What seems complex to others is unlimited possibility " "to experts"
+            ),
         },
     }
 

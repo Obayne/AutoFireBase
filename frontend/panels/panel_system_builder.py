@@ -67,7 +67,11 @@ class PanelSelectionDialog(QtWidgets.QDialog):
         """Load panel data from database."""
         if db_loader:
             try:
-                con = db_loader.connect()
+                # Use the populated database in project root
+                import os
+
+                db_path = os.path.join(os.path.dirname(__file__), "..", "..", "autofire.db")
+                con = db_loader.connect(db_path)
                 self.panels = db_loader.fetch_panels(con)
                 con.close()
             except Exception as e:
@@ -79,7 +83,7 @@ class PanelSelectionDialog(QtWidgets.QDialog):
         return [
             {
                 "id": 1,
-                "manufacturer_name": "Honeywell Firelite",
+                "manufacturer_name": "Firelite",
                 "model": "MS-9050UD",
                 "name": "MS-9050UD Fire Alarm Control Panel",
                 "panel_type": "main",
@@ -788,7 +792,11 @@ class SystemBuilderPanel(QtWidgets.QDockWidget):
             return
 
         try:
-            con = db_loader.connect()
+            # Use the populated database in project root
+            import os
+
+            db_path = os.path.join(os.path.dirname(__file__), "..", "..", "autofire.db")
+            con = db_loader.connect(db_path)
             wires = db_loader.fetch_wires(con)
             con.close()
 
@@ -830,7 +838,11 @@ class SystemBuilderPanel(QtWidgets.QDockWidget):
             # Load devices if not already loaded
             if db_loader:
                 try:
-                    con = db_loader.connect()
+                    # Use the populated database in project root
+                    import os
+
+                    db_path = os.path.join(os.path.dirname(__file__), "..", "..", "autofire.db")
+                    con = db_loader.connect(db_path)
                     self.all_devices = db_loader.fetch_devices(con)
                     con.close()
                 except Exception as e:
@@ -921,16 +933,22 @@ class SystemBuilderPanel(QtWidgets.QDockWidget):
         """Load available wire types from database."""
         if db_loader:
             try:
-                con = db_loader.connect()
+                # Use the populated database in project root
+                import os
+
+                db_path = os.path.join(os.path.dirname(__file__), "..", "..", "autofire.db")
+                con = db_loader.connect(db_path)
                 wires = db_loader.fetch_wires(con)
                 con.close()
 
                 # Group by type and gauge
                 wire_options = set()
                 for wire in wires:
-                    wire_options.add(
-                        f"{wire.get('type', 'Unknown')} - {wire.get('gauge', 'Unknown')} AWG {wire.get('color', 'Unknown')}"
-                    )
+                    # split long f-string to satisfy line-length linter (E501)
+                    _wire_type = wire.get("type", "Unknown")
+                    _wire_gauge = wire.get("gauge", "Unknown")
+                    _wire_color = wire.get("color", "Unknown")
+                    wire_options.add(f"{_wire_type} - {_wire_gauge} AWG {_wire_color}")
 
                 for option in sorted(wire_options):
                     self.wire_type_combo.addItem(option)
@@ -954,7 +972,7 @@ class SystemBuilderPanel(QtWidgets.QDockWidget):
             selected_devices.append(device)
 
         # Get wire type from wire tab
-        wire_type_text = "NAC"  # Default, could be enhanced to get from wire tab
+        _wire_type_text = "NAC"  # Default, currently unused placeholder
         circuit_type = self.circuit_combo.currentText()
 
         # Create connections between all selected device pairs
@@ -1078,7 +1096,11 @@ class SystemBuilderPanel(QtWidgets.QDockWidget):
         panel_id = self.panel_config["panel"].get("id")
         if db_loader and panel_id:
             try:
-                con = db_loader.connect()
+                # Use the populated database in project root
+                import os
+
+                db_path = os.path.join(os.path.dirname(__file__), "..", "..", "autofire.db")
+                con = db_loader.connect(db_path)
                 self.devices = db_loader.fetch_compatible_devices(con, panel_id)
                 con.close()
             except Exception as e:
@@ -1097,7 +1119,10 @@ class SystemBuilderPanel(QtWidgets.QDockWidget):
             wire_info = f"{conn.wire_type.get('gauge', '?')} AWG {conn.wire_type.get('color', '?')}"
             footage = f"{conn.footage} ft"
 
-            item_text = f"{i+1}. {device1_name} ↔ {device2_name} ({wire_info}, {conn.circuit_type}, {footage})"
+            # split the item text into smaller parts to avoid long source lines
+            prefix = f"{i+1}. {device1_name} ↔ {device2_name} "
+            details = f"({wire_info}, {conn.circuit_type}, {footage})"
+            item_text = prefix + details
             item = QtWidgets.QListWidgetItem(item_text)
             item.setData(QtCore.Qt.ItemDataRole.UserRole, conn)
             self.connections_list.addItem(item)

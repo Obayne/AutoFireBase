@@ -1,0 +1,22 @@
+name: CI Agent
+
+on:
+    push:
+        branches: ["*"]
+    pull_request:
+        branches: ["*"]
+    workflow_dispatch:
+
+jobs:
+    agent:
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+            - name: Agent Status
+              run: |
+                  echo "CI Agent active: $GITHUB_REF on $GITHUB_REPOSITORY"
+            # Add custom steps below for notifications, deployment, or other automation

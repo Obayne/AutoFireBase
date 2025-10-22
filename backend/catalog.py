@@ -55,7 +55,11 @@ def _builtin():
 def load_catalog():
     if db_loader is not None:
         try:
-            con = db_loader.connect()
+            # Use the populated database in project root
+            import os
+
+            db_path = os.path.join(os.path.dirname(__file__), "..", "autofire.db")
+            con = db_loader.connect(db_path)
             db_loader.ensure_schema(con)
             db_loader.seed_demo(con)
             devs = db_loader.fetch_devices(con)

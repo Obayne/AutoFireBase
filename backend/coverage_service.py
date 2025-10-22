@@ -43,7 +43,8 @@ def get_required_ceiling_strobe_candela(ceiling_height: int, room_size: int) -> 
     con = get_connection()
     cur = con.cursor()
     # Find the best matching record for the given ceiling height and room size.
-    # We look for the closest ceiling height without going under, then the smallest room size that fits.
+    # We look for the closest ceiling height without going under, then the
+    # smallest room size that fits.
     cur.execute(
         f"""
         SELECT candela FROM {CEILING_STROBE_TABLE_NAME}

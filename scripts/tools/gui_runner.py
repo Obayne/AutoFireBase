@@ -10,9 +10,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from app.main import MainWindow
-from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import QApplication
+from app.main import MainWindow  # noqa: E402 (we adjust sys.path above intentionally)
+from PySide6.QtCore import QTimer  # noqa: E402
+from PySide6.QtWidgets import QApplication  # noqa: E402
 
 
 def safe_call(win, name):

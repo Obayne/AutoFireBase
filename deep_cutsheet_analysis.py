@@ -239,7 +239,7 @@ def analyze_detector_specs(text, detector_data):
     """Extract detector specifications from PDF text."""
 
     # Look for addressing information
-    addr_patterns = [
+    _addr_patterns = [
         r"address.*?(\d+)",
         r"(\d+).*?address",
         r"protocol.*?(.*)",
@@ -255,7 +255,7 @@ def analyze_detector_specs(text, detector_data):
     ]
 
     # Look for mounting specifications
-    mounting_patterns = [
+    _mounting_patterns = [
         r"ceiling.*?mount",
         r"wall.*?mount",
         r"(\d+).*?inch.*?from.*?wall",

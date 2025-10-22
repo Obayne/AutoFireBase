@@ -225,10 +225,10 @@ def populate_devices():
 
         if cursor.fetchone()[0] == 0:
             cursor.execute(
-                """
-                INSERT INTO panels (manufacturer_id, model, name, panel_type, max_devices, properties_json)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """,
+                (
+                    "INSERT INTO panels (manufacturer_id, model, name, panel_type, "
+                    "max_devices, properties_json)"
+                ),
                 (
                     manufacturers.get(panel["manufacturer"], 1),
                     panel["model"],

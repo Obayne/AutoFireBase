@@ -483,7 +483,16 @@ class SystemBuilderWidget(QWidget):
                     continue
 
             # Create list item
-            display_text = f"{device['name']} ({device['symbol']}) - {device['manufacturer']} {device['model']}"
+            # split display text to avoid long source line
+            display_text = (
+                str(device["name"])
+                + " ("
+                + str(device["symbol"])
+                + ") - "
+                + str(device["manufacturer"])
+                + " "
+                + str(device["model"])
+            )
             item = QtWidgets.QListWidgetItem(display_text)
             item.setData(Qt.ItemDataRole.UserRole, device)
             self.device_catalog_list.addItem(item)
@@ -537,8 +546,11 @@ class SystemBuilderWidget(QWidget):
 
             # Actions column
             remove_btn = QPushButton("Remove")
+            # keep style but split into shorter literal segments
             remove_btn.setStyleSheet(
-                "background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px;"
+                "background-color: #dc3545; color: white; border: none; "
+                + "padding: 4px 8px;"
+                + " border-radius: 3px;"
             )
             remove_btn.clicked.connect(lambda checked, r=row: self._remove_staged_device(r))
             self.devices_table.setCellWidget(row, 6, remove_btn)
@@ -700,17 +712,26 @@ class SystemBuilderWidget(QWidget):
 
         recommendations = {
             "SLC (Signaling Line Circuit) - 18-22 AWG": {
-                "description": "🔍 SLC Circuit: 18 AWG 2-conductor shielded cable for reliable data communication",
+                "description": (
+                    "🔍 SLC Circuit: 18 AWG 2-conductor shielded cable for reliable "
+                    + "data communication"
+                ),
                 "sku": "SLC-18-2C-SHIELD",
                 "gauge": "18",
                 "conductors": 2,
                 "resistance": 6.4,
                 "capacitance": 42.0,
                 "reel": 1000,
-                "details": "Recommended for smoke detectors, heat detectors, and other addressable devices",
+                "details": (
+                    "Recommended for smoke detectors, heat detectors, and other "
+                    + "addressable devices"
+                ),
             },
             "NAC (Notification Appliance Circuit) - 14-16 AWG": {
-                "description": "🔊 NAC Circuit: 14 AWG 2-conductor for notification appliances (horns, strobes)",
+                "description": (
+                    "🔊 NAC Circuit: 14 AWG 2-conductor for notification appliances "
+                    + "(horns, strobes)"
+                ),
                 "sku": "NAC-14-2C-RED",
                 "gauge": "14",
                 "conductors": 2,
@@ -828,7 +849,9 @@ class SystemBuilderWidget(QWidget):
             # Actions column
             remove_btn = QPushButton("Remove")
             remove_btn.setStyleSheet(
-                "background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px;"
+                "background-color: #dc3545; color: white; border: none; "
+                + "padding: 4px 8px;"
+                + " border-radius: 3px;"
             )
             remove_btn.clicked.connect(lambda checked, r=row: self._remove_staged_wire(r))
             self.wires_table.setCellWidget(row, 6, remove_btn)
@@ -915,7 +938,9 @@ class SystemBuilderWidget(QWidget):
             # Actions column
             remove_btn = QPushButton("Remove")
             remove_btn.setStyleSheet(
-                "background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px;"
+                "background-color: #dc3545; color: white; border: none; "
+                + "padding: 4px 8px;"
+                + " border-radius: 3px;"
             )
             remove_btn.clicked.connect(lambda checked, r=row: self._remove_staged_panel(r))
             self.panels_table.setCellWidget(row, 6, remove_btn)

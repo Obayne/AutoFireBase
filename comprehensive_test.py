@@ -7,6 +7,8 @@ Tests device palette, placement, and System Builder functionality
 import os
 import sys
 
+import pytest
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 from PySide6.QtWidgets import QApplication
@@ -30,11 +32,10 @@ def test_device_catalog():
         print("Device breakdown:")
         for t, count in sorted(types.items()):
             print(f"  {t}: {count} devices")
-
-        return True
+def test_model_space(qapp, app_controller):
+        return None
     except Exception as e:
-        print(f"✗ Device catalog test failed: {e}")
-        return False
+        pytest.fail(f"Device catalog test failed: {e}")
 
 
 def test_database_connectivity():
@@ -59,10 +60,9 @@ def test_database_connectivity():
 
         con.close()
         print("✓ Database operations completed successfully")
-        return True
+        return None
     except Exception as e:
-        print(f"✗ Database test failed: {e}")
-        return False
+        pytest.fail(f"Database test failed: {e}")
 
 
 def test_system_builder():
@@ -91,24 +91,22 @@ def test_system_builder():
         print(f"✓ System Builder loaded {len(panel.devices)} compatible devices")
 
         # Test wire loading
-        wires = panel._load_wire_types()
+        _wires = panel._load_wire_types()
         print("✓ Loaded wire types (UI populated)")
 
-        return True
+        return None
     except Exception as e:
-        print(f"✗ System Builder test failed: {e}")
-        return False
+        pytest.fail(f"System Builder test failed: {e}")
 
 
-def test_model_space(qapp):
+def test_model_space(qapp, app_controller):
     """Test Model Space window and device palette."""
     print("\n=== Testing Model Space ===")
     try:
-        from frontend.controller import AutoFireController
-        from frontend.windows.model_space import ModelSpaceWindow
+    from frontend.windows.model_space import ModelSpaceWindow
 
-        # Create controller to get device data
-        controller = AutoFireController()
+    # Use test-safe controller fixture to avoid importing Qt-heavy app
+    controller = app_controller
         devices_all = controller.devices_all
 
         print(f"✓ Controller loaded {len(devices_all)} devices")
@@ -129,10 +127,9 @@ def test_model_space(qapp):
             f"✓ Device palette populated with {total_devices} devices in {device_count} categories"
         )
 
-        return True
+        return None
     except Exception as e:
-        print(f"✗ Model Space test failed: {e}")
-        return False
+        pytest.fail(f"Model Space test failed: {e}")
 
 
 def test_device_placement(qapp):
@@ -151,20 +148,19 @@ def test_device_placement(qapp):
         assert device.manufacturer == "Test Mfg"
         assert device.part_number == "TEST-001"
         print("✓ Device properties set correctly")
-
+        def test_gui_components(qapp):
         # Test position
         pos = device.pos()
         assert pos.x() == 100
         assert pos.y() == 100
         print("✓ Device position set correctly")
 
-        return True
+        return None
     except Exception as e:
-        print(f"✗ Device placement test failed: {e}")
         import traceback
 
         traceback.print_exc()
-        return False
+        pytest.fail(f"Device placement test failed: {e}")
 
 
 def test_gui_components(qapp):
@@ -172,24 +168,21 @@ def test_gui_components(qapp):
     print("\n=== Testing GUI Components ===")
 
     try:
-        print("Creating AutoFire controller...")
-        from frontend.controller import AutoFireController
-
-        # Test controller creation
-        controller = AutoFireController()
+    print("Creating AutoFire controller (test fixture)...")
+    # Use the test fixture rather than constructing the real controller
+    controller = app_controller
         print("✓ AutoFire controller created")
 
         # Test that we can access main components
         devices = controller.devices_all
         print(f"✓ Controller has {len(devices)} devices loaded")
 
-        return True
+        return None
     except Exception as e:
-        print(f"✗ GUI test failed: {e}")
         import traceback
 
         traceback.print_exc()
-        return False
+        pytest.fail(f"GUI test failed: {e}")
 
 
 def main():
@@ -211,8 +204,10 @@ def main():
 
     for test in tests:
         try:
-            if test():
-                passed += 1
+            test()
+            passed += 1
+        except AssertionError as e:
+            print(f"✗ Test {test.__name__} failed: {e}")
         except Exception as e:
             print(f"✗ Test {test.__name__} crashed: {e}")
 

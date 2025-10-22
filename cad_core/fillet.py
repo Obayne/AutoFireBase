@@ -12,10 +12,10 @@ def _len(v: Point) -> float:
 
 
 def _norm(v: Point) -> Point:
-    l = _len(v)
-    if l <= 0.0:
+    length = _len(v)
+    if length <= 0.0:
         return Point(0.0, 0.0)
-    return Point(v.x / l, v.y / l)
+    return Point(v.x / length, v.y / length)
 
 
 def _sub(a: Point, b: Point) -> Point:
@@ -48,17 +48,17 @@ def fillet_line_line(
     if radius <= tol:
         return None
 
-    I = intersection_line_line(l1, l2, tol=tol)
-    if I is None:
+    intersection_point = intersection_line_line(l1, l2, tol=tol)
+    if intersection_point is None:
         return None
 
     # Choose directions away from intersection along each line
-    # Prefer the endpoint farther from I to get a stable direction.
+    # Prefer the endpoint farther from intersection_point to get a stable direction.
     def away_dir(L: Line) -> Point:
-        d_a = _len(_sub(L.a, I))
-        d_b = _len(_sub(L.b, I))
+        d_a = _len(_sub(L.a, intersection_point))
+        d_b = _len(_sub(L.b, intersection_point))
         # Prefer endpoint b when distances are equal to avoid sign flip
-        v = _sub(L.b, I) if d_b >= d_a else _sub(L.a, I)
+        v = _sub(L.b, intersection_point) if d_b >= d_a else _sub(L.a, intersection_point)
         return _norm(v)
 
     u1 = away_dir(l1)
@@ -82,9 +82,9 @@ def fillet_line_line(
     # Center distance from intersection along bisector
     d = radius / math.sin(half)
 
-    p1 = _add(I, _scale(u1, t))
-    p2 = _add(I, _scale(u2, t))
-    center = _add(I, _scale(b, d))
+    p1 = _add(intersection_point, _scale(u1, t))
+    p2 = _add(intersection_point, _scale(u2, t))
+    center = _add(intersection_point, _scale(b, d))
     return (p1, p2, center)
 
 

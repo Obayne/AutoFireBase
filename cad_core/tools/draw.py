@@ -198,7 +198,7 @@ class DrawController:
 
 
 def _circle_from_3pts(a: QtCore.QPointF, b: QtCore.QPointF, c: QtCore.QPointF):
-    # Compute circle through 3 points; return center, radius, and start/span in degrees from point a→b→c
+    # Compute circle through 3 points; return center, radius, and start/span in degrees.
     ax, ay = a.x(), a.y()
     bx, by = b.x(), b.y()
     cx, cy = c.x(), c.y()
@@ -233,7 +233,7 @@ def _circle_from_3pts(a: QtCore.QPointF, b: QtCore.QPointF, c: QtCore.QPointF):
             x -= 360
         return x
 
-    s1 = norm(a1 - a0)
+    norm(a1 - a0)
     s2 = norm(a2 - a0)
     # ensure sweep includes a1 directionally; simple heuristic: use s2 as span
     return ux, uy, r, a0, s2

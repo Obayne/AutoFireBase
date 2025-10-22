@@ -85,7 +85,7 @@ class ScaleUnderlayDragTool:
         self.anchor = None
         self.orig = self.group.transform()
         self.win.statusBar().showMessage(
-            "Underlay Scale (Drag): click anchor point, then move mouse; click again to commit, Esc to cancel"
+            "Scale (Drag): click anchor, move, click to commit, Esc to cancel"
         )
 
     def cancel(self):
@@ -103,7 +103,6 @@ class ScaleUnderlayDragTool:
             return
         # scale factor from horizontal drag distance
         try:
-            view = self.win.view
             cur = p
             dx = cur.x() - self.anchor.x()
             factor = max(0.01, 1.0 + dx / 200.0)

@@ -80,49 +80,21 @@ class CoverageDialog(QtWidgets.QDialog):
         v.addWidget(bb)
 
         self.btn_suggest.clicked.connect(self.suggest_candela)
-
         # Track the source of the settings
         self.source = "manual"
-        self.ed_diam.valueChanged.connect(self._on_manual_edit)
-        self.ed_L10.valueChanged.connect(self._on_manual_edit)
-        self.ed_target.valueChanged.connect(self._on_manual_edit)
-        self.ed_spacing.valueChanged.connect(self._on_manual_edit)
-
-    def suggest_candela(self):
-        try:
-            from backend.coverage_service import (
-                get_required_ceiling_strobe_candela,
-                get_required_wall_strobe_candela,
-            )
-
-            room_size = self.ed_room_size.value()
-            ceiling_height = self.ed_ceiling_height.value()
-            mount = self.cmb_mount.currentText()
-
-            candela = None
-            if mount == "wall":
-                candela = get_required_wall_strobe_candela(room_size)
-            else:  # ceiling
-                candela = get_required_ceiling_strobe_candela(ceiling_height, room_size)
-
-            if candela:
-                self.lbl_suggested_candela.setText(f"{candela} cd")
-            else:
-                self.lbl_suggested_candela.setText("N/A (out of range)")
-        except Exception as e:
-            self.lbl_suggested_candela.setText(f"Error: {e}")
-
-        # load existing
-        if existing:
-            mode = existing.get("mode", "none")
+        # Preserve provided existing settings for later use
+        self._existing = existing
+        # If caller provided existing settings, populate fields now
+        if self._existing:
+            mode = self._existing.get("mode", "none")
             i = self.cmb_mode.findText(mode)
             if i >= 0:
                 self.cmb_mode.setCurrentIndex(i)
-            mnt = existing.get("mount", "ceiling")
+            mnt = self._existing.get("mount", "ceiling")
             j = self.cmb_mount.findText(mnt)
             if j >= 0:
                 self.cmb_mount.setCurrentIndex(j)
-            p = existing.get("params", {})
+            p = self._existing.get("params", {})
             if "diameter_ft" in p:
                 self.ed_diam.setValue(float(p.get("diameter_ft", 50.0)))
             if "L10" in p:
@@ -132,8 +104,14 @@ class CoverageDialog(QtWidgets.QDialog):
             if "spacing_ft" in p:
                 self.ed_spacing.setValue(float(p.get("spacing_ft", 30.0)))
 
-        # Set source based on existing data if available
-        self.source = existing.get("source", "manual")
+            # Set source based on existing data if available
+            self.source = self._existing.get("source", "manual")
+        self.ed_diam.valueChanged.connect(self._on_manual_edit)
+        self.ed_L10.valueChanged.connect(self._on_manual_edit)
+        self.ed_target.valueChanged.connect(self._on_manual_edit)
+        self.ed_spacing.valueChanged.connect(self._on_manual_edit)
+
+    # NOTE: suggest_candela is defined below once (kept as the canonical implementation)
 
     def _on_manual_edit(self):
         self.source = "manual"
@@ -177,7 +155,7 @@ class CoverageDialog(QtWidgets.QDialog):
             else:
                 self.lbl_suggested_candela.setText("N/A (out of range)")
                 self.source = "manual"
-        except Exception as e:
+        except (ImportError, ValueError) as e:
             self.lbl_suggested_candela.setText(f"Error: {e}")
             self.source = "manual"
 

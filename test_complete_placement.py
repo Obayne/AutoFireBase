@@ -6,6 +6,8 @@ Test the complete workflow from catalog selection to canvas placement.
 import os
 import sys
 
+import pytest
+
 # Prevent the main app from starting
 os.environ["AUTOFIRE_TEST_MODE"] = "1"
 
@@ -21,7 +23,7 @@ def test_complete_placement_workflow():
         from PySide6.QtCore import QPointF
         from PySide6.QtWidgets import QApplication
 
-        app = QApplication.instance() or QApplication(sys.argv)
+        _app = QApplication.instance() or QApplication(sys.argv)
 
         # Test 1: Load catalog and find panel
         from backend.catalog import load_catalog
@@ -35,8 +37,7 @@ def test_complete_placement_workflow():
                 break
 
         if not panel_device:
-            print("❌ No fire alarm panel found in catalog")
-            return False
+            pytest.fail("No fire alarm panel found in catalog")
 
         print(f"✅ Found panel in catalog: {panel_device['name']}")
 
@@ -53,9 +54,12 @@ def test_complete_placement_workflow():
         current_proto = panel_device
         device_type = current_proto.get("type", "other").lower()
 
-        print(
-            f"✅ Device type check: '{device_type}' -> should create FireAlarmPanel: {device_type in ['panel', 'fire_alarm_panel', 'main_panel']}"
+        is_panel_type = device_type in ["panel", "fire_alarm_panel", "main_panel"]
+        msg = (
+            f"✅ Device type check: '{device_type}' -> "
+            f"should create FireAlarmPanel: {is_panel_type}"
         )
+        print(msg)
 
         # Test 4: Create ghost device (what happens when selecting from palette)
         device_name = (
@@ -73,7 +77,7 @@ def test_complete_placement_workflow():
         if device_type in ["panel", "fire_alarm_panel", "main_panel"]:
             from frontend.fire_alarm_panel import FireAlarmPanel
 
-            ghost = FireAlarmPanel(
+            _ghost = FireAlarmPanel(
                 0,
                 0,
                 device_symbol,
@@ -85,7 +89,7 @@ def test_complete_placement_workflow():
         else:
             from frontend.device import DeviceItem
 
-            ghost = DeviceItem(
+            _ghost = DeviceItem(
                 0,
                 0,
                 device_symbol,
@@ -136,8 +140,7 @@ def test_complete_placement_workflow():
             if main_panel:
                 print(f"✅ Panel registered with circuit manager: {main_panel.name}")
             else:
-                print("❌ Panel not found in circuit manager")
-                return False
+                pytest.fail("Panel not found in circuit manager")
 
         print("✅ Device added to scene successfully")
 
@@ -160,18 +163,18 @@ def test_complete_placement_workflow():
         print(
             "If it's still ghosted, the issue might be in the Qt event handling or command stack."
         )
-
-        return True
-
     except Exception as e:
-        print(f"❌ Error in placement workflow: {e}")
         import traceback
 
         traceback.print_exc()
-        return False
+        pytest.fail(f"Error in placement workflow: {e}")
+
+    # Completed successfully
+    return None
 
 
 if __name__ == "__main__":
-    success = test_complete_placement_workflow()
-    if not success:
+    try:
+        test_complete_placement_workflow()
+    except Exception:
         sys.exit(1)

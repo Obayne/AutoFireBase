@@ -33,7 +33,7 @@ class RotateTool:
                 self.base = None
                 return False
             ang = float(val)
-            rad = ang * 3.141592653589793 / 180.0
+            # rad value isn't used directly; keep calculation removed to avoid unused var
             sel = list(self.win.scene.selectedItems())
             if not sel:
                 self.active = False

@@ -118,7 +118,9 @@ def main() -> int:
             print("WARNING: SHA mismatch between cached file and saved file.")
 
         print(
-            "All done. You can now run .\\venv\\Scripts\\python.exe .\\scripts\\tools\\local_llm_test.py to validate the model load."
+            "All done. You can now run "
+            " .\\venv\\Scripts\\python.exe .\\scripts\\tools\\local_llm_test.py "
+            "to validate the model load."
         )
         return 0
 

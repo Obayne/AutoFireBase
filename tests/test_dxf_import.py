@@ -39,7 +39,7 @@ class TestDXFImport:
         """Test basic path building from DXF document."""
         # Create mock DXF document
         mock_doc = Mock()
-        mock_msp = Mock()
+        _mock_msp = Mock()
         mock_doc.modelspace.return_value = []
         mock_doc.header = {}
         mock_readfile.return_value = mock_doc

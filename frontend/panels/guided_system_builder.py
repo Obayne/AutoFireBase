@@ -383,11 +383,13 @@ class GuidedSystemBuilderWidget(QWidget):
 
         # Panel selection guidance
         guidance = QLabel(
-            """
-        <h3>🔧 Fire Alarm Control Panel Selection</h3>
-        <p>Based on your building assessment, we'll recommend the most appropriate control panel.
-        The panel is the "brain" of your fire alarm system and must have adequate capacity for your building.</p>
-        """
+            "<h3>🔧 Fire Alarm Control Panel Selection</h3>"
+            + "<p>Based on your building assessment, we'll recommend the most appropriate "
+            + "control panel.</p>"
+            + (
+                '<p>The panel is the "brain" of your fire alarm system and must have adequate '
+                + "capacity for your building.</p>"
+            )
         )
         guidance.setWordWrap(True)
         guidance.setStyleSheet(
@@ -441,11 +443,9 @@ class GuidedSystemBuilderWidget(QWidget):
         layout = QVBoxLayout(widget)
 
         guidance = QLabel(
-            """
-        <h3>🔌 Circuit & Wiring Planning</h3>
-        <p>Based on your selected devices, we'll specify the appropriate wire types and circuit configurations
-        to ensure reliable communication and code compliance.</p>
-        """
+            "<h3>🔌 Circuit & Wiring Planning</h3>"
+            + "<p>Based on your selected devices, we'll specify the appropriate wire types and "
+            + "circuit configurations to ensure reliable communication and code compliance.</p>"
         )
         guidance.setWordWrap(True)
         guidance.setStyleSheet(
@@ -529,15 +529,30 @@ class GuidedSystemBuilderWidget(QWidget):
 
         # Panel recommendations
         if assessment.size_sqft < 5000:
-            panel_rec = "📟 **Conventional Panel Recommended**\\n- Cost-effective for smaller buildings\\n- 2-8 zones typical\\n- Manual device addressing"
+            panel_rec = (
+                "📟 **Conventional Panel Recommended**\\n"
+                "- Cost-effective for smaller buildings\\n"
+                "- 2-8 zones typical\\n"
+                "- Manual device addressing"
+            )
             self.recommendations.panel_type = "conventional"
             self.recommendations.panel_zones = min(4, max(2, assessment.floors * 2))
         elif assessment.size_sqft < 25000:
-            panel_rec = "📟 **Addressable Panel Recommended**\\n- Better monitoring and diagnostics\\n- Individual device addressing\\n- Reduced installation time"
+            panel_rec = (
+                "📟 **Addressable Panel Recommended**\\n"
+                "- Better monitoring and diagnostics\\n"
+                "- Individual device addressing\\n"
+                "- Reduced installation time"
+            )
             self.recommendations.panel_type = "addressable"
             self.recommendations.panel_zones = min(8, max(4, assessment.floors * 2))
         else:
-            panel_rec = "📟 **Networked Addressable System Recommended**\\n- Multiple panels with network capability\\n- Advanced monitoring and control\\n- Scalable for future expansion"
+            panel_rec = (
+                "📟 **Networked Addressable System Recommended**\\n"
+                "- Multiple panels with network capability\\n"
+                "- Advanced monitoring and control\\n"
+                "- Scalable for future expansion"
+            )
             self.recommendations.panel_type = "networked"
             self.recommendations.panel_zones = max(8, assessment.floors * 3)
 
@@ -545,7 +560,12 @@ class GuidedSystemBuilderWidget(QWidget):
 
         # Device recommendations
         if "Office" in assessment.building_type:
-            device_rec = "🔍 **Detection Strategy**\\n- Photoelectric smoke detectors in offices\\n- Heat detectors in mechanical/storage areas\\n- Standard 30ft spacing"
+            device_rec = (
+                "🔍 **Detection Strategy**\\n"
+                "- Photoelectric smoke detectors in offices\\n"
+                "- Heat detectors in mechanical/storage areas\\n"
+                "- Standard 30ft spacing"
+            )
             self.recommendations.device_count_estimate = {
                 "smoke_detectors": max(assessment.size_sqft // 900, assessment.floors * 2),
                 "heat_detectors": assessment.floors,
@@ -553,7 +573,12 @@ class GuidedSystemBuilderWidget(QWidget):
                 "horn_strobes": max(assessment.size_sqft // 2500, assessment.floors * 2),
             }
         elif "Industrial" in assessment.building_type:
-            device_rec = "🔍 **Detection Strategy**\\n- Heat detectors primary (high ceiling/dust)\\n- Smoke detectors in office areas only\\n- Enhanced spacing for ceiling height"
+            device_rec = (
+                "🔍 **Detection Strategy**\\n"
+                "- Heat detectors primary (high ceiling/dust)\\n"
+                "- Smoke detectors in office areas only\\n"
+                "- Enhanced spacing for ceiling height"
+            )
             self.recommendations.device_count_estimate = {
                 "heat_detectors": max(assessment.size_sqft // 900, assessment.floors * 3),
                 "smoke_detectors": max(assessment.size_sqft // 3000, 2),
@@ -561,7 +586,12 @@ class GuidedSystemBuilderWidget(QWidget):
                 "horn_strobes": max(assessment.size_sqft // 2000, assessment.floors * 3),
             }
         else:
-            device_rec = "🔍 **Detection Strategy**\\n- Mixed smoke/heat detection per NFPA 72\\n- Standard commercial spacing\\n- Code-compliant notification coverage"
+            device_rec = (
+                "🔍 **Detection Strategy**\\n"
+                "- Mixed smoke/heat detection per NFPA 72\\n"
+                "- Standard commercial spacing\\n"
+                "- Code-compliant notification coverage"
+            )
             self.recommendations.device_count_estimate = {
                 "smoke_detectors": max(assessment.size_sqft // 900, assessment.floors * 2),
                 "heat_detectors": max(assessment.floors, 1),
@@ -573,12 +603,22 @@ class GuidedSystemBuilderWidget(QWidget):
 
         # Notification recommendations
         if "High-Occupancy" in assessment.occupancy_level:
-            notif_rec = "🔊 **Notification Requirements**\\n- Voice evacuation system required\\n- Enhanced audible/visual coverage\\n- Emergency communication capability"
+            notif_rec = (
+                "🔊 **Notification Requirements**\\n"
+                "- Voice evacuation system required\\n"
+                "- Enhanced audible/visual coverage\\n"
+                "- Emergency communication capability"
+            )
             self.recommendations.compliance_notes.append(
                 "Voice evacuation system required for high-occupancy"
             )
         else:
-            notif_rec = "🔊 **Notification Requirements**\\n- Standard horn/strobe notification\\n- ADA-compliant visual devices\\n- Adequate sound pressure levels"
+            notif_rec = (
+                "🔊 **Notification Requirements**\\n"
+                "- Standard horn/strobe notification\\n"
+                "- ADA-compliant visual devices\\n"
+                "- Adequate sound pressure levels"
+            )
 
         recommendations.append(notif_rec)
 
@@ -723,7 +763,8 @@ class GuidedSystemBuilderWidget(QWidget):
 
         if not recommended_panels:
             no_panels = QLabel(
-                "⚠️ No suitable panels found in catalog. Please ensure your device catalog is properly populated."
+                "⚠️ No suitable panels found in catalog. "
+                + "Please ensure your device catalog is properly populated."
             )
             no_panels.setStyleSheet("color: #dc3545; padding: 10px;")
             self.panel_layout.addWidget(no_panels)
@@ -743,7 +784,8 @@ class GuidedSystemBuilderWidget(QWidget):
 
         for device in self.device_catalog:
             if device.get("type", "").lower() in ["panel", "facp", "control"]:
-                # Simple matching for now - in real implementation, would have detailed specifications
+                # Simple matching for now - in real implementation,
+                # would have detailed specifications
                 recommended.append(device)
 
         return recommended[:3]  # Limit to top 3 recommendations
@@ -771,7 +813,12 @@ class GuidedSystemBuilderWidget(QWidget):
 
         # Panel name and model
         name_label = QLabel(f"<b>{panel['name']}</b>")
-        model_label = QLabel(f"Model: {panel['model']} | Manufacturer: {panel['manufacturer']}")
+        model_label = QLabel(
+            "Model: "
+            + str(panel.get("model", ""))
+            + " | Manufacturer: "
+            + str(panel.get("manufacturer", ""))
+        )
         model_label.setStyleSheet("color: #6c757d; font-size: 11px;")
 
         # Recommendation reason
@@ -878,7 +925,9 @@ class GuidedSystemBuilderWidget(QWidget):
                 self.device_rec_layout.addWidget(category_group)
 
         self._update_guidance(
-            "Select the devices your system needs. Recommendations are based on your building type and code requirements."
+            "Select the devices your system needs. "
+            + "Recommendations are based on your building type "
+            + "and code requirements."
         )
 
     def _get_detection_devices(self):
@@ -912,8 +961,10 @@ class GuidedSystemBuilderWidget(QWidget):
 
         # Device info
         info_layout = QVBoxLayout()
-        name_label = QLabel(f"<b>{device['name']}</b>")
-        model_label = QLabel(f"{device['model']} - {device['manufacturer']}")
+        name_label = QLabel("<b>" + device.get("name", "") + "</b>")
+        model_label = QLabel(
+            str(device.get("model", "")) + " - " + str(device.get("manufacturer", ""))
+        )
         model_label.setStyleSheet("color: #6c757d; font-size: 10px;")
 
         info_layout.addWidget(name_label)
@@ -982,7 +1033,11 @@ class GuidedSystemBuilderWidget(QWidget):
             )
         else:
             self._update_guidance(
-                f"✅ Added {device['name']}. Total devices: {len(self.selected_devices)}. Continue adding or proceed to wire planning."
+                "✅ Added "
+                + device.get("name", "")
+                + ". Total devices: "
+                + str(len(self.selected_devices))
+                + ". Continue adding or proceed to wire planning."
             )
 
     def _get_device_rationale(self, device):

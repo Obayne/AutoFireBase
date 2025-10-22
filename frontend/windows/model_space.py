@@ -52,6 +52,20 @@ setup_logging()
 _logger = logging.getLogger(__name__)
 
 
+class WireSegment(QtWidgets.QGraphicsLineItem):
+    """Minimal wire segment with metadata for voltage drop calculations."""
+
+    def __init__(self, x1, y1, x2, y2, ohms_per_1000ft=3.08, parent=None):
+        super().__init__(parent)
+        self.setLine(x1, y1, x2, y2)
+        self.ohms_per_1000ft = float(ohms_per_1000ft)
+        self.length_ft = 0.0  # will be computed on add
+        pen = QtGui.QPen(QtGui.QColor(200, 0, 0))
+        pen.setWidth(2)
+        self.setPen(pen)
+        self.setZValue(65)
+
+
 class ModelSpaceWindow(QMainWindow):
     """
     Model Space Window - Dedicated CAD workspace for device placement and design.
@@ -167,6 +181,14 @@ class ModelSpaceWindow(QMainWindow):
         wire_action.setCheckable(True)
         wire_action.triggered.connect(lambda: self.draw.set_mode(DrawMode.WIRE))
 
+        # Quick Voltage Drop calculator
+        vd_action = toolbar.addAction("Voltage Drop")
+        vd_action.triggered.connect(self._calculate_voltage_drop)
+
+        # Add a demo wire segment (scaffolding for overlay)
+        add_wire_seg_action = toolbar.addAction("Add Wire Seg")
+        add_wire_seg_action.triggered.connect(self._add_wire_segment)
+
         toolbar.addSeparator()
 
         # CAD Drawing Tools (mutually exclusive)
@@ -195,63 +217,55 @@ class ModelSpaceWindow(QMainWindow):
 
         toolbar.addSeparator()
 
-        # Text annotation tools
-        text_action = toolbar.addAction("Text")
-        text_action.triggered.connect(self._start_text_tool)
+    def _calculate_voltage_drop(self):
+        """Basic voltage drop calculation using wire segments.
+        Sums total resistance from wire metadata (ohms/1000ft) and lengths, then shows a summary.
+        """
+        try:
+            total_length_ft = 0.0
+            total_resistance_ohms = 0.0
 
-        mtext_action = toolbar.addAction("MText")
-        mtext_action.triggered.connect(self._start_mtext_tool)
+            for item in self.layer_wires.childItems():
+                length_ft = getattr(item, "length_ft", 0.0)
+                ohms_per_1000ft = getattr(item, "ohms_per_1000ft", 0.0)
+                total_length_ft += float(length_ft)
+                total_resistance_ohms += (float(ohms_per_1000ft) * float(length_ft)) / 1000.0
 
-        toolbar.addSeparator()
+            current_a = 0.5
+            v_drop = total_resistance_ohms * current_a
 
-        # Navigation tools
-        zoom_extents_action = toolbar.addAction("Zoom Extents")
-        zoom_extents_action.triggered.connect(self.view.zoom_fit)
+            msg = (
+                f"Wire length: {total_length_ft:.1f} ft | "
+                f"R_total: {total_resistance_ohms:.2f} Ω | "
+                f"Vdrop@0.5A: {v_drop:.2f} V"
+            )
+            self.statusBar().showMessage(msg, 5000)
+        except Exception as e:
+            self.statusBar().showMessage(f"Voltage drop calc error: {e}", 5000)
 
-        zoom_selection_action = toolbar.addAction("Zoom Selection")
-        zoom_selection_action.triggered.connect(self._zoom_to_selection)
+    def _add_wire_segment(self):
+        """Create a minimal wire segment and add to the wire layer."""
+        try:
+            # Create a short segment near the view center
+            center = self.view.mapToScene(self.view.viewport().rect().center())
+            x1 = center.x() - 100
+            y1 = center.y()
+            x2 = center.x() + 100
+            y2 = center.y()
 
-        toolbar.addSeparator()
+            seg = WireSegment(x1, y1, x2, y2, ohms_per_1000ft=3.08)
+            # Compute length in feet based on px_per_ft (pixels per foot)
+            px_len = QtCore.QLineF(x1, y1, x2, y2).length()
+            feet_len = float(px_len) / float(self.px_per_ft)
+            seg.length_ft = feet_len
 
-        # Grid and snap
-        grid_action = toolbar.addAction("Grid")
-        grid_action.setCheckable(True)
-        grid_action.setChecked(True)
-        grid_action.triggered.connect(self._toggle_grid)
-
-        snap_action = toolbar.addAction("Snap")
-        snap_action.setCheckable(True)
-        snap_action.setChecked(bool(self.prefs.get("snap", True)))
-        snap_action.triggered.connect(self._toggle_snap)
-
-        toolbar.addSeparator()
-
-        # Coverage overlays
-        coverage_action = toolbar.addAction("Coverage")
-        coverage_action.setCheckable(True)
-
-        # Array fill
-        array_action = toolbar.addAction("Array")
-        array_action.setCheckable(True)
-
-        # Measure
-        measure_action = toolbar.addAction("Measure")
-        measure_action.setCheckable(True)
-        measure_action.triggered.connect(self._toggle_measure_tool)
-
-        toolbar.addSeparator()
-
-        # Layers
-        self.layers_action = toolbar.addAction("Layers")
-        self.layers_action.triggered.connect(self._show_layer_manager)
-
-        # Undo/Redo
-        toolbar.addSeparator()
-        undo_action = toolbar.addAction("Undo")
-        undo_action.triggered.connect(self.undo)
-
-        redo_action = toolbar.addAction("Redo")
-        redo_action.triggered.connect(self.redo)
+            self.layer_wires.addToGroup(seg)
+            self.statusBar().showMessage(
+                f"Added wire segment: {feet_len:.1f} ft @ {seg.ohms_per_1000ft:.2f} Ω/1000ft",
+                4000,
+            )
+        except Exception as e:
+            self.statusBar().showMessage(f"Failed to add wire segment: {e}", 5000)
 
     def _show_layer_manager(self):
         """Show the layer manager dialog."""
@@ -879,20 +893,64 @@ class ModelSpaceWindow(QMainWindow):
             self.tool_label.setText(f"Tool: {tool_name}")
 
     def _calculate_voltage_drop(self):
-        """Calculate voltage drop for selected connection."""
-        current_item = self.current_connections_list.currentItem()
-        if current_item:
-            # TODO: Implement actual voltage drop calculation
+        """Calculate voltage drop using active wire resistance and total wire length."""
+        try:
+            # Determine active wire resistance from Wire Spool selection
+            resistance_per_1000ft = None
+            if hasattr(self, "wire_list") and self.wire_list.currentItem():
+                wire_data = self.wire_list.currentItem().data(QtCore.Qt.ItemDataRole.UserRole)
+                if wire_data:
+                    resistance_per_1000ft = wire_data.get("resistance_per_1000ft")
+
+            # Fallback default if no wire selected or missing data (Ohms per 1000 ft)
+            if resistance_per_1000ft is None:
+                resistance_per_1000ft = 8.0  # typical for 14 AWG copper
+
+            # Sum total wire length from drawn wire segments
+            wire_items = [item for item in self.scene.items() if hasattr(item, "length")]
+            total_length_ft = sum(getattr(item, "length", 0.0) for item in wire_items)
+
+            # If no wire drawn yet, prompt user
+            if total_length_ft <= 0:
+                QtWidgets.QMessageBox.warning(
+                    self,
+                    "No Wire Segments",
+                    "No wire segments found. Draw wire paths in the canvas "
+                    "or select a staged connection.",
+                )
+                return
+
+            # Ask user for circuit current (Amps)
+            current_a, ok = QtWidgets.QInputDialog.getDouble(
+                self,
+                "Circuit Current",
+                "Enter circuit current (A):",
+                1.5,  # default amperage
+                0.1,
+                20.0,
+                1,
+            )
+            if not ok:
+                return
+
+            # Compute total resistance and voltage drop
+            r_total = (resistance_per_1000ft * total_length_ft) / 1000.0
+            v_drop = r_total * current_a
+            percent_24v = (v_drop / 24.0) * 100.0
+
+            # Present results
             QtWidgets.QMessageBox.information(
                 self,
                 "Voltage Drop",
-                "Voltage drop calculation: 0.5V (2.1%)\n\n"
-                "This is a placeholder - full calculation engine needed.",
+                (
+                    f"Wire resistance: {resistance_per_1000ft:.2f} Ω/1000ft\n"
+                    f"Total length: {total_length_ft:.1f} ft\n"
+                    f"Current: {current_a:.2f} A\n\n"
+                    f"Voltage drop: {v_drop:.2f} V ({percent_24v:.1f}% of 24V)"
+                ),
             )
-        else:
-            QtWidgets.QMessageBox.warning(
-                self, "Selection Error", "Please select a connection to calculate voltage drop."
-            )
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Voltage Drop Error", str(e))
 
     def _update_connections_device_list(self):
         """Update the device list in connections panel with placed devices."""
@@ -1396,7 +1454,8 @@ class ModelSpaceWindow(QMainWindow):
             self.current_proto = dev
             self.current_kind = dev.get("type", "other").lower()
 
-            # Extract name from the appropriate field (support both direct catalog and assembly data)
+            # Extract name from the appropriate field
+            # (support both direct catalog and assembly data)
             device_name = dev.get("name") or dev.get("model") or dev.get("device_type") or "Unknown"
 
             self.statusBar().showMessage(f"Selected: {device_name}")
@@ -1410,7 +1469,8 @@ class ModelSpaceWindow(QMainWindow):
             self.scene.removeItem(self.ghost)
             self.ghost = None
 
-        # Extract name and symbol from the appropriate fields (support both direct catalog and assembly data)
+        # Extract name and symbol from the appropriate fields
+        # (support both direct catalog and assembly data)
         device_name = (
             device_proto.get("name")
             or device_proto.get("model")
