@@ -19,3 +19,17 @@ def skip_if_no_qt(request):
         import PySide6  # noqa: F401
     except Exception:
         pytest.skip("PySide6 not available; skipping GUI test")
+
+
+@pytest.fixture(autouse=True)
+def ensure_qapp_for_gui(request):
+    """Autouse fixture: for tests marked `gui`, attempt to create the pytest-qt
+    `qapp` fixture (which constructs a QApplication). If pytest-qt or PySide6
+    aren't available, the test will be skipped.
+    """
+    if "gui" in request.keywords:
+        try:
+            # request.getfixturevalue will raise if pytest-qt isn't installed
+            request.getfixturevalue("qapp")
+        except Exception:
+            pytest.skip("pytest-qt or PySide6 not available; skipping GUI test")

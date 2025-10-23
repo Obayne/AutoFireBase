@@ -37,6 +37,8 @@ jobs:
 
       - name: Initialize test database for CI
         if: always()
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           python tools/ci_init_db.py
 

@@ -3,6 +3,7 @@ Pytest configuration for AutoFire tests.
 Provides Qt application fixture for GUI tests.
 """
 
+import importlib.util
 import os
 import sys
 
@@ -30,15 +31,10 @@ def setup_qt():
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
-# Provide a minimal qtbot fixture if pytest-qt is unavailable
-try:  # pragma: no cover - exercised indirectly in tests
-    from pytestqt.qtbot import QtBot  # type: ignore
-
-    @pytest.fixture
-    def qtbot(qapp):
-        return QtBot()
-
-except Exception:  # pragma: no cover
+# Provide a minimal qtbot fixture only if pytest-qt is unavailable. If
+# pytest-qt is installed it exposes a fully-featured `qtbot` fixture and we
+# must not override it here.
+if importlib.util.find_spec("pytestqt") is None:
 
     @pytest.fixture
     def qtbot(qapp):
