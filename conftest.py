@@ -56,3 +56,17 @@ if importlib.util.find_spec("pytestqt") is None:
                 QtCore.QThread.msleep(int(ms))
 
         return _QtBot()
+
+    @pytest.fixture(autouse=True)
+    def ensure_qapp_for_gui(request):
+        """Ensure a QApplication is constructed for tests marked with `gui`.
+
+        Uses pytest-qt's `qapp` fixture when available; otherwise uses the
+        repository's `qapp` fixture defined above. Skips the test if PySide6
+        isn't installed.
+        """
+        if "gui" in request.keywords:
+            try:
+                request.getfixturevalue("qapp")
+            except Exception:
+                pytest.skip("pytest-qt or PySide6 not available; skipping GUI test")
