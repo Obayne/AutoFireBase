@@ -33,5 +33,41 @@ jobs:
           python -m pip install pytest pytest-qt PySide6
 
       - name: Run single GUI test (device placement)
+        id: run_tests
         run: |
-          xvfb-run -s '-screen 0 1024x768x24' pytest -q tests/test_device_placement_gui.py -q
+          mkdir -p test-output
+          # Run pytest and capture stdout/stderr to a file for upload and PR comment
+          xvfb-run -s '-screen 0 1024x768x24' pytest -q tests/test_device_placement_gui.py -q 2>&1 | tee test-output/pytest-output.txt
+          echo "::set-output name=logfile::test-output/pytest-output.txt" || true
+
+      - name: Upload pytest output artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-tests-quick-output
+          path: test-output/pytest-output.txt
+
+      - name: Post short test output to PR
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = 'test-output/pytest-output.txt';
+            let body = '';
+            if (fs.existsSync(path)) {
+              const txt = fs.readFileSync(path, 'utf8').split('\n').slice(0,200).join('\n');
+              body = `### gui-tests-quick: pytest output (first 200 lines)\n\n<pre>\n${txt}\n</pre>`;
+            } else {
+              body = 'No pytest output found.';
+            }
+            const pr = context.payload.pull_request;
+            if (pr) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: body,
+              });
+            } else {
+              core.info('No pull_request in context; skipping comment.');
+            }
