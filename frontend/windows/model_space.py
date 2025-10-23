@@ -73,6 +73,11 @@ class ModelSpaceWindow(QMainWindow):
     """
 
     def __init__(self, app_controller, parent=None):
+        import time
+
+        logger = logging.getLogger(__name__)
+        start_ts = time.time()
+        logger.info("ModelSpaceWindow.__init__ start")
         super().__init__(parent)
         self.app_controller = app_controller
         self.setWindowTitle("AutoFire - Model Space")
@@ -103,6 +108,11 @@ class ModelSpaceWindow(QMainWindow):
         self._connect_signals()
 
         self.resize(1200, 800)
+        try:
+            end_ts = time.time()
+            logger.info("ModelSpaceWindow.__init__ complete (%.3fs)", end_ts - start_ts)
+        except Exception:
+            pass
 
     def _setup_scene_and_view(self):
         """Setup the main CAD scene and view."""
@@ -1024,37 +1034,199 @@ class ModelSpaceWindow(QMainWindow):
             self.layer_sketch.setOpacity(opacity)
 
     def _populate_device_tree(self):
-        """Populate the device tree with available devices from database."""
+        """Populate the device tree with available devices from database.
+
+        This version loads the catalog in a background QThread to avoid
+        blocking UI painting during startup. When devices are ready the
+        main thread receives the list and populates the tree.
+        """
+        # If a loader thread is already running, do nothing
+        if getattr(self, "_device_loader_thread", None) is not None:
+            _logger.debug("Device loader already running; skipping duplicate request")
+            return
+
+        # Show a lightweight, more visible placeholder while loading.
+        # Use a centered QLabel inside a QWidget so it's obvious the UI is
+        # alive while the background loader runs.
         try:
-            # Load devices from database using the same source as System Builder
-            devices = load_catalog()
+            if getattr(self, "_device_placeholder_widget", None) is None:
+                placeholder_widget = QtWidgets.QWidget()
+                layout = QtWidgets.QVBoxLayout(placeholder_widget)
+                label = QtWidgets.QLabel("Loading devices...", alignment=Qt.AlignCenter)
+                font = label.font()
+                font.setPointSize(max(12, font.pointSize() + 2))
+                label.setFont(font)
+                layout.addStretch()
+                layout.addWidget(label)
+                layout.addStretch()
+                placeholder_widget.setMinimumHeight(120)
+                self._device_placeholder_widget = placeholder_widget
+                # Place into a dock on the right where the device tree normally lives
+                try:
+                    if not hasattr(self, "_device_placeholder_dock"):
+                        self._device_placeholder_dock = QtWidgets.QDockWidget(
+                            "Device Palette", self
+                        )
+                        self._device_placeholder_dock.setWidget(self._device_placeholder_widget)
+                        self.addDockWidget(
+                            Qt.DockWidgetArea.RightDockWidgetArea, self._device_placeholder_dock
+                        )
+                except Exception:
+                    # Fall back to adding placeholder into the device_tree area
+                    self.device_tree.clear()
+                    item = QtWidgets.QTreeWidgetItem(["Loading devices..."])
+                    self.device_tree.addTopLevelItem(item)
+        except Exception:
+            # Best-effort placeholder; ignore failures
+            try:
+                self.device_tree.clear()
+                item = QtWidgets.QTreeWidgetItem(["Loading devices..."])
+                self.device_tree.addTopLevelItem(item)
+            except Exception:
+                pass
 
-            # Group devices by type for hierarchy
-            grouped = {}
-            for d in devices:
-                cat = d.get("type", "Unknown") or "Unknown"
-                grouped.setdefault(cat, []).append(d)
+        class DeviceLoader(QtCore.QObject):
+            devices_ready = QtCore.Signal(list)
+            error = QtCore.Signal(str)
 
-            # Clear existing tree
-            self.device_tree.clear()
+            @QtCore.Slot()
+            def run(self):
+                try:
+                    devs = load_catalog()
+                    self.devices_ready.emit(devs)
+                except Exception as e:
+                    self.error.emit(str(e))
 
-            for cat in sorted(grouped.keys()):
-                cat_item = QtWidgets.QTreeWidgetItem([cat])
-                for dev in sorted(grouped[cat], key=lambda x: x.get("name", "")):
-                    txt = f"{dev.get('name','<unknown>')} ({dev.get('symbol','')})"
-                    if dev.get("part_number"):
-                        txt += f" - {dev.get('part_number')}"
-                    it = QtWidgets.QTreeWidgetItem([txt])
-                    it.setData(0, Qt.ItemDataRole.UserRole, dev)
-                    cat_item.addChild(it)
-                self.device_tree.addTopLevelItem(cat_item)
-            self.device_tree.expandAll()
+        try:
+            loader = DeviceLoader()
+            thread = QtCore.QThread()
+            loader.moveToThread(thread)
 
-            _logger.info(f"Populated device tree with {len(devices)} devices from database")
+            def _on_devices_ready(devs):
+                try:
+                    # Clear placeholder and any placeholder dock
+                    try:
+                        if getattr(self, "_device_placeholder_dock", None) is not None:
+                            self.removeDockWidget(self._device_placeholder_dock)
+                            try:
+                                self._device_placeholder_dock.deleteLater()
+                            except Exception:
+                                pass
+                            self._device_placeholder_dock = None
+                            self._device_placeholder_widget = None
+                    except Exception:
+                        pass
+
+                    self.device_tree.clear()
+                    grouped = {}
+                    for d in devs:
+                        cat = d.get("type", "Unknown") or "Unknown"
+                        grouped.setdefault(cat, []).append(d)
+
+                    for cat in sorted(grouped.keys()):
+                        cat_item = QtWidgets.QTreeWidgetItem([cat])
+                        for dev in sorted(grouped[cat], key=lambda x: x.get("name", "")):
+                            txt = f"{dev.get('name','<unknown>')} ({dev.get('symbol','')})"
+                            if dev.get("part_number"):
+                                txt += f" - {dev.get('part_number')}"
+                            it = QtWidgets.QTreeWidgetItem([txt])
+                            it.setData(0, Qt.ItemDataRole.UserRole, dev)
+                            cat_item.addChild(it)
+                        self.device_tree.addTopLevelItem(cat_item)
+                    self.device_tree.expandAll()
+                    _logger.info("Populated device tree with %d devices from database", len(devs))
+                except Exception as e:
+                    _logger.error("Failed while populating device tree: %s", e)
+                finally:
+                    # Clean up thread and loader
+                    try:
+                        thread.quit()
+                        thread.wait(2000)
+                    except Exception:
+                        pass
+                    self._device_loader_thread = None
+
+            def _on_error(msg):
+                _logger.error("Device loader error: %s", msg)
+                try:
+                    # Show error in placeholder dock if possible
+                    if getattr(self, "_device_placeholder_widget", None) is not None:
+                        try:
+                            for i in range(self._device_placeholder_widget.layout().count()):
+                                item = self._device_placeholder_widget.layout().itemAt(i)
+                                if (
+                                    item
+                                    and item.widget()
+                                    and isinstance(item.widget(), QtWidgets.QLabel)
+                                ):
+                                    item.widget().setText("Failed to load devices")
+                                    break
+                        except Exception:
+                            pass
+                    else:
+                        self.device_tree.clear()
+                except Exception:
+                    pass
+                try:
+                    thread.quit()
+                    thread.wait(2000)
+                except Exception:
+                    pass
+                self._device_loader_thread = None
+
+            loader.devices_ready.connect(_on_devices_ready)
+            loader.error.connect(_on_error)
+            thread.started.connect(loader.run)
+            thread.finished.connect(thread.deleteLater)
+            self._device_loader_thread = thread
+            # Ensure threads are stopped if the application quits early
+            try:
+                app = QtWidgets.QApplication.instance()
+                if app is not None:
+
+                    def _stop_loader():
+                        try:
+                            if getattr(self, "_device_loader_thread", None) is not None:
+                                self._device_loader_thread.quit()
+                                self._device_loader_thread.wait(1000)
+                        except Exception:
+                            pass
+
+                    app.aboutToQuit.connect(_stop_loader)
+            except Exception:
+                pass
+
+            thread.start()
         except Exception as e:
-            _logger.error(f"Failed to populate device tree: {e}")
-            # Fallback to empty tree instead of crashing
-            self.device_tree.clear()
+            # Best-effort fallback: synchronous load if thread creation fails
+            _logger.exception(
+                "Failed to start device loader thread, falling back to sync load: %s", e
+            )
+            try:
+                devices = load_catalog()
+                # reuse previous synchronous population logic
+                self.device_tree.clear()
+                grouped = {}
+                for d in devices:
+                    cat = d.get("type", "Unknown") or "Unknown"
+                    grouped.setdefault(cat, []).append(d)
+                for cat in sorted(grouped.keys()):
+                    cat_item = QtWidgets.QTreeWidgetItem([cat])
+                    for dev in sorted(grouped[cat], key=lambda x: x.get("name", "")):
+                        txt = f"{dev.get('name','<unknown>')} ({dev.get('symbol','')})"
+                        if dev.get("part_number"):
+                            txt += f" - {dev.get('part_number')}"
+                        it = QtWidgets.QTreeWidgetItem([txt])
+                        it.setData(0, Qt.ItemDataRole.UserRole, dev)
+                        cat_item.addChild(it)
+                    self.device_tree.addTopLevelItem(cat_item)
+                self.device_tree.expandAll()
+                _logger.info(
+                    "Populated device tree (sync fallback) with %d devices from database",
+                    len(devices),
+                )
+            except Exception:
+                _logger.exception("Failed to populate device tree in fallback path")
 
     def _setup_properties_dock(self):
         """Setup the properties dock."""
@@ -1411,16 +1583,32 @@ class ModelSpaceWindow(QMainWindow):
         # Initialize drawing controller for wire routing
         self.draw = DrawController(self, self.layer_wires)
 
-        # Initialize measurement tool
-        from cad_core.tools.measure_tool import MeasureTool
+        # Initialize measurement tool (optional import)
+        try:
+            from cad_core.tools.measure_tool import MeasureTool  # type: ignore
+        except Exception:
+
+            class MeasureTool:  # type: ignore
+                def __init__(self, *_, **__):
+                    pass
 
         self.measure_tool = MeasureTool(self, self.layer_overlay)
 
-        # Initialize text tools
-        from cad_core.tools.text_tool import (
-            MTextTool,
-            TextTool,
-        )
+        # Initialize text tools (optional import)
+        try:
+            from cad_core.tools.text_tool import (
+                MTextTool,  # type: ignore
+                TextTool,  # type: ignore
+            )
+        except Exception:
+
+            class MTextTool:  # type: ignore
+                def __init__(self, *_, **__):
+                    pass
+
+            class TextTool:  # type: ignore
+                def __init__(self, *_, **__):
+                    pass
 
         self.text_tool = TextTool(self, self.layer_sketch)
         self.mtext_tool = MTextTool(self, self.layer_sketch)

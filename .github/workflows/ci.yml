@@ -24,6 +24,12 @@ jobs:
           pip install -r requirements.txt
           pip install pytest ruff black
 
+      - name: Install package (editable)
+        run: |
+          # Make the repository importable for tools and tests
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
       - name: Auto-fix lint and format
         run: |
           ruff check --fix . || true

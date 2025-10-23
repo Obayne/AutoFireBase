@@ -66,6 +66,16 @@ def main() -> int:
     # default DB path so tests which call loader.connect() without arguments
     # (using DB_DEFAULT) will find the required tables.
     dbpath = os.path.join(os.getcwd(), ".autofire_ci_test.db")
+    # Ensure the loader (if imported) will use the seeded DB by default so
+    # tests that call `db.loader.connect()` without arguments see the
+    # seeded tables. This is a defensive measure for CI environments.
+    try:
+        setattr(loader, "DB_DEFAULT", dbpath)
+        print(f"Set loader.DB_DEFAULT to: {dbpath}")
+    except Exception:
+        # If loader isn't present or doesn't allow attribute assignment,
+        # continue; the script will still seed dbpath explicitly below.
+        pass
     for path in (dbpath, getattr(loader, "DB_DEFAULT", None)):
         if not path:
             continue
