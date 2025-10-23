@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
 
@@ -20,15 +22,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip wheel
           pip install -r requirements.txt
           pip install pytest ruff black
-
-      - name: Install package (editable)
-        run: |
-          # Make the repository importable for tools and tests
-          python -m pip install --upgrade pip
-          python -m pip install -e .
 
       - name: Auto-fix lint and format
         run: |
@@ -43,12 +39,8 @@ jobs:
 
       - name: Initialize test database for CI
         if: always()
-        env:
-          PYTHONPATH: ${{ github.workspace }}
         run: |
           python tools/ci_init_db.py
 
       - name: Run all tests
-        env:
-          PYTHONPATH: ${{ github.workspace }}
         run: pytest -q -m "not gui"

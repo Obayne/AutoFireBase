@@ -10,22 +10,49 @@ import sys
 # folder) and append them to sys.path if they contain a `db` package.
 repo_root = os.getcwd()
 
-# Walk the repo tree (shallow) to find a `db` directory regardless of
-# nested checkout layout (e.g., D:/a/Repo/Repo/...). Add its parent to
-# sys.path so `from db import loader` succeeds.
+# Prefer explicit known locations first (repo-root, Autofire subfolder)
+candidate_roots = [
+    repo_root,
+    os.path.join(repo_root, "Autofire"),
+    os.path.join(repo_root, "AutoFireBase"),
+]
+
 found_db_parent = None
-for root, dirs, files in os.walk(repo_root):
-    # Only consider directories named 'db'
-    if "db" in dirs:
-        found_db_parent = root
+for candidate in candidate_roots:
+    if os.path.isdir(os.path.join(candidate, "db")):
+        found_db_parent = candidate
         break
+
+# If not found in known locations, walk the repo tree (shallow) to find a
+# `db` directory, skipping cache and hidden directories
+if not found_db_parent:
+    for root, dirs, files in os.walk(repo_root):
+        # Skip hidden and cache directories
+        dirs[:] = [
+            d
+            for d in dirs
+            if not d.startswith(".") and d not in ("__pycache__", "node_modules", "venv", ".venv")
+        ]
+        # Only consider directories named 'db'
+        if "db" in dirs:
+            found_db_parent = root
+            break
 
 if found_db_parent:
     if found_db_parent not in sys.path:
         sys.path.insert(0, found_db_parent)
     print(f"Found 'db' package under: {found_db_parent}; added to sys.path")
 else:
-    print("Warning: could not locate a local 'db' package under cwd; will attempt import anyway.")
+    print(
+        "Warning: could not locate a local 'db' package under cwd; "
+        "will attempt import anyway."
+    )
+
+# Clear any stale 'db' module from sys.modules before importing
+if "db" in sys.modules:
+    del sys.modules["db"]
+if "db.loader" in sys.modules:
+    del sys.modules["db.loader"]
 
 try:
     from db import loader
@@ -37,8 +64,20 @@ except (ImportError, ModuleNotFoundError) as exc:  # pragma: no cover - CI helpe
     print("Attempting to locate db/loader.py in the checkout...")
     loader_path = None
     for root, dirs, files in os.walk(repo_root):
+        # Skip hidden and cache directories in fallback search
+        dirs[:] = [
+            d
+            for d in dirs
+            if not d.startswith(".")
+            and d not in ("__pycache__", "node_modules", "venv", ".venv")
+        ]
         if "loader.py" in files and os.path.basename(root) == "db":
             loader_path = os.path.join(root, "loader.py")
+            # Ensure the parent directory is in sys.path
+            parent_dir = os.path.dirname(root)
+            if parent_dir not in sys.path:
+                sys.path.insert(0, parent_dir)
+                print(f"Added {parent_dir} to sys.path for module import")
             break
 
     if loader_path is None:
@@ -46,13 +85,18 @@ except (ImportError, ModuleNotFoundError) as exc:  # pragma: no cover - CI helpe
         print("cwd contents:", os.listdir(repo_root))
         raise
 
-    print(f"Found loader at: {loader_path}; importing as module 'ci_db_loader'")
+    print(
+        f"Found loader at: {loader_path}; "
+        "importing as module 'ci_db_loader'"
+    )
     import importlib.util
 
     spec = importlib.util.spec_from_file_location("ci_db_loader", loader_path)
     if spec is None or spec.loader is None:
         print("Could not construct module spec for loader; aborting")
-        raise ImportError("Could not import db.loader (spec creation failed)") from exc
+        raise ImportError(
+            "Could not import db.loader (spec creation failed)"
+        ) from exc
 
     ci_db_loader = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(ci_db_loader)  # type: ignore
@@ -87,20 +131,26 @@ def main() -> int:
             try:
                 loader.seed_demo(con)
             except sqlite3.Error as exc:  # pragma: no cover - best-effort
-                print(f"Seeding demo data (sqlite error) for {path} (continuing):", exc)
+                print(
+                    f"Seeding demo data (sqlite error) for {path} "
+                    f"(continuing): {exc}"
+                )
         except sqlite3.Error as exc:
-            print(f"Failed to initialize DB at {path} (sqlite error):", exc)
+            print(f"Failed to initialize DB at {path} (sqlite error): {exc}")
         except OSError as exc:
             # Catch filesystem / OS related errors but allow other exceptions to
             # surface (they should fail the job so we can fix them).
-            print(f"Failed to initialize DB at {path} (OS error):", exc)
+            print(f"Failed to initialize DB at {path} (OS error): {exc}")
         finally:
             if con is not None:
                 try:
                     con.close()
                 except sqlite3.Error:
                     pass
-    print("DB initialization attempts complete. Seeded:", dbpath, "and loader default (if present)")
+    print(
+        "DB initialization attempts complete. Seeded:", dbpath,
+        "and loader default (if present)"
+    )
     return 0
 
 
