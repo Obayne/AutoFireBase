@@ -30,7 +30,13 @@ jobs:
       - name: Install Python deps
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest pytest-qt PySide6
+          # Pin a known-good PySide6 wheel and prefer binary wheels to avoid
+          # building from source on CI. Retry a few times to mitigate
+          # transient network flakiness.
+          for i in 1 2 3; do
+            python -m pip install --upgrade pip && \
+              python -m pip install --no-cache-dir --prefer-binary PySide6==6.9.2 pytest pytest-qt && break || sleep 5;
+          done
 
       - name: Run single GUI test (device placement)
         id: run_tests
@@ -41,12 +47,14 @@ jobs:
           echo "::set-output name=logfile::test-output/pytest-output.txt" || true
 
       - name: Upload pytest output artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gui-tests-quick-output
           path: test-output/pytest-output.txt
 
       - name: Post short test output to PR
+        if: always()
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
