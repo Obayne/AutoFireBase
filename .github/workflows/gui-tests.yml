@@ -30,6 +30,8 @@ jobs:
       - name: Install system packages for headless Qt
         run: |
           sudo apt-get update -y
+          # Install common EGL/OpenGL and X11 packages. Use || true so the job
+          # continues even if package names differ across Ubuntu images.
           sudo apt-get install -y --no-install-recommends xvfb libegl1 libegl1-mesa libegl-mesa0 libegl1-mesa-drivers libglvnd0 libglx-mesa0 libglx0 libgl1-mesa-glx \
             libgl1-mesa-dri libgles2-mesa libgbm1 libxrandr2 libx11-xcb1 libxcb1 libx11-6 libxkbcommon0 \
             libxcb-xinerama0 libxss1 fontconfig fonts-dejavu-core fonts-dejavu-extra || true
