@@ -1,0 +1,111 @@
+name: gui-tests-ubuntu24
+
+on:
+  push:
+    paths:
+      - 'tests/**'
+      - '.github/workflows/gui-tests-ubuntu24.yml'
+    branches: ['main', 'feat/**']
+  pull_request:
+    paths:
+      - 'tests/**'
+      - '.github/workflows/gui-tests-ubuntu24.yml'
+    branches: ['main']
+
+jobs:
+  gui-tests:
+    name: GUI tests (Linux headless)
+    runs-on: ubuntu-24.04
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install system packages for headless Qt
+        run: |
+          set -e
+          sudo apt-get update -y
+          # Conservative set of packages that on ubuntu-24.04 commonly provide
+          # libEGL.so.1 and other Mesa/GL dependencies. Some package names may
+          # differ across images; continue on failure to keep the job non-fatal
+          # while we iterate.
+          sudo apt-get install -y --no-install-recommends \
+            xvfb \
+            libegl-mesa0 libegl1 libgbm1 libglx-mesa0 libgl1-mesa-dri libgl1-mesa-glx \
+            libgles2 libx11-6 libx11-xcb1 libxcb1 libxrandr2 libxkbcommon0 \
+            fontconfig fonts-dejavu-core fonts-dejavu-extra || true
+          # Refresh font cache
+          sudo fc-cache -f -v || true
+
+      - name: Install Python dependencies (pytest-qt + PySide6)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev-minimal.txt
+          python -m pip install pytest-qt
+          # prefer binary wheels and retry once if the first attempt fails
+          python -m pip install --prefer-binary --no-cache-dir "PySide6>=6.5,<7" || \
+            (sleep 3 && python -m pip install --prefer-binary --no-cache-dir "PySide6>=6.5,<7") || \
+            python -m pip install --no-deps --force-reinstall "PySide6>=6.5,<7"
+
+      - name: Sanity check PySide6 import (non-fatal) and collect diagnostics
+        id: sanity
+        run: |
+          set -e
+          echo 'Sanity: check PySide6 can be imported and report platform info (non-fatal)'
+          python - <<'PY' || true
+            import importlib, sys, traceback, subprocess
+            try:
+                m = importlib.import_module('PySide6')
+                v = getattr(m, '__version__', 'unknown')
+                print('PySide6 import OK, version:', v)
+                from PySide6 import QtCore
+                print('QtCore QT_VERSION_STR:', QtCore.QT_VERSION_STR)
+            except Exception:
+                print('PySide6 import failed (sanity check):', file=sys.stderr)
+                traceback.print_exc()
+                # Try to provide more diagnostics: locate shiboken6 and run ldd to show missing shared objects.
+                try:
+                    shib = importlib.import_module('shiboken6')
+                    path = getattr(shib, '__file__', None)
+                    if path:
+                        print('\n== ldd for shiboken6 binary ==')
+                        subprocess.run(['ldd', path], check=False)
+                except Exception:
+                    pass
+                # Exit with non-zero so the subsequent output-based gate will detect failure
+                sys.exit(1)
+          PY
+
+      - name: Set import_ok output
+        id: set_import_ok
+        run: |
+          # Write a single output line for the runner (true if PySide6 imports)
+          if python -c "import importlib; importlib.import_module('PySide6')" >/dev/null 2>&1; then
+            echo "import_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "import_ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Initialize test database for CI
+        run: |
+          # Ensure the repo root is on PYTHONPATH so tools/ci_init_db.py can import local packages
+          export PYTHONPATH="${{ github.workspace }}"
+          python tools/ci_init_db.py || true
+
+      - name: Run GUI-marked tests
+        if: steps.set_import_ok.outputs.import_ok == 'true'
+        run: |
+          export QT_QPA_PLATFORM=offscreen
+          xvfb-run -s '-screen 0 1280x1024x24' pytest -q -m gui
+
+      - name: Skip GUI tests notice
+        if: steps.set_import_ok.outputs.import_ok != 'true'
+        run: |
+          echo 'PySide6 import failed — skipping GUI tests on this runner.'
+          echo 'See earlier step "Sanity check PySide6 import" for ldd diagnostics.'
