@@ -37,7 +37,9 @@ jobs:
           # while we iterate.
           sudo apt-get install -y --no-install-recommends \
             xvfb \
-            libegl-mesa0 libegl1 libgbm1 libglx-mesa0 libgl1-mesa-dri libgl1-mesa-glx \
+            # multiple EGL/GL candidates to cover package-name differences on hosted images
+            libegl1-mesa libegl-mesa0 libegl1 libegl1-mesa-drivers libgbm1 libglvnd0 \
+            libglx-mesa0 libgl1-mesa-dri libgl1-mesa-glx mesa-utils \
             libgles2 libx11-6 libx11-xcb1 libxcb1 libxrandr2 libxkbcommon0 \
             fontconfig fonts-dejavu-core fonts-dejavu-extra || true
           # Refresh font cache
@@ -91,6 +93,19 @@ jobs:
           else
             echo "import_ok=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Collect ldd diagnostics
+        if: steps.set_import_ok.outputs.import_ok != 'true'
+        run: |
+          echo 'Collecting ldd diagnostics for PySide6/shiboken6 (if present)'
+          python tools/ci_ldd_diagnostics.py || true
+
+      - name: Upload diagnostics artifact
+        if: steps.set_import_ok.outputs.import_ok != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-ldd-diagnostics
+          path: /tmp/ldd-shiboken6.txt
 
       - name: Initialize test database for CI
         run: |
