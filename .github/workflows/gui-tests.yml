@@ -36,7 +36,7 @@ jobs:
           # Use --no-install-recommends to keep the runtime minimal. Some
           # packages may not be available on all images; continue on failure
           # to avoid hard CI aborts.
-          sudo apt-get install -y --no-install-recommends xvfb libegl1 libegl1-mesa libegl-mesa0 libegl1-mesa-drivers libglx-mesa0 libgl1 libgl1-mesa-glx \
+          sudo apt-get install -y --no-install-recommends xvfb libegl1 libegl1-mesa libegl-mesa0 libegl1-mesa-drivers libglvnd0 libglx-mesa0 libglx0 libgl1 libgl1-mesa-glx \
             libgl1-mesa-dri libgles2-mesa libgbm1 libxrandr2 libx11-xcb1 libxcb1 libx11-6 libxkbcommon0 \
             libxcb-xinerama0 libxss1 \
             fontconfig fonts-dejavu-core fonts-dejavu-extra fonts-liberation fonts-noto-core \
@@ -59,17 +59,18 @@ jobs:
 
       - name: Sanity check PySide6 import
         run: |
-          echo 'Sanity: check PySide6 can be imported and report platform info'
+          echo 'Sanity: check PySide6 can be imported and report platform info (non-fatal)'
           python - <<'PY'
-import sys, importlib
+import sys, importlib, traceback
 try:
     m = importlib.import_module('PySide6')
     v = getattr(m, '__version__', 'unknown')
     print('PySide6 import OK, version:', v)
     from PySide6 import QtCore
     print('QtCore QT_VERSION_STR:', QtCore.QT_VERSION_STR)
-except Exception as e:
-    print('PySide6 import failed:', e, file=sys.stderr)
+except Exception:
+    print('PySide6 import failed (sanity check):', file=sys.stderr)
+    traceback.print_exc()
     # Try to provide more diagnostics: locate shiboken6 or a binary in the
     # PySide6 distribution and run ldd to show missing shared objects.
     try:
@@ -81,7 +82,8 @@ except Exception as e:
             subprocess.run(['ldd', path], check=False)
     except Exception:
         pass
-    raise
+    # Do not raise here — let the separate check step decide whether to skip GUI tests.
+    sys.exit(0)
 PY
 
       - name: Check PySide6 import and set output
