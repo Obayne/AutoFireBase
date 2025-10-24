@@ -19,6 +19,8 @@ jobs:
   quick-tests:
     name: Quick focused tests
     runs-on: ${{ matrix.os }}
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -62,6 +64,13 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev-minimal.txt
         shell: powershell
+
+      - name: Initialize test database for CI
+        if: always()
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python tools/ci_init_db.py || true
 
       - name: Run headless startup smoke test (Linux uses xvfb)
         if: runner.os == 'Linux'
