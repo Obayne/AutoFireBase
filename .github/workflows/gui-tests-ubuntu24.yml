@@ -87,8 +87,9 @@ jobs:
       - name: Set import_ok output
         id: set_import_ok
         run: |
-          # Write a single output line for the runner (true if PySide6 imports)
-          if python -c "import importlib; importlib.import_module('PySide6')" >/dev/null 2>&1; then
+          # Write a single output line for the runner (true if PySide6 and core GUI modules load)
+          # Use a dedicated helper that imports QtCore/QtGui to trigger native library loading.
+          if python tools/ci_import_check.py >/dev/null 2>&1; then
             echo "import_ok=true" >> "$GITHUB_OUTPUT"
           else
             echo "import_ok=false" >> "$GITHUB_OUTPUT"
