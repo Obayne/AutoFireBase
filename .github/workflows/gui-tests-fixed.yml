@@ -1,0 +1,70 @@
+name: gui-tests-fixed
+
+on:
+  push:
+    paths:
+      - 'tests/**'
+      - '.github/workflows/gui-tests-fixed.yml'
+    branches: ['main']
+  pull_request:
+    paths:
+      - 'tests/**'
+      - '.github/workflows/gui-tests-fixed.yml'
+    branches: ['main']
+
+jobs:
+  gui-tests:
+    name: GUI tests (Linux headless)
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install system packages for headless Qt
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends xvfb libegl1 libegl1-mesa libegl-mesa0 libegl1-mesa-drivers libglvnd0 libglx-mesa0 libglx0 libgl1-mesa-glx \
+            libgl1-mesa-dri libgles2-mesa libgbm1 libxrandr2 libx11-xcb1 libxcb1 libx11-6 libxkbcommon0 \
+            libxcb-xinerama0 libxss1 fontconfig fonts-dejavu-core fonts-dejavu-extra || true
+          sudo fc-cache -f -v || true
+
+      - name: Install Python dependencies (pytest-qt + PySide6)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev-minimal.txt
+          python -m pip install pytest-qt
+          python -m pip install --prefer-binary --no-cache-dir "PySide6>=6.5,<7" || \
+            (sleep 3 && python -m pip install --prefer-binary --no-cache-dir "PySide6>=6.5,<7") || \
+            python -m pip install --no-deps --force-reinstall "PySide6>=6.5,<7"
+
+      - name: Check PySide6 import and set output
+        id: check_pyside6
+        run: |
+          if python -c "import importlib; importlib.import_module('PySide6')" >/dev/null 2>&1; then
+            echo "import_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "import_ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Initialize test database for CI
+        run: |
+          export PYTHONPATH="${{ github.workspace }}"
+          python tools/ci_init_db.py || true
+
+      - name: Run GUI-marked tests
+        if: steps.check_pyside6.outputs.import_ok == 'true'
+        run: |
+          export QT_QPA_PLATFORM=offscreen
+          xvfb-run -s '-screen 0 1280x1024x24' pytest -q -m gui
+
+      - name: Skip GUI tests notice
+        if: steps.check_pyside6.outputs.import_ok != 'true'
+        run: |
+          echo 'PySide6 import failed — skipping GUI tests on this runner.'

@@ -5,7 +5,7 @@ on:
     paths:
       - 'tests/**'
       - '.github/workflows/gui-tests.yml'
-    branches: ['main', 'feat/**', '*']
+    branches: ['main', 'feat/**']
   pull_request:
     paths:
       - 'tests/**'
@@ -30,66 +30,130 @@ jobs:
       - name: Install system packages for headless Qt
         run: |
           sudo apt-get update -y
-          # Install a targeted set of packages that commonly provide EGL/OpenGL
-          # and X11 dependencies on Ubuntu runners. Install extra common font
-          # packages and fontconfig so Qt can find fonts on headless runners.
-          # Use --no-install-recommends to keep the runtime minimal. Some
-          # packages may not be available on all images; continue on failure
-          # to avoid hard CI aborts.
-          sudo apt-get install -y --no-install-recommends xvfb libegl1 libegl1-mesa libegl-mesa0 libegl1-mesa-drivers libglvnd0 libglx-mesa0 libglx0 libgl1 libgl1-mesa-glx \
+          sudo apt-get install -y --no-install-recommends xvfb libegl1 libegl1-mesa libegl-mesa0 libegl1-mesa-drivers libglvnd0 libglx-mesa0 libglx0 libgl1-mesa-glx \
             libgl1-mesa-dri libgles2-mesa libgbm1 libxrandr2 libx11-xcb1 libxcb1 libx11-6 libxkbcommon0 \
-            libxcb-xinerama0 libxss1 \
-            fontconfig fonts-dejavu-core fonts-dejavu-extra fonts-liberation fonts-noto-core \
-            fonts-noto-cjk fonts-noto-color-emoji || true
-          # Refresh the font cache so Qt finds newly-installed fonts
+            libxcb-xinerama0 libxss1 fontconfig fonts-dejavu-core fonts-dejavu-extra || true
           sudo fc-cache -f -v || true
 
       - name: Install Python dependencies (pytest-qt + PySide6)
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev-minimal.txt
-          # Pin PySide6 to a known-good minor version to avoid sudden upstream
-          # breakages on the CI image. Retry a couple times for transient
-          # network errors.
           python -m pip install pytest-qt
-          # prefer binary wheels and retry once if the first attempt fails
           python -m pip install --prefer-binary --no-cache-dir "PySide6>=6.5,<7" || \
             (sleep 3 && python -m pip install --prefer-binary --no-cache-dir "PySide6>=6.5,<7") || \
             python -m pip install --no-deps --force-reinstall "PySide6>=6.5,<7"
 
-      - name: Sanity check PySide6 import
+      - name: Check PySide6 import and set output
+        id: check_pyside6
         run: |
-          echo 'Sanity: check PySide6 can be imported and report platform info (non-fatal)'
-          python - <<'PY'
-import sys, importlib, traceback
-try:
-    m = importlib.import_module('PySide6')
-    v = getattr(m, '__version__', 'unknown')
-    print('PySide6 import OK, version:', v)
-    from PySide6 import QtCore
-    print('QtCore QT_VERSION_STR:', QtCore.QT_VERSION_STR)
-except Exception:
-    print('PySide6 import failed (sanity check):', file=sys.stderr)
-    traceback.print_exc()
-    # Try to provide more diagnostics: locate shiboken6 or a binary in the
-    # PySide6 distribution and run ldd to show missing shared objects.
-    try:
-        shib = importlib.import_module('shiboken6')
-        path = getattr(shib, '__file__', None)
-        if path:
-            print('\n== ldd for shiboken6 binary ==')
-            import subprocess
-            subprocess.run(['ldd', path], check=False)
-    except Exception:
-        pass
-    # Do not raise here — let the separate check step decide whether to skip GUI tests.
-    sys.exit(0)
-PY
+          if python -c "import importlib; importlib.import_module('PySide6')" >/dev/null 2>&1; then
+            echo "import_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "import_ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      name: gui-tests
+
+      on:
+        push:
+          paths:
+            - 'tests/**'
+            - '.github/workflows/gui-tests.yml'
+          branches: ['main']
+        pull_request:
+          paths:
+            - 'tests/**'
+            - '.github/workflows/gui-tests.yml'
+          branches: ['main']
+
+      jobs:
+        gui-tests:
+          name: GUI tests (Linux headless)
+          runs-on: ubuntu-latest
+          env:
+            PYTHONPATH: ${{ github.workspace }}
+          steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: 3.11
+
+            - name: Install system packages for headless Qt
+              run: |
+                sudo apt-get update -y
+                sudo apt-get install -y --no-install-recommends xvfb libegl1 libegl1-mesa libegl-mesa0 libegl1-mesa-drivers libglvnd0 libglx-mesa0 libglx0 libgl1-mesa-glx \
+                  libgl1-mesa-dri libgles2-mesa libgbm1 libxrandr2 libx11-xcb1 libxcb1 libx11-6 libxkbcommon0 \
+                  libxcb-xinerama0 libxss1 fontconfig fonts-dejavu-core fonts-dejavu-extra || true
+                sudo fc-cache -f -v || true
+
+            - name: Install Python dependencies (pytest-qt + PySide6)
+              run: |
+                python -m pip install --upgrade pip
+                python -m pip install -r requirements-dev-minimal.txt
+                python -m pip install pytest-qt
+                python -m pip install --prefer-binary --no-cache-dir "PySide6>=6.5,<7" || \
+                  (sleep 3 && python -m pip install --prefer-binary --no-cache-dir "PySide6>=6.5,<7") || \
+                  python -m pip install --no-deps --force-reinstall "PySide6>=6.5,<7"
+
+            - name: Check PySide6 import and set output
+              id: check_pyside6
+              run: |
+                if python -c "import importlib; importlib.import_module('PySide6')" >/dev/null 2>&1; then
+                  echo "import_ok=true" >> "$GITHUB_OUTPUT"
+                else
+                  echo "import_ok=false" >> "$GITHUB_OUTPUT"
+                fi
+
+            - name: Initialize test database for CI
+              run: |
+                export PYTHONPATH="${{ github.workspace }}"
+                python tools/ci_init_db.py || true
+
+            - name: Run GUI-marked tests
+              if: steps.check_pyside6.outputs.import_ok == 'true'
+              run: |
+                export QT_QPA_PLATFORM=offscreen
+                xvfb-run -s '-screen 0 1280x1024x24' pytest -q -m gui
+
+            - name: Skip GUI tests notice
+              if: steps.check_pyside6.outputs.import_ok != 'true'
+              run: |
+                echo 'PySide6 import failed — skipping GUI tests on this runner.'
+                v = getattr(m, '__version__', 'unknown')
+                print('PySide6 import OK, version:', v)
+                from PySide6 import QtCore
+                print('QtCore QT_VERSION_STR:', QtCore.QT_VERSION_STR)
+            except Exception:
+                print('PySide6 import failed (sanity check):', file=sys.stderr)
+                traceback.print_exc()
+                # Try to provide more diagnostics: locate shiboken6 or a binary in the
+                # PySide6 distribution and run ldd to show missing shared objects.
+                try:
+                    shib = importlib.import_module('shiboken6')
+                    path = getattr(shib, '__file__', None)
+                    if path:
+                        print('\n== ldd for shiboken6 binary ==')
+                        import subprocess
+                        subprocess.run(['ldd', path], check=False)
+                except Exception:
+                    pass
+                # Do not raise here — let the separate check step decide whether to skip GUI tests.
+                sys.exit(0)
+          PY
 
       - name: Check PySide6 import and set output
         id: check_pyside6
         run: |
-          python -c "import importlib;\nimport sys;\ntry:\n  importlib.import_module('PySide6');\n  print('import_ok=true');\nexcept Exception:\n  print('import_ok=false');\n" | while read line; do echo "${line}" >> $GITHUB_OUTPUT; done
+          # Use bash to write a single output line that's safe for the Actions runner
+          if python -c "import importlib; importlib.import_module('PySide6')" >/dev/null 2>&1; then
+            echo "import_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "import_ok=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Initialize test database for CI
         run: |
@@ -118,7 +182,125 @@ on:
     paths:
       - 'tests/**'
       - '.github/workflows/gui-tests.yml'
-    branches: ['main', 'feat/**', '*']
+    branches: ['main', 'feat/**']
+  pull_request:
+    paths:
+      - 'tests/**'
+      - '.github/workflows/gui-tests.yml'
+    branches: ['main']
+
+jobs:
+  gui-tests:
+    name: GUI tests (Linux headless)
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install system packages for headless Qt
+        run: |
+          sudo apt-get update -y
+          # Install a targeted set of packages that commonly provide EGL/OpenGL
+          # and X11 dependencies on Ubuntu runners. Install extra common font
+          # packages and fontconfig so Qt can find fonts on headless runners.
+          # Use --no-install-recommends to keep the runtime minimal. Some
+          # packages may not be available on all images; continue on failure
+          # to avoid hard CI aborts.
+          sudo apt-get install -y --no-install-recommends xvfb libegl1 libegl1-mesa libegl-mesa0 libegl1-mesa-drivers libglvnd0 libglx-mesa0 libglx0 libgl1 libgl1-mesa-glx \
+            libgl1-mesa-dri libgles2-mesa libgbm1 libxrandr2 libx11-xcb1 libxcb1 libx11-6 libxkbcommon0 \
+            libxcb-xinerama0 libxss1 \
+            fontconfig fonts-dejavu-core fonts-dejavu-extra fonts-liberation fonts-noto-core \
+            fonts-noto-cjk fonts-noto-color-emoji || true
+          # Refresh the font cache so Qt finds newly-installed fonts
+          sudo fc-cache -f -v || true
+
+      - name: Install Python dependencies (pytest-qt + PySide6)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev-minimal.txt
+          # Pin PySide6 to a known-good minor version to avoid sudden upstream
+          # breakages on the CI image. Retry a couple times for transient
+          # network errors.
+          python -m pip install pytest-qt
+          # prefer binary wheels and retry once if the first attempt fails
+          python -m pip install --prefer-binary --no-cache-dir "PySide6>=6.5,<7" || \
+            (sleep 3 && python -m pip install --prefer-binary --no-cache-dir "PySide6>=6.5,<7") || \
+            python -m pip install --no-deps --force-reinstall "PySide6>=6.5,<7"
+
+    - name: Sanity check PySide6 import
+    run: |
+      echo 'Sanity: check PySide6 can be imported and report platform info (non-fatal)'
+      python - <<'PY'
+      import sys, importlib, traceback
+      try:
+        m = importlib.import_module('PySide6')
+        v = getattr(m, '__version__', 'unknown')
+        print('PySide6 import OK, version:', v)
+        from PySide6 import QtCore
+        print('QtCore QT_VERSION_STR:', QtCore.QT_VERSION_STR)
+      except Exception:
+        print('PySide6 import failed (sanity check):', file=sys.stderr)
+        traceback.print_exc()
+        # Try to provide more diagnostics: locate shiboken6 or a binary in the
+        # PySide6 distribution and run ldd to show missing shared objects.
+        try:
+          shib = importlib.import_module('shiboken6')
+          path = getattr(shib, '__file__', None)
+          if path:
+            print('\n== ldd for shiboken6 binary ==')
+            import subprocess
+            subprocess.run(['ldd', path], check=False)
+        except Exception:
+          pass
+        # Do not raise here — let the separate check step decide whether to skip GUI tests.
+        sys.exit(0)
+      PY
+
+      - name: Check PySide6 import and set output
+        id: check_pyside6
+        run: |
+          # Use bash to write a single output line that's safe for the Actions runner
+          if python -c "import importlib; importlib.import_module('PySide6')" >/dev/null 2>&1; then
+            echo "import_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "import_ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Initialize test database for CI
+        run: |
+          # Ensure the repo root is on PYTHONPATH so tools/ci_init_db.py can import local packages
+          export PYTHONPATH="${{ github.workspace }}"
+          python tools/ci_init_db.py || true
+
+      - name: Run GUI-marked tests
+        if: steps.check_pyside6.outputs.import_ok == 'true'
+        run: |
+          # Use xvfb-run to provide an X server for Qt. Set QT_QPA_PLATFORM
+          # to offscreen; this helps avoid platform plugin issues on headless
+          # runners. Use a reasonably-sized screen and ensure the process
+          # exits with the test status.
+          export QT_QPA_PLATFORM=offscreen
+          xvfb-run -s '-screen 0 1280x1024x24' pytest -q -m gui
+
+      - name: Skip GUI tests notice
+        if: steps.check_pyside6.outputs.import_ok != 'true'
+        run: |
+          echo 'PySide6 import failed — skipping GUI tests on this runner.'
+name: gui-tests
+
+on:
+  push:
+    paths:
+      - 'tests/**'
+      - '.github/workflows/gui-tests.yml'
+    branches: ['main', 'feat/**']
   pull_request:
     paths:
       - 'tests/**'
@@ -173,36 +355,38 @@ jobs:
       - name: Sanity check PySide6 import
         run: |
           echo 'Sanity: check PySide6 can be imported and report platform info (non-fatal)'
-          python - <<'PY'
-import sys, importlib, traceback
-try:
-    m = importlib.import_module('PySide6')
-    v = getattr(m, '__version__', 'unknown')
-    print('PySide6 import OK, version:', v)
-    from PySide6 import QtCore
-    print('QtCore QT_VERSION_STR:', QtCore.QT_VERSION_STR)
-except Exception:
-    print('PySide6 import failed (sanity check):', file=sys.stderr)
-    traceback.print_exc()
-    # Try to provide more diagnostics: locate shiboken6 or a binary in the
-    # PySide6 distribution and run ldd to show missing shared objects.
-    try:
-        shib = importlib.import_module('shiboken6')
-        path = getattr(shib, '__file__', None)
-        if path:
+      python - <<'PY'
+      import importlib, sys, traceback, subprocess
+      try:
+        m = importlib.import_module('PySide6')
+        v = getattr(m, '__version__', 'unknown')
+        print('PySide6 import OK, version:', v)
+        from PySide6 import QtCore
+        print('QtCore QT_VERSION_STR:', QtCore.QT_VERSION_STR)
+      except Exception:
+        print('PySide6 import failed (sanity check):', file=sys.stderr)
+        traceback.print_exc()
+        # Try to provide more diagnostics: locate shiboken6 and run ldd to show missing shared objects.
+        try:
+          shib = importlib.import_module('shiboken6')
+          path = getattr(shib, '__file__', None)
+          if path:
             print('\n== ldd for shiboken6 binary ==')
-            import subprocess
             subprocess.run(['ldd', path], check=False)
-    except Exception:
-        pass
-    # Do not raise here — let the separate check step decide whether to skip GUI tests.
-    sys.exit(0)
-PY
+        except Exception:
+          pass
+        # Do not raise here — let the separate check step decide whether to skip GUI tests.
+        sys.exit(0)
+      PY
 
       - name: Check PySide6 import and set output
         id: check_pyside6
         run: |
-          python -c "import importlib;\nimport sys;\ntry:\n  importlib.import_module('PySide6');\n  print('import_ok=true');\nexcept Exception:\n  print('import_ok=false');\n" | while read line; do echo "${line}" >> $GITHUB_OUTPUT; done
+          if python -c "import importlib; importlib.import_module('PySide6')" >/dev/null 2>&1; then
+            echo "import_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "import_ok=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Initialize test database for CI
         run: |
