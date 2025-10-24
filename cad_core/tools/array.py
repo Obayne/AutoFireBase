@@ -1,5 +1,6 @@
-from app.device import DeviceItem
 from PySide6 import QtCore, QtWidgets
+
+from frontend.device import DeviceItem
 
 
 class ArrayTool(QtCore.QObject):
