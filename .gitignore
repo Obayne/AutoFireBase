@@ -58,3 +58,12 @@ C:/Dev/Models/
 
 # Ignore local sample zip bundles moved to artifacts
 /artifacts/zip-samples/
+
+# Local token files used by local automation (do NOT commit)
+git.txt
+git_provided.txt
+git_new.txt
+
+# Local automation logs and diagnostics
+tools/automation/agent_activity.log
+pwsh-diagnostics/

@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    # Ignore major upgrades until maintainers review
+    # - match:
+    #     dependency-name: "*"
+    #     update-types: ["version-update:semver-major"]

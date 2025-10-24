@@ -25,7 +25,7 @@ jobs:
       - name: Install system packages for headless Qt (quick)
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends xvfb libegl1-mesa libgl1-mesa-glx \
+          sudo apt-get install -y --no-install-recommends xvfb libegl1 libegl1-mesa libgl1-mesa-glx \
             libgbm1 libxrandr2 libx11-xcb1 libxcb1 fontconfig fonts-dejavu-core || true
           sudo fc-cache -f -v || true
 
@@ -36,9 +36,108 @@ jobs:
           # building from source on CI. Retry a few times to mitigate
           # transient network flakiness.
           for i in 1 2 3; do
-            python -m pip install --upgrade pip && \
-              python -m pip install --no-cache-dir --prefer-binary PySide6==6.9.2 pytest pytest-qt && break || sleep 5;
-          done
+            name: gui-tests-quick
+
+            on:
+              pull_request:
+                paths:
+                  - 'tests/**'
+                  - '.github/workflows/gui-tests.yml'
+                branches: ['main']
+
+            jobs:
+              gui-tests-quick:
+                name: Quick GUI smoke (single test)
+                runs-on: ubuntu-latest
+                env:
+                  PYTHONPATH: ${{ github.workspace }}
+                steps:
+                  - name: Checkout
+                    uses: actions/checkout@v4
+
+                  - name: Set up Python
+                    uses: actions/setup-python@v4
+                    with:
+                      python-version: 3.11
+
+                  - name: Install system packages for headless Qt (quick)
+                    run: |
+                      sudo apt-get update -y
+                      sudo apt-get install -y --no-install-recommends xvfb libegl1 libegl1-mesa libgl1-mesa-glx \
+                        libgbm1 libxrandr2 libx11-xcb1 libxcb1 fontconfig fonts-dejavu-core || true
+                      sudo fc-cache -f -v || true
+
+                  - name: Install Python deps
+                    run: |
+                      python -m pip install --upgrade pip
+                      # Pin a known-good PySide6 wheel and prefer binary wheels to avoid
+                      # building from source on CI. Retry a few times to mitigate
+                      # transient network flakiness.
+                      for i in 1 2 3; do
+                        python -m pip install --upgrade pip && \
+                          python -m pip install --no-cache-dir --prefer-binary PySide6==6.9.2 pytest pytest-qt && break || sleep 5;
+                      done
+
+                  - name: Initialize test database for CI
+                    if: always()
+                    env:
+                      PYTHONPATH: ${{ github.workspace }}
+                    run: |
+                      python tools/ci_init_db.py || true
+
+                  - name: Check PySide6 import and set output
+                    id: check_pyside6
+                    run: |
+                      python -c "import importlib;\nimport sys;\ntry:\n  importlib.import_module('PySide6');\n  print('import_ok=true');\nexcept Exception:\n  print('import_ok=false');\n" | while read line; do echo "${line}" >> $GITHUB_OUTPUT; done
+
+                  - name: Run single GUI test (device placement)
+                    id: run_tests
+                    if: steps.check_pyside6.outputs.import_ok == 'true'
+                    run: |
+                      mkdir -p test-output
+                      # Run pytest and capture stdout/stderr to a file for upload and PR comment
+                      xvfb-run -s '-screen 0 1024x768x24' pytest -q tests/test_device_placement_gui.py -q 2>&1 | tee test-output/pytest-output.txt
+                      echo "::set-output name=logfile::test-output/pytest-output.txt" || true
+
+                  - name: Skip quick GUI test notice
+                    if: steps.check_pyside6.outputs.import_ok != 'true'
+                    run: |
+                      echo 'PySide6 import failed — skipping quick GUI test on this runner.'
+
+                  - name: Upload pytest output artifact
+                    if: always()
+                    uses: actions/upload-artifact@v4
+                    with:
+                      name: gui-tests-quick-output
+                      path: test-output/pytest-output.txt
+
+                  - name: Post short test output to PR
+                    if: always()
+                    uses: actions/github-script@v6
+                    with:
+                      github-token: ${{ secrets.GITHUB_TOKEN }}
+                      script: |
+                        const fs = require('fs');
+                        const path = 'test-output/pytest-output.txt';
+                        let body = '';
+                        if (fs.existsSync(path)) {
+                          const txt = fs.readFileSync(path, 'utf8').split('\n').slice(0,200).join('\n');
+                          body = `### gui-tests-quick: pytest output (first 200 lines)\n\n<pre>\n${txt}\n</pre>`;
+                        } else {
+                          body = 'No pytest output found.';
+                        }
+                        const pr = context.payload.pull_request;
+                        if (pr) {
+                          await github.rest.issues.createComment({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: pr.number,
+                            body: body,
+                          });
+                        } else {
+                          core.info('No pull_request in context; skipping comment.');
+                        }
+
 
       - name: Initialize test database for CI
         if: always()
@@ -47,13 +146,24 @@ jobs:
         run: |
           python tools/ci_init_db.py || true
 
+      - name: Check PySide6 import and set output
+        id: check_pyside6
+        run: |
+          python -c "import importlib;\nimport sys;\ntry:\n  importlib.import_module('PySide6');\n  print('import_ok=true');\nexcept Exception:\n  print('import_ok=false');\n" | while read line; do echo "${line}" >> $GITHUB_OUTPUT; done
+
       - name: Run single GUI test (device placement)
         id: run_tests
+        if: steps.check_pyside6.outputs.import_ok == 'true'
         run: |
           mkdir -p test-output
           # Run pytest and capture stdout/stderr to a file for upload and PR comment
           xvfb-run -s '-screen 0 1024x768x24' pytest -q tests/test_device_placement_gui.py -q 2>&1 | tee test-output/pytest-output.txt
           echo "::set-output name=logfile::test-output/pytest-output.txt" || true
+
+      - name: Skip quick GUI test notice
+        if: steps.check_pyside6.outputs.import_ok != 'true'
+        run: |
+          echo 'PySide6 import failed — skipping quick GUI test on this runner.'
 
       - name: Upload pytest output artifact
         if: always()

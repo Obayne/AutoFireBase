@@ -18,13 +18,20 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
           pip install -r requirements.txt
           pip install pytest ruff black
+
+      - name: Make the repository importable for tools and tests
+        run: |
+          # Use PYTHONPATH to import the local package in-place to avoid
+          # running an editable build (setuptools may fail on a flat layout)
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade wheel
 
       - name: Auto-fix lint and format
         run: |
@@ -39,8 +46,12 @@ jobs:
 
       - name: Initialize test database for CI
         if: always()
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           python tools/ci_init_db.py
 
       - name: Run all tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: pytest -q -m "not gui"
