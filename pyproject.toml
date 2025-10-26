@@ -50,21 +50,20 @@ ignore = [
   "E501",  # line length handled by Black and allowed for long UI strings/templates
   "UP006", # prefer list/tuple builtins — defer for legacy/typed modules
   "UP035", # typing imports vs collections.abc — defer for legacy code
-  "UP045", # X | None style — defer for legacy code
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # UI/experimental modules with long strings and evolving APIs
-"theme_engine.py" = ["E501", "UP015", "I001", "F401", "UP045", "UP006", "E722", "UP035"]
-"theme_persistence.py" = ["E501", "I001", "F401", "UP035", "UP015", "UP006", "E722", "UP045", "F541"]
+"theme_engine.py" = ["E501", "UP015", "I001", "F401", "UP006", "E722", "UP035"]
+"theme_persistence.py" = ["E501", "I001", "F401", "UP035", "UP015", "UP006", "E722", "F541"]
 "window_management_system.py" = ["E501", "I001", "F401", "UP035", "UP006", "E722"]
 "smart_drawing_tools.py" = ["UP006", "F841", "I001", "F401", "UP035"]
-"smart_search_system.py" = ["I001", "UP035", "UP006", "F401", "F541", "UP045"]
+"smart_search_system.py" = ["I001", "UP035", "UP006", "F401", "F541"]
 "validate_priority_systems.py" = ["I001", "F401", "E501"]
 "test_priority_systems.py" = ["I001", "F401", "F841"]
 "tests/frontend/*.py" = ["I001", "F401"]
 "tests/backend/test_circuits_calc.py" = ["I001"]
-"professional_reporting_system.py" = ["F405", "F541", "UP006", "F403", "I001", "F401", "UP035", "UP045"]
+"professional_reporting_system.py" = ["F405", "F541", "UP006", "F403", "I001", "F401", "UP035"]
 "professional_project_setup.py" = ["I001", "F401", "UP035", "UP006", "UP015", "F841"]
 "frontend/windows/model_space.py" = ["I001"]
 "backend/title_block.py" = ["I001"]
@@ -84,4 +83,3 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-

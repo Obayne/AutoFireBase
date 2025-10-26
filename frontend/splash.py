@@ -12,7 +12,6 @@ from pathlib import Path
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
-    QApplication,
     QDialog,
     QHBoxLayout,
     QLabel,
@@ -35,14 +34,7 @@ class SplashScreen(QDialog):
         super().__init__(parent)
         self.setWindowTitle("AutoFire - Fire Alarm CAD")
         self.setModal(True)
-
-        # Make splash screen size responsive to DPI
-        # Get screen DPI info
-        screen = QApplication.primaryScreen()
-        dpi_ratio = screen.logicalDotsPerInch() / 96.0  # 96 DPI is standard
-        base_width = int(700 * dpi_ratio)
-        base_height = int(500 * dpi_ratio)
-        self.setFixedSize(base_width, base_height)
+        self.setFixedSize(700, 500)
 
         self._setup_ui()
         self._load_recent_projects()
@@ -109,9 +101,7 @@ class SplashScreen(QDialog):
 
         title_label = QLabel("AutoFire")
         title_font = QFont()
-        # Use relative font size that scales with system DPI
-        base_size = self.font().pointSize()
-        title_font.setPointSize(max(24, base_size * 2))  # Scale with base font but min 24pt
+        title_font.setPointSize(32)
         title_font.setBold(True)
         title_label.setFont(title_font)
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -120,8 +110,7 @@ class SplashScreen(QDialog):
 
         subtitle_label = QLabel("Professional Fire Alarm CAD System")
         subtitle_font = QFont()
-        # Scale subtitle font with system DPI
-        subtitle_font.setPointSize(max(12, int(base_size * 1.2)))  # Scale but min 12pt
+        subtitle_font.setPointSize(14)
         subtitle_label.setFont(subtitle_font)
         subtitle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         subtitle_label.setStyleSheet("color: #cccccc;")
@@ -201,9 +190,11 @@ class SplashScreen(QDialog):
             }
             QPushButton:hover {
                 background-color: #106ebe;
+                transform: translateY(-1px);
             }
             QPushButton:pressed {
                 background-color: #005a9e;
+                transform: translateY(0px);
             }
         """
         )
