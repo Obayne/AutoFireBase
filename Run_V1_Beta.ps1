@@ -7,9 +7,10 @@ if (Test-Path .\.venv\Scripts\Activate.ps1) {
     . .\.venv\Scripts\Activate.ps1
 }
 
-# Ensure GUI platform (unset headless overrides)
+# Prefer no splash for faster startup
+$env:AUTOFIRE_NO_SPLASH = '1'
+# Ensure GUI platform
 Remove-Item Env:QT_QPA_PLATFORM -ErrorAction SilentlyContinue | Out-Null
-Remove-Item Env:AUTOFIRE_NO_SPLASH -ErrorAction SilentlyContinue | Out-Null
 
 $src = Join-Path (Get-Location) 'unified_app\src'
 if (-not (Test-Path $src)) {
