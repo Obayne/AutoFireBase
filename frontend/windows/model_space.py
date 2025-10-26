@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
 # Backend services
 from backend.catalog import load_catalog
 from backend.logging_config import setup_logging
+from backend import branding
 
 # CAD command system for undo/redo
 from cad_core.commands import CADCommandStack
@@ -38,6 +39,7 @@ from frontend.panels.improved_system_builder import (
 
 # Layers panel for advanced layer management
 from frontend.panels.layer_manager import LayerManager
+from frontend.panels.circuits_editor import CircuitsEditor
 
 # Status widgets
 from frontend.widgets.canvas_status_summary import CanvasStatusSummary
@@ -80,7 +82,7 @@ class ModelSpaceWindow(QMainWindow):
         logger.info("ModelSpaceWindow.__init__ start")
         super().__init__(parent)
         self.app_controller = app_controller
-        self.setWindowTitle("AutoFire - Model Space")
+        self.setWindowTitle(f"{branding.PRODUCT_NAME} - Model Space")
         self.setObjectName("ModelSpaceWindow")
 
         # Initialize core attributes
@@ -200,6 +202,11 @@ class ModelSpaceWindow(QMainWindow):
         add_wire_seg_action.triggered.connect(self._add_wire_segment)
 
         toolbar.addSeparator()
+
+        # Quick: Export Submittal ZIP (one-click)
+        export_zip_quick = toolbar.addAction("Export ZIP")
+        export_zip_quick.setToolTip("Export Submittal Bundle (ZIP) using defaults")
+        export_zip_quick.triggered.connect(self._export_report_bundle_zip)
 
         # CAD Drawing Tools (mutually exclusive)
         self.draw_action_group = QtGui.QActionGroup(self)
@@ -329,9 +336,12 @@ class ModelSpaceWindow(QMainWindow):
 
         # Device tree
         self.device_tree = QtWidgets.QTreeWidget()
-        self.device_tree.setHeaderLabels(["Devices"])
+        self.device_tree.setColumnCount(3)
+        self.device_tree.setHeaderLabels(["Device", "Manufacturer", "Part Number"])
         self.device_tree.setAlternatingRowColors(True)
         self.device_tree.setSortingEnabled(True)
+        self.device_tree.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.device_tree.customContextMenuRequested.connect(self._on_device_tree_context_menu)
 
         # Populate device tree
         self._populate_device_tree()
@@ -609,6 +619,18 @@ class ModelSpaceWindow(QMainWindow):
         )
         lay.addWidget(self.apply_props_button)
 
+        # Documentation buttons
+        docs_btns = QtWidgets.QHBoxLayout()
+        self.open_cutsheet_btn = QtWidgets.QPushButton("Open Cutsheet")
+        self.open_cutsheet_btn.setEnabled(False)
+        self.open_cutsheet_btn.clicked.connect(lambda: self._open_device_doc("cutsheet"))
+        docs_btns.addWidget(self.open_cutsheet_btn)
+        self.open_manual_btn = QtWidgets.QPushButton("Open Manual")
+        self.open_manual_btn.setEnabled(False)
+        self.open_manual_btn.clicked.connect(lambda: self._open_device_doc("manual"))
+        docs_btns.addWidget(self.open_manual_btn)
+        lay.addLayout(docs_btns)
+
         # Device info display - cleaner
         self.device_info_text = QtWidgets.QTextEdit()
         self.device_info_text.setMaximumHeight(120)
@@ -631,7 +653,27 @@ class ModelSpaceWindow(QMainWindow):
         self.right_tab_widget.addTab(w, "Properties")
 
     def _setup_connections_tab(self):
-        """Setup connections tab with device interconnection management."""
+        """Setup enhanced connections tab with hierarchical circuit display."""
+        try:
+            from frontend.panels.enhanced_connections import create_enhanced_connections_tab
+            
+            # Create the enhanced connections panel
+            self.connections_panel = create_enhanced_connections_tab(self)
+            
+            # Connect signals for integration
+            self.connections_panel.circuit_selected.connect(self._on_circuit_selected)
+            self.connections_panel.device_selected.connect(self._on_device_selected)
+            self.connections_panel.calculations_updated.connect(self._on_calculations_updated)
+            
+            self.right_tab_widget.addTab(self.connections_panel, "Connections")
+            
+        except ImportError as e:
+            # Fallback to basic connections tab if enhanced version fails
+            _logger.warning("Enhanced connections not available, using basic version: %s", e)
+            self._setup_basic_connections_tab()
+    
+    def _setup_basic_connections_tab(self):
+        """Setup basic connections tab (fallback)."""
         w = QtWidgets.QWidget()
         lay = QtWidgets.QVBoxLayout(w)
 
@@ -1126,10 +1168,10 @@ class ModelSpaceWindow(QMainWindow):
                     for cat in sorted(grouped.keys()):
                         cat_item = QtWidgets.QTreeWidgetItem([cat])
                         for dev in sorted(grouped[cat], key=lambda x: x.get("name", "")):
-                            txt = f"{dev.get('name','<unknown>')} ({dev.get('symbol','')})"
-                            if dev.get("part_number"):
-                                txt += f" - {dev.get('part_number')}"
-                            it = QtWidgets.QTreeWidgetItem([txt])
+                            name_txt = f"{dev.get('name','<unknown>')} ({dev.get('symbol','')})"
+                            mfg_txt = dev.get("manufacturer", "") or ""
+                            pn_txt = dev.get("part_number", "") or ""
+                            it = QtWidgets.QTreeWidgetItem([name_txt, mfg_txt, pn_txt])
                             it.setData(0, Qt.ItemDataRole.UserRole, dev)
                             cat_item.addChild(it)
                         self.device_tree.addTopLevelItem(cat_item)
@@ -1213,10 +1255,10 @@ class ModelSpaceWindow(QMainWindow):
                 for cat in sorted(grouped.keys()):
                     cat_item = QtWidgets.QTreeWidgetItem([cat])
                     for dev in sorted(grouped[cat], key=lambda x: x.get("name", "")):
-                        txt = f"{dev.get('name','<unknown>')} ({dev.get('symbol','')})"
-                        if dev.get("part_number"):
-                            txt += f" - {dev.get('part_number')}"
-                        it = QtWidgets.QTreeWidgetItem([txt])
+                        name_txt = f"{dev.get('name','<unknown>')} ({dev.get('symbol','')})"
+                        mfg_txt = dev.get("manufacturer", "") or ""
+                        pn_txt = dev.get("part_number", "") or ""
+                        it = QtWidgets.QTreeWidgetItem([name_txt, mfg_txt, pn_txt])
                         it.setData(0, Qt.ItemDataRole.UserRole, dev)
                         cat_item.addChild(it)
                     self.device_tree.addTopLevelItem(cat_item)
@@ -1339,6 +1381,12 @@ class ModelSpaceWindow(QMainWindow):
         redo_action.setShortcut("Ctrl+Y")
         redo_action.triggered.connect(lambda: self.redo())
 
+        # Preferences
+        edit_menu.addSeparator()
+        prefs_action = edit_menu.addAction("&Preferences...")
+        prefs_action.setShortcut("Ctrl+,")
+        prefs_action.triggered.connect(self._open_preferences)
+
         # View menu
         view_menu = menubar.addMenu("&View")
         zoom_in_action = view_menu.addAction("Zoom &In")
@@ -1366,8 +1414,11 @@ class ModelSpaceWindow(QMainWindow):
         # Add insert options here
 
         # Tools menu
-        menubar.addMenu("&Tools")
-        # Add basic tools here
+        tools_menu = menubar.addMenu("&Tools")
+        # Circuits Editor (v1)
+        circuits_action = tools_menu.addAction("Open Circuits Editor")
+        circuits_action.setShortcut("Ctrl+Shift+E")
+        circuits_action.triggered.connect(self._open_circuits_editor)
 
         # System Builder menu
         system_menu = menubar.addMenu("&System Builder")
@@ -1402,21 +1453,153 @@ class ModelSpaceWindow(QMainWindow):
         # Add connection options
 
         # Reports menu
-        menubar.addMenu("&Reports")
-        # Add report options
+        reports_menu = menubar.addMenu("&Reports")
+        # BOM CSV export
+        export_bom_action = reports_menu.addAction("Generate &BOM (CSV)...")
+        export_bom_action.setShortcut("Ctrl+B")
+        export_bom_action.triggered.connect(self._generate_bom_report)
 
-        # Compliance menu
+        # Cable Schedule export
+        export_cable_action = reports_menu.addAction("Generate &Cable Schedule (CSV)...")
+        export_cable_action.setShortcut("Ctrl+Shift+C")
+        export_cable_action.triggered.connect(self._generate_cable_schedule)
+
+        # Report bundle export
+        export_bundle_action = reports_menu.addAction("Export Report &Bundle...")
+        export_bundle_action.setShortcut("Ctrl+Shift+R")
+        export_bundle_action.triggered.connect(self._export_report_bundle)
+
+        # HTML Submittal Pack
+        export_html_action = reports_menu.addAction("Export &Submittal Pack (HTML)...")
+        export_html_action.setShortcut("Ctrl+Alt+H")
+        export_html_action.triggered.connect(self._export_submittal_html)
+
+        # ZIP bundle export
+        export_zip_action = reports_menu.addAction("Export Submittal &Bundle (ZIP)...")
+        export_zip_action.setShortcut("Ctrl+Alt+Z")
+        export_zip_action.triggered.connect(self._export_report_bundle_zip)
+
+    # Compliance menu
         menubar.addMenu("&Compliance")
         # Add compliance options
 
         # Window menu
-        menubar.addMenu("&Window")
-        # Add window management options
+        window_menu = menubar.addMenu("&Window")
+        try:
+            wm = getattr(self.app_controller, "window_manager", None)
+        except Exception:
+            wm = None
+        if wm:
+            ensure_visible = window_menu.addAction("Ensure All Windows Visible")
+            ensure_visible.triggered.connect(wm.ensure_windows_visible)
+
+            window_menu.addSeparator()
+
+            profiles_menu = window_menu.addMenu("Layout Profiles")
+            try:
+                from window_management_system import WindowProfile  # type: ignore
+
+                profiles_menu.addAction(
+                    "Designer",
+                    lambda: wm.apply_layout_profile(WindowProfile.DESIGNER),
+                )
+                profiles_menu.addAction(
+                    "Engineer",
+                    lambda: wm.apply_layout_profile(WindowProfile.ENGINEER),
+                )
+                profiles_menu.addAction(
+                    "Manager",
+                    lambda: wm.apply_layout_profile(WindowProfile.MANAGER),
+                )
+                profiles_menu.addAction(
+                    "Dual Monitor",
+                    lambda: wm.apply_layout_profile(WindowProfile.DUAL_MONITOR),
+                )
+            except Exception:
+                # Profiles unavailable; continue with basic actions only
+                pass
+
+            window_menu.addSeparator()
+
+            # Save/Load layouts
+            save_layout = window_menu.addAction("Save Current Layout…")
+            def _save_layout():
+                from PySide6.QtWidgets import QInputDialog
+                name, ok = QInputDialog.getText(self, "Save Layout", "Layout name:")
+                if ok and name.strip():
+                    try:
+                        wm.save_current_layout(name.strip())
+                        self.statusBar().showMessage(f"Saved layout '{name.strip()}'", 4000)
+                    except Exception:
+                        pass
+            save_layout.triggered.connect(_save_layout)
+
+            load_layout = window_menu.addAction("Load Layout…")
+            def _load_layout():
+                from PySide6.QtWidgets import QInputDialog
+                try:
+                    names = wm.get_available_layouts()
+                except Exception:
+                    names = []
+                if not names:
+                    return
+                name, ok = QInputDialog.getItem(self, "Load Layout", "Choose a layout:", names, 0, False)
+                if ok and name:
+                    try:
+                        wm.load_layout(name)
+                        self.statusBar().showMessage(f"Loaded layout '{name}'", 4000)
+                    except Exception:
+                        pass
+            load_layout.triggered.connect(_load_layout)
+        else:
+            disabled = window_menu.addAction("Window Manager unavailable")
+            disabled.setEnabled(False)
 
         # Help menu
         help_menu = menubar.addMenu("&Help")
         about_action = help_menu.addAction("&About")
         about_action.triggered.connect(self.show_about)
+
+        # Export menu for sheets
+        export_menu = menubar.addMenu("E&xport")
+        export_sheet_action = export_menu.addAction("Export Sheet (SVG/PNG/PDF)...")
+        export_sheet_action.setShortcut("Ctrl+P")
+        export_sheet_action.triggered.connect(self._export_title_block_sheet)
+
+    
+    def _open_preferences(self):
+        """Open Preferences dialog and persist updates."""
+        try:
+            from backend.preferences import update_preferences, load_preferences
+            from frontend.dialogs.preferences import PreferencesDialog
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Preferences", f"Preferences unavailable: {e}")
+            return
+
+        # Start with current prefs merged with stored file (so unknown keys persist)
+        current = {}
+        try:
+            current = load_preferences()
+            # Include any runtime-only keys from controller.prefs if present
+            if isinstance(self.app_controller.prefs, dict):
+                current.update({k: v for k, v in self.app_controller.prefs.items() if k not in current})
+        except Exception:
+            current = dict(getattr(self, "prefs", {}) or {})
+
+        dlg = PreferencesDialog(self, initial=current)
+        if not dlg.exec():
+            return
+
+        new_vals = dlg.values()
+        try:
+            merged = update_preferences(new_vals)
+            # Update controller and window prefs in-memory
+            if isinstance(self.app_controller.prefs, dict):
+                self.app_controller.prefs.update(merged)
+            self.prefs.update(merged)
+            self.statusBar().showMessage("Preferences saved", 4000)
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Preferences", f"Failed to save preferences: {e}")
 
     def _show_system_builder(self):
         """Show the System Builder dock."""
@@ -1427,6 +1610,365 @@ class ModelSpaceWindow(QMainWindow):
                 dock.raise_()
                 dock.activateWindow()
                 break
+
+    def _generate_bom_report(self):
+        """Generate a simple BOM CSV by aggregating placed devices."""
+        try:
+            from backend.reports import generate_bom_csv
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Reports", f"Reports module unavailable: {e}")
+            return
+
+        # Choose destination path
+        default_dir = str(
+            self.prefs.get(
+                "report_default_dir",
+                os.path.join(os.getcwd(), "artifacts", "reports"),
+            )
+        )
+        try:
+            os.makedirs(default_dir, exist_ok=True)
+        except Exception:
+            pass
+        default_path = os.path.join(default_dir, "bom.csv")
+
+        dest_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Save BOM As",
+            default_path,
+            "CSV Files (*.csv);;All Files (*)",
+        )
+        if not dest_path:
+            return
+
+        # Collect device-like items from devices group
+        items = []
+        try:
+            if self.devices_group:
+                items = list(self.devices_group.childItems())
+        except Exception:
+            items = []
+
+        try:
+            result = generate_bom_csv(items, dest_path)
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "BOM Export Failed", str(e))
+            return
+
+        # Notify
+        total_lines = result.get("unique_items", 0)
+        total_qty = result.get("total_qty", 0)
+        self.statusBar().showMessage(
+            f"BOM saved: {dest_path} (items: {total_lines}, qty: {total_qty})"
+        )
+        QtWidgets.QMessageBox.information(
+            self,
+            "BOM Exported",
+            f"Saved to:\n{dest_path}\n\nUnique items: {total_lines}\nTotal quantity: {total_qty}",
+        )
+
+    def _generate_cable_schedule(self):
+        """Generate a cable schedule CSV from wire items."""
+        try:
+            from backend.reports import generate_cable_schedule_csv
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Reports", f"Reports module unavailable: {e}")
+            return
+
+        default_dir = str(
+            self.prefs.get(
+                "report_default_dir",
+                os.path.join(os.getcwd(), "artifacts", "reports"),
+            )
+        )
+        try:
+            os.makedirs(default_dir, exist_ok=True)
+        except Exception:
+            pass
+        default_path = os.path.join(default_dir, "cable_schedule.csv")
+
+        dest_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Save Cable Schedule As",
+            default_path,
+            "CSV Files (*.csv);;All Files (*)",
+        )
+        if not dest_path:
+            return
+
+        wire_items = []
+        try:
+            if self.layer_wires:
+                wire_items = list(self.layer_wires.childItems())
+        except Exception:
+            wire_items = []
+
+        try:
+            result = generate_cable_schedule_csv(wire_items, dest_path)
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Cable Schedule Export Failed", str(e))
+            return
+
+        groups = result.get("groups", 0)
+        total_len = result.get("total_length_ft", 0.0)
+        self.statusBar().showMessage(
+            f"Cable schedule saved: {dest_path} (groups: {groups}, total ft: {total_len:.2f})"
+        )
+        QtWidgets.QMessageBox.information(
+            self,
+            "Cable Schedule Exported",
+            f"Saved to:\n{dest_path}\n\nGroups: {groups}\nTotal length (ft): {total_len:.2f}",
+        )
+
+    def _export_report_bundle(self):
+        """Export a BOM + Cable Schedule into a folder."""
+        try:
+            from backend.reports import export_report_bundle
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Reports", f"Reports module unavailable: {e}")
+            return
+
+        default_dir = str(
+            self.prefs.get(
+                "report_default_dir",
+                os.path.join(os.getcwd(), "artifacts", "reports", "bundle"),
+            )
+        )
+        try:
+            os.makedirs(default_dir, exist_ok=True)
+        except Exception:
+            pass
+
+        folder = QtWidgets.QFileDialog.getExistingDirectory(
+            self, "Choose Report Folder", default_dir
+        )
+        if not folder:
+            return
+
+        device_items = []
+        wire_items = []
+        try:
+            if self.devices_group:
+                device_items = list(self.devices_group.childItems())
+        except Exception:
+            pass
+        try:
+            if self.layer_wires:
+                wire_items = list(self.layer_wires.childItems())
+        except Exception:
+            pass
+
+        try:
+            summary = export_report_bundle(device_items, wire_items, folder)
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Report Bundle Failed", str(e))
+            return
+
+        msg = (
+            f"BOM: {summary.get('bom_path')} (unique: {summary.get('bom_unique')}, "
+            f"qty: {summary.get('bom_qty')})\n"
+            f"Cable: {summary.get('cable_path')} (groups: {summary.get('cable_groups')}, "
+            f"segments: {summary.get('cable_segments')}, "
+            f"length ft: {summary.get('cable_length_ft')})\n"
+            f"Riser: {summary.get('riser_path')} (rows: {summary.get('riser_rows')})\n"
+            f"Compliance: {summary.get('compliance_path')} (rows: {summary.get('compliance_rows')})"
+        )
+        self.statusBar().showMessage("Report bundle exported")
+        QtWidgets.QMessageBox.information(self, "Report Bundle Exported", msg)
+
+    def _export_submittal_html(self):
+        """Export HTML submittal (index.html) and open it for print/copy."""
+        try:
+            from backend.reports import export_html_submittal
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Reports", f"Reports module unavailable: {e}")
+            return
+
+        default_dir = str(
+            self.prefs.get(
+                "report_default_dir",
+                os.path.join(os.getcwd(), "artifacts", "reports", "submittal"),
+            )
+        )
+        try:
+            os.makedirs(default_dir, exist_ok=True)
+        except Exception:
+            pass
+        folder = QtWidgets.QFileDialog.getExistingDirectory(
+            self, "Choose Submittal Folder", default_dir
+        )
+        if not folder:
+            return
+
+        device_items = []
+        wire_items = []
+        try:
+            if self.devices_group:
+                device_items = list(self.devices_group.childItems())
+        except Exception:
+            pass
+        try:
+            if self.layer_wires:
+                wire_items = list(self.layer_wires.childItems())
+        except Exception:
+            pass
+
+        try:
+            out = export_html_submittal(device_items, wire_items, folder)
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "HTML Submittal Failed", str(e))
+            return
+
+        index_path = out.get("index_path")
+        self.statusBar().showMessage(f"Submittal exported: {index_path}")
+        try:
+            from PySide6.QtGui import QDesktopServices
+            from PySide6.QtCore import QUrl
+
+            if index_path:
+                QDesktopServices.openUrl(QUrl.fromLocalFile(index_path))
+        except Exception:
+            pass
+
+    def _export_report_bundle_zip(self):
+        """Export a full submittal bundle as a ZIP archive."""
+        try:
+            from backend.reports import export_report_bundle_zip
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Reports", f"Reports module unavailable: {e}")
+            return
+
+        default_dir = str(
+            self.prefs.get(
+                "report_default_dir",
+                os.path.join(os.getcwd(), "artifacts", "reports"),
+            )
+        )
+        try:
+            os.makedirs(default_dir, exist_ok=True)
+        except Exception:
+            pass
+        default_path = os.path.join(default_dir, "submittal_bundle.zip")
+
+        dest_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Save Submittal Bundle As",
+            default_path,
+            "ZIP Files (*.zip);;All Files (*)",
+        )
+        if not dest_path:
+            return
+
+        device_items = []
+        wire_items = []
+        try:
+            if self.devices_group:
+                device_items = list(self.devices_group.childItems())
+        except Exception:
+            pass
+        try:
+            if self.layer_wires:
+                wire_items = list(self.layer_wires.childItems())
+        except Exception:
+            pass
+
+        try:
+            summary = export_report_bundle_zip(device_items, wire_items, dest_path)
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "ZIP Export Failed", str(e))
+            return
+
+        self.statusBar().showMessage(f"Submittal bundle saved: {summary.get('zip_path')}")
+        QtWidgets.QMessageBox.information(
+            self,
+            "Submittal Bundle Exported",
+            f"Saved to:\n{summary.get('zip_path')}\n\n"
+            f"Includes: index.html, device_documents.html, BOM, Cable, Riser, Compliance",
+        )
+
+    def _generate_riser(self):
+        """Generate riser CSV."""
+        try:
+            from backend.reports import generate_riser_csv
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Reports", f"Reports module unavailable: {e}")
+            return
+
+        default_dir = str(
+            self.prefs.get(
+                "report_default_dir",
+                os.path.join(os.getcwd(), "artifacts", "reports"),
+            )
+        )
+        try:
+            os.makedirs(default_dir, exist_ok=True)
+        except Exception:
+            pass
+        default_path = os.path.join(default_dir, "riser.csv")
+        dest_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Save Riser As", default_path, "CSV Files (*.csv);;All Files (*)"
+        )
+        if not dest_path:
+            return
+        device_items = []
+        try:
+            if self.devices_group:
+                device_items = list(self.devices_group.childItems())
+        except Exception:
+            pass
+        try:
+            result = generate_riser_csv(device_items, dest_path)
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Riser Export Failed", str(e))
+            return
+        self.statusBar().showMessage(f"Riser saved: {dest_path} (rows: {result.get('rows', 0)})")
+        QtWidgets.QMessageBox.information(
+            self, "Riser Exported", f"Saved to:\n{dest_path}\nRows: {result.get('rows', 0)}"
+        )
+
+    def _generate_compliance_summary(self):
+        """Generate compliance summary CSV."""
+        try:
+            from backend.reports import generate_compliance_summary_csv
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Reports", f"Reports module unavailable: {e}")
+            return
+
+        default_dir = str(
+            self.prefs.get(
+                "report_default_dir",
+                os.path.join(os.getcwd(), "artifacts", "reports"),
+            )
+        )
+        try:
+            os.makedirs(default_dir, exist_ok=True)
+        except Exception:
+            pass
+        default_path = os.path.join(default_dir, "compliance_summary.csv")
+        dest_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Save Compliance Summary As", default_path, "CSV Files (*.csv);;All Files (*)"
+        )
+        if not dest_path:
+            return
+        device_items = []
+        try:
+            if self.devices_group:
+                device_items = list(self.devices_group.childItems())
+        except Exception:
+            pass
+        try:
+            result = generate_compliance_summary_csv(device_items, dest_path)
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Compliance Export Failed", str(e))
+            return
+        self.statusBar().showMessage(
+            f"Compliance summary saved: {dest_path} (rows: {result.get('rows', 0)})"
+        )
+        QtWidgets.QMessageBox.information(
+            self,
+            "Compliance Summary Exported",
+            f"Saved to:\n{dest_path}\nRows: {result.get('rows', 0)}",
+        )
 
     def _show_system_builder_tab(self, tab_index: int):
         """Show System Builder and switch to specific tab."""
@@ -1472,13 +2014,82 @@ class ModelSpaceWindow(QMainWindow):
         """Show about dialog."""
         QtWidgets.QMessageBox.about(
             self,
-            "About AutoFire",
-            "AutoFire - Fire Alarm CAD System\nVersion 0.8.0\n\n"
+            f"About {branding.PRODUCT_NAME}",
+            f"{branding.PRODUCT_NAME} - Fire Alarm CAD System\nVersion {branding.get_version()}\n\n"
             "Professional fire alarm system design tool.",
         )
 
+    def _open_circuits_editor(self):
+        """Open the circuits editor dock with current device/wire items."""
+        # Collect items similarly to report generators
+        device_items = []
+        wire_items = []
+        try:
+            if hasattr(self, "devices_group") and self.devices_group is not None:
+                device_items = list(self.devices_group.childItems())
+            if hasattr(self, "layer_wires") and self.layer_wires is not None:
+                wire_items = list(self.layer_wires.childItems())
+        except Exception:
+            pass
+
+        dock = QtWidgets.QDockWidget("Circuits Editor", self)
+        widget = CircuitsEditor(self)
+        widget.set_data(device_items, wire_items)
+        dock.setWidget(widget)
+        self.addDockWidget(Qt.RightDockWidgetArea, dock)
+        dock.show()
+
+    def _export_title_block_sheet(self):
+        try:
+            from backend.title_block import (
+                export_title_block_pdf_file,
+                export_title_block_png_file,
+                export_title_block_svg_file,
+            )
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Export Error", f"Exporter unavailable: {e}")
+            return
+
+        # Build default metadata
+        from backend import branding
+        from datetime import datetime
+
+        meta = {
+            "sheet_title": "Fire Alarm Design Sheet",
+            "project_name": getattr(self, "project_name", "Untitled Project"),
+            "project_address": getattr(self, "project_address", ""),
+            "designer": getattr(self, "designer_name", ""),
+            "date": datetime.today().strftime("%Y-%m-%d"),
+            "company": branding.PRODUCT_NAME,
+            "company_contact": "",
+        }
+
+        dlg = QtWidgets.QFileDialog(self, "Export Sheet")
+        dlg.setAcceptMode(QtWidgets.QFileDialog.AcceptMode.AcceptSave)
+        dlg.setNameFilters(["SVG Image (*.svg)", "PNG Image (*.png)", "PDF File (*.pdf)"])
+        if not dlg.exec():
+            return
+        out_path = dlg.selectedFiles()[0]
+        sel_filter = dlg.selectedNameFilter()
+        try:
+            if sel_filter.lower().startswith("svg") or out_path.lower().endswith(".svg"):
+                if not out_path.lower().endswith(".svg"):
+                    out_path += ".svg"
+                export_title_block_svg_file(out_path, meta)
+            elif sel_filter.lower().startswith("png") or out_path.lower().endswith(".png"):
+                if not out_path.lower().endswith(".png"):
+                    out_path += ".png"
+                export_title_block_png_file(out_path, meta)
+            else:
+                if not out_path.lower().endswith(".pdf"):
+                    out_path += ".pdf"
+                export_title_block_pdf_file(out_path, meta)
+            self.statusBar().showMessage(f"Exported sheet to {out_path}", 5000)
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Export Failed", str(e))
+
     def _new_project(self):
-        """Create a new project."""
+        """Create a new project and open System Builder for project setup."""
         reply = QtWidgets.QMessageBox.question(
             self,
             "New Project",
@@ -1494,7 +2105,12 @@ class ModelSpaceWindow(QMainWindow):
                 self.app_controller.current_project_path = None
             if hasattr(self.app_controller, "project_data"):
                 self.app_controller.project_data = self.app_controller._get_default_project_data()
-            self.statusBar().showMessage("New project created")
+            
+            # Show System Builder for new project setup
+            self._show_system_builder()
+            self.statusBar().showMessage(
+                "New project - use System Builder to configure your design"
+            )
 
     def _open_project(self):
         """Open an existing project."""
@@ -1752,6 +2368,23 @@ class ModelSpaceWindow(QMainWindow):
         if hasattr(self, "apply_props_button"):
             self.apply_props_button.setEnabled(True)
 
+        # Enable docs buttons when links exist
+        try:
+            from backend.device_docs import lookup_docs_for_item
+
+            docs = lookup_docs_for_item(device_item)
+            has_c = bool(docs.get("cutsheet"))
+            has_m = bool(docs.get("manual"))
+            if hasattr(self, "open_cutsheet_btn"):
+                self.open_cutsheet_btn.setEnabled(has_c)
+            if hasattr(self, "open_manual_btn"):
+                self.open_manual_btn.setEnabled(has_m)
+        except Exception:
+            if hasattr(self, "open_cutsheet_btn"):
+                self.open_cutsheet_btn.setEnabled(False)
+            if hasattr(self, "open_manual_btn"):
+                self.open_manual_btn.setEnabled(False)
+
     def _clear_properties_panel(self):
         """Clear the properties panel when no device is selected."""
         if hasattr(self, "selected_device_label"):
@@ -1768,6 +2401,58 @@ class ModelSpaceWindow(QMainWindow):
 
         if hasattr(self, "apply_props_button"):
             self.apply_props_button.setEnabled(False)
+
+        if hasattr(self, "open_cutsheet_btn"):
+            self.open_cutsheet_btn.setEnabled(False)
+        if hasattr(self, "open_manual_btn"):
+            self.open_manual_btn.setEnabled(False)
+
+    def _open_device_doc(self, kind: str):
+        selected_items = self.scene.selectedItems()
+        if not selected_items:
+            return
+        device_item = selected_items[0]
+        try:
+            from backend.device_docs import lookup_docs_for_item
+            from PySide6.QtGui import QDesktopServices
+            from PySide6.QtCore import QUrl
+
+            docs = lookup_docs_for_item(device_item)
+            url = docs.get(kind)
+            if url:
+                QDesktopServices.openUrl(QUrl(url))
+        except Exception:
+            pass
+
+    def _on_device_tree_context_menu(self, pos: QtCore.QPoint) -> None:
+        item = self.device_tree.itemAt(pos)
+        if not item:
+            return
+        dev = item.data(0, Qt.ItemDataRole.UserRole)
+        if not isinstance(dev, dict):
+            return
+        menu = QtWidgets.QMenu(self)
+        act_c = menu.addAction("Open Cutsheet")
+        menu.addAction("Open Manual")
+        chosen = menu.exec(self.device_tree.viewport().mapToGlobal(pos))
+        if not chosen:
+            return
+        try:
+            from backend.device_docs import lookup_docs_for_spec
+            from PySide6.QtGui import QDesktopServices
+            from PySide6.QtCore import QUrl
+
+            docs = lookup_docs_for_spec(
+                manufacturer=dev.get("manufacturer"),
+                model=dev.get("model") or dev.get("symbol"),
+                name=dev.get("name"),
+                part_number=dev.get("part_number"),
+            )
+            url = docs.get("cutsheet") if chosen == act_c else docs.get("manual")
+            if url:
+                QDesktopServices.openUrl(QUrl(url))
+        except Exception:
+            pass
 
     def _update_status_summary(self):
         """Update the status summary with current canvas statistics."""
@@ -1886,3 +2571,26 @@ class ModelSpaceWindow(QMainWindow):
         if hasattr(self.app_controller, "on_model_space_closed"):
             self.app_controller.on_model_space_closed()
         event.accept()
+
+    def _on_circuit_selected(self, circuit_id: str):
+        """Handle circuit selection from enhanced connections panel."""
+        _logger.info("Circuit selected: %s", circuit_id)
+        self.statusBar().showMessage(f"Selected circuit: {circuit_id}")
+        
+        # Could highlight circuit items in the scene here
+        # TODO: Integrate with scene highlighting
+    
+    def _on_device_selected(self, device_name: str):
+        """Handle device selection from enhanced connections panel."""
+        _logger.info("Device selected: %s", device_name)
+        self.statusBar().showMessage(f"Selected device: {device_name}")
+        
+        # Could highlight device in the scene here
+        # TODO: Integrate with scene highlighting
+    
+    def _on_calculations_updated(self):
+        """Handle calculation updates from enhanced connections panel."""
+        _logger.debug("Live calculations updated")
+        
+        # Could update other UI elements that depend on calculations
+        # TODO: Integrate with other panels that need calculation results

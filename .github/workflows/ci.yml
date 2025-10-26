@@ -55,3 +55,10 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: pytest -q -m "not gui"
+
+      - name: Smoke test headless reports CLI (ZIP bundle)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -m backend.reports_cli --demo --zip artifacts/reports/submittal_bundle.zip
+          if (-Not (Test-Path "artifacts/reports/submittal_bundle.zip")) { throw "ZIP not created" }

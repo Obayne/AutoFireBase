@@ -90,6 +90,53 @@ cd AutoFire
 python app\main.py
 ```
 
+#### High-fidelity exports (optional)
+For the best SVG→PNG/PDF exports from the Title Block exporter, install optional graphics deps.
+
+Option A — via setup script:
+```powershell
+./setup_dev.ps1 -WithOptional
+```
+
+Option B — manual install in the venv:
+```powershell
+pip install -r requirements-optional.txt
+```
+
+These install CairoSVG and Pillow. If they’re not present, exports still work: SVG is always written; PNG/PDF use safe fallbacks (placeholder PNG via Pillow if available; simple PDF via reportlab, which is already included in requirements.txt).
+
+#### Device documentation links: CSV importer
+
+Maintain links to device cutsheets/manuals in `backend/device_docs.json`. To bulk update from a CSV:
+
+```powershell
+# Activate environment first
+.\.venv\Scripts\Activate.ps1
+
+# Import from CSV (headers case-insensitive; aliases supported)
+python -m tools.import_device_docs_csv `
+  --csv .\path\to\device_docs.csv `
+  --out .\backend\device_docs.json
+
+# Overwrite existing links with CSV values
+python -m tools.import_device_docs_csv `
+  --csv .\path\to\device_docs.csv `
+  --out .\backend\device_docs.json `
+  --overwrite
+```
+
+
+CSV columns (any case; aliases in parentheses):
+- `part_number` (part, pn, model)
+- `cutsheet_url` (cutsheet, spec, spec_url)
+- `manual_url` (manual, install, install_url)
+
+
+Behavior:
+- Keys are lowercased part numbers.
+- Without `--overwrite`, existing non-empty JSON values are preserved; CSV fills missing fields.
+- With `--overwrite`, CSV replaces existing values.
+
 ### Build Executable
 ```powershell
 # Build release version

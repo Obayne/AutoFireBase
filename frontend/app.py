@@ -46,9 +46,19 @@ def main() -> int:
         app.setApplicationName("AutoFire")
         app.setApplicationVersion("0.8.0")
 
-        # TEMPORARILY SKIP SPLASH SCREENS - go directly to System Builder
-        # TODO: Migrate splash screen project info into System Builder interface
-        logger.info("Skipping splash screens, starting directly with System Builder...")
+        # Apply a modern theme early so widgets pick up palette and styles
+        try:
+            from frontend.ui.theme import apply_theme
+
+            # Allow env override; default to 'dark'
+            theme_name = os.environ.get("AUTOFIRE_THEME", "dark")
+            apply_theme(app, theme_name)
+            logger.info("Applied theme: %s", theme_name)
+        except Exception:
+            logger.exception("Failed to apply theme; continuing with default palette")
+
+        # Start with main CAD interface - System Builder opens when creating new projects
+        logger.info("Starting main CAD interface...")
 
         # Create and retain a global reference to the application controller.
         # Defer heavy controller initialization until after the event loop starts

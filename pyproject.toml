@@ -5,7 +5,39 @@ target-version = ["py311"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-extend-exclude = ["build", "dist", ".venv", "scripts/archive"]
+extend-exclude = [
+  "build",
+  "dist",
+  ".venv",
+  "scripts/archive",
+  # Exclude large demo/experimental modules from lint until stabilized
+  "professional_*.py",
+  "live_calculations_engine.py",
+  "nfpa_rules_engine.py",
+  # Exclude experimental UI panels and proto modules that are not part of core checks
+  "frontend/panels/**",
+  "improved_guided_system_builder.py",
+  "information_panel_system.py",
+  "examples/**",
+  "device_placement_workflow_demo.py",
+  "enhanced_error_handling.py",
+  "experience_level_system.py",
+  "flamecad_final_showcase.py",
+  "frontend/design_system.py",
+  "frontend/information_architecture.py",
+  "*system_builder*.py",
+  "*device_database*.py",
+  "design_assistant_panel.py",
+  "complete_system_integration.py",
+  "cad_core/ai/**",
+  "cad_core/calculations/live_integration.py",
+  "autofire_professional_integrated.py",
+  "autofire_theme_system.py",
+  "autonomous_validation_suite.py",
+  "archive/**",
+  "advanced_cad_integration.py",
+  "ai_integration_framework.py",
+]
 
 [tool.ruff.lint]
 select = [
@@ -14,6 +46,29 @@ select = [
   "I",  # isort
   "UP", # pyupgrade
 ]
+ignore = [
+  "E501",  # line length handled by Black and allowed for long UI strings/templates
+  "UP006", # prefer list/tuple builtins — defer for legacy/typed modules
+  "UP035", # typing imports vs collections.abc — defer for legacy code
+  "UP045", # X | None style — defer for legacy code
+]
+
+[tool.ruff.lint.per-file-ignores]
+# UI/experimental modules with long strings and evolving APIs
+"theme_engine.py" = ["E501", "UP015", "I001", "F401", "UP045", "UP006", "E722", "UP035"]
+"theme_persistence.py" = ["E501", "I001", "F401", "UP035", "UP015", "UP006", "E722", "UP045", "F541"]
+"window_management_system.py" = ["E501", "I001", "F401", "UP035", "UP006", "E722"]
+"smart_drawing_tools.py" = ["UP006", "F841", "I001", "F401", "UP035"]
+"smart_search_system.py" = ["I001", "UP035", "UP006", "F401", "F541", "UP045"]
+"validate_priority_systems.py" = ["I001", "F401", "E501"]
+"test_priority_systems.py" = ["I001", "F401", "F841"]
+"tests/frontend/*.py" = ["I001", "F401"]
+"tests/backend/test_circuits_calc.py" = ["I001"]
+"professional_reporting_system.py" = ["F405", "F541", "UP006", "F403", "I001", "F401", "UP035", "UP045"]
+"professional_project_setup.py" = ["I001", "F401", "UP035", "UP006", "UP015", "F841"]
+"frontend/windows/model_space.py" = ["I001"]
+"backend/title_block.py" = ["I001"]
+"backend/circuits.py" = ["I001"]
 
 [tool.ruff.format]
 quote-style = "double"

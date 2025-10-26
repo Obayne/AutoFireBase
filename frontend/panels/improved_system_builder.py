@@ -184,7 +184,6 @@ class ImprovedGuidedSystemBuilder(QWidget):
             font-size: 20px;
             font-weight: 900;
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         """
         )
         layout.addWidget(title)
@@ -230,7 +229,6 @@ class ImprovedGuidedSystemBuilder(QWidget):
                 font-size: 12px;
                 font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
                 border: {'2px solid #ffffff' if i == 0 else '1px solid rgba(255,255,255,0.3)'};
-                text-shadow: {'1px 1px 2px rgba(0,0,0,0.3)' if i == 0 else 'none'};
             """
             )
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -254,7 +252,6 @@ class ImprovedGuidedSystemBuilder(QWidget):
             font-size: 15px;
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
             border: 1px solid rgba(255,255,255,0.3);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         """
         )
         self.guidance_label.setWordWrap(True)
@@ -1408,7 +1405,6 @@ class ImprovedGuidedSystemBuilder(QWidget):
             }
             QPushButton:hover:enabled {
                 background-color: #6c7b7d;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             }
             QPushButton:disabled {
                 background-color: #bdc3c7;
@@ -1452,7 +1448,6 @@ class ImprovedGuidedSystemBuilder(QWidget):
             }
             QPushButton:hover:enabled {
                 background-color: #1f4e79;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             }
             QPushButton:disabled {
                 background-color: #bdc3c7;
@@ -1479,7 +1474,6 @@ class ImprovedGuidedSystemBuilder(QWidget):
             }
             QPushButton:hover {
                 background-color: #0d5016;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             }
         """
         )
@@ -1637,12 +1631,9 @@ class ImprovedGuidedSystemBuilder(QWidget):
             }
             QPushButton:hover {
                 background-color: #219a52;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             }
             QPushButton:pressed {
                 background-color: #1e8449;
-                transform: translateY(0px);
             }
         """
         )
@@ -1665,12 +1656,9 @@ class ImprovedGuidedSystemBuilder(QWidget):
             }
             QPushButton:hover {
                 background-color: #2980b9;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             }
             QPushButton:pressed {
                 background-color: #21618c;
-                transform: translateY(0px);
             }
         """
         )

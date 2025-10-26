@@ -1,5 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+try:
+    from backend import branding as _branding
+    _product = getattr(_branding, 'PRODUCT_NAME', 'AutoFire')
+except Exception:
+    _product = 'AutoFire'
 
 a = Analysis(
     ['main.py'],
@@ -21,7 +26,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='AutoFire_Debug',
+    name=f"{_product}_Debug",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -40,5 +45,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='AutoFire_Debug',
+    name=f"{_product}_Debug",
 )

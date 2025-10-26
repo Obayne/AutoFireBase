@@ -1,11 +1,31 @@
 """
-Panel Selection and Configuration Dialog
-Allows users to select main panels, annunciators, and other fire alarm equipment.
+FlameCAD Panel Selection and Configuration Dialog
+Professional interface for selecting main panels, annunciators, and fire alarm equipment.
 """
 
 import json
 
 from PySide6 import QtCore, QtWidgets
+
+# Import our professional design system
+try:
+    from frontend.design_system import AutoFireColor, AutoFireStyleSheet, AutoFireFont
+    DESIGN_SYSTEM_AVAILABLE = True
+except ImportError:
+    # Fallback for development/testing
+    DESIGN_SYSTEM_AVAILABLE = False
+    class AutoFireColor:
+        PRIMARY = "#C41E3A"
+        SECONDARY = "#8B0000"
+        ACCENT = "#FF6B35"
+        
+    class AutoFireStyleSheet:
+        @staticmethod
+        def group_box(): return ""
+        @staticmethod 
+        def button_primary(): return ""
+        @staticmethod
+        def input_field(): return ""
 
 try:
     from db import loader as db_loader
@@ -48,9 +68,9 @@ class PanelSelectionDialog(QtWidgets.QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Panel Selection & Configuration")
+        self.setWindowTitle("🔥 FlameCAD Panel Selection & Configuration")
         self.setModal(True)
-        self.resize(800, 600)
+        self.resize(900, 700)  # Slightly larger for professional layout
 
         # Data
         self.panels = []
@@ -119,146 +139,198 @@ class PanelSelectionDialog(QtWidgets.QDialog):
         ]
 
     def _setup_ui(self):
-        """Setup the user interface."""
+        """Setup the professional user interface with FlameCAD styling."""
         layout = QtWidgets.QVBoxLayout(self)
 
-        # Apply dialog styling for better contrast - MAXIMUM VISIBILITY
-        self.setStyleSheet(
-            """
-            QDialog {
-                background-color: #ffffff !important;
-                color: #000000 !important;
-                font-size: 14pt !important;
-                font-weight: bold !important;
-            }
-            QLabel {
-                color: #000000 !important;
-                font-weight: bold !important;
-                font-size: 14pt !important;
-                background-color: #ffffff !important;
-            }
-            QComboBox {
-                background-color: #ffffff !important;
-                color: #000000 !important;
-                border: 3px solid #ff0000 !important;
-                border-radius: 4px;
-                padding: 12px !important;
-                font-size: 14pt !important;
-                font-weight: bold !important;
-            }
-            QComboBox:hover {
-                border-color: #0000ff !important;
-                background-color: #f0f0f0 !important;
-            }
-            QComboBox::drop-down {
-                border: none;
-                background-color: #0078d7;
-            }
-            QComboBox::down-arrow {
-                image: none;
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 8px solid white;
-                width: 0;
-                height: 0;
-            }
-            QListWidget {
-                background-color: #ffffff !important;
-                color: #000000 !important;
-                border: 5px solid #ff0000 !important;
-                border-radius: 4px;
-                font-size: 16pt !important;
-                font-weight: bold !important;
-                selection-background-color: #0078d7 !important;
-                selection-color: #ffffff !important;
-            }
-            QListWidget::item {
-                padding: 15px !important;
-                border-bottom: 2px solid #000000 !important;
-                color: #000000 !important;
-                background-color: #ffffff !important;
-                font-weight: bold !important;
-                font-size: 16pt !important;
-                margin: 2px !important;
-            }
-            QListWidget::item:hover {
-                background-color: #ffff00 !important;
-                color: #000000 !important;
-                font-weight: bold !important;
-                border: 2px solid #0000ff !important;
-            }
-            QListWidget::item:selected {
-                background-color: #0078d7 !important;
-                color: #ffffff !important;
-                font-weight: bold !important;
-                border: 3px solid #ff0000 !important;
-            }
-            QListWidget::item:selected:hover {
-                background-color: #ff0000 !important;
-                color: #ffffff !important;
-            }
-            QGroupBox {
-                font-weight: bold;
-                font-size: 11pt;
-                color: #495057;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-                margin-top: 10px;
-                padding-top: 10px;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 5px 0 5px;
-                background-color: #f8f9fa;
-            }
-            QTextEdit {
-                background-color: white;
-                color: #212529;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-                font-size: 10pt;
-            }
-            QTableWidget {
-                background-color: white;
-                color: #212529;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-                gridline-color: #e9ecef;
-                font-size: 10pt;
-            }
-            QHeaderView::section {
-                background-color: #e9ecef;
-                color: #495057;
-                border: 1px solid #ced4da;
-                padding: 6px;
-                font-weight: bold;
-            }
-            QPushButton {
-                background-color: #0078d7;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                font-size: 10pt;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #106ebe;
-            }
-            QPushButton:pressed {
-                background-color: #005a9e;
-            }
-            QPushButton:disabled {
-                background-color: #6c757d;
-                color: #adb5bd;
-            }
-        """
-        )
+        # Apply professional FlameCAD dialog styling
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.setStyleSheet(f"""
+                QDialog {{
+                    background-color: {AutoFireColor.SURFACE_PRIMARY if hasattr(AutoFireColor, 'SURFACE_PRIMARY') else '#f8f9fa'};
+                    color: {AutoFireColor.TEXT_PRIMARY if hasattr(AutoFireColor, 'TEXT_PRIMARY') else '#333'};
+                    font-size: 13px;
+                    font-family: 'Segoe UI', 'Roboto', sans-serif;
+                    border-radius: 12px;
+                }}
+                QLabel {{
+                    color: {AutoFireColor.TEXT_PRIMARY if hasattr(AutoFireColor, 'TEXT_PRIMARY') else '#333'};
+                    font-weight: 600;
+                    font-size: 14px;
+                    padding: 5px 0;
+                }}
+                QComboBox {{
+                    background-color: {AutoFireColor.SURFACE_SECONDARY if hasattr(AutoFireColor, 'SURFACE_SECONDARY') else '#fff'};
+                    color: {AutoFireColor.TEXT_PRIMARY if hasattr(AutoFireColor, 'TEXT_PRIMARY') else '#333'};
+                    border: 2px solid {AutoFireColor.BORDER_PRIMARY if hasattr(AutoFireColor, 'BORDER_PRIMARY') else '#ddd'};
+                    border-radius: 6px;
+                    padding: 10px 15px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    min-height: 20px;
+                }}
+                QComboBox:hover {{
+                    border-color: {AutoFireColor.ACCENT};
+                    background-color: {AutoFireColor.SURFACE_PRIMARY if hasattr(AutoFireColor, 'SURFACE_PRIMARY') else '#f0f0f0'};
+                }}
+                QComboBox:focus {{
+                    border-color: {AutoFireColor.PRIMARY};
+                    background-color: {AutoFireColor.SURFACE_PRIMARY if hasattr(AutoFireColor, 'SURFACE_PRIMARY') else '#fff'};
+                }}
+                QComboBox::drop-down {{
+                    border: none;
+                    background-color: {AutoFireColor.ACCENT};
+                    border-top-right-radius: 4px;
+                    border-bottom-right-radius: 4px;
+                    width: 25px;
+                }}
+                QComboBox::down-arrow {{
+                    image: none;
+                    border-left: 5px solid transparent;
+                    border-right: 5px solid transparent;
+                    border-top: 6px solid white;
+                    margin: 2px;
+                }}
+                QListWidget {{
+                    background-color: {AutoFireColor.SURFACE_PRIMARY if hasattr(AutoFireColor, 'SURFACE_PRIMARY') else '#fff'};
+                    color: {AutoFireColor.TEXT_PRIMARY if hasattr(AutoFireColor, 'TEXT_PRIMARY') else '#333'};
+                    border: 2px solid {AutoFireColor.BORDER_PRIMARY if hasattr(AutoFireColor, 'BORDER_PRIMARY') else '#ddd'};
+                    border-radius: 8px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    selection-background-color: {AutoFireColor.ACCENT};
+                    selection-color: white;
+                    alternate-background-color: {AutoFireColor.SURFACE_SECONDARY if hasattr(AutoFireColor, 'SURFACE_SECONDARY') else '#f9f9f9'};
+                }}
+                QListWidget::item {{
+                    padding: 12px 15px;
+                    border-bottom: 1px solid {AutoFireColor.BORDER_PRIMARY if hasattr(AutoFireColor, 'BORDER_PRIMARY') else '#eee'};
+                    color: {AutoFireColor.TEXT_PRIMARY if hasattr(AutoFireColor, 'TEXT_PRIMARY') else '#333'};
+                    background-color: transparent;
+                }}
+                QListWidget::item:selected {{
+                    background-color: {AutoFireColor.ACCENT};
+                    color: white;
+                    font-weight: 600;
+                    border-radius: 4px;
+                    margin: 2px;
+                }}
+                QListWidget::item:hover {{
+                    background-color: {AutoFireColor.BUTTON_HOVER if hasattr(AutoFireColor, 'BUTTON_HOVER') else '#f0f0f0'};
+                    border-radius: 4px;
+                    margin: 2px;
+                }}
+                QTextEdit {{
+                    background-color: {AutoFireColor.SURFACE_SECONDARY if hasattr(AutoFireColor, 'SURFACE_SECONDARY') else '#fff'};
+                    color: {AutoFireColor.TEXT_PRIMARY if hasattr(AutoFireColor, 'TEXT_PRIMARY') else '#333'};
+                    border: 2px solid {AutoFireColor.BORDER_PRIMARY if hasattr(AutoFireColor, 'BORDER_PRIMARY') else '#ddd'};
+                    border-radius: 6px;
+                    padding: 10px;
+                    font-size: 12px;
+                    line-height: 1.4;
+                }}
+                QPushButton {{
+                    background-color: {AutoFireColor.ACCENT};
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    font-size: 13px;
+                    min-width: 100px;
+                }}
+                QPushButton:hover {{
+                    background-color: {AutoFireColor.SECONDARY};
+                }}
+                QPushButton:pressed {{
+                    background-color: {AutoFireColor.PRIMARY};
+                }}
+                QPushButton:disabled {{
+                    background-color: {AutoFireColor.BORDER_PRIMARY if hasattr(AutoFireColor, 'BORDER_PRIMARY') else '#ccc'};
+                    color: {AutoFireColor.TEXT_MUTED if hasattr(AutoFireColor, 'TEXT_MUTED') else '#999'};
+                }}
+                QGroupBox {{
+                    font-weight: 600;
+                    font-size: 14px;
+                    color: {AutoFireColor.TEXT_PRIMARY if hasattr(AutoFireColor, 'TEXT_PRIMARY') else '#333'};
+                    border: 2px solid {AutoFireColor.BORDER_PRIMARY if hasattr(AutoFireColor, 'BORDER_PRIMARY') else '#ddd'};
+                    border-radius: 8px;
+                    margin-top: 10px;
+                    padding-top: 15px;
+                }}
+                QGroupBox::title {{
+                    color: {AutoFireColor.PRIMARY};
+                    font-weight: 700;
+                    font-size: 15px;
+                    subcontrol-origin: margin;
+                    left: 15px;
+                    padding: 0 8px 0 8px;
+                }}
+            """)
+        else:
+            # Fallback professional styling
+            self.setStyleSheet("""
+                QDialog {
+                    background-color: #f8f9fa;
+                    color: #333;
+                    font-size: 13px;
+                    font-family: 'Segoe UI', 'Roboto', sans-serif;
+                }
+                QComboBox {
+                    background-color: #fff;
+                    border: 2px solid #ddd;
+                    border-radius: 6px;
+                    padding: 10px 15px;
+                    font-size: 13px;
+                }
+                QComboBox:hover {
+                    border-color: #FF6B35;
+                }
+                QListWidget {
+                    background-color: #fff;
+                    border: 2px solid #ddd;
+                    border-radius: 8px;
+                    selection-background-color: #FF6B35;
+                    selection-color: white;
+                }
+                QPushButton {
+                    background-color: #FF6B35;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 6px;
+                    font-weight: 600;
+                }
+                QPushButton:hover {
+                    background-color: #8B0000;
+                }
+            """)
 
-        # Manufacturer filter
+        # Professional header with FlameCAD branding
+        header_layout = QtWidgets.QHBoxLayout()
+        header_label = QtWidgets.QLabel("🔥 FlameCAD Panel Selection")
+        if DESIGN_SYSTEM_AVAILABLE:
+            header_label.setStyleSheet(f"""
+                color: {AutoFireColor.PRIMARY};
+                font-size: 18px;
+                font-weight: 700;
+                padding: 15px 0;
+                margin-bottom: 10px;
+            """)
+        else:
+            header_label.setStyleSheet("""
+                color: #C41E3A;
+                font-size: 18px;
+                font-weight: bold;
+                padding: 15px 0;
+                margin-bottom: 10px;
+            """)
+        header_layout.addWidget(header_label)
+        header_layout.addStretch()
+        layout.addLayout(header_layout)
+
+        # Professional manufacturer filter
         filter_layout = QtWidgets.QHBoxLayout()
-        filter_label = QtWidgets.QLabel("Manufacturer:")
+        filter_label = QtWidgets.QLabel("🏭 Manufacturer:")
         filter_layout.addWidget(filter_label)
         self.manufacturer_combo = QtWidgets.QComboBox()
         self.manufacturer_combo.addItem("All Manufacturers")
@@ -272,50 +344,78 @@ class PanelSelectionDialog(QtWidgets.QDialog):
         filter_layout.addStretch()
         layout.addLayout(filter_layout)
 
-        # Panel list
+        # Professional panel list with enhanced styling
+        panel_list_label = QtWidgets.QLabel("🔧 Available Fire Alarm Control Panels:")
+        layout.addWidget(panel_list_label)
+        
         self.panel_list = QtWidgets.QListWidget()
         self.panel_list.itemSelectionChanged.connect(self._on_panel_selected)
         layout.addWidget(self.panel_list)
 
-        # Panel details
-        self.details_group = QtWidgets.QGroupBox("Panel Details")
+        # Professional panel details section
+        self.details_group = QtWidgets.QGroupBox("📋 Panel Specifications & Features")
         details_layout = QtWidgets.QVBoxLayout(self.details_group)
 
         self.details_text = QtWidgets.QTextEdit()
         self.details_text.setReadOnly(True)
-        self.details_text.setMaximumHeight(150)
+        self.details_text.setMaximumHeight(160)
+        self.details_text.setPlaceholderText("Select a panel to view detailed specifications...")
         details_layout.addWidget(self.details_text)
 
-        # Circuit configuration
-        self.circuit_group = QtWidgets.QGroupBox("Circuit Configuration")
+        # Professional circuit configuration section
+        self.circuit_group = QtWidgets.QGroupBox("⚡ Circuit Configuration & Capacity")
         circuit_layout = QtWidgets.QVBoxLayout(self.circuit_group)
 
         self.circuit_table = QtWidgets.QTableWidget()
         self.circuit_table.setColumnCount(4)
-        self.circuit_table.setHorizontalHeaderLabels(["Type", "Number", "Capacity", "Config"])
+        self.circuit_table.setHorizontalHeaderLabels(["Circuit Type", "Number", "Max Capacity", "Configuration"])
         self.circuit_table.horizontalHeader().setStretchLastSection(True)
+        self.circuit_table.setAlternatingRowColors(True)
+        self.circuit_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         circuit_layout.addWidget(self.circuit_table)
 
         layout.addWidget(self.details_group)
         layout.addWidget(self.circuit_group)
 
-        # Buttons
+        # Professional button layout
         button_layout = QtWidgets.QHBoxLayout()
         button_layout.addStretch()
 
-        self.select_button = QtWidgets.QPushButton("Select Panel")
+        # Cancel button with secondary styling
+        self.cancel_button = QtWidgets.QPushButton("❌ Cancel")
+        self.cancel_button.clicked.connect(self.reject)
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.cancel_button.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {AutoFireColor.SURFACE_SECONDARY if hasattr(AutoFireColor, 'SURFACE_SECONDARY') else '#f8f9fa'};
+                    color: {AutoFireColor.TEXT_PRIMARY if hasattr(AutoFireColor, 'TEXT_PRIMARY') else '#333'};
+                    border: 2px solid {AutoFireColor.BORDER_PRIMARY if hasattr(AutoFireColor, 'BORDER_PRIMARY') else '#ddd'};
+                    padding: 10px 20px;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    font-size: 13px;
+                    min-width: 100px;
+                }}
+                QPushButton:hover {{
+                    background-color: {AutoFireColor.BUTTON_HOVER if hasattr(AutoFireColor, 'BUTTON_HOVER') else '#e9ecef'};
+                    border-color: {AutoFireColor.ACCENT};
+                }}
+            """)
+        button_layout.addWidget(self.cancel_button)
+
+        # Primary select button
+        self.select_button = QtWidgets.QPushButton("🔥 Select Panel")
         self.select_button.clicked.connect(self._on_select_panel)
         self.select_button.setEnabled(False)
         button_layout.addWidget(self.select_button)
 
-        self.cancel_button = QtWidgets.QPushButton("Cancel")
-        self.cancel_button.clicked.connect(self.reject)
-        button_layout.addWidget(self.cancel_button)
-
         layout.addLayout(button_layout)
 
-        # Populate initial panel list
+        # Populate initial panel list with professional data
         self._filter_panels()
+
+        # Set initial focus for better UX
+        self.manufacturer_combo.setFocus()
 
     def _filter_panels(self):
         """Filter panels by manufacturer."""

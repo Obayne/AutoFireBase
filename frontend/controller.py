@@ -32,22 +32,48 @@ class AutoFireController:
         # Placeholder attribute expected by tests; in the full application
         # this would reference the main model space window instance.
         self.model_space_window = object()
-        # Provide lightweight default preferences and devices for headless
-        # tests that expect controller.prefs and controller.devices_all.
-        # Keep values minimal and safe for test runs.
-        self.prefs = {
+        # Preferences: merge UI/runtime defaults with persisted user prefs.
+        # Keep base values minimal and safe for test runs, then overlay
+        # backend.preferences (JSON) values if available.
+        base_prefs = {
             "px_per_ft": 12.0,
             "snap_label": "grid",
             "snap_step_in": 0.0,
             "grid": 12,
             "snap": True,
         }
+        try:
+            from backend.preferences import load_preferences
+
+            persisted = load_preferences()
+            base_prefs.update(persisted)
+        except Exception:
+            # Non-fatal: continue with base prefs if preferences unavailable
+            pass
+        self.prefs = base_prefs
         self.devices_all: list = []
         # Minimal signal stubs that provide a connect() method used by UI
         # components during initialization. They are intentionally no-ops so
         # tests don't need a full Qt signal object.
         self.model_space_changed = SignalStub()
         self.prefs_changed = SignalStub()
+
+        # Initialize optional professional Window Manager if available.
+        # This enables intelligent positioning, multi-monitor awareness, and
+        # saved workspace layouts. Fallback gracefully if not present.
+        self.window_manager = None
+        try:
+            # Only initialize when a Qt application exists (tests may be headless)
+            from PySide6.QtWidgets import QApplication  # type: ignore
+
+            if QApplication.instance() is not None:
+                from window_management_system import WindowManager  # type: ignore
+
+                self.window_manager = WindowManager()
+                logger.info("WindowManager initialized")
+        except Exception:
+            # Not fatal for tests or minimal runs
+            logger.debug("WindowManager not available; continuing without it")
 
         # Debug helper: when AUTOFIRE_DEBUG_SHOW=1 is set in the environment
         # attempt to create the full ModelSpaceWindow (preferred) so the
@@ -72,6 +98,11 @@ class AutoFireController:
                         except Exception:
                             pass
                         logger.info("Created and showed ModelSpaceWindow for debug run")
+                        try:
+                            # Mark that a GUI window was shown to avoid duplicate creation later
+                            self._gui_shown = True
+                        except Exception:
+                            pass
                     except Exception:
                         logger.exception("Failed to show ModelSpaceWindow; falling back")
                 except Exception:
@@ -92,41 +123,57 @@ class AutoFireController:
                         except Exception:
                             pass
                         logger.info("Created fallback debug QMainWindow")
+                        try:
+                            self._gui_shown = True
+                        except Exception:
+                            pass
                     except Exception:
                         logger.exception("Failed to show fallback debug window")
             except Exception:
                 # Non-fatal: debug helper should never raise during normal test runs
                 logging.getLogger(__name__).exception("Debug UI helper failed")
 
-                # If running as a GUI application (autofire main launcher), create
-                # and show the main ModelSpaceWindow so the app is immediately visible.
-                if os.environ.get("AUTOFIRE_GUI") == "1":
-                    try:
-                        from frontend.windows.model_space import ModelSpaceWindow
+        # If running as a GUI application (autofire main launcher), create
+        # and show the main ModelSpaceWindow so the app is immediately visible.
+        # This runs regardless of AUTOFIRE_DEBUG_SHOW and ensures the window appears in normal runs.
+        try:
+            if os.environ.get("AUTOFIRE_GUI") == "1" and not getattr(self, "_gui_shown", False):
+                from frontend.windows.model_space import ModelSpaceWindow
 
-                        try:
-                            win = ModelSpaceWindow(self)
-                            self.model_space_window = win
-                            try:
-                                win.show()
-                                try:
-                                    getattr(win, "raise_")()
-                                except Exception:
-                                    pass
-                                logging.getLogger(__name__).info(
-                                    "ModelSpaceWindow created and shown for AUTOFIRE_GUI run"
-                                )
-                            except Exception:
-                                logging.getLogger(__name__).exception(
-                                    "Failed to show ModelSpaceWindow in AUTOFIRE_GUI run"
-                                )
-                        except Exception:
-                            logging.getLogger(__name__).exception(
-                                "Failed to create ModelSpaceWindow in AUTOFIRE_GUI run"
-                            )
+                try:
+                    win = ModelSpaceWindow(self)
+                    self.model_space_window = win
+                    try:
+                        # Register with Window Manager (if available) before showing
+                        wm = getattr(self, "window_manager", None)
+                        if wm:
+                            wm.register_window(win, "model_space_main", "model_space")
                     except Exception:
-                        # Import failed or PySide not available - not fatal for tests
+                        logger.debug("Failed to register window with WindowManager")
+                    try:
+                        win.show()
+                        try:
+                            getattr(win, "raise_")()
+                        except Exception:
+                            pass
+                        logging.getLogger(__name__).info(
+                            "ModelSpaceWindow created and shown for AUTOFIRE_GUI run"
+                        )
+                    except Exception:
+                        logging.getLogger(__name__).exception(
+                            "Failed to show ModelSpaceWindow in AUTOFIRE_GUI run"
+                        )
+                    try:
+                        self._gui_shown = True
+                    except Exception:
                         pass
+                except Exception:
+                    logging.getLogger(__name__).exception(
+                        "Failed to create ModelSpaceWindow in AUTOFIRE_GUI run"
+                    )
+        except Exception:
+            # Import failed or PySide not available - not fatal for tests
+            pass
 
         # End timing
         try:

@@ -1,9 +1,13 @@
+import logging
 from typing import cast
 
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 
 DEFAULT_GRID_SIZE = 24  # pixels between minor lines
+
+# Module-level logger for lightweight, optional runtime tracing
+logger = logging.getLogger(__name__)
 
 
 class GridScene(QtWidgets.QGraphicsScene):
@@ -372,6 +376,17 @@ class CanvasView(QtWidgets.QGraphicsView):
 
     def mousePressEvent(self, event):
         """Handle mouse press events for panning and device placement with enhanced feedback."""
+        try:
+            # Trace mouse press intent at INFO level to aid manual testing
+            pos = event.position()
+            logger.info(
+                "mousePressEvent: button=%s pos=(%.1f, %.1f)",
+                getattr(event, "button")() if hasattr(event, "button") else "?",
+                getattr(pos, "x")() if hasattr(pos, "x") else 0.0,
+                getattr(pos, "y")() if hasattr(pos, "y") else 0.0,
+            )
+        except Exception:
+            pass
         if event.button() == Qt.MouseButton.MiddleButton:
             # Middle mouse button for panning
             self.setDragMode(QtWidgets.QGraphicsView.DragMode.ScrollHandDrag)
@@ -389,14 +404,36 @@ class CanvasView(QtWidgets.QGraphicsView):
             if hasattr(self.win, "current_proto") and self.win.current_proto:
                 # Place the device at the click position
                 scene_pos = self.mapToScene(event.position().toPoint())
+                try:
+                    logger.info(
+                        "placement-click at (%.0f, %.0f)", scene_pos.x(), scene_pos.y()
+                    )
+                except Exception:
+                    pass
                 success = self._place_device_at(scene_pos)
 
                 # Provide visual feedback for successful/failed placement
                 if success:
+                    try:
+                        logger.info(
+                            "placement-result: success at (%.0f, %.0f)",
+                            scene_pos.x(),
+                            scene_pos.y(),
+                        )
+                    except Exception:
+                        pass
                     self._show_placement_feedback(scene_pos, success=True)
                     # Keep the prototype selected for continuous placement
                     # User can press ESC to exit placement mode
                 else:
+                    try:
+                        logger.info(
+                            "placement-result: FAILED at (%.0f, %.0f)",
+                            scene_pos.x(),
+                            scene_pos.y(),
+                        )
+                    except Exception:
+                        pass
                     self._show_placement_feedback(scene_pos, success=False)
 
                 event.accept()
@@ -503,6 +540,19 @@ class CanvasView(QtWidgets.QGraphicsView):
         Place the currently selected device prototype at the given
         position with enhanced validation.
         """
+        try:
+            proto_name = None
+            if hasattr(self.win, "current_proto") and self.win.current_proto:
+                dd = self._extract_device_data(self.win.current_proto)
+                proto_name = dd.get("name")
+            logger.info(
+                "_place_device_at: pos=(%.0f, %.0f) proto=%s",
+                scene_pos.x(),
+                scene_pos.y(),
+                proto_name or "<none>",
+            )
+        except Exception:
+            pass
         if not hasattr(self.win, "current_proto") or not self.win.current_proto:
             self._show_status("No device selected for placement")
             return False
@@ -545,11 +595,29 @@ class CanvasView(QtWidgets.QGraphicsView):
             except Exception:
                 # Non-fatal if auto-connect fails
                 pass
+            try:
+                logger.info(
+                    "_place_device_at: SUCCESS name=%s at (%.0f, %.0f)",
+                    device_data.get("name"),
+                    scene_pos.x(),
+                    scene_pos.y(),
+                )
+            except Exception:
+                pass
             self._show_status(
                 f"Placed: {device_data['name']} at ({scene_pos.x():.0f}, {scene_pos.y():.0f})"
             )
             return True
         else:
+            try:
+                logger.info(
+                    "_place_device_at: FAILED name=%s at (%.0f, %.0f)",
+                    device_data.get("name"),
+                    scene_pos.x(),
+                    scene_pos.y(),
+                )
+            except Exception:
+                pass
             self._show_status(f"Failed to place: {device_data['name']}")
             return False
 

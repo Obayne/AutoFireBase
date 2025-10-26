@@ -1,5 +1,5 @@
 """
-Guided Fire Alarm System Builder - Intuitive workflow for any skill level.
+Guided Fire Alarm System Builder - Professional workflow for FlameCAD.
 
 This module provides a step-by-step guided approach to building fire alarm systems:
 1. Building Assessment - Understand requirements
@@ -8,7 +8,8 @@ This module provides a step-by-step guided approach to building fire alarm syste
 4. Wire Specification - Plan circuits and wiring
 5. System Assembly - Review and deploy complete system
 
-The workflow adapts to user skill level and provides intelligent recommendations.
+The workflow adapts to user skill level and provides intelligent recommendations
+with professional NFPA 72 compliance guidance.
 """
 
 import os
@@ -31,6 +32,26 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+# Import our professional design system
+try:
+    from frontend.design_system import AutoFireColor, AutoFireStyleSheet, AutoFireFont
+    DESIGN_SYSTEM_AVAILABLE = True
+except ImportError:
+    # Fallback for development/testing
+    DESIGN_SYSTEM_AVAILABLE = False
+    class AutoFireColor:
+        PRIMARY = "#C41E3A"
+        SECONDARY = "#8B0000"
+        ACCENT = "#FF6B35"
+        
+    class AutoFireStyleSheet:
+        @staticmethod
+        def group_box(): return ""
+        @staticmethod 
+        def button_primary(): return ""
+        @staticmethod
+        def input_field(): return ""
 
 
 @dataclass
@@ -126,149 +147,271 @@ class GuidedSystemBuilderWidget(QWidget):
 
         layout.addWidget(self.tab_widget)
 
-        # Navigation controls
+        # Professional navigation controls
         nav_layout = QHBoxLayout()
+        nav_layout.setContentsMargins(10, 15, 10, 15)
 
         self.back_btn = QPushButton("⬅️ Back")
         self.back_btn.setEnabled(False)
         self.back_btn.clicked.connect(self._go_back)
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.back_btn.setStyleSheet(AutoFireStyleSheet.button_secondary())
 
         nav_layout.addWidget(self.back_btn)
         nav_layout.addStretch()
 
         self.next_btn = QPushButton("Next ➡️")
         self.next_btn.clicked.connect(self._go_next)
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.next_btn.setStyleSheet(AutoFireStyleSheet.button_primary())
 
-        self.complete_btn = QPushButton("🎉 Complete System")
+        self.complete_btn = QPushButton("🔥 Complete System")
         self.complete_btn.setVisible(False)
         self.complete_btn.clicked.connect(self._complete_system)
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.complete_btn.setStyleSheet(AutoFireStyleSheet.button_success())
 
         nav_layout.addWidget(self.next_btn)
         nav_layout.addWidget(self.complete_btn)
 
         layout.addLayout(nav_layout)
 
+        # Apply professional styling to tab widget
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.tab_widget.setStyleSheet(f"""
+                QTabWidget::pane {{
+                    border: 2px solid {AutoFireColor.BORDER_PRIMARY};
+                    border-radius: 8px;
+                    background-color: {AutoFireColor.SURFACE_PRIMARY};
+                    margin-top: 5px;
+                }}
+                QTabWidget::tab-bar {{
+                    alignment: center;
+                }}
+                QTabBar::tab {{
+                    background-color: {AutoFireColor.SURFACE_SECONDARY};
+                    color: {AutoFireColor.TEXT_SECONDARY};
+                    padding: 10px 20px;
+                    margin-right: 2px;
+                    border: 1px solid {AutoFireColor.BORDER_PRIMARY};
+                    border-bottom: none;
+                    border-top-left-radius: 8px;
+                    border-top-right-radius: 8px;
+                    font-weight: 600;
+                }}
+                QTabBar::tab:selected {{
+                    background-color: {AutoFireColor.ACCENT};
+                    color: {AutoFireColor.TEXT_ON_PRIMARY};
+                    border-color: {AutoFireColor.ACCENT};
+                }}
+                QTabBar::tab:hover {{
+                    background-color: {AutoFireColor.BUTTON_HOVER};
+                }}
+            """)
+
     def _create_workflow_header(self):
-        """Create the workflow progress header."""
+        """Create the professional workflow progress header with FlameCAD branding."""
         header = QWidget()
-        header.setStyleSheet(
-            """
-            QWidget {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                    stop:0 #0078d4, stop:1 #005a9f);
-                border-radius: 8px;
-                margin-bottom: 15px;
-            }
-        """
-        )
+        
+        if DESIGN_SYSTEM_AVAILABLE:
+            header.setStyleSheet(f"""
+                QWidget {{
+                    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                        stop:0 {AutoFireColor.PRIMARY}, stop:1 {AutoFireColor.SECONDARY});
+                    border-radius: 12px;
+                    margin-bottom: 20px;
+                    border: 2px solid {AutoFireColor.BORDER_PRIMARY};
+                }}
+            """)
+        else:
+            # Fallback styling
+            header.setStyleSheet("""
+                QWidget {
+                    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                        stop:0 #C41E3A, stop:1 #8B0000);
+                    border-radius: 12px;
+                    margin-bottom: 20px;
+                }
+            """)
 
         layout = QVBoxLayout(header)
 
-        # Title
-        title = QLabel("🚨 Fire Alarm System Builder")
-        title.setStyleSheet(
-            """
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            margin: 10px;
-        """
-        )
+        # Professional title with FlameCAD branding
+        title = QLabel("� FlameCAD System Builder")
+        if DESIGN_SYSTEM_AVAILABLE:
+            title.setStyleSheet(f"""
+                color: {AutoFireColor.TEXT_ON_PRIMARY};
+                font-size: 20px;
+                font-weight: 700;
+                margin: 15px;
+                padding: 5px;
+            """)
+            title.setFont(AutoFireFont.heading())
+        else:
+            title.setStyleSheet("""
+                color: white;
+                font-size: 20px;
+                font-weight: bold;
+                margin: 15px;
+                padding: 5px;
+            """)
         layout.addWidget(title)
 
-        # Progress bar
+        # Professional progress bar
         self.progress_bar = QProgressBar()
         self.progress_bar.setMinimum(0)
         self.progress_bar.setMaximum(5)
         self.progress_bar.setValue(1)
-        self.progress_bar.setStyleSheet(
-            """
-            QProgressBar {
-                border: 2px solid white;
-                border-radius: 5px;
-                background-color: rgba(255,255,255,0.2);
-                margin: 5px 15px;
-                height: 20px;
-            }
-            QProgressBar::chunk {
-                background-color: #28a745;
-                border-radius: 3px;
-            }
-        """
-        )
+        
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.progress_bar.setStyleSheet(f"""
+                QProgressBar {{
+                    border: 2px solid {AutoFireColor.TEXT_ON_PRIMARY};
+                    border-radius: 8px;
+                    background-color: {AutoFireColor.SURFACE_SECONDARY};
+                    margin: 8px 20px;
+                    height: 24px;
+                    text-align: center;
+                    font-weight: 600;
+                }}
+                QProgressBar::chunk {{
+                    background-color: {AutoFireColor.ACCENT};
+                    border-radius: 6px;
+                }}
+            """)
+        else:
+            self.progress_bar.setStyleSheet("""
+                QProgressBar {
+                    border: 2px solid white;
+                    border-radius: 8px;
+                    background-color: rgba(255,255,255,0.2);
+                    margin: 8px 20px;
+                    height: 24px;
+                }
+                QProgressBar::chunk {
+                    background-color: #FF6B35;
+                    border-radius: 6px;
+                }
+            """)
         layout.addWidget(self.progress_bar)
 
-        # Step indicators
+        # Professional step indicators
         steps_layout = QHBoxLayout()
-        steps_layout.setContentsMargins(15, 5, 15, 15)
+        steps_layout.setContentsMargins(20, 8, 20, 15)
 
         self.step_indicators = []
         steps = ["📋 Assess", "🔧 Panel", "🔍 Devices", "🔌 Wiring", "✅ Review"]
 
         for i, step in enumerate(steps):
             indicator = QLabel(step)
-            indicator.setStyleSheet(
-                f"""
-                color: {'white' if i == 0 else 'rgba(255,255,255,0.6)'};
-                font-weight: {'bold' if i == 0 else 'normal'};
-                padding: 5px 10px;
-                border-radius: 15px;
-                background-color: {'rgba(255,255,255,0.2)' if i == 0 else 'transparent'};
-            """
-            )
+            
+            if DESIGN_SYSTEM_AVAILABLE:
+                is_current = i == 0
+                indicator.setStyleSheet(f"""
+                    color: {AutoFireColor.TEXT_ON_PRIMARY if is_current else AutoFireColor.TEXT_MUTED};
+                    font-weight: {'700' if is_current else '500'};
+                    padding: 8px 15px;
+                    border-radius: 20px;
+                    background-color: {AutoFireColor.SURFACE_OVERLAY if is_current else 'transparent'};
+                    border: {'2px solid ' + AutoFireColor.ACCENT if is_current else '1px solid transparent'};
+                """)
+                if is_current:
+                    indicator.setFont(AutoFireFont.bold())
+            else:
+                indicator.setStyleSheet(f"""
+                    color: {'white' if i == 0 else 'rgba(255,255,255,0.7)'};
+                    font-weight: {'bold' if i == 0 else 'normal'};
+                    padding: 8px 15px;
+                    border-radius: 20px;
+                    background-color: {'rgba(255,255,255,0.2)' if i == 0 else 'transparent'};
+                """)
+            
             indicator.setAlignment(Qt.AlignCenter)
             self.step_indicators.append(indicator)
             steps_layout.addWidget(indicator)
 
         layout.addLayout(steps_layout)
 
-        # Current guidance
-        self.guidance_label = QLabel("Let's start by understanding your building requirements...")
-        self.guidance_label.setStyleSheet(
-            """
-            color: white;
-            font-style: italic;
-            margin: 0 15px 10px 15px;
-            padding: 8px;
-            background-color: rgba(255,255,255,0.1);
-            border-radius: 4px;
-        """
-        )
+        # Professional guidance message
+        self.guidance_label = QLabel("Let's start by understanding your building requirements for NFPA 72 compliance...")
+        
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.guidance_label.setStyleSheet(f"""
+                color: {AutoFireColor.TEXT_ON_PRIMARY};
+                font-style: italic;
+                font-weight: 500;
+                margin: 5px 20px 15px 20px;
+                padding: 12px;
+                background-color: {AutoFireColor.SURFACE_OVERLAY};
+                border-radius: 8px;
+                border-left: 4px solid {AutoFireColor.ACCENT};
+            """)
+        else:
+            self.guidance_label.setStyleSheet("""
+                color: white;
+                font-style: italic;
+                margin: 5px 20px 15px 20px;
+                padding: 12px;
+                background-color: rgba(255,255,255,0.15);
+                border-radius: 8px;
+            """)
         layout.addWidget(self.guidance_label)
 
         return header
 
     def _setup_assessment_tab(self):
-        """Setup Step 1: Building Assessment."""
+        """Setup Step 1: Building Assessment with professional styling."""
         widget = QWidget()
         layout = QVBoxLayout(widget)
 
-        # Welcome message
+        # Professional welcome message
         welcome = QLabel(
             """
-        <h3>🏢 Welcome to the Fire Alarm System Builder!</h3>
-        <p>This guided workflow will help you design a complete fire alarm system
-        tailored to your building's specific requirements and code compliance needs.</p>
-        <p><b>Step 1:</b> Let's assess your building to determine the right system components.</p>
+        <h3>🏢 Welcome to FlameCAD System Builder!</h3>
+        <p>This professional workflow guides you through designing compliant fire alarm systems
+        tailored to your building's specific requirements and NFPA 72 code compliance needs.</p>
+        <p><b>Step 1:</b> Let's assess your building to determine the optimal system components.</p>
         """
         )
         welcome.setWordWrap(True)
-        welcome.setStyleSheet(
-            "background-color: #e3f2fd; padding: 15px; border-radius: 6px; margin-bottom: 15px;"
-        )
+        
+        if DESIGN_SYSTEM_AVAILABLE:
+            welcome.setStyleSheet(f"""
+                background-color: {AutoFireColor.SURFACE_PRIMARY};
+                color: {AutoFireColor.TEXT_PRIMARY};
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                border-left: 5px solid {AutoFireColor.ACCENT};
+                font-size: 14px;
+                line-height: 1.5;
+            """)
+        else:
+            welcome.setStyleSheet("""
+                background-color: #f8f9fa;
+                color: #333;
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                border-left: 5px solid #FF6B35;
+            """)
         layout.addWidget(welcome)
 
-        # Building assessment form
-        assessment_group = QGroupBox("Building Information")
+        # Professional building assessment form
+        assessment_group = QGroupBox("Building Information & Requirements")
+        if DESIGN_SYSTEM_AVAILABLE:
+            assessment_group.setStyleSheet(AutoFireStyleSheet.group_box())
         assessment_layout = QFormLayout(assessment_group)
 
-        # Building type with guidance
+        # Building type with professional styling and guidance
         self.building_type = QComboBox()
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.building_type.setStyleSheet(AutoFireStyleSheet.input_field())
         self.building_type.addItems(
             [
                 "Select building type...",
                 "🏢 Office Building (Business occupancy)",
-                "🏭 Industrial/Manufacturing (Industrial occupancy)",
+                "🏭 Industrial/Manufacturing (Industrial occupancy)", 
                 "🏫 School/Educational (Educational occupancy)",
                 "🏥 Healthcare Facility (Healthcare occupancy)",
                 "🏨 Hotel/Hospitality (Residential occupancy)",
@@ -281,38 +424,60 @@ class GuidedSystemBuilderWidget(QWidget):
         self.building_type.currentTextChanged.connect(self._on_assessment_changed)
         assessment_layout.addRow("Building Type:", self.building_type)
 
-        # Building size
+        # Building size with professional guidance
         size_layout = QHBoxLayout()
         self.building_size = QSpinBox()
         self.building_size.setRange(500, 999999)
         self.building_size.setValue(10000)
         self.building_size.setSuffix(" sq ft")
         self.building_size.valueChanged.connect(self._on_assessment_changed)
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.building_size.setStyleSheet(AutoFireStyleSheet.input_field())
 
-        self.size_guidance = QLabel("💡 Affects device count and panel capacity")
-        self.size_guidance.setStyleSheet("color: #6c757d; font-size: 10px; font-style: italic;")
+        self.size_guidance = QLabel("💡 Affects device count and panel capacity requirements")
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.size_guidance.setStyleSheet(f"""
+                color: {AutoFireColor.TEXT_SECONDARY};
+                font-size: 11px;
+                font-style: italic;
+                margin-left: 10px;
+            """)
+        else:
+            self.size_guidance.setStyleSheet("color: #6c757d; font-size: 11px; font-style: italic;")
 
         size_layout.addWidget(self.building_size)
         size_layout.addWidget(self.size_guidance)
         assessment_layout.addRow("Total Floor Area:", size_layout)
 
-        # Number of floors
+        # Number of floors with professional guidance
         floors_layout = QHBoxLayout()
         self.floors = QSpinBox()
         self.floors.setRange(1, 50)
         self.floors.setValue(1)
         self.floors.valueChanged.connect(self._on_assessment_changed)
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.floors.setStyleSheet(AutoFireStyleSheet.input_field())
 
-        self.floors_guidance = QLabel("💡 Multi-story buildings may need additional features")
-        self.floors_guidance.setStyleSheet("color: #6c757d; font-size: 10px; font-style: italic;")
+        self.floors_guidance = QLabel("💡 Multi-story buildings require additional NFPA 72 considerations")
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.floors_guidance.setStyleSheet(f"""
+                color: {AutoFireColor.TEXT_SECONDARY};
+                font-size: 11px;
+                font-style: italic;
+                margin-left: 10px;
+            """)
+        else:
+            self.floors_guidance.setStyleSheet("color: #6c757d; font-size: 11px; font-style: italic;")
 
         floors_layout.addWidget(self.floors)
         floors_layout.addWidget(self.floors_guidance)
         assessment_layout.addRow("Number of Floors:", floors_layout)
 
-        # Occupant load
+        # Occupant load with professional guidance
         occupancy_layout = QHBoxLayout()
         self.occupancy = QComboBox()
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.occupancy.setStyleSheet(AutoFireStyleSheet.input_field())
         self.occupancy.addItems(
             [
                 "Light (1-49 people)",
@@ -323,10 +488,16 @@ class GuidedSystemBuilderWidget(QWidget):
         )
         self.occupancy.currentTextChanged.connect(self._on_assessment_changed)
 
-        self.occupancy_guidance = QLabel("💡 Higher occupancy requires enhanced notification")
-        self.occupancy_guidance.setStyleSheet(
-            "color: #6c757d; font-size: 10px; font-style: italic;"
-        )
+        self.occupancy_guidance = QLabel("💡 Higher occupancy requires enhanced notification per NFPA 72")
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.occupancy_guidance.setStyleSheet(f"""
+                color: {AutoFireColor.TEXT_SECONDARY};
+                font-size: 11px;
+                font-style: italic;
+                margin-left: 10px;
+            """)
+        else:
+            self.occupancy_guidance.setStyleSheet("color: #6c757d; font-size: 11px; font-style: italic;")
 
         occupancy_layout.addWidget(self.occupancy)
         occupancy_layout.addWidget(self.occupancy_guidance)
@@ -334,43 +505,85 @@ class GuidedSystemBuilderWidget(QWidget):
 
         layout.addWidget(assessment_group)
 
-        # Special considerations
-        special_group = QGroupBox("Special Considerations (Optional)")
+        # Professional special considerations section
+        special_group = QGroupBox("Special Considerations & Hazards (Optional)")
+        if DESIGN_SYSTEM_AVAILABLE:
+            special_group.setStyleSheet(AutoFireStyleSheet.group_box())
         special_layout = QVBoxLayout(special_group)
 
-        self.hazards_kitchen = QCheckBox("Commercial kitchen")
-        self.hazards_mechanical = QCheckBox("Large mechanical rooms")
-        self.hazards_storage = QCheckBox("Hazardous material storage")
-        self.hazards_datacenter = QCheckBox("Data center/server room")
+        self.hazards_kitchen = QCheckBox("Commercial kitchen facilities")
+        self.hazards_mechanical = QCheckBox("Large mechanical/equipment rooms")
+        self.hazards_storage = QCheckBox("Hazardous material storage areas")
+        self.hazards_datacenter = QCheckBox("Data center/critical server rooms")
 
-        for checkbox in [
+        hazard_checkboxes = [
             self.hazards_kitchen,
             self.hazards_mechanical,
             self.hazards_storage,
             self.hazards_datacenter,
-        ]:
+        ]
+        
+        for checkbox in hazard_checkboxes:
             checkbox.toggled.connect(self._on_assessment_changed)
+            if DESIGN_SYSTEM_AVAILABLE:
+                checkbox.setStyleSheet(f"""
+                    QCheckBox {{
+                        color: {AutoFireColor.TEXT_PRIMARY};
+                        spacing: 8px;
+                        font-weight: 500;
+                    }}
+                    QCheckBox::indicator {{
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 3px;
+                        border: 2px solid {AutoFireColor.BORDER_PRIMARY};
+                    }}
+                    QCheckBox::indicator:checked {{
+                        background-color: {AutoFireColor.ACCENT};
+                        border-color: {AutoFireColor.ACCENT};
+                    }}
+                """)
             special_layout.addWidget(checkbox)
 
         layout.addWidget(special_group)
 
-        # System recommendations display
+        # Professional system recommendations display
         self.recommendations_display = QTextEdit()
         self.recommendations_display.setMaximumHeight(120)
-        self.recommendations_display.setStyleSheet(
-            """
-            background-color: #f8f9fa;
-            border: 2px solid #28a745;
-            border-radius: 6px;
-            padding: 10px;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        """
-        )
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.recommendations_display.setStyleSheet(f"""
+                background-color: {AutoFireColor.SURFACE_PRIMARY};
+                border: 2px solid {AutoFireColor.ACCENT};
+                border-radius: 8px;
+                padding: 15px;
+                color: {AutoFireColor.TEXT_PRIMARY};
+                font-family: 'Segoe UI', Arial, sans-serif;
+                font-size: 13px;
+                line-height: 1.4;
+            """)
+        else:
+            self.recommendations_display.setStyleSheet("""
+                background-color: #f8f9fa;
+                border: 2px solid #FF6B35;
+                border-radius: 8px;
+                padding: 15px;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            """)
         self.recommendations_display.setPlainText(
             "Complete the building assessment above to see intelligent system recommendations..."
         )
 
-        layout.addWidget(QLabel("💡 Intelligent System Recommendations:"))
+        # Professional recommendations label
+        recommendations_label = QLabel("💡 Intelligent System Recommendations:")
+        if DESIGN_SYSTEM_AVAILABLE:
+            recommendations_label.setStyleSheet(f"""
+                color: {AutoFireColor.TEXT_PRIMARY};
+                font-weight: 600;
+                font-size: 14px;
+                margin-top: 15px;
+                margin-bottom: 5px;
+            """)
+        layout.addWidget(recommendations_label)
         layout.addWidget(self.recommendations_display)
 
         layout.addStretch()

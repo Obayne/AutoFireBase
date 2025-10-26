@@ -201,11 +201,9 @@ class SplashScreen(QDialog):
             }
             QPushButton:hover {
                 background-color: #106ebe;
-                transform: translateY(-1px);
             }
             QPushButton:pressed {
                 background-color: #005a9e;
-                transform: translateY(0px);
             }
         """
         )

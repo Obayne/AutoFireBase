@@ -31,6 +31,44 @@ def setup_qt():
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _qt_session_teardown():
+    """Best-effort cleanup of Qt threads to avoid teardown noise/exits.
+
+    Ensures any background QThreads are asked to stop by emitting aboutToQuit,
+    and waits briefly for thread pools to finish. This helps prevent
+    "QThread: Destroyed while thread '' is still running" at process exit.
+    """
+    yield
+    try:
+        from PySide6 import QtCore, QtWidgets  # type: ignore
+
+        app = QtWidgets.QApplication.instance()
+        if app is not None:
+            try:
+                # Emit the aboutToQuit signal so any connected slots can stop threads
+                app.aboutToQuit.emit()
+            except Exception:
+                pass
+
+        # Give Qt a moment to process any posted events and finish worker threads
+        try:
+            QtCore.QCoreApplication.processEvents()
+        except Exception:
+            pass
+        try:
+            QtCore.QThread.msleep(50)
+        except Exception:
+            pass
+        try:
+            QtCore.QThreadPool.globalInstance().waitForDone(1000)
+        except Exception:
+            pass
+    except Exception:
+        # If PySide6 isn't present or any import fails, just ignore
+        pass
+
+
 # Provide a minimal qtbot fixture only if pytest-qt is unavailable. If
 # pytest-qt is installed it exposes a fully-featured `qtbot` fixture and we
 # must not override it here.

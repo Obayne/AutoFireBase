@@ -1,0 +1,13 @@
+{
+  "p2r": {
+    "cutsheet": "https://example.com/specs/p2r-cutsheet.pdf",
+    "manual": "https://example.com/manuals/p2r-installation.pdf"
+  },
+  "sd-355": {
+    "cutsheet": "https://example.com/specs/sd-355-cutsheet.pdf",
+    "manual": "https://example.com/manuals/sd-355-installation.pdf"
+  },
+  "bg-12lx": {
+    "cutsheet": "https://example.com/specs/bg-12lx-cutsheet.pdf"
+  }
+}

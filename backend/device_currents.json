@@ -1,0 +1,8 @@
+{
+  "p2r": {"alarm_current_a": 0.158},
+  "p2w": {"alarm_current_a": 0.158},
+  "hs": {"alarm_current_a": 0.090},
+  "strobe-75cd": {"alarm_current_a": 0.180, "candela": 75},
+  "sd-355": {"standby_current_a": 0.000085, "alarm_current_a": 0.000085},
+  "bg-12lx": {"standby_current_a": 0.0, "alarm_current_a": 0.0}
+}

@@ -1,15 +1,23 @@
 @echo off
 setlocal
 echo ===============================================
-echo  AutoFire - Open Crash Logs
+echo  Open Crash Logs
 echo ===============================================
 
-set userlog=%USERPROFILE%\AutoFire\logs\last_crash.txt
+set userlog1=%USERPROFILE%\AlarmForge\logs\last_crash.txt
+set userlog2=%USERPROFILE%\AutoFire\logs\last_crash.txt
 set exelog=
 
-if exist ".\dist\AutoFire\logs\last_crash.txt" set exelog=.\dist\AutoFire\logs\last_crash.txt
+if exist ".\dist\AlarmForge\logs\last_crash.txt" set exelog=.\dist\AlarmForge\logs\last_crash.txt
+if "%exelog%"=="" if exist ".\dist\AutoFire\logs\last_crash.txt" set exelog=.\dist\AutoFire\logs\last_crash.txt
 
 if "%exelog%"=="" (
+  for /f "delims=" %%F in ('dir /ad /o:-d /b ".\dist" ^| findstr /r "^AlarmForge_[0-9]"') do (
+    if exist ".\dist\%%F\AlarmForge\logs\last_crash.txt" (
+      set exelog=.\dist\%%F\AlarmForge\logs\last_crash.txt
+      goto :found
+    )
+  )
   for /f "delims=" %%F in ('dir /ad /o:-d /b ".\dist" ^| findstr /r "^AutoFire_[0-9]"') do (
     if exist ".\dist\%%F\AutoFire\logs\last_crash.txt" (
       set exelog=.\dist\%%F\AutoFire\logs\last_crash.txt
@@ -19,11 +27,14 @@ if "%exelog%"=="" (
 )
 
 :found
-if exist "%userlog%" (
-  echo Opening: %userlog%
-  start notepad "%userlog%"
+if exist "%userlog1%" (
+  echo Opening: %userlog1%
+  start notepad "%userlog1%"
+) else if exist "%userlog2%" (
+  echo Opening: %userlog2%
+  start notepad "%userlog2%"
 ) else (
-  echo No user log at %userlog%
+  echo No user log found in user profile.
 )
 
 if not "%exelog%"=="" (

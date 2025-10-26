@@ -1,5 +1,6 @@
 param(
-  [switch]$Force
+  [switch]$Force,
+  [switch]$WithOptional
 )
 
 Write-Host "[dev-setup] Using Python: $(python --version 2>$null)"
@@ -36,6 +37,18 @@ if (Test-Path "requirements-dev.txt") {
   pre-commit install
 } else {
   Write-Warning "requirements-dev.txt not found - skipping dev tools."
+}
+
+# Optional, nice-to-have dependencies (graphics exports)
+if ($WithOptional) {
+  if (Test-Path "requirements-optional.txt") {
+    Write-Host "[dev-setup] Installing optional dependencies for graphics exports (SVG→PNG/PDF)"
+    pip install -r requirements-optional.txt
+  } else {
+    Write-Warning "requirements-optional.txt not found - skipping optional installs."
+  }
+} else {
+  Write-Host "[dev-setup] Optional graphics packages are available. Re-run with -WithOptional to install."
 }
 
 Write-Host "[dev-setup] Done. To activate later: . .venv/Scripts/Activate.ps1"
