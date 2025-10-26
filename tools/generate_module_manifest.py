@@ -42,7 +42,7 @@ def run_modulefinder(entry_files: List[Path]) -> Set[Path]:
     for entry in entry_files:
         try:
             finder.run_script(str(entry))
-        except (ImportError, SyntaxError, OSError, RuntimeError) as exc:
+        except (ImportError, SyntaxError, OSError, RuntimeError, AttributeError) as exc:
             # We intentionally avoid failing hard: static analysis can hit guarded imports
             print(f"[warn] modulefinder raised for {entry.name}: {exc}", file=sys.stderr)
 

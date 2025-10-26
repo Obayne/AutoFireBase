@@ -1,0 +1,17 @@
+{
+  "generated_at": "2025-10-26T03-29-08",
+  "repo_root": "C:\\Dev\\Autofire",
+  "entries": [
+    "autofire_professional_integrated.py"
+  ],
+  "files": [
+    "autofire_professional_integrated.py",
+    "backend/__init__.py",
+    "backend/catalog.py",
+    "frontend/__init__.py",
+    "frontend/design_system.py",
+    "professional_reporting_system.py",
+    "smart_search_system.py",
+    "window_management_system.py"
+  ]
+}
