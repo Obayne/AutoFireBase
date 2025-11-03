@@ -32,10 +32,8 @@ from cad_core.tools.draw import (
 )
 from frontend.assistant import AssistantDock
 
-# System builder for panel-based system design
-from frontend.panels.improved_system_builder import (
-    ImprovedGuidedSystemBuilder as SystemBuilderWidget,
-)
+# System builder for direct professional CAD access
+from frontend.panels.system_builder_guided import SystemBuilderWidget
 
 # Layers panel for advanced layer management
 from frontend.panels.layer_manager import LayerManager
@@ -1003,14 +1001,65 @@ class ModelSpaceWindow(QMainWindow):
         pass
 
     def _setup_system_builder_panel(self):
-        """Setup the system builder panel dock."""
+        """Setup the direct CAD launcher (system builder)."""
         self.system_builder_panel = SystemBuilderWidget(self)
-        self.system_builder_panel.assembled.connect(self._on_system_assembled)
+        self.system_builder_panel.cad_ready.connect(self._on_cad_ready)
 
         # Create dock for system builder
-        system_dock = QtWidgets.QDockWidget("System Builder", self)
+        system_dock = QtWidgets.QDockWidget("🔥 Professional Setup", self)
+        system_dock.setObjectName("SystemBuilderDock")
         system_dock.setWidget(self.system_builder_panel)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, system_dock)
+
+        # Initially show the system builder for first-time setup
+        system_dock.show()
+
+    def _on_cad_ready(self, settings):
+        """Handle CAD workspace ready with AI context."""
+        self.ai_context = settings.get("ai_context", {})
+
+        # Apply AI context to workspace
+        self._apply_ai_context(settings)
+
+        # Hide the system builder and show CAD tools
+        system_dock = self.findChild(QtWidgets.QDockWidget, "SystemBuilderDock")
+        if system_dock:
+            system_dock.hide()
+
+        # Show main CAD panels
+        self._show_device_palette()
+        self._show_wire_spool()
+
+        print(f"🎯 CAD Workspace Ready with AI Context: {len(self.ai_context)} items loaded")
+
+    def _apply_ai_context(self, settings):
+        """Apply AI context to enhance workspace functionality."""
+        ai_context = settings.get("ai_context", {})
+
+        # Apply compliance settings
+        compliance_level = ai_context.get("compliance_level", "Manual")
+        if compliance_level == "Automatic":
+            # Enable automatic compliance checking
+            self.auto_compliance = True
+
+        # Apply manufacturer preferences to device filtering
+        preferred_mfgs = ai_context.get("preferred_manufacturers", [])
+        if hasattr(self, "device_palette_tree") and preferred_mfgs:
+            # This would enhance device filtering with regional preferences
+            pass
+
+        # Apply local code context
+        fire_code = ai_context.get("fire_code", "Standard")
+        nfpa_edition = ai_context.get("nfpa_edition", "NFPA 72-2019")
+
+        # Store context for use by other tools
+        self.fire_code_context = {
+            "fire_code": fire_code,
+            "nfpa_edition": nfpa_edition,
+            "voltage_standards": ai_context.get("voltage_standards", ["24VDC"]),
+            "wire_types": ai_context.get("wire_types", ["FPLR"]),
+            "preferred_manufacturers": preferred_mfgs,
+        }
 
     def _on_system_assembled(self, assembly_data):
         """Handle system assembly - populate Device Palette and Wire Spool per spec."""

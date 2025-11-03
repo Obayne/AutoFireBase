@@ -1,31 +1,30 @@
 """
-Enhanced System Builder - Intuitive Guided Workflow
+System Builder - Direct CAD Launch
 
-This wrapper provides the new guided system builder as the main SystemBuilderWidget,
-maintaining compatibility while providing a much more intuitive user experience.
+Professional approach: Go directly to CAD with AI initialization period.
+AI learns about user's region, local codes, and project context in the background.
 """
 
-# Import the guided system builder
-from .guided_system_builder import GuidedSystemBuilderWidget
+# Import the direct CAD launcher
+from frontend.panels.direct_cad_launcher import DirectCADLauncher
 
 
 # Create alias for backward compatibility
-class SystemBuilderWidget(GuidedSystemBuilderWidget):
+class SystemBuilderWidget(DirectCADLauncher):
     """
-    Enhanced System Builder with guided workflow.
+    Direct CAD Launcher.
 
-    Provides intuitive step-by-step guidance for building fire alarm systems:
-    1. Building Assessment - Understanding requirements
-    2. Panel Selection - Choosing the right control panel
-    3. Device Planning - Selecting detection and notification devices
-    4. Wire Planning - Specifying circuits and wiring
-    5. System Review - Final review and deployment
+    Professional workflow:
+    1. Launch immediately - no menus or wizards
+    2. AI initialization period (3-4 seconds)
+    3. AI learns: location, codes, manufacturers, compliance
+    4. Launch CAD workspace with full context
 
-    Works for any skill level - from beginners to experts.
+    No hand-holding - just intelligent background assistance.
     """
 
     pass
 
 
-# Also export the guided version directly
-__all__ = ["SystemBuilderWidget", "GuidedSystemBuilderWidget"]
+# Also export directly
+__all__ = ["SystemBuilderWidget", "DirectCADLauncher"]

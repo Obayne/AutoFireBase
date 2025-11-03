@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QProgressBar,
     QPushButton,
     QSpinBox,
@@ -36,22 +37,29 @@ from PySide6.QtWidgets import (
 # Import our professional design system
 try:
     from frontend.design_system import AutoFireColor, AutoFireStyleSheet, AutoFireFont
+
     DESIGN_SYSTEM_AVAILABLE = True
 except ImportError:
     # Fallback for development/testing
     DESIGN_SYSTEM_AVAILABLE = False
+
     class AutoFireColor:
         PRIMARY = "#C41E3A"
         SECONDARY = "#8B0000"
         ACCENT = "#FF6B35"
-        
+
     class AutoFireStyleSheet:
         @staticmethod
-        def group_box(): return ""
-        @staticmethod 
-        def button_primary(): return ""
+        def group_box():
+            return ""
+
         @staticmethod
-        def input_field(): return ""
+        def button_primary():
+            return ""
+
+        @staticmethod
+        def input_field():
+            return ""
 
 
 @dataclass
@@ -129,6 +137,10 @@ class GuidedSystemBuilderWidget(QWidget):
         """Setup the guided workflow UI."""
         layout = QVBoxLayout(self)
 
+        # Professional mode toggle
+        self.mode_header = self._create_mode_selector()
+        layout.addWidget(self.mode_header)
+
         # Workflow header with progress
         self.workflow_header = self._create_workflow_header()
         layout.addWidget(self.workflow_header)
@@ -178,7 +190,8 @@ class GuidedSystemBuilderWidget(QWidget):
 
         # Apply professional styling to tab widget
         if DESIGN_SYSTEM_AVAILABLE:
-            self.tab_widget.setStyleSheet(f"""
+            self.tab_widget.setStyleSheet(
+                f"""
                 QTabWidget::pane {{
                     border: 2px solid {AutoFireColor.BORDER_PRIMARY};
                     border-radius: 8px;
@@ -207,14 +220,16 @@ class GuidedSystemBuilderWidget(QWidget):
                 QTabBar::tab:hover {{
                     background-color: {AutoFireColor.BUTTON_HOVER};
                 }}
-            """)
+            """
+            )
 
     def _create_workflow_header(self):
         """Create the professional workflow progress header with FlameCAD branding."""
         header = QWidget()
-        
+
         if DESIGN_SYSTEM_AVAILABLE:
-            header.setStyleSheet(f"""
+            header.setStyleSheet(
+                f"""
                 QWidget {{
                     background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
                         stop:0 {AutoFireColor.PRIMARY}, stop:1 {AutoFireColor.SECONDARY});
@@ -222,39 +237,46 @@ class GuidedSystemBuilderWidget(QWidget):
                     margin-bottom: 20px;
                     border: 2px solid {AutoFireColor.BORDER_PRIMARY};
                 }}
-            """)
+            """
+            )
         else:
             # Fallback styling
-            header.setStyleSheet("""
+            header.setStyleSheet(
+                """
                 QWidget {
                     background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
                         stop:0 #C41E3A, stop:1 #8B0000);
                     border-radius: 12px;
                     margin-bottom: 20px;
                 }
-            """)
+            """
+            )
 
         layout = QVBoxLayout(header)
 
         # Professional title with FlameCAD branding
         title = QLabel("� FlameCAD System Builder")
         if DESIGN_SYSTEM_AVAILABLE:
-            title.setStyleSheet(f"""
+            title.setStyleSheet(
+                f"""
                 color: {AutoFireColor.TEXT_ON_PRIMARY};
                 font-size: 20px;
                 font-weight: 700;
                 margin: 15px;
                 padding: 5px;
-            """)
+            """
+            )
             title.setFont(AutoFireFont.heading())
         else:
-            title.setStyleSheet("""
+            title.setStyleSheet(
+                """
                 color: white;
                 font-size: 20px;
                 font-weight: bold;
                 margin: 15px;
                 padding: 5px;
-            """)
+            """
+            )
         layout.addWidget(title)
 
         # Professional progress bar
@@ -262,9 +284,10 @@ class GuidedSystemBuilderWidget(QWidget):
         self.progress_bar.setMinimum(0)
         self.progress_bar.setMaximum(5)
         self.progress_bar.setValue(1)
-        
+
         if DESIGN_SYSTEM_AVAILABLE:
-            self.progress_bar.setStyleSheet(f"""
+            self.progress_bar.setStyleSheet(
+                f"""
                 QProgressBar {{
                     border: 2px solid {AutoFireColor.TEXT_ON_PRIMARY};
                     border-radius: 8px;
@@ -278,9 +301,11 @@ class GuidedSystemBuilderWidget(QWidget):
                     background-color: {AutoFireColor.ACCENT};
                     border-radius: 6px;
                 }}
-            """)
+            """
+            )
         else:
-            self.progress_bar.setStyleSheet("""
+            self.progress_bar.setStyleSheet(
+                """
                 QProgressBar {
                     border: 2px solid white;
                     border-radius: 8px;
@@ -292,7 +317,8 @@ class GuidedSystemBuilderWidget(QWidget):
                     background-color: #FF6B35;
                     border-radius: 6px;
                 }
-            """)
+            """
+            )
         layout.addWidget(self.progress_bar)
 
         # Professional step indicators
@@ -304,28 +330,32 @@ class GuidedSystemBuilderWidget(QWidget):
 
         for i, step in enumerate(steps):
             indicator = QLabel(step)
-            
+
             if DESIGN_SYSTEM_AVAILABLE:
                 is_current = i == 0
-                indicator.setStyleSheet(f"""
+                indicator.setStyleSheet(
+                    f"""
                     color: {AutoFireColor.TEXT_ON_PRIMARY if is_current else AutoFireColor.TEXT_MUTED};
                     font-weight: {'700' if is_current else '500'};
                     padding: 8px 15px;
                     border-radius: 20px;
                     background-color: {AutoFireColor.SURFACE_OVERLAY if is_current else 'transparent'};
                     border: {'2px solid ' + AutoFireColor.ACCENT if is_current else '1px solid transparent'};
-                """)
+                """
+                )
                 if is_current:
                     indicator.setFont(AutoFireFont.bold())
             else:
-                indicator.setStyleSheet(f"""
+                indicator.setStyleSheet(
+                    f"""
                     color: {'white' if i == 0 else 'rgba(255,255,255,0.7)'};
                     font-weight: {'bold' if i == 0 else 'normal'};
                     padding: 8px 15px;
                     border-radius: 20px;
                     background-color: {'rgba(255,255,255,0.2)' if i == 0 else 'transparent'};
-                """)
-            
+                """
+                )
+
             indicator.setAlignment(Qt.AlignCenter)
             self.step_indicators.append(indicator)
             steps_layout.addWidget(indicator)
@@ -333,10 +363,13 @@ class GuidedSystemBuilderWidget(QWidget):
         layout.addLayout(steps_layout)
 
         # Professional guidance message
-        self.guidance_label = QLabel("Let's start by understanding your building requirements for NFPA 72 compliance...")
-        
+        self.guidance_label = QLabel(
+            "Let's start by understanding your building requirements for NFPA 72 compliance..."
+        )
+
         if DESIGN_SYSTEM_AVAILABLE:
-            self.guidance_label.setStyleSheet(f"""
+            self.guidance_label.setStyleSheet(
+                f"""
                 color: {AutoFireColor.TEXT_ON_PRIMARY};
                 font-style: italic;
                 font-weight: 500;
@@ -345,19 +378,330 @@ class GuidedSystemBuilderWidget(QWidget):
                 background-color: {AutoFireColor.SURFACE_OVERLAY};
                 border-radius: 8px;
                 border-left: 4px solid {AutoFireColor.ACCENT};
-            """)
+            """
+            )
         else:
-            self.guidance_label.setStyleSheet("""
+            self.guidance_label.setStyleSheet(
+                """
                 color: white;
                 font-style: italic;
                 margin: 5px 20px 15px 20px;
                 padding: 12px;
                 background-color: rgba(255,255,255,0.15);
                 border-radius: 8px;
-            """)
+            """
+            )
         layout.addWidget(self.guidance_label)
 
         return header
+
+    def _create_mode_selector(self):
+        """Create professional/guided mode selector."""
+        mode_widget = QWidget()
+
+        if DESIGN_SYSTEM_AVAILABLE:
+            mode_widget.setStyleSheet(
+                f"""
+                QWidget {{
+                    background-color: {AutoFireColor.SURFACE_PRIMARY};
+                    border: 1px solid {AutoFireColor.BORDER_PRIMARY};
+                    border-radius: 8px;
+                    margin-bottom: 10px;
+                    padding: 10px;
+                }}
+            """
+            )
+        else:
+            mode_widget.setStyleSheet(
+                """
+                QWidget {
+                    background-color: #2d3142;
+                    border: 1px solid #4f5f76;
+                    border-radius: 8px;
+                    margin-bottom: 10px;
+                    padding: 10px;
+                }
+            """
+            )
+
+        layout = QHBoxLayout(mode_widget)
+
+        # Mode selection
+        mode_label = QLabel("🎯 Workflow Mode:")
+        if DESIGN_SYSTEM_AVAILABLE:
+            mode_label.setStyleSheet(f"color: {AutoFireColor.TEXT_PRIMARY}; font-weight: 600;")
+        else:
+            mode_label.setStyleSheet("color: white; font-weight: bold;")
+
+        self.mode_selector = QComboBox()
+        self.mode_selector.addItems(
+            [
+                "📚 Guided Mode - Step-by-step with education",
+                "🚀 Quick Setup - Express mode for professionals",
+            ]
+        )
+        self.mode_selector.currentTextChanged.connect(self._on_mode_changed)
+
+        if DESIGN_SYSTEM_AVAILABLE:
+            self.mode_selector.setStyleSheet(AutoFireStyleSheet.input_field())
+        else:
+            self.mode_selector.setStyleSheet(
+                """
+                QComboBox {
+                    background-color: #3c4360;
+                    color: white;
+                    border: 1px solid #5c6b85;
+                    border-radius: 4px;
+                    padding: 5px 10px;
+                    min-width: 300px;
+                }
+                QComboBox::drop-down {
+                    border: none;
+                }
+                QComboBox::down-arrow {
+                    color: white;
+                }
+            """
+            )
+
+        # Professional tip
+        tip_label = QLabel(
+            "💡 Experts: Quick Setup creates projects faster while keeping compliance guidance"
+        )
+        if DESIGN_SYSTEM_AVAILABLE:
+            tip_label.setStyleSheet(f"color: {AutoFireColor.TEXT_SECONDARY}; font-style: italic;")
+        else:
+            tip_label.setStyleSheet("color: #a0a8b8; font-style: italic;")
+
+        layout.addWidget(mode_label)
+        layout.addWidget(self.mode_selector)
+        layout.addStretch()
+        layout.addWidget(tip_label)
+
+        # Initialize mode state
+        self.is_quick_mode = False
+
+        return mode_widget
+
+    def _on_mode_changed(self, mode_text):
+        """Handle mode selection change."""
+        self.is_quick_mode = "Quick Setup" in mode_text
+        self._update_workflow_for_mode()
+
+    def _update_workflow_for_mode(self):
+        """Update the workflow based on selected mode."""
+        if self.is_quick_mode:
+            # Quick mode: Show condensed view with templates
+            self._setup_quick_mode()
+        else:
+            # Guided mode: Show full educational workflow
+            self._setup_guided_mode()
+
+    def _setup_quick_mode(self):
+        """Setup quick professional mode."""
+        # Hide educational content, show templates and presets
+        self.progress_bar.setVisible(False)
+
+        # Clear existing tabs
+        while self.tab_widget.count() > 0:
+            self.tab_widget.removeTab(0)
+
+        # Add quick setup tab
+        self._setup_quick_setup_tab()
+
+        # Update navigation
+        self.next_btn.setText("Create Project 🚀")
+        self.back_btn.setVisible(False)
+
+        self._update_guidance("🚀 Quick Setup: Select project template and manufacturer presets")
+
+    def _setup_guided_mode(self):
+        """Setup guided educational mode."""
+        # Show full educational workflow
+        self.progress_bar.setVisible(True)
+
+        # Clear existing tabs
+        while self.tab_widget.count() > 0:
+            self.tab_widget.removeTab(0)
+
+        # Restore full workflow tabs
+        self._setup_assessment_tab()  # Step 1
+        self._setup_panel_selection_tab()  # Step 2
+        self._setup_device_planning_tab()  # Step 3
+        self._setup_wire_planning_tab()  # Step 4
+        self._setup_system_review_tab()  # Step 5
+
+        # Restore normal navigation
+        self.next_btn.setText("Next ➡️")
+        self.back_btn.setVisible(True)
+
+        self._update_guidance(
+            "📚 Guided Mode: Step-by-step workflow with NFPA 72 compliance education"
+        )
+
+    def _setup_quick_setup_tab(self):
+        """Setup quick professional setup tab."""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+
+        # Professional header
+        header = QLabel(
+            """
+            <h2>🚀 Professional Quick Setup</h2>
+            <p>Rapid project creation for experienced fire alarm designers.<br/>
+            <b>Includes:</b> Project templates, manufacturer presets, compliance shortcuts</p>
+        """
+        )
+        header.setWordWrap(True)
+        header.setStyleSheet(
+            """
+            background-color: #1a237e;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        """
+        )
+        layout.addWidget(header)
+
+        # Project templates section
+        templates_group = QGroupBox("🏗️ Project Templates")
+        templates_layout = QVBoxLayout(templates_group)
+
+        self.template_selector = QComboBox()
+        self.template_selector.addItems(
+            [
+                "🏢 Commercial Office Building (Business occupancy)",
+                "🏭 Industrial Facility (Industrial occupancy)",
+                "🏫 Educational Building (Educational occupancy)",
+                "🏥 Healthcare Facility (Healthcare occupancy)",
+                "🏨 Hotel/Lodging (Residential occupancy)",
+                "🏪 Retail Store (Mercantile occupancy)",
+                "🏛️ Assembly Building (Assembly occupancy)",
+                "🏠 Residential Complex (Residential occupancy)",
+                "📋 Custom Project (Manual configuration)",
+            ]
+        )
+        self.template_selector.currentTextChanged.connect(self._on_template_changed)
+
+        templates_layout.addWidget(QLabel("Select project type for automated recommendations:"))
+        templates_layout.addWidget(self.template_selector)
+        layout.addWidget(templates_group)
+
+        # Manufacturer presets section
+        mfg_group = QGroupBox("🏭 Manufacturer Presets")
+        mfg_layout = QVBoxLayout(mfg_group)
+
+        self.manufacturer_selector = QComboBox()
+        # Populate from database
+        manufacturers = self._get_manufacturers_from_database()
+        self.manufacturer_selector.addItems(["Auto-detect from catalog"] + manufacturers)
+
+        mfg_layout.addWidget(QLabel("Primary manufacturer for this project:"))
+        mfg_layout.addWidget(self.manufacturer_selector)
+        layout.addWidget(mfg_group)
+
+        # Quick configuration section
+        config_group = QGroupBox("⚡ Quick Configuration")
+        config_layout = QFormLayout(config_group)
+
+        self.project_name = QLineEdit()
+        self.project_name.setPlaceholderText("Enter project name...")
+
+        self.building_size = QSpinBox()
+        self.building_size.setRange(1000, 1000000)
+        self.building_size.setValue(50000)
+        self.building_size.setSuffix(" sq ft")
+
+        self.floors = QSpinBox()
+        self.floors.setRange(1, 50)
+        self.floors.setValue(3)
+
+        config_layout.addRow("Project Name:", self.project_name)
+        config_layout.addRow("Building Size:", self.building_size)
+        config_layout.addRow("Number of Floors:", self.floors)
+        layout.addWidget(config_group)
+
+        # Preview section
+        self.preview_area = QTextEdit()
+        self.preview_area.setMaximumHeight(150)
+        self.preview_area.setReadOnly(True)
+        self.preview_area.setStyleSheet(
+            """
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+        """
+        )
+        layout.addWidget(QLabel("📋 Project Preview:"))
+        layout.addWidget(self.preview_area)
+
+        layout.addStretch()
+        self.tab_widget.addTab(widget, "Quick Setup")
+
+        # Initialize preview
+        self._update_quick_preview()
+
+    def _on_template_changed(self):
+        """Handle template selection change."""
+        self._update_quick_preview()
+
+    def _update_quick_preview(self):
+        """Update the quick setup preview."""
+        template = self.template_selector.currentText()
+        mfg = self.manufacturer_selector.currentText()
+
+        preview_text = f"""
+<b>Selected Configuration:</b><br/>
+• Template: {template}<br/>
+• Manufacturer: {mfg}<br/>
+• Estimated devices: {self._estimate_device_count()}<br/>
+• Compliance: NFPA 72-2019 automatic validation<br/>
+• Setup time: ~2 minutes vs 15+ minutes guided mode<br/>
+<br/>
+<i>Click 'Create Project' to generate workspace with professional templates.</i>
+        """
+        self.preview_area.setHtml(preview_text)
+
+    def _estimate_device_count(self):
+        """Estimate device count based on building size and type."""
+        size = self.building_size.value()
+
+        # Basic estimation (real FireCAD would have detailed algorithms)
+        if "Office" in self.template_selector.currentText():
+            devices_per_sqft = 0.02  # 1 device per 50 sq ft
+        elif "Industrial" in self.template_selector.currentText():
+            devices_per_sqft = 0.015  # Industrial has fewer devices
+        else:
+            devices_per_sqft = 0.025  # Default
+
+        estimated = int(size * devices_per_sqft)
+        return f"{estimated}-{int(estimated * 1.3)} devices"
+
+    def _get_manufacturers_from_database(self):
+        """Get manufacturers from the device database."""
+        try:
+            db_path = os.path.join(os.path.dirname(__file__), "..", "..", "autofire.db")
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+
+            cursor.execute(
+                """
+                SELECT DISTINCT m.name
+                FROM manufacturers m
+                INNER JOIN devices d ON d.manufacturer_id = m.id
+                WHERE m.name IS NOT NULL AND m.name != ''
+                ORDER BY m.name
+            """
+            )
+
+            manufacturers = [row[0] for row in cursor.fetchall()]
+            conn.close()
+            return manufacturers[:20]  # Limit to top 20
+        except Exception as e:
+            print(f"Error loading manufacturers: {e}")
+            return ["Notifier", "Honeywell", "Simplex", "Edwards", "System Sensor"]
 
     def _setup_assessment_tab(self):
         """Setup Step 1: Building Assessment with professional styling."""
@@ -374,9 +718,10 @@ class GuidedSystemBuilderWidget(QWidget):
         """
         )
         welcome.setWordWrap(True)
-        
+
         if DESIGN_SYSTEM_AVAILABLE:
-            welcome.setStyleSheet(f"""
+            welcome.setStyleSheet(
+                f"""
                 background-color: {AutoFireColor.SURFACE_PRIMARY};
                 color: {AutoFireColor.TEXT_PRIMARY};
                 padding: 20px;
@@ -385,16 +730,19 @@ class GuidedSystemBuilderWidget(QWidget):
                 border-left: 5px solid {AutoFireColor.ACCENT};
                 font-size: 14px;
                 line-height: 1.5;
-            """)
+            """
+            )
         else:
-            welcome.setStyleSheet("""
+            welcome.setStyleSheet(
+                """
                 background-color: #f8f9fa;
                 color: #333;
                 padding: 20px;
                 border-radius: 10px;
                 margin-bottom: 20px;
                 border-left: 5px solid #FF6B35;
-            """)
+            """
+            )
         layout.addWidget(welcome)
 
         # Professional building assessment form
@@ -411,7 +759,7 @@ class GuidedSystemBuilderWidget(QWidget):
             [
                 "Select building type...",
                 "🏢 Office Building (Business occupancy)",
-                "🏭 Industrial/Manufacturing (Industrial occupancy)", 
+                "🏭 Industrial/Manufacturing (Industrial occupancy)",
                 "🏫 School/Educational (Educational occupancy)",
                 "🏥 Healthcare Facility (Healthcare occupancy)",
                 "🏨 Hotel/Hospitality (Residential occupancy)",
@@ -436,12 +784,14 @@ class GuidedSystemBuilderWidget(QWidget):
 
         self.size_guidance = QLabel("💡 Affects device count and panel capacity requirements")
         if DESIGN_SYSTEM_AVAILABLE:
-            self.size_guidance.setStyleSheet(f"""
+            self.size_guidance.setStyleSheet(
+                f"""
                 color: {AutoFireColor.TEXT_SECONDARY};
                 font-size: 11px;
                 font-style: italic;
                 margin-left: 10px;
-            """)
+            """
+            )
         else:
             self.size_guidance.setStyleSheet("color: #6c757d; font-size: 11px; font-style: italic;")
 
@@ -458,16 +808,22 @@ class GuidedSystemBuilderWidget(QWidget):
         if DESIGN_SYSTEM_AVAILABLE:
             self.floors.setStyleSheet(AutoFireStyleSheet.input_field())
 
-        self.floors_guidance = QLabel("💡 Multi-story buildings require additional NFPA 72 considerations")
+        self.floors_guidance = QLabel(
+            "💡 Multi-story buildings require additional NFPA 72 considerations"
+        )
         if DESIGN_SYSTEM_AVAILABLE:
-            self.floors_guidance.setStyleSheet(f"""
+            self.floors_guidance.setStyleSheet(
+                f"""
                 color: {AutoFireColor.TEXT_SECONDARY};
                 font-size: 11px;
                 font-style: italic;
                 margin-left: 10px;
-            """)
+            """
+            )
         else:
-            self.floors_guidance.setStyleSheet("color: #6c757d; font-size: 11px; font-style: italic;")
+            self.floors_guidance.setStyleSheet(
+                "color: #6c757d; font-size: 11px; font-style: italic;"
+            )
 
         floors_layout.addWidget(self.floors)
         floors_layout.addWidget(self.floors_guidance)
@@ -488,16 +844,22 @@ class GuidedSystemBuilderWidget(QWidget):
         )
         self.occupancy.currentTextChanged.connect(self._on_assessment_changed)
 
-        self.occupancy_guidance = QLabel("💡 Higher occupancy requires enhanced notification per NFPA 72")
+        self.occupancy_guidance = QLabel(
+            "💡 Higher occupancy requires enhanced notification per NFPA 72"
+        )
         if DESIGN_SYSTEM_AVAILABLE:
-            self.occupancy_guidance.setStyleSheet(f"""
+            self.occupancy_guidance.setStyleSheet(
+                f"""
                 color: {AutoFireColor.TEXT_SECONDARY};
                 font-size: 11px;
                 font-style: italic;
                 margin-left: 10px;
-            """)
+            """
+            )
         else:
-            self.occupancy_guidance.setStyleSheet("color: #6c757d; font-size: 11px; font-style: italic;")
+            self.occupancy_guidance.setStyleSheet(
+                "color: #6c757d; font-size: 11px; font-style: italic;"
+            )
 
         occupancy_layout.addWidget(self.occupancy)
         occupancy_layout.addWidget(self.occupancy_guidance)
@@ -522,11 +884,12 @@ class GuidedSystemBuilderWidget(QWidget):
             self.hazards_storage,
             self.hazards_datacenter,
         ]
-        
+
         for checkbox in hazard_checkboxes:
             checkbox.toggled.connect(self._on_assessment_changed)
             if DESIGN_SYSTEM_AVAILABLE:
-                checkbox.setStyleSheet(f"""
+                checkbox.setStyleSheet(
+                    f"""
                     QCheckBox {{
                         color: {AutoFireColor.TEXT_PRIMARY};
                         spacing: 8px;
@@ -542,7 +905,8 @@ class GuidedSystemBuilderWidget(QWidget):
                         background-color: {AutoFireColor.ACCENT};
                         border-color: {AutoFireColor.ACCENT};
                     }}
-                """)
+                """
+                )
             special_layout.addWidget(checkbox)
 
         layout.addWidget(special_group)
@@ -551,7 +915,8 @@ class GuidedSystemBuilderWidget(QWidget):
         self.recommendations_display = QTextEdit()
         self.recommendations_display.setMaximumHeight(120)
         if DESIGN_SYSTEM_AVAILABLE:
-            self.recommendations_display.setStyleSheet(f"""
+            self.recommendations_display.setStyleSheet(
+                f"""
                 background-color: {AutoFireColor.SURFACE_PRIMARY};
                 border: 2px solid {AutoFireColor.ACCENT};
                 border-radius: 8px;
@@ -560,15 +925,18 @@ class GuidedSystemBuilderWidget(QWidget):
                 font-family: 'Segoe UI', Arial, sans-serif;
                 font-size: 13px;
                 line-height: 1.4;
-            """)
+            """
+            )
         else:
-            self.recommendations_display.setStyleSheet("""
+            self.recommendations_display.setStyleSheet(
+                """
                 background-color: #f8f9fa;
                 border: 2px solid #FF6B35;
                 border-radius: 8px;
                 padding: 15px;
                 font-family: 'Segoe UI', Arial, sans-serif;
-            """)
+            """
+            )
         self.recommendations_display.setPlainText(
             "Complete the building assessment above to see intelligent system recommendations..."
         )
@@ -576,13 +944,15 @@ class GuidedSystemBuilderWidget(QWidget):
         # Professional recommendations label
         recommendations_label = QLabel("💡 Intelligent System Recommendations:")
         if DESIGN_SYSTEM_AVAILABLE:
-            recommendations_label.setStyleSheet(f"""
+            recommendations_label.setStyleSheet(
+                f"""
                 color: {AutoFireColor.TEXT_PRIMARY};
                 font-weight: 600;
                 font-size: 14px;
                 margin-top: 15px;
                 margin-bottom: 5px;
-            """)
+            """
+            )
         layout.addWidget(recommendations_label)
         layout.addWidget(self.recommendations_display)
 
