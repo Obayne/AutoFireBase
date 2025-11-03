@@ -837,6 +837,18 @@ def run_with_splash():
     return app.exec()
 
 
+def run_without_splash():
+    """Run AutoFire without the splash screen (fast path)."""
+    app = QApplication(sys.argv)
+    app.setApplicationName("AutoFire Professional")
+    app.setApplicationVersion("1.0")
+    app.setOrganizationName("AutoFire Systems")
+
+    window = IntegratedAutoFire()
+    window.show()
+    return app.exec()
+
+
 def main():
     """Main entry point for integrated AutoFire."""
     try:
@@ -849,7 +861,22 @@ def main():
         )
         print("")
 
-        # Run with splash screen
+        # Headless or no-splash controls via environment variables
+        headless = os.environ.get("AUTOFIRE_HEADLESS") == "1" or os.environ.get(
+            "QT_QPA_PLATFORM", ""
+        ).lower() in {"offscreen", "minimal"}
+        no_splash = os.environ.get("AUTOFIRE_NO_SPLASH") == "1"
+
+        if headless:
+            # Do not start a QApplication in headless mode; just report status and exit
+            print("🧪 Headless quick-start: skipping Qt initialization and splash")
+            print(f"Loaded systems: {sum(SYSTEMS_LOADED.values())}/{len(SYSTEMS_LOADED)}")
+            return 0
+
+        if no_splash:
+            return run_without_splash()
+
+        # Default behavior: run with splash
         return run_with_splash()
 
     except Exception as e:

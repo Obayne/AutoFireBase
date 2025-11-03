@@ -1,0 +1,39 @@
+{
+  "panels": [
+    {
+      "id": "FACP-1",
+      "name": "Main FACP"
+    },
+    {
+      "id": "PSN-1",
+      "name": "NAC Panel"
+    }
+  ],
+  "circuits": [
+    {
+      "id": "NAC1",
+      "panel_id": "FACP-1",
+      "type": "NAC"
+    }
+  ],
+  "connections": [
+    {
+      "method": "reverse_polarity",
+      "label": "FACP-1:NAC1 \u2192 panel:PSN-1 (reverse_polarity)",
+      "source_panel": "FACP-1",
+      "source_circuit": "NAC1",
+      "target_kind": "panel",
+      "target_id": "PSN-1",
+      "vendor_bus": null,
+      "valid_panel": true,
+      "valid_circuit": true
+    }
+  ],
+  "stats": {
+    "counts": {
+      "panels": 2,
+      "circuits": 1,
+      "connections": 1
+    }
+  }
+}

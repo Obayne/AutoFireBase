@@ -10,17 +10,15 @@ that professionals expect from premium CAD software.
 
 from dataclasses import dataclass
 from enum import Enum
-from importlib.util import find_spec
-from typing import TYPE_CHECKING
 
-# Only detect availability; avoid importing Qt types to keep this module lightweight
-PYSIDE6_AVAILABLE = find_spec("PySide6") is not None
+try:
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QColor, QFont, QIcon, QPalette, QPixmap
+    from PySide6.QtWidgets import QApplication, QStyle
 
-if TYPE_CHECKING:
-    # For type hints only; avoids runtime import cost
-    from PySide6.QtWidgets import QApplication  # pragma: no cover
-
-# No runtime Qt imports here; functions import lazily as needed.
+    PYSIDE6_AVAILABLE = True
+except ImportError:
+    PYSIDE6_AVAILABLE = False
 
 
 class AutoFireColor(Enum):
@@ -585,17 +583,9 @@ def create_professional_font(
     """Create a professional font with AutoFire standards."""
     if not PYSIDE6_AVAILABLE:
         return None
-    # Import within function to keep module import-light and typing happy
-    try:
-        from PySide6.QtGui import QFont as _QFont  # type: ignore
-    except Exception:
-        return None
 
-    font = _QFont(AutoFireTypography.PRIMARY_FONT, size)
-    try:
-        font.setWeight(_QFont.Weight(weight))  # PySide6>=6.6 style
-    except Exception:
-        pass
+    font = QFont(AutoFireTypography.PRIMARY_FONT, size)
+    font.setWeight(QFont.Weight(weight))
     return font
 
 

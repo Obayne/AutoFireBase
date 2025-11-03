@@ -174,6 +174,15 @@ pytest tests/test_units.py -v
 
 See [CI_TESTING.md](CI_TESTING.md) for detailed CI/CD testing guide.
 
+### Try it: Riser export (demo)
+
+```powershell
+# Export a simple riser JSON with a demo project
+python -m backend.riser_cli --out artifacts/riser_demo.json --demo
+
+# View the output path printed in the terminal and open the JSON file
+```
+
 ## 🛠️ Development Workflow
 
 ### Daily Development
@@ -317,6 +326,9 @@ pytest --cov=frontend --cov=cad_core --cov=backend
 - `docs/ARCHITECTURE.md`: Detailed architecture documentation
 - `docs/CONTRIBUTING.md`: Contribution guidelines
 - `CHANGELOG.md`: Version history and changes
+- Competitive research and parity:
+  - `docs/COMPETITIVE_FIRECAD_RESEARCH.md` — Summary of FireCAD workflows and implications
+  - `docs/V1_BETA_PARITY_CHECKLIST.md` — Actionable checklist mapped to modules
 
 ## 🤝 Contributing
 
@@ -329,6 +341,7 @@ pytest --cov=frontend --cov=cad_core --cov=backend
 7. Push and create a pull request
 
 ### Code Review Process
+
 - All changes require review
 - CI must pass (formatting, linting, tests)
 - At least one maintainer approval required
@@ -341,17 +354,20 @@ See LICENSE file for details.
 ## 🆘 Troubleshooting
 
 ### Common Issues
+
 - **Qt/GUI not showing**: Ensure virtual environment is activated
 - **Import errors**: Run `pip install -r requirements.txt`
 - **Database issues**: Check `~/AutoFire/` directory permissions
 - **Build failures**: Clean build artifacts with `.\Build_Clean.ps1`
 
 ### Logs
+
 - Application logs: `~/AutoFire/logs/`
 - View logs: `.\Open_Logs.cmd`
 - Debug mode: Use `Run_AutoFire_Debug.cmd`
 
 ### Getting Help
+
 - Check existing issues on GitHub
 - Review `RECOVERY.md` for common fixes
 - See `CLEANUP_PROCEDURE.md` for maintenance

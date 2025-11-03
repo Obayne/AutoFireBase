@@ -71,6 +71,23 @@ class GridScene(QtWidgets.QGraphicsScene):
         if not self.show_grid or self.grid_size <= 0:
             return
 
+        # Prevent performance issues with extremely large rects
+        max_grid_lines = 10000  # Reasonable limit for grid lines
+        if (
+            rect.width() / self.grid_size > max_grid_lines
+            or rect.height() / self.grid_size > max_grid_lines
+        ):
+            return
+
+        # Additional safety checks for extreme coordinates
+        if (
+            abs(rect.left()) > 1e6
+            or abs(rect.right()) > 1e6
+            or abs(rect.top()) > 1e6
+            or abs(rect.bottom()) > 1e6
+        ):
+            return
+
         g = self.grid_size
         left = int(rect.left()) - (int(rect.left()) % g)
         top = int(rect.top()) - (int(rect.top()) % g)
@@ -405,9 +422,7 @@ class CanvasView(QtWidgets.QGraphicsView):
                 # Place the device at the click position
                 scene_pos = self.mapToScene(event.position().toPoint())
                 try:
-                    logger.info(
-                        "placement-click at (%.0f, %.0f)", scene_pos.x(), scene_pos.y()
-                    )
+                    logger.info("placement-click at (%.0f, %.0f)", scene_pos.x(), scene_pos.y())
                 except Exception:
                     pass
                 success = self._place_device_at(scene_pos)

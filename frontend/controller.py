@@ -182,6 +182,47 @@ class AutoFireController:
         except Exception:
             pass
 
+    def on_model_space_closed(self):
+        """Handle model space window closure - close all windows and quit."""
+        try:
+            from PySide6.QtWidgets import QApplication
+
+            # Clear the reference
+            self.model_space_window = None
+
+            # Close any other windows (like paperspace, layer manager, etc.)
+            app = QApplication.instance()
+            if app and isinstance(app, QApplication):
+                # Find all top-level windows and close them
+                for widget in app.topLevelWidgets():
+                    if hasattr(widget, "close") and widget.isVisible():
+                        try:
+                            widget.close()
+                        except Exception:
+                            pass
+                # Quit the application
+                app.quit()
+        except Exception:
+            # Fallback: just quit
+            import sys
+
+            sys.exit(0)
+
+    def on_paperspace_closed(self):
+        """Handle paperspace window closure."""
+        # Paperspace can close independently, but if model space is also closed, quit
+        if self.model_space_window is None:
+            try:
+                from PySide6.QtWidgets import QApplication
+
+                app = QApplication.instance()
+                if app:
+                    app.quit()
+            except Exception:
+                import sys
+
+                sys.exit(0)
+
     def __getattr__(self, name: str):
         # Lazily provide no-op signal stubs for any "*_changed" attribute
         # to keep UI initialization working in headless tests.

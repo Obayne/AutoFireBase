@@ -60,6 +60,80 @@ class LayersPanel(QtWidgets.QDockWidget):
         widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout(widget)
 
+        # Apply theme-aware styling
+        self.setStyleSheet(
+            """
+            QDockWidget {
+                background-color: #3C3C3C;
+                color: #FFFFFF;
+                border: 1px solid #555555;
+            }
+            QDockWidget::title {
+                background-color: #C41E3A;
+                color: white;
+                padding: 8px;
+                font-weight: bold;
+            }
+            QWidget {
+                background-color: #3C3C3C;
+                color: #FFFFFF;
+            }
+            QPushButton {
+                background-color: #FF6B35;
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                font-weight: 600;
+            }
+            QPushButton:hover {
+                background-color: #E55A2B;
+            }
+            QTreeWidget {
+                background-color: #2B2B2B;
+                color: #FFFFFF;
+                border: 1px solid #555555;
+                alternate-background-color: #353535;
+            }
+            QTreeWidget::item:selected {
+                background-color: #C41E3A;
+            }
+            QHeaderView::section {
+                background-color: #C41E3A;
+                color: white;
+                padding: 6px;
+                border: 1px solid #8B0000;
+                font-weight: bold;
+            }
+            QGroupBox {
+                background-color: #3C3C3C;
+                color: #FFFFFF;
+                border: 2px solid #555555;
+                border-radius: 6px;
+                margin-top: 8px;
+                font-weight: bold;
+            }
+            QGroupBox::title {
+                color: #C41E3A;
+                subcontrol-origin: margin;
+                subcontrol-position: top center;
+                padding: 0 5px;
+            }
+            QSlider::groove:horizontal {
+                background-color: #555555;
+                height: 6px;
+                border-radius: 3px;
+            }
+            QSlider::handle:horizontal {
+                background-color: #C41E3A;
+                border: 1px solid #8B0000;
+                width: 18px;
+                margin: -6px 0;
+                border-radius: 9px;
+            }
+        """
+        )
+
         # Toolbar
         toolbar = QtWidgets.QHBoxLayout()
 

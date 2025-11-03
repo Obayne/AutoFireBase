@@ -49,10 +49,10 @@ logger = logging.getLogger("SystemBuilder")
 
 
 @dataclass
-class BuildingAssessment:
-    """Building assessment data."""
+class ProjectAssessment:
+    """Project assessment data."""
 
-    building_type: str = ""
+    project_type: str = ""
     size_sqft: int = 0
     floors: int = 1
     occupancy_level: str = ""
@@ -106,7 +106,7 @@ class ImprovedGuidedSystemBuilder(QWidget):
 
         # Workflow state
         self.current_step = 0
-        self.assessment = BuildingAssessment()
+        self.assessment = ProjectAssessment()
         self.recommendations = SystemRecommendation()
         self.recommendations.device_count_estimate = {}
         self.recommendations.wire_requirements = {}
@@ -260,7 +260,7 @@ class ImprovedGuidedSystemBuilder(QWidget):
         return header
 
     def _create_assessment_page(self):
-        """Create building assessment page with proper scrolling."""
+        """Create project assessment page with proper scrolling."""
         # Create scroll area
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
@@ -276,13 +276,13 @@ class ImprovedGuidedSystemBuilder(QWidget):
         welcome_html = "".join(
             [
                 '<h3 style="color: #1a252f; margin-bottom: 10px; '
-                'font-size: 18px; font-weight: 900;">🏢 Building Assessment</h3>',
+                'font-size: 18px; font-weight: 900;">🏢 Project Assessment</h3>',
                 '<p style="color: #2c3e50; font-size: 16px; line-height: 1.5; '
                 'font-weight: 600;">',
-                "Help us understand your building to provide the best fire alarm "
+                "Help us understand your project to provide the best fire alarm "
                 "system recommendations. ",
                 "This assessment ensures your system meets code requirements and "
-                "building-specific needs.",
+                "project-specific needs.",
                 "</p>",
             ]
         )
@@ -302,9 +302,9 @@ class ImprovedGuidedSystemBuilder(QWidget):
         )
         layout.addWidget(welcome)
 
-        # Building info form
-        building_group = QGroupBox("Building Information")
-        building_group.setStyleSheet(
+        # Project info form
+        project_group = QGroupBox("Project Information")
+        project_group.setStyleSheet(
             """
             QGroupBox {
                 font-weight: 900;
@@ -326,14 +326,14 @@ class ImprovedGuidedSystemBuilder(QWidget):
             }
         """
         )
-        building_layout = QFormLayout(building_group)
-        building_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
+        project_layout = QFormLayout(project_group)
+        project_layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
 
-        # Building type
+        # Project type
         self.building_type = QComboBox()
         self.building_type.addItems(
             [
-                "Select building type...",
+                "Select project type...",
                 "🏢 Office Building",
                 "🏭 Industrial/Manufacturing",
                 "🏫 School/Educational",
@@ -376,8 +376,8 @@ class ImprovedGuidedSystemBuilder(QWidget):
         self.building_type.currentTextChanged.connect(self._on_assessment_changed)
 
         # Create bold label
-        building_type_label = QLabel("Building Type:")
-        building_type_label.setStyleSheet(
+        project_type_label = QLabel("Project Type:")
+        project_type_label.setStyleSheet(
             """
             color: #1a252f;
             font-weight: 900;
@@ -385,7 +385,7 @@ class ImprovedGuidedSystemBuilder(QWidget):
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
         """
         )
-        building_layout.addRow(building_type_label, self.building_type)
+        project_layout.addRow(project_type_label, self.building_type)
 
         # Size and floors in same row
         size_floors_layout = QHBoxLayout()
@@ -474,7 +474,7 @@ class ImprovedGuidedSystemBuilder(QWidget):
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
         """
         )
-        building_layout.addRow(size_floors_label, size_floors_layout)
+        project_layout.addRow(size_floors_label, size_floors_layout)
 
         # Occupancy
         self.occupancy = QComboBox()
@@ -528,9 +528,9 @@ class ImprovedGuidedSystemBuilder(QWidget):
             font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
         """
         )
-        building_layout.addRow(occupancy_label, self.occupancy)
+        project_layout.addRow(occupancy_label, self.occupancy)
 
-        layout.addWidget(building_group)
+        layout.addWidget(project_group)
 
         # Special considerations with much better visibility
         special_group = QGroupBox("⚠️ Special Areas - Check All That Apply")
@@ -689,28 +689,30 @@ class ImprovedGuidedSystemBuilder(QWidget):
 
         # Your building summary
         self.building_summary_frame = QFrame()
+        # Apply theme-aware styling using the same approach as other panels
         self.building_summary_frame.setStyleSheet(
             """
             QFrame {
-                background-color: #e7f3ff;
-                border: 2px solid #0066cc;
+                background-color: #3C3C3C;
+                border: 2px solid #555555;
                 border-radius: 8px;
                 padding: 15px;
                 margin-bottom: 20px;
+                color: #FFFFFF;
             }
         """
         )
         summary_layout = QVBoxLayout(self.building_summary_frame)
 
-        summary_title = QLabel("📋 Your Building Summary:")
+        summary_title = QLabel("📋 Your Project Summary:")
         summary_title.setStyleSheet(
-            "font-weight: bold; font-size: 14px; color: #0066cc; margin-bottom: 8px;"
+            "font-weight: bold; font-size: 14px; color: #C41E3A; margin-bottom: 8px;"
         )
         summary_layout.addWidget(summary_title)
 
-        self.building_summary_text = QLabel("Loading building information...")
+        self.building_summary_text = QLabel("Loading project information...")
         self.building_summary_text.setStyleSheet(
-            "font-size: 13px; color: #004499; margin-left: 10px;"
+            "font-size: 13px; color: #CCCCCC; margin-left: 10px;"
         )
         self.building_summary_text.setWordWrap(True)
         summary_layout.addWidget(self.building_summary_text)
@@ -1955,7 +1957,7 @@ class ImprovedGuidedSystemBuilder(QWidget):
             f"Occupancy={self.occupancy.currentText()}"
         )
 
-        self.assessment.building_type = self.building_type.currentText()
+        self.assessment.project_type = self.building_type.currentText()
         self.assessment.size_sqft = self.building_size.value()
         self.assessment.floors = self.floors.value()
         self.assessment.occupancy_level = self.occupancy.currentText()
@@ -1982,11 +1984,11 @@ class ImprovedGuidedSystemBuilder(QWidget):
         if not self.assessment.building_type.startswith("Select"):
             self._generate_recommendations()
 
-            # Update panel recommendations and building summary
+            # Update panel recommendations and project summary
             if hasattr(self, "recommended_panels_layout"):
                 self._populate_panel_recommendations()
             if hasattr(self, "building_summary_text"):
-                self._update_building_summary()
+                self._update_project_summary()
 
             self.next_btn.setEnabled(True)
             self._update_guidance(
@@ -2307,21 +2309,21 @@ class ImprovedGuidedSystemBuilder(QWidget):
         self.next_btn.setEnabled(True)
         logger.info(f"Panel selected: {panel['manufacturer']} {panel['model']}")
 
-        # Update building summary to show selection
-        self._update_building_summary()
+        # Update project summary to show selection
+        self._update_project_summary()
 
         # Show success message
         self._update_guidance(
             f"✅ Selected {panel['manufacturer']} {panel['model']}. Ready for device planning."
         )
 
-    def _update_building_summary(self):
-        """Update the building summary with current assessment and selection."""
+    def _update_project_summary(self):
+        """Update the project summary with current assessment and selection."""
         if hasattr(self, "building_summary_text"):
             assessment = self.assessment
 
             summary_parts = []
-            summary_parts.append(f"Building Type: {assessment.building_type}")
+            summary_parts.append(f"Project Type: {assessment.project_type}")
             summary_parts.append(f"Size: {assessment.size_sqft:,} sq ft")
             summary_parts.append(f"Floors: {assessment.floors}")
             summary_parts.append(f"Occupancy: {assessment.occupancy_level}")
@@ -3546,7 +3548,7 @@ Always check local codes and amendments."""
         )
         self.review_layout.addWidget(summary_header)
 
-        # Building assessment summary
+        # Project assessment summary
         assessment_widget = self._create_assessment_summary_widget()
         self.review_layout.addWidget(assessment_widget)
 
@@ -3572,7 +3574,7 @@ Always check local codes and amendments."""
         logger.info("System review populated with complete design summary")
 
     def _create_assessment_summary_widget(self):
-        """Create building assessment summary widget."""
+        """Create project assessment summary widget."""
         widget = QFrame()
         widget.setStyleSheet(
             """

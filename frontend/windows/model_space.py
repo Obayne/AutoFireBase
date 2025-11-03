@@ -46,6 +46,11 @@ from frontend.widgets.canvas_status_summary import CanvasStatusSummary
 
 # Grid scene and defaults used by the main window
 from frontend.windows.scene import DEFAULT_GRID_SIZE, CanvasView, GridScene
+from frontend.labels_manager import (
+    get_hide_conduit_fill,
+    set_hide_conduit_fill,
+    format_label_for_ui,
+)
 
 # Ensure logging is configured early so module-level loggers emit during
 # headless simulators and when the app starts from __main__.
@@ -281,6 +286,8 @@ class ModelSpaceWindow(QMainWindow):
                 f"Added wire segment: {feet_len:.1f} ft @ {seg.ohms_per_1000ft:.2f} Ω/1000ft",
                 4000,
             )
+            # Update labels after adding a segment
+            self.update_wire_labels_overlay()
         except Exception as e:
             self.statusBar().showMessage(f"Failed to add wire segment: {e}", 5000)
 
@@ -330,18 +337,113 @@ class ModelSpaceWindow(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, left_dock)
 
     def _setup_device_palette_tab(self):
-        """Setup device palette tab."""
+        """Setup device palette tab with professional-grade filtering."""
         w = QtWidgets.QWidget()
         lay = QtWidgets.QVBoxLayout(w)
 
-        # Device tree
+        # Search and Filter Controls
+        search_frame = QtWidgets.QFrame()
+        search_layout = QtWidgets.QVBoxLayout(search_frame)
+        search_frame.setStyleSheet(
+            "QFrame { background-color: #2d2d30; border: 1px solid #3c3c3c; border-radius: 4px; }"
+        )
+
+        # Search box with advanced features
+        search_row = QtWidgets.QHBoxLayout()
+        search_label = QtWidgets.QLabel("Search:")
+        self.device_search = QtWidgets.QLineEdit()
+        self.device_search.setPlaceholderText(
+            "Search devices, manufacturers, part numbers... (supports AND/OR)"
+        )
+        self.device_search.textChanged.connect(self._filter_devices)
+        search_row.addWidget(search_label)
+        search_row.addWidget(self.device_search)
+        search_layout.addLayout(search_row)
+
+        # Advanced filter row
+        filter_row1 = QtWidgets.QHBoxLayout()
+
+        # Device type filter
+        type_label = QtWidgets.QLabel("Type:")
+        self.filter_combo = QtWidgets.QComboBox()
+        self.filter_combo.addItems(
+            [
+                "All Types",
+                "Smoke Detectors",
+                "Heat Detectors",
+                "Manual Pull Stations",
+                "Horn/Strobes",
+                "Speakers",
+                "Control Modules",
+                "Monitor Modules",
+                "Panels",
+                "Annunciators",
+            ]
+        )
+        self.filter_combo.currentTextChanged.connect(self._filter_devices)
+
+        # Manufacturer filter
+        mfg_label = QtWidgets.QLabel("Manufacturer:")
+        self.manufacturer_combo = QtWidgets.QComboBox()
+        self.manufacturer_combo.addItem("All Manufacturers")
+        self.manufacturer_combo.currentTextChanged.connect(self._filter_devices)
+
+        filter_row1.addWidget(type_label)
+        filter_row1.addWidget(self.filter_combo)
+        filter_row1.addStretch()
+        filter_row1.addWidget(mfg_label)
+        filter_row1.addWidget(self.manufacturer_combo)
+        search_layout.addLayout(filter_row1)
+
+        # Control buttons row
+        filter_row2 = QtWidgets.QHBoxLayout()
+
+        # Clear button
+        clear_btn = QtWidgets.QPushButton("Clear All")
+        clear_btn.clicked.connect(self._clear_filters)
+        clear_btn.setMaximumWidth(80)
+
+        # Advanced search toggle
+        advanced_btn = QtWidgets.QPushButton("Advanced")
+        advanced_btn.setCheckable(True)
+        advanced_btn.setMaximumWidth(80)
+        advanced_btn.toggled.connect(self._toggle_advanced_search)
+
+        filter_row2.addStretch()
+        filter_row2.addWidget(advanced_btn)
+        filter_row2.addWidget(clear_btn)
+        search_layout.addLayout(filter_row2)
+
+        lay.addWidget(search_frame)
+
+        # Results count
+        self.results_label = QtWidgets.QLabel("Loading devices...")
+        self.results_label.setStyleSheet("color: #cccccc; font-size: 11px; margin: 5px;")
+        lay.addWidget(self.results_label)
+
+        # Device tree with improved structure
         self.device_tree = QtWidgets.QTreeWidget()
         self.device_tree.setColumnCount(3)
         self.device_tree.setHeaderLabels(["Device", "Manufacturer", "Part Number"])
         self.device_tree.setAlternatingRowColors(True)
         self.device_tree.setSortingEnabled(True)
+        self.device_tree.setRootIsDecorated(True)
         self.device_tree.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.device_tree.customContextMenuRequested.connect(self._on_device_tree_context_menu)
+
+        # Store all devices for filtering
+        self.all_devices = []
+        self.device_type_mapping = {
+            "Smoke Detectors": ["smoke", "photo", "ionization"],
+            "Heat Detectors": ["heat", "thermal", "fixed_temperature", "rate_of_rise"],
+            "Manual Pull Stations": ["pull", "manual", "station"],
+            "Horn/Strobes": ["horn", "strobe", "speaker_strobe", "notification"],
+            "Speakers": ["speaker", "audio", "voice"],
+            "Control Modules": ["control", "relay", "output"],
+            "Monitor Modules": ["monitor", "input", "supervision"],
+            "Panels": ["panel", "facp", "controller"],
+            "Annunciators": ["annunciator", "display", "lcd", "led"],
+        }
 
         # Populate device tree
         self._populate_device_tree()
@@ -350,29 +452,98 @@ class ModelSpaceWindow(QMainWindow):
         self.left_tab_widget.addTab(w, "Devices")
 
     def _setup_wire_spool_tab(self):
-        """Setup wire spool tab per specification."""
+        """Setup wire spool tab with professional-grade filtering."""
         w = QtWidgets.QWidget()
         lay = QtWidgets.QVBoxLayout(w)
 
-        # Header per spec: "Wire Spool shows active reels with Ω/1000ft, remaining length, cost"
+        # Wire Spool Header
         spool_label = QtWidgets.QLabel("Wire Spool")
         spool_label.setStyleSheet("font-weight: bold; font-size: 14px; margin-bottom: 10px;")
         lay.addWidget(spool_label)
 
-        # Wire list with radio button selection per spec
+        # Search and Filter Controls for Wire Spool
+        wire_search_frame = QtWidgets.QFrame()
+        wire_search_layout = QtWidgets.QVBoxLayout(wire_search_frame)
+        wire_search_frame.setStyleSheet(
+            "QFrame { background-color: #2d2d30; border: 1px solid #3c3c3c; border-radius: 4px; }"
+        )
+
+        # Wire search box
+        wire_search_row = QtWidgets.QHBoxLayout()
+        wire_search_label = QtWidgets.QLabel("Search:")
+        self.wire_search = QtWidgets.QLineEdit()
+        self.wire_search.setPlaceholderText("Search wire types, gauges, colors, manufacturers...")
+        self.wire_search.textChanged.connect(self._filter_wires)
+        wire_search_row.addWidget(wire_search_label)
+        wire_search_row.addWidget(self.wire_search)
+        wire_search_layout.addLayout(wire_search_row)
+
+        # Wire filter controls
+        wire_filter_row = QtWidgets.QHBoxLayout()
+
+        # Wire type filter
+        wire_type_label = QtWidgets.QLabel("Type:")
+        self.wire_type_combo = QtWidgets.QComboBox()
+        self.wire_type_combo.addItems(["All Types", "SLC/IDC", "NAC", "Power", "Riser", "Plenum"])
+        self.wire_type_combo.currentTextChanged.connect(self._filter_wires)
+
+        # Wire gauge filter
+        gauge_label = QtWidgets.QLabel("Gauge:")
+        self.wire_gauge_combo = QtWidgets.QComboBox()
+        self.wire_gauge_combo.addItems(
+            ["All Gauges", "12 AWG", "14 AWG", "16 AWG", "18 AWG", "20 AWG", "22 AWG"]
+        )
+        self.wire_gauge_combo.currentTextChanged.connect(self._filter_wires)
+
+        wire_filter_row.addWidget(wire_type_label)
+        wire_filter_row.addWidget(self.wire_type_combo)
+        wire_filter_row.addStretch()
+        wire_filter_row.addWidget(gauge_label)
+        wire_filter_row.addWidget(self.wire_gauge_combo)
+        wire_search_layout.addLayout(wire_filter_row)
+
+        # Wire control buttons
+        wire_control_row = QtWidgets.QHBoxLayout()
+
+        # Clear wire filters
+        wire_clear_btn = QtWidgets.QPushButton("Clear")
+        wire_clear_btn.clicked.connect(self._clear_wire_filters)
+        wire_clear_btn.setMaximumWidth(60)
+
+        # Add custom wire
+        add_wire_btn = QtWidgets.QPushButton("Add Custom")
+        add_wire_btn.clicked.connect(self._add_custom_wire)
+        add_wire_btn.setMaximumWidth(80)
+
+        wire_control_row.addStretch()
+        wire_control_row.addWidget(add_wire_btn)
+        wire_control_row.addWidget(wire_clear_btn)
+        wire_search_layout.addLayout(wire_control_row)
+
+        lay.addWidget(wire_search_frame)
+
+        # Wire results count
+        self.wire_results_label = QtWidgets.QLabel("Loading wires...")
+        self.wire_results_label.setStyleSheet("color: #cccccc; font-size: 11px; margin: 5px;")
+        lay.addWidget(self.wire_results_label)
+
+        # Wire list with enhanced styling
         self.wire_list = QtWidgets.QListWidget()
+        self.wire_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.wire_list.setStyleSheet(
             """
             QListWidget {
-                background-color: #2d2d30;
-                color: #ffffff;
-                border: 1px solid #555555;
+                background-color: #1e1e1e;
+                border: 1px solid #3c3c3c;
                 border-radius: 4px;
-                font-size: 11px;
+                padding: 5px;
+                font-family: 'Segoe UI';
+                font-size: 12px;
             }
             QListWidget::item {
                 padding: 8px;
-                border-bottom: 1px solid #404040;
+                border-bottom: 1px solid #333333;
+                color: #ffffff;
             }
             QListWidget::item:selected {
                 background-color: #0078d4;
@@ -395,6 +566,12 @@ class ModelSpaceWindow(QMainWindow):
         # Connect selection changes
         self.wire_list.itemSelectionChanged.connect(self._on_wire_selection_changed)
 
+        # Store all wires for filtering
+        self.all_wires = []
+
+        # Populate with available wires from database
+        self._populate_wire_spool_from_database()
+
         lay.addStretch()
         self.left_tab_widget.addTab(w, "Wire Spool")
 
@@ -415,6 +592,65 @@ class ModelSpaceWindow(QMainWindow):
         else:
             self.active_wire_label.setText("Active Wire: None selected")
             self.wire_label_status.setText("Wire: None")
+
+    def _populate_wire_spool_from_database(self):
+        """Load available wires from database and populate the wire spool."""
+        try:
+            import sqlite3
+
+            _logger.info("Loading wires from database for wire spool...")
+
+            con = sqlite3.connect("autofire.db")
+            cur = con.cursor()
+
+            # Get wires with their types
+            cur.execute(
+                """
+                SELECT w.name, w.gauge, w.color, wt.code AS type,
+                       w.ohms_per_1000ft, w.max_current_a, w.model
+                FROM wires w
+                LEFT JOIN wire_types wt ON w.type_id = wt.id
+                ORDER BY w.gauge, w.name
+            """
+            )
+
+            wire_rows = cur.fetchall()
+            con.close()
+
+            # Convert to wire data structures and store for filtering
+            wires = []
+            for wire_row in wire_rows:
+                name, gauge, color, wire_type, ohms, max_current, model = wire_row
+
+                wire_data = {
+                    "name": name,
+                    "gauge": gauge,
+                    "color": color,
+                    "type": wire_type or "",
+                    "ohms_per_1000ft": ohms,
+                    "max_current_a": max_current,
+                    "model": model or "",
+                }
+                wires.append(wire_data)
+
+            # Store all wires for filtering
+            self.all_wires = wires
+
+            # Update wire list with all wires initially
+            self._update_wire_list(wires)
+
+            # Update results count
+            self.wire_results_label.setText(f"Showing {len(wires)} wires")
+
+            _logger.info(f"✅ Populated wire spool with {len(wires)} wires from database")
+
+        except Exception as e:
+            _logger.error(f"Failed to load wires from database: {e}")
+            # Add fallback message
+            self.wire_list.clear()
+            item = QtWidgets.QListWidgetItem("No wires available - check database")
+            self.wire_list.addItem(item)
+            self.wire_results_label.setText("Error loading wires")
 
     def _setup_right_dock(self):
         """Setup right dock with Inspector tabs."""
@@ -656,22 +892,22 @@ class ModelSpaceWindow(QMainWindow):
         """Setup enhanced connections tab with hierarchical circuit display."""
         try:
             from frontend.panels.enhanced_connections import create_enhanced_connections_tab
-            
+
             # Create the enhanced connections panel
             self.connections_panel = create_enhanced_connections_tab(self)
-            
+
             # Connect signals for integration
             self.connections_panel.circuit_selected.connect(self._on_circuit_selected)
             self.connections_panel.device_selected.connect(self._on_device_selected)
             self.connections_panel.calculations_updated.connect(self._on_calculations_updated)
-            
+
             self.right_tab_widget.addTab(self.connections_panel, "Connections")
-            
+
         except ImportError as e:
             # Fallback to basic connections tab if enhanced version fails
             _logger.warning("Enhanced connections not available, using basic version: %s", e)
             self._setup_basic_connections_tab()
-    
+
     def _setup_basic_connections_tab(self):
         """Setup basic connections tab (fallback)."""
         w = QtWidgets.QWidget()
@@ -927,6 +1163,112 @@ class ModelSpaceWindow(QMainWindow):
             else:
                 self.measure_tool.start()
 
+    def _on_hide_conduit_fill_toggled(self, checked: bool) -> None:
+        """Persist the 'hide_conduit_fill' preference and trigger a lightweight repaint.
+
+        Note: This does not yet walk existing text items to reformat labels; it simply
+        updates the preference and nudges the viewport to repaint so future draws use
+        the new setting.
+        """
+        try:
+            set_hide_conduit_fill(bool(checked))
+            # User feedback
+            try:
+                self.statusBar().showMessage(
+                    f"Hide Conduit Fill: {'On' if checked else 'Off'}", 2000
+                )
+            except Exception:
+                pass
+        finally:
+            # Best-effort repaint
+            try:
+                self.view.viewport().update()
+            except Exception:
+                pass
+
+    # --- Wire label overlay helpers ---
+    def _infer_wire_spec_for_item(self, item) -> dict:
+        """Infer a minimal wire spec for labeling from an item.
+
+        Returns a dict with keys: conduit_kind, trade_size, wires (AWG->count)
+        This MVP uses conservative defaults when attributes are missing.
+        """
+        # Try to pick up attributes if present on the item (future wiring can set these)
+        conduit = getattr(item, "conduit_kind", "EMT")
+        trade = getattr(item, "trade_size", '3/4"')
+        awg = getattr(item, "wire_gauge", getattr(item, "awg", 18))
+        count = getattr(item, "conductor_count", 2)
+        try:
+            awg = int(awg)
+            count = int(count)
+        except Exception:
+            awg, count = 18, 2
+        return {"conduit_kind": str(conduit), "trade_size": str(trade), "wires": {awg: count}}
+
+    def update_wire_labels_overlay(self) -> None:
+        """Create or update simple text labels along wire segments based on preferences."""
+        try:
+            if not hasattr(self, "layer_wires") or self.layer_wires is None:
+                return
+            for item in list(self.layer_wires.childItems() or []):
+                # Compute label text
+                spec = self._infer_wire_spec_for_item(item)
+                label_text = format_label_for_ui(
+                    conduit_kind=spec["conduit_kind"],
+                    trade_size=spec["trade_size"],
+                    wires=spec["wires"],
+                )
+
+                # Find or create the text item attached to this segment
+                label_item = getattr(item, "_label_item", None)
+                if label_text:
+                    if label_item is None:
+                        label_item = QtWidgets.QGraphicsSimpleTextItem(label_text)
+                        label_item.setBrush(QtGui.QBrush(QtGui.QColor("#DADADA")))
+                        try:
+                            # Prefer explicit GraphicsItemFlag enum for PySide6
+                            flag = (
+                                QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIgnoresTransformations
+                            )
+                        except Exception:
+                            # Fallback for environments where enum exposure differs
+                            flag = QtWidgets.QGraphicsItem.ItemIgnoresTransformations  # type: ignore[attr-defined]
+                        label_item.setFlag(flag, True)
+                        label_item.setZValue(70)
+                        # Attach as child so it moves with the segment
+                        if hasattr(item, "addToGroup"):
+                            # item is likely a group; fall back to scene add
+                            self.scene.addItem(label_item)
+                        else:
+                            label_item.setParentItem(item)
+                        setattr(item, "_label_item", label_item)
+                    else:
+                        label_item.setText(label_text)
+
+                    # Position near the segment midpoint if possible
+                    try:
+                        ln = item.line()  # QGraphicsLineItem
+                        mid_x = (ln.x1() + ln.x2()) / 2.0
+                        mid_y = (ln.y1() + ln.y2()) / 2.0
+                        label_item.setPos(mid_x + 6, mid_y - 6)
+                    except Exception:
+                        # Best-effort placement
+                        pass
+                else:
+                    # Remove label if present
+                    if label_item is not None:
+                        try:
+                            self.scene.removeItem(label_item)
+                        except Exception:
+                            pass
+                        setattr(item, "_label_item", None)
+        except Exception as e:
+            # Non-fatal; show status for visibility
+            try:
+                self.statusBar().showMessage(f"Label update error: {e}", 3000)
+            except Exception:
+                pass
+
     def _start_text_tool(self):
         """Start the text annotation tool."""
         if hasattr(self, "text_tool"):
@@ -943,66 +1285,6 @@ class ModelSpaceWindow(QMainWindow):
         """Update the tool status indicator."""
         if hasattr(self, "tool_label"):
             self.tool_label.setText(f"Tool: {tool_name}")
-
-    def _calculate_voltage_drop(self):
-        """Calculate voltage drop using active wire resistance and total wire length."""
-        try:
-            # Determine active wire resistance from Wire Spool selection
-            resistance_per_1000ft = None
-            if hasattr(self, "wire_list") and self.wire_list.currentItem():
-                wire_data = self.wire_list.currentItem().data(QtCore.Qt.ItemDataRole.UserRole)
-                if wire_data:
-                    resistance_per_1000ft = wire_data.get("resistance_per_1000ft")
-
-            # Fallback default if no wire selected or missing data (Ohms per 1000 ft)
-            if resistance_per_1000ft is None:
-                resistance_per_1000ft = 8.0  # typical for 14 AWG copper
-
-            # Sum total wire length from drawn wire segments
-            wire_items = [item for item in self.scene.items() if hasattr(item, "length")]
-            total_length_ft = sum(getattr(item, "length", 0.0) for item in wire_items)
-
-            # If no wire drawn yet, prompt user
-            if total_length_ft <= 0:
-                QtWidgets.QMessageBox.warning(
-                    self,
-                    "No Wire Segments",
-                    "No wire segments found. Draw wire paths in the canvas "
-                    "or select a staged connection.",
-                )
-                return
-
-            # Ask user for circuit current (Amps)
-            current_a, ok = QtWidgets.QInputDialog.getDouble(
-                self,
-                "Circuit Current",
-                "Enter circuit current (A):",
-                1.5,  # default amperage
-                0.1,
-                20.0,
-                1,
-            )
-            if not ok:
-                return
-
-            # Compute total resistance and voltage drop
-            r_total = (resistance_per_1000ft * total_length_ft) / 1000.0
-            v_drop = r_total * current_a
-            percent_24v = (v_drop / 24.0) * 100.0
-
-            # Present results
-            QtWidgets.QMessageBox.information(
-                self,
-                "Voltage Drop",
-                (
-                    f"Wire resistance: {resistance_per_1000ft:.2f} Ω/1000ft\n"
-                    f"Total length: {total_length_ft:.1f} ft\n"
-                    f"Current: {current_a:.2f} A\n\n"
-                    f"Voltage drop: {v_drop:.2f} V ({percent_24v:.1f}% of 24V)"
-                ),
-            )
-        except Exception as e:
-            QtWidgets.QMessageBox.critical(self, "Voltage Drop Error", str(e))
 
     def _update_connections_device_list(self):
         """Update the device list in connections panel with placed devices."""
@@ -1076,199 +1358,343 @@ class ModelSpaceWindow(QMainWindow):
             self.layer_sketch.setOpacity(opacity)
 
     def _populate_device_tree(self):
-        """Populate the device tree with available devices from database.
+        """Populate the device tree with devices from the database."""
+        _logger.info("Starting device tree population...")
 
-        This version loads the catalog in a background QThread to avoid
-        blocking UI painting during startup. When devices are ready the
-        main thread receives the list and populates the tree.
-        """
-        # If a loader thread is already running, do nothing
-        if getattr(self, "_device_loader_thread", None) is not None:
-            _logger.debug("Device loader already running; skipping duplicate request")
+        try:
+            # Load devices from catalog
+            _logger.info("Loading devices from catalog...")
+            devices = load_catalog()
+            _logger.info(f"Loaded {len(devices)} devices from catalog")
+
+            # Store all devices for filtering
+            self.all_devices = devices
+
+            # Populate manufacturer dropdown
+            self._populate_manufacturers()
+
+            # Update the tree with all devices initially
+            self._update_device_tree(devices)
+
+            # Update results count
+            self.results_label.setText(f"Showing {len(devices)} devices")
+
+            _logger.info("✅ Successfully populated device tree with %d devices", len(devices))
+
+        except Exception as e:
+            _logger.error("Failed to populate device tree: %s", e)
+            try:
+                self.device_tree.clear()
+                item = QtWidgets.QTreeWidgetItem([f"Error loading devices: {e}"])
+                self.device_tree.addTopLevelItem(item)
+                self.results_label.setText("Error loading devices")
+            except Exception:
+                pass
+
+    def _update_device_tree(self, devices):
+        """Update the device tree with the given device list."""
+        self.device_tree.clear()
+
+        if not devices:
+            item = QtWidgets.QTreeWidgetItem(["No devices found"])
+            self.device_tree.addTopLevelItem(item)
             return
 
-        # Show a lightweight, more visible placeholder while loading.
-        # Use a centered QLabel inside a QWidget so it's obvious the UI is
-        # alive while the background loader runs.
-        try:
-            if getattr(self, "_device_placeholder_widget", None) is None:
-                placeholder_widget = QtWidgets.QWidget()
-                layout = QtWidgets.QVBoxLayout(placeholder_widget)
-                label = QtWidgets.QLabel("Loading devices...", alignment=Qt.AlignCenter)
-                font = label.font()
-                font.setPointSize(max(12, font.pointSize() + 2))
-                label.setFont(font)
-                layout.addStretch()
-                layout.addWidget(label)
-                layout.addStretch()
-                placeholder_widget.setMinimumHeight(120)
-                self._device_placeholder_widget = placeholder_widget
-                # Place into a dock on the right where the device tree normally lives
-                try:
-                    if not hasattr(self, "_device_placeholder_dock"):
-                        self._device_placeholder_dock = QtWidgets.QDockWidget(
-                            "Device Palette", self
-                        )
-                        self._device_placeholder_dock.setWidget(self._device_placeholder_widget)
-                        self.addDockWidget(
-                            Qt.DockWidgetArea.RightDockWidgetArea, self._device_placeholder_dock
-                        )
-                except Exception:
-                    # Fall back to adding placeholder into the device_tree area
-                    self.device_tree.clear()
-                    item = QtWidgets.QTreeWidgetItem(["Loading devices..."])
-                    self.device_tree.addTopLevelItem(item)
-        except Exception:
-            # Best-effort placeholder; ignore failures
-            try:
-                self.device_tree.clear()
-                item = QtWidgets.QTreeWidgetItem(["Loading devices..."])
-                self.device_tree.addTopLevelItem(item)
-            except Exception:
-                pass
+        # Group devices by type for better organization
+        grouped = {}
+        for d in devices:
+            cat = d.get("type", "Unknown") or "Unknown"
+            grouped.setdefault(cat, []).append(d)
 
-        class DeviceLoader(QtCore.QObject):
-            devices_ready = QtCore.Signal(list)
-            error = QtCore.Signal(str)
+        # Add devices to tree
+        for cat in sorted(grouped.keys()):
+            cat_item = QtWidgets.QTreeWidgetItem([f"{cat} ({len(grouped[cat])})"])
+            cat_item.setExpanded(True)  # Expand categories by default
 
-            @QtCore.Slot()
-            def run(self):
-                try:
-                    devs = load_catalog()
-                    self.devices_ready.emit(devs)
-                except Exception as e:
-                    self.error.emit(str(e))
+            for dev in sorted(grouped[cat], key=lambda x: x.get("name", "")):
+                name_txt = f"{dev.get('name','<unknown>')}"
+                symbol = dev.get("symbol", "")
+                if symbol:
+                    name_txt += f" ({symbol})"
 
-        try:
-            loader = DeviceLoader()
-            thread = QtCore.QThread()
-            loader.moveToThread(thread)
+                mfg_txt = dev.get("manufacturer", "") or ""
+                pn_txt = dev.get("part_number", "") or ""
 
-            def _on_devices_ready(devs):
-                try:
-                    # Clear placeholder and any placeholder dock
-                    try:
-                        if getattr(self, "_device_placeholder_dock", None) is not None:
-                            self.removeDockWidget(self._device_placeholder_dock)
-                            try:
-                                self._device_placeholder_dock.deleteLater()
-                            except Exception:
-                                pass
-                            self._device_placeholder_dock = None
-                            self._device_placeholder_widget = None
-                    except Exception:
-                        pass
+                it = QtWidgets.QTreeWidgetItem([name_txt, mfg_txt, pn_txt])
+                it.setData(0, Qt.ItemDataRole.UserRole, dev)
+                cat_item.addChild(it)
 
-                    self.device_tree.clear()
-                    grouped = {}
-                    for d in devs:
-                        cat = d.get("type", "Unknown") or "Unknown"
-                        grouped.setdefault(cat, []).append(d)
+            self.device_tree.addTopLevelItem(cat_item)
 
-                    for cat in sorted(grouped.keys()):
-                        cat_item = QtWidgets.QTreeWidgetItem([cat])
-                        for dev in sorted(grouped[cat], key=lambda x: x.get("name", "")):
-                            name_txt = f"{dev.get('name','<unknown>')} ({dev.get('symbol','')})"
-                            mfg_txt = dev.get("manufacturer", "") or ""
-                            pn_txt = dev.get("part_number", "") or ""
-                            it = QtWidgets.QTreeWidgetItem([name_txt, mfg_txt, pn_txt])
-                            it.setData(0, Qt.ItemDataRole.UserRole, dev)
-                            cat_item.addChild(it)
-                        self.device_tree.addTopLevelItem(cat_item)
-                    self.device_tree.expandAll()
-                    _logger.info("Populated device tree with %d devices from database", len(devs))
-                except Exception as e:
-                    _logger.error("Failed while populating device tree: %s", e)
-                finally:
-                    # Clean up thread and loader
-                    try:
-                        thread.quit()
-                        thread.wait(2000)
-                    except Exception:
-                        pass
-                    self._device_loader_thread = None
+    def _filter_devices(self):
+        """Filter devices based on search text, type, and manufacturer filters."""
+        search_text = self.device_search.text().lower().strip()
+        category_filter = self.filter_combo.currentText()
+        manufacturer_filter = getattr(self, "manufacturer_combo", None)
+        manufacturer_filter = (
+            manufacturer_filter.currentText() if manufacturer_filter else "All Manufacturers"
+        )
 
-            def _on_error(msg):
-                _logger.error("Device loader error: %s", msg)
-                try:
-                    # Show error in placeholder dock if possible
-                    if getattr(self, "_device_placeholder_widget", None) is not None:
-                        try:
-                            for i in range(self._device_placeholder_widget.layout().count()):
-                                item = self._device_placeholder_widget.layout().itemAt(i)
-                                if (
-                                    item
-                                    and item.widget()
-                                    and isinstance(item.widget(), QtWidgets.QLabel)
-                                ):
-                                    item.widget().setText("Failed to load devices")
-                                    break
-                        except Exception:
-                            pass
-                    else:
-                        self.device_tree.clear()
-                except Exception:
-                    pass
-                try:
-                    thread.quit()
-                    thread.wait(2000)
-                except Exception:
-                    pass
-                self._device_loader_thread = None
+        if not hasattr(self, "all_devices"):
+            return
 
-            loader.devices_ready.connect(_on_devices_ready)
-            loader.error.connect(_on_error)
-            thread.started.connect(loader.run)
-            thread.finished.connect(thread.deleteLater)
-            self._device_loader_thread = thread
-            # Ensure threads are stopped if the application quits early
-            try:
-                app = QtWidgets.QApplication.instance()
-                if app is not None:
+        filtered_devices = []
 
-                    def _stop_loader():
-                        try:
-                            if getattr(self, "_device_loader_thread", None) is not None:
-                                self._device_loader_thread.quit()
-                                self._device_loader_thread.wait(1000)
-                        except Exception:
-                            pass
+        for device in self.all_devices:
+            # Apply manufacturer filter first
+            if manufacturer_filter != "All Manufacturers":
+                device_mfg = device.get("manufacturer", "").strip()
+                if device_mfg != manufacturer_filter:
+                    continue
 
-                    app.aboutToQuit.connect(_stop_loader)
-            except Exception:
-                pass
+            # Apply category filter
+            if category_filter != "All Types":
+                device_type = device.get("type", "").lower()
+                device_name = device.get("name", "").lower()
 
-            thread.start()
-        except Exception as e:
-            # Best-effort fallback: synchronous load if thread creation fails
-            _logger.exception(
-                "Failed to start device loader thread, falling back to sync load: %s", e
+                # Check if device matches the category filter
+                if category_filter in self.device_type_mapping:
+                    keywords = self.device_type_mapping[category_filter]
+                    if not any(
+                        keyword in device_type or keyword in device_name for keyword in keywords
+                    ):
+                        continue
+
+            # Apply search filter with enhanced logic
+            if search_text:
+                # Support AND/OR operators for advanced search
+                if " AND " in search_text.upper():
+                    search_terms = [
+                        term.strip().lower() for term in search_text.upper().split(" AND ")
+                    ]
+                    searchable_text = " ".join(
+                        [
+                            device.get("name", ""),
+                            device.get("manufacturer", ""),
+                            device.get("part_number", ""),
+                            device.get("type", ""),
+                            device.get("symbol", ""),
+                        ]
+                    ).lower()
+
+                    if not all(term in searchable_text for term in search_terms):
+                        continue
+                elif " OR " in search_text.upper():
+                    search_terms = [
+                        term.strip().lower() for term in search_text.upper().split(" OR ")
+                    ]
+                    searchable_text = " ".join(
+                        [
+                            device.get("name", ""),
+                            device.get("manufacturer", ""),
+                            device.get("part_number", ""),
+                            device.get("type", ""),
+                            device.get("symbol", ""),
+                        ]
+                    ).lower()
+
+                    if not any(term in searchable_text for term in search_terms):
+                        continue
+                else:
+                    # Simple search
+                    searchable_text = " ".join(
+                        [
+                            device.get("name", ""),
+                            device.get("manufacturer", ""),
+                            device.get("part_number", ""),
+                            device.get("type", ""),
+                            device.get("symbol", ""),
+                        ]
+                    ).lower()
+
+                    if search_text not in searchable_text:
+                        continue
+
+            filtered_devices.append(device)
+
+        # Update tree with filtered results
+        self._update_device_tree(filtered_devices)
+
+        # Update results count
+        total = len(self.all_devices) if hasattr(self, "all_devices") else 0
+        self.results_label.setText(f"Showing {len(filtered_devices)} of {total} devices")
+
+    def _clear_filters(self):
+        """Clear all filters and show all devices."""
+        self.device_search.clear()
+        self.filter_combo.setCurrentIndex(0)  # "All Types"
+        if hasattr(self, "manufacturer_combo"):
+            self.manufacturer_combo.setCurrentIndex(0)  # "All Manufacturers"
+        if hasattr(self, "all_devices"):
+            self._update_device_tree(self.all_devices)
+            self.results_label.setText(f"Showing {len(self.all_devices)} devices")
+
+    def _toggle_advanced_search(self, enabled):
+        """Toggle advanced search features."""
+        # Placeholder for advanced search features
+        if enabled:
+            # Could add regex support, boolean operators, etc.
+            self.device_search.setPlaceholderText(
+                "Advanced search: use 'AND', 'OR', regex patterns..."
             )
-            try:
-                devices = load_catalog()
-                # reuse previous synchronous population logic
-                self.device_tree.clear()
-                grouped = {}
-                for d in devices:
-                    cat = d.get("type", "Unknown") or "Unknown"
-                    grouped.setdefault(cat, []).append(d)
-                for cat in sorted(grouped.keys()):
-                    cat_item = QtWidgets.QTreeWidgetItem([cat])
-                    for dev in sorted(grouped[cat], key=lambda x: x.get("name", "")):
-                        name_txt = f"{dev.get('name','<unknown>')} ({dev.get('symbol','')})"
-                        mfg_txt = dev.get("manufacturer", "") or ""
-                        pn_txt = dev.get("part_number", "") or ""
-                        it = QtWidgets.QTreeWidgetItem([name_txt, mfg_txt, pn_txt])
-                        it.setData(0, Qt.ItemDataRole.UserRole, dev)
-                        cat_item.addChild(it)
-                    self.device_tree.addTopLevelItem(cat_item)
-                self.device_tree.expandAll()
-                _logger.info(
-                    "Populated device tree (sync fallback) with %d devices from database",
-                    len(devices),
-                )
-            except Exception:
-                _logger.exception("Failed to populate device tree in fallback path")
+        else:
+            self.device_search.setPlaceholderText("Search devices, manufacturers, part numbers...")
+
+    def _populate_manufacturers(self):
+        """Populate manufacturer dropdown with unique manufacturers from devices."""
+        if not hasattr(self, "all_devices") or not self.all_devices:
+            return
+
+        manufacturers = set()
+        for device in self.all_devices:
+            mfg = device.get("manufacturer", "").strip()
+            if mfg:
+                manufacturers.add(mfg)
+
+        # Clear and repopulate manufacturer combo
+        self.manufacturer_combo.clear()
+        self.manufacturer_combo.addItem("All Manufacturers")
+        for mfg in sorted(manufacturers):
+            self.manufacturer_combo.addItem(mfg)
+
+    # Wire filtering methods
+    def _filter_wires(self):
+        """Filter wires based on search text, type, and gauge filters."""
+        search_text = self.wire_search.text().lower().strip()
+        type_filter = self.wire_type_combo.currentText()
+        gauge_filter = self.wire_gauge_combo.currentText()
+
+        if not hasattr(self, "all_wires"):
+            return
+
+        filtered_wires = []
+
+        for wire in self.all_wires:
+            # Apply type filter
+            if type_filter != "All Types":
+                wire_type = wire.get("type", "").lower()
+                wire_name = wire.get("name", "").lower()
+
+                # Map filter to wire type keywords
+                type_keywords = {
+                    "SLC/IDC": ["slc", "idc", "signal", "initiating"],
+                    "NAC": ["nac", "notification", "appliance"],
+                    "Power": ["power", "supply", "battery"],
+                    "Riser": ["riser", "cmr"],
+                    "Plenum": ["plenum", "cmp"],
+                }
+
+                if type_filter in type_keywords:
+                    keywords = type_keywords[type_filter]
+                    if not any(
+                        keyword in wire_type or keyword in wire_name for keyword in keywords
+                    ):
+                        continue
+
+            # Apply gauge filter
+            if gauge_filter != "All Gauges":
+                wire_gauge = str(wire.get("gauge", ""))
+                filter_gauge = gauge_filter.split()[0]  # Extract number from "14 AWG"
+                if filter_gauge not in wire_gauge:
+                    continue
+
+            # Apply search filter
+            if search_text:
+                searchable_text = " ".join(
+                    [
+                        wire.get("name", ""),
+                        wire.get("color", ""),
+                        str(wire.get("gauge", "")),
+                        wire.get("type", ""),
+                        str(wire.get("ohms_per_1000ft", "")),
+                        str(wire.get("max_current_a", "")),
+                    ]
+                ).lower()
+
+                if search_text not in searchable_text:
+                    continue
+
+            filtered_wires.append(wire)
+
+        # Update wire list with filtered results
+        self._update_wire_list(filtered_wires)
+
+        # Update results count
+        total = len(self.all_wires) if hasattr(self, "all_wires") else 0
+        self.wire_results_label.setText(f"Showing {len(filtered_wires)} of {total} wires")
+
+    def _clear_wire_filters(self):
+        """Clear all wire filters and show all wires."""
+        self.wire_search.clear()
+        self.wire_type_combo.setCurrentIndex(0)  # "All Types"
+        self.wire_gauge_combo.setCurrentIndex(0)  # "All Gauges"
+        if hasattr(self, "all_wires"):
+            self._update_wire_list(self.all_wires)
+            self.wire_results_label.setText(f"Showing {len(self.all_wires)} wires")
+
+    def _add_custom_wire(self):
+        """Add a custom wire to the spool."""
+        # Placeholder for adding custom wire functionality
+        from PySide6 import QtWidgets
+
+        dialog = QtWidgets.QInputDialog()
+        dialog.setWindowTitle("Add Custom Wire")
+        dialog.setLabelText("Enter wire specification (e.g., '16 AWG Red SLC'):")
+        dialog.setTextValue("")
+
+        if dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            wire_spec = dialog.textValue().strip()
+            if wire_spec:
+                # Create a simple custom wire entry
+                custom_wire = {
+                    "name": f"Custom: {wire_spec}",
+                    "gauge": 16,  # Default
+                    "color": "Unknown",
+                    "type": "Custom",
+                    "ohms_per_1000ft": 4.0,  # Default
+                    "max_current_a": 10.0,  # Default
+                    "model": "CUSTOM",
+                    "sku": wire_spec,
+                }
+
+                # Add to wire list
+                self.all_wires.append(custom_wire)
+                self._filter_wires()  # Refresh display
+
+    def _update_wire_list(self, wires):
+        """Update the wire list widget with the given wires."""
+        self.wire_list.clear()
+
+        if not wires:
+            item = QtWidgets.QListWidgetItem("No wires found")
+            self.wire_list.addItem(item)
+            return
+
+        for wire in wires:
+            gauge = wire.get("gauge", 0)
+            color = wire.get("color", "Unknown")
+            wire_type = wire.get("type", "")
+            ohms = wire.get("ohms_per_1000ft", 0.0)
+            max_current = wire.get("max_current_a", 0.0)
+
+            # Create display text
+            if wire_type:
+                display_name = f"{gauge} AWG {wire_type} - {color}"
+            else:
+                display_name = f"{gauge} AWG - {color}"
+
+            specs = f"({ohms:.1f} Ω/1000ft, {max_current:.0f}A)"
+            full_display = f"{display_name} {specs}"
+
+            # Create list item
+            item = QtWidgets.QListWidgetItem(full_display)
+
+            # Store wire data
+            wire_data = dict(wire)
+            wire_data["sku"] = display_name
+            item.setData(Qt.ItemDataRole.UserRole, wire_data)
+
+            self.wire_list.addItem(item)
 
     def _setup_properties_dock(self):
         """Setup the properties dock."""
@@ -1409,6 +1835,12 @@ class ModelSpaceWindow(QMainWindow):
         grid_action.setChecked(True)
         grid_action.triggered.connect(lambda: self.view.toggle_grid())
 
+        # Hide Conduit Fill toggle (affects wirepath label formatting)
+        hide_fill_action = view_menu.addAction("Hide Conduit Fill")
+        hide_fill_action.setCheckable(True)
+        hide_fill_action.setChecked(get_hide_conduit_fill())
+        hide_fill_action.toggled.connect(self._on_hide_conduit_fill_toggled)
+
         # Insert menu
         menubar.addMenu("&Insert")
         # Add insert options here
@@ -1479,7 +1911,7 @@ class ModelSpaceWindow(QMainWindow):
         export_zip_action.setShortcut("Ctrl+Alt+Z")
         export_zip_action.triggered.connect(self._export_report_bundle_zip)
 
-    # Compliance menu
+        # Compliance menu
         menubar.addMenu("&Compliance")
         # Add compliance options
 
@@ -1523,8 +1955,10 @@ class ModelSpaceWindow(QMainWindow):
 
             # Save/Load layouts
             save_layout = window_menu.addAction("Save Current Layout…")
+
             def _save_layout():
                 from PySide6.QtWidgets import QInputDialog
+
                 name, ok = QInputDialog.getText(self, "Save Layout", "Layout name:")
                 if ok and name.strip():
                     try:
@@ -1532,24 +1966,30 @@ class ModelSpaceWindow(QMainWindow):
                         self.statusBar().showMessage(f"Saved layout '{name.strip()}'", 4000)
                     except Exception:
                         pass
+
             save_layout.triggered.connect(_save_layout)
 
             load_layout = window_menu.addAction("Load Layout…")
+
             def _load_layout():
                 from PySide6.QtWidgets import QInputDialog
+
                 try:
                     names = wm.get_available_layouts()
                 except Exception:
                     names = []
                 if not names:
                     return
-                name, ok = QInputDialog.getItem(self, "Load Layout", "Choose a layout:", names, 0, False)
+                name, ok = QInputDialog.getItem(
+                    self, "Load Layout", "Choose a layout:", names, 0, False
+                )
                 if ok and name:
                     try:
                         wm.load_layout(name)
                         self.statusBar().showMessage(f"Loaded layout '{name}'", 4000)
                     except Exception:
                         pass
+
             load_layout.triggered.connect(_load_layout)
         else:
             disabled = window_menu.addAction("Window Manager unavailable")
@@ -1566,7 +2006,6 @@ class ModelSpaceWindow(QMainWindow):
         export_sheet_action.setShortcut("Ctrl+P")
         export_sheet_action.triggered.connect(self._export_title_block_sheet)
 
-    
     def _open_preferences(self):
         """Open Preferences dialog and persist updates."""
         try:
@@ -1582,7 +2021,9 @@ class ModelSpaceWindow(QMainWindow):
             current = load_preferences()
             # Include any runtime-only keys from controller.prefs if present
             if isinstance(self.app_controller.prefs, dict):
-                current.update({k: v for k, v in self.app_controller.prefs.items() if k not in current})
+                current.update(
+                    {k: v for k, v in self.app_controller.prefs.items() if k not in current}
+                )
         except Exception:
             current = dict(getattr(self, "prefs", {}) or {})
 
@@ -2105,7 +2546,7 @@ class ModelSpaceWindow(QMainWindow):
                 self.app_controller.current_project_path = None
             if hasattr(self.app_controller, "project_data"):
                 self.app_controller.project_data = self.app_controller._get_default_project_data()
-            
+
             # Show System Builder for new project setup
             self._show_system_builder()
             self.statusBar().showMessage(
@@ -2567,30 +3008,67 @@ class ModelSpaceWindow(QMainWindow):
 
     def closeEvent(self, event):
         """Handle window close event."""
-        # Notify controller about window closing
+        # Check if project has unsaved changes
+        if hasattr(self.app_controller, "is_modified") and self.app_controller.is_modified:
+            reply = QtWidgets.QMessageBox.question(
+                self,
+                "Unsaved Changes",
+                "You have unsaved changes. Do you want to save before closing?",
+                QtWidgets.QMessageBox.StandardButton.Save
+                | QtWidgets.QMessageBox.StandardButton.Discard
+                | QtWidgets.QMessageBox.StandardButton.Cancel,
+                QtWidgets.QMessageBox.StandardButton.Save,
+            )
+
+            if reply == QtWidgets.QMessageBox.StandardButton.Cancel:
+                event.ignore()
+                return
+            elif reply == QtWidgets.QMessageBox.StandardButton.Save:
+                # Try to save
+                try:
+                    self._save_project()
+                    # If save was cancelled (user hit cancel in file dialog), don't close
+                    if (
+                        hasattr(self.app_controller, "is_modified")
+                        and self.app_controller.is_modified
+                    ):
+                        event.ignore()
+                        return
+                except Exception as e:
+                    QtWidgets.QMessageBox.warning(
+                        self, "Save Error", f"Could not save project: {e}"
+                    )
+                    event.ignore()
+                    return
+
+        # Notify controller about window closing - this will close all other windows too
         if hasattr(self.app_controller, "on_model_space_closed"):
             self.app_controller.on_model_space_closed()
+        else:
+            # Fallback: close application directly
+            QtWidgets.QApplication.quit()
+
         event.accept()
 
     def _on_circuit_selected(self, circuit_id: str):
         """Handle circuit selection from enhanced connections panel."""
         _logger.info("Circuit selected: %s", circuit_id)
         self.statusBar().showMessage(f"Selected circuit: {circuit_id}")
-        
+
         # Could highlight circuit items in the scene here
         # TODO: Integrate with scene highlighting
-    
+
     def _on_device_selected(self, device_name: str):
         """Handle device selection from enhanced connections panel."""
         _logger.info("Device selected: %s", device_name)
         self.statusBar().showMessage(f"Selected device: {device_name}")
-        
+
         # Could highlight device in the scene here
         # TODO: Integrate with scene highlighting
-    
+
     def _on_calculations_updated(self):
         """Handle calculation updates from enhanced connections panel."""
         _logger.debug("Live calculations updated")
-        
+
         # Could update other UI elements that depend on calculations
         # TODO: Integrate with other panels that need calculation results

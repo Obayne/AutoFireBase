@@ -10,6 +10,8 @@ Current keys
 - report_default_dir: str
 - include_device_docs_in_submittal: bool
 - export_image_dpi: int
+- hide_conduit_fill: bool
+- circuits_overrides: dict[str, dict]  # per-circuit UI overrides (MVP)
 
 Environment overrides (optional, mostly for tests)
 - AUTOFIRE_PREF_FILE: absolute path to the preferences JSON
@@ -21,23 +23,25 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, cast
 
 
-def _default_report_dir(cwd: Optional[Path] = None) -> str:
+def _default_report_dir(cwd: Path | None = None) -> str:
     base = Path(cwd) if cwd is not None else Path(os.getcwd())
     return str(base / "artifacts" / "reports")
 
 
-def get_default_preferences(cwd: Optional[Path] = None) -> Dict[str, Any]:
+def get_default_preferences(cwd: Path | None = None) -> Dict[str, Any]:
     return {
         "report_default_dir": _default_report_dir(cwd),
         "include_device_docs_in_submittal": True,
         "export_image_dpi": 300,
+        "hide_conduit_fill": False,
+        "circuits_overrides": {},
     }
 
 
-def get_preferences_path(path: Optional[os.PathLike[str] | str] = None) -> Path:
+def get_preferences_path(path: os.PathLike[str] | str | None = None) -> Path:
     if path:
         return Path(path)
 
@@ -78,13 +82,19 @@ def _merge_defaults(loaded: Dict[str, Any], defaults: Dict[str, Any]) -> Dict[st
     out["include_device_docs_in_submittal"] = bool(
         out.get("include_device_docs_in_submittal", defaults["include_device_docs_in_submittal"])
     )
+    out["hide_conduit_fill"] = bool(out.get("hide_conduit_fill", defaults["hide_conduit_fill"]))
+    # Ensure circuits_overrides is a dict
+    co = out.get("circuits_overrides", defaults["circuits_overrides"])  # type: ignore[assignment]
+    if not isinstance(co, dict):
+        co = {}
+    out["circuits_overrides"] = co
     return out
 
 
 def load_preferences(
-    path: Optional[os.PathLike[str] | str] = None,
+    path: os.PathLike[str] | str | None = None,
     *,
-    cwd: Optional[Path] = None,
+    cwd: Path | None = None,
 ) -> Dict[str, Any]:
     pref_path = get_preferences_path(path)
     defaults = get_default_preferences(cwd)
@@ -92,8 +102,9 @@ def load_preferences(
         return dict(defaults)
     try:
         with pref_path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-            if not isinstance(data, dict):
+            raw = json.load(f)
+            data: Dict[str, Any] = cast(Dict[str, Any], raw) if isinstance(raw, dict) else {}
+            if not data:
                 return dict(defaults)
             return _merge_defaults(data, defaults)
     except (OSError, json.JSONDecodeError, UnicodeDecodeError, ValueError):
@@ -103,7 +114,7 @@ def load_preferences(
 
 def save_preferences(
     prefs: Dict[str, Any],
-    path: Optional[os.PathLike[str] | str] = None,
+    path: os.PathLike[str] | str | None = None,
 ) -> Path:
     pref_path = get_preferences_path(path)
     _ensure_dir(pref_path)
@@ -118,9 +129,9 @@ def save_preferences(
 
 def update_preferences(
     updates: Dict[str, Any],
-    path: Optional[os.PathLike[str] | str] = None,
+    path: os.PathLike[str] | str | None = None,
     *,
-    cwd: Optional[Path] = None,
+    cwd: Path | None = None,
 ) -> Dict[str, Any]:
     """Load, apply partial updates, normalize, and save.
 
