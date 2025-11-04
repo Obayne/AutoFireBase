@@ -1,12 +1,36 @@
 # -*- mode: python ; coding: utf-8 -*-
+# LV CAD Unified Build Configuration
 
 
 a = Analysis(
-    ['app\\boot.py'],
+    ['lvcad.py'],
     pathex=['.'],
     binaries=[],
-    datas=[('app', 'app'), ('core', 'core'), ('updater', 'updater')],
-    hiddenimports=['shapely','shapely.geometry','app.main', 'app.minwin', 'app.tools.array', 'app.tools.draw', 'app.tools.dimension', 'app.tools.text_tool', 'app.tools.trim_tool', 'app.tools.measure_tool', 'app.tools.extend_tool', 'app.tools.fillet_tool', 'app.tools.fillet_radius_tool', 'app.tools.rotate_tool', 'app.tools.mirror_tool', 'app.tools.scale_tool', 'app.tools.chamfer_tool', 'app.layout', 'app.dxf_import'],
+    datas=[
+        ('app', 'app'),
+        ('frontend', 'frontend'),
+        ('backend', 'backend'),
+        ('cad_core', 'cad_core'),
+        ('core', 'core'),
+        ('updater', 'updater'),
+        ('db', 'db'),
+        ('autofire_layer_intelligence.py', '.'),
+        ('fire_pilot.py', '.'),
+        ('lvcad_pro.py', '.'),
+        ('VERSION.txt', '.')
+    ],
+    hiddenimports=[
+        'shapely','shapely.geometry',
+        'app.main', 'app.minwin', 'app.boot',
+        'frontend.app', 'frontend.controller',
+        'autofire_layer_intelligence', 'fire_pilot',
+        'app.tools.array', 'app.tools.draw', 'app.tools.dimension',
+        'app.tools.text_tool', 'app.tools.trim_tool', 'app.tools.measure_tool',
+        'app.tools.extend_tool', 'app.tools.fillet_tool', 'app.tools.fillet_radius_tool',
+        'app.tools.rotate_tool', 'app.tools.mirror_tool', 'app.tools.scale_tool',
+        'app.tools.chamfer_tool', 'app.layout', 'app.dxf_import',
+        'PySide6', 'ezdxf', 'fitz', 'tkinter'
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

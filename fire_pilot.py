@@ -28,7 +28,7 @@ try:
     HAS_DEPENDENCIES = True
 except ImportError:
     HAS_DEPENDENCIES = False
-    print("⚠️  Some dependencies missing. Install with: pip install PyMuPDF ezdxf")
+    print("WARNING: Some dependencies missing. Install with: pip install PyMuPDF ezdxf")
 
 
 @dataclass
