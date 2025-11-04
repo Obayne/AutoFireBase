@@ -332,7 +332,7 @@ def demonstrate_intelligent_device_placement():
 
     # Create visual placement image
     print("🖼️ Creating device placement visualization...")
-    placement_image = placement_engine.create_device_placement_image(construction_set, 0, designs)
+    placement_engine.create_device_placement_image(construction_set, 0, designs)
 
     # Save detailed report
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

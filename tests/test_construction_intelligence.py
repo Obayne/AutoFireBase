@@ -2,10 +2,7 @@
 Tests for AutoFire Construction Drawing Intelligence.
 """
 
-from unittest.mock import MagicMock, Mock, patch
-
 import numpy as np
-import pytest
 
 from autofire_construction_drawing_intelligence import (
     ArchitecturalSymbol,
@@ -107,9 +104,7 @@ class TestConstructionDrawingIntelligence:
         # Mock image for classification
         image = np.ones((500, 500, 3), dtype=np.uint8) * 255
 
-        assert (
-            intelligence._classify_drawing_type(image, architectural) == DrawingType.FLOOR_PLAN
-        )
+        assert intelligence._classify_drawing_type(image, architectural) == DrawingType.FLOOR_PLAN
         assert intelligence._classify_drawing_type(image, structural) == DrawingType.STRUCTURAL
         assert intelligence._classify_drawing_type(image, electrical) == DrawingType.ELECTRICAL
         assert intelligence._classify_drawing_type(image, mechanical) == DrawingType.MECHANICAL

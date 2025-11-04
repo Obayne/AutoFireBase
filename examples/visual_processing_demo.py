@@ -13,7 +13,6 @@ Features demonstrated:
 5. Visual debugging output with annotated images
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -24,7 +23,6 @@ import numpy as np
 
 from autofire_construction_drawing_intelligence import (
     ConstructionDrawingIntelligence,
-    enhance_autofire_with_construction_intelligence,
 )
 from autofire_device_placement import AutoFireDevicePlacementEngine
 from autofire_visual_processor import AutoFireVisualProcessor
@@ -83,7 +81,7 @@ def example_basic_visual_processing():
     if scale:
         print(f"✅ Scale: {scale.scale_text} (confidence: {scale.confidence:.2f})")
 
-    print(f"\n📊 Summary:")
+    print("\n📊 Summary:")
     print(f"   - Walls detected: {len(walls)}")
     print(f"   - Rooms detected: {len(rooms)}")
     print(f"   - Scale detected: {scale.scale_text if scale else 'None'}")
@@ -95,11 +93,10 @@ def example_nfpa_device_placement():
     print("EXAMPLE 2: NFPA 72 Device Placement")
     print("=" * 70)
 
-    processor = AutoFireVisualProcessor()
     placement_engine = AutoFireDevicePlacementEngine()
 
     # Create sample image and analyze
-    sample_image = create_sample_floor_plan_image()
+    create_sample_floor_plan_image()
 
     print("\n🔍 Analyzing floor plan...")
     # Create a simple visual analysis result manually for demo
@@ -175,9 +172,9 @@ def example_construction_intelligence():
     print("\n🔍 Analyzing drawing with professional intelligence...")
     analysis = intelligence.analyze_drawing_professionally(sample_image)
 
-    print(f"✅ Professional analysis complete\n")
+    print("✅ Professional analysis complete\n")
 
-    print(f"📋 Title Block Information:")
+    print("📋 Title Block Information:")
     title_block = analysis["title_block"]
     print(f"   - Sheet Number: {title_block.sheet_number or 'Not detected'}")
     print(f"   - Drawing Scale: {title_block.drawing_scale or 'Not detected'}")
@@ -186,12 +183,12 @@ def example_construction_intelligence():
 
     classification = analysis["drawing_classification"]
     if classification:
-        print(f"\n📊 Drawing Classification:")
+        print("\n📊 Drawing Classification:")
         print(f"   - Discipline: {classification.get('discipline', 'Unknown')}")
         print(f"   - View Type: {classification.get('view_type', 'Unknown')}")
         print(f"   - Typical Scale: {classification.get('typical_scale', 'Unknown')}")
 
-    print(f"\n🔧 Detected Elements:")
+    print("\n🔧 Detected Elements:")
     print(f"   - Symbols: {len(analysis['symbols'])}")
     print(f"   - Structural Elements: {len(analysis['structural_elements'])}")
     print(f"   - MEP Elements: {len(analysis['mep_elements'])}")
@@ -200,7 +197,7 @@ def example_construction_intelligence():
     for issue in analysis["coordination_issues"]:
         print(f"   - {issue}")
 
-    print(f"\n📝 Professional Notes:")
+    print("\n📝 Professional Notes:")
     for note in analysis["professional_notes"]:
         print(f"   - {note}")
 
@@ -241,28 +238,28 @@ def example_complete_integration():
     enhanced_results = intelligence.enhance_autofire_visual_analysis(
         {"rooms": rooms, "walls": walls}, sample_image
     )
-    print(f"   ✅ Enhanced with professional analysis")
+    print("   ✅ Enhanced with professional analysis")
 
     print("\n🔥 Step 3: NFPA 72 Device Placement")
     designs = placement_engine.design_fire_alarm_system(visual_results)
     print(f"   ✅ Designed fire alarm system for {len(designs)} spaces")
 
     print("\n📊 Complete Analysis Summary:")
-    print(f"   Visual Elements:")
+    print("   Visual Elements:")
     print(f"      - Walls: {len(walls)}")
     print(f"      - Rooms: {len(rooms)}")
     print(f"      - Total Area: {visual_results.total_area_sq_ft:.0f} sq ft")
 
-    print(f"\n   Construction Intelligence:")
+    print("\n   Construction Intelligence:")
     ci = enhanced_results.get("construction_intelligence", {})
     print(f"      - Drawing Type: {ci.get('drawing_classification', {}).get('discipline', 'N/A')}")
     print(f"      - Symbols Recognized: {ci.get('symbol_recognition', 0)}")
     print(f"      - Coordination Issues: {len(ci.get('coordination_check', []))}")
 
-    print(f"\n   Fire Alarm Design:")
+    print("\n   Fire Alarm Design:")
     total_devices = sum(d.total_devices for d in designs)
     print(f"      - Total Devices: {total_devices}")
-    print(f"      - NFPA Compliance: All rooms compliant")
+    print("      - NFPA Compliance: All rooms compliant")
 
     print("\n✅ Complete visual processing pipeline operational!")
 

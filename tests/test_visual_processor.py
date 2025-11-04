@@ -2,11 +2,9 @@
 Tests for AutoFire Visual Processing Pipeline.
 """
 
-import math
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import numpy as np
-import pytest
 
 from autofire_visual_processor import (
     AutoFireVisualProcessor,
@@ -95,8 +93,9 @@ class TestAutoFireVisualProcessor:
 
         # Create a small test image
         test_image = np.ones((100, 100, 3), dtype=np.uint8) * 255
-        from PIL import Image
         import io
+
+        from PIL import Image
 
         pil_img = Image.fromarray(test_image)
         img_bytes = io.BytesIO()

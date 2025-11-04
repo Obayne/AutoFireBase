@@ -2,11 +2,9 @@
 Tests for AutoFire Device Placement Engine.
 """
 
-import math
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import numpy as np
-import pytest
 
 from autofire_device_placement import (
     AutoFireDevicePlacementEngine,
