@@ -1,0 +1,24 @@
+ConstructDoc Analysis Report
+========================================
+
+What this tool does:
+• Extracts text from PDF files
+• Counts construction-related words
+• Provides basic document analysis
+
+What this tool does NOT do:
+• Design fire protection systems
+• Replace professional engineering
+• Provide guaranteed accuracy
+
+Files Analyzed: 2
+
+File: 088 E000 - ELECTRICAL COVER SHEET.pdf
+  Words: 2747
+  Fire-related terms: 26
+  Has fire content: True
+
+File: FP0.1 - GENERAL NOTES SCHEDULES AND LEGEND.pdf
+  Words: 1279
+  Fire-related terms: 39
+  Has fire content: True
