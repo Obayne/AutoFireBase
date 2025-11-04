@@ -1,4 +1,4 @@
-﻿import json
+import json
 import math
 import os
 import sys
@@ -16,7 +16,6 @@ if __package__ in (None, ""):
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtWidgets import (
-    QApplication,
     QCheckBox,
     QComboBox,
     QDockWidget,
@@ -41,7 +40,7 @@ from app import catalog, dxf_import
 from app.logging_config import setup_logging
 
 # Grid scene and defaults used by the main window
-from app.scene import GridScene, DEFAULT_GRID_SIZE
+from app.scene import DEFAULT_GRID_SIZE, GridScene
 
 # Ensure logging is configured early so module-level loggers emit during
 # headless simulators and when the app starts from __main__.
@@ -54,14 +53,13 @@ from app.tools.chamfer_tool import ChamferTool
 from app.tools.extend_tool import ExtendTool
 
 _logger = logging.getLogger(__name__)
+from app.layout import PageFrame, TitleBlock, ViewportItem
 from app.tools.fillet_radius_tool import FilletRadiusTool
 from app.tools.fillet_tool import FilletTool
 from app.tools.freehand import FreehandTool
 from app.tools.leader import LeaderTool
 from app.tools.measure_tool import MeasureTool
 from app.tools.mirror_tool import MirrorTool
-from app.tools.text_tool import MTextTool, TextTool
-from app.layout import PageFrame, TitleBlock, ViewportItem
 from app.tools.move_tool import MoveTool
 from app.tools.revision_cloud import RevisionCloudTool
 from app.tools.rotate_tool import RotateTool
@@ -71,6 +69,7 @@ from app.tools.scale_underlay import (
     ScaleUnderlayRefTool,
     scale_underlay_by_factor,
 )
+from app.tools.text_tool import MTextTool, TextTool
 from app.tools.trim_tool import TrimTool
 
 try:
@@ -188,8 +187,8 @@ except Exception:
 
 
 APP_VERSION = "0.6.8-cad-base"
-APP_TITLE = f"Auto-Fire {APP_VERSION}"
-PREF_DIR = os.path.join(os.path.expanduser("~"), "AutoFire")
+APP_TITLE = f"LV CAD (Layer Vision) {APP_VERSION}"
+PREF_DIR = os.path.join(os.path.expanduser("~"), "LV_CAD")
 PREF_PATH = os.path.join(PREF_DIR, "preferences.json")
 LOG_DIR = os.path.join(PREF_DIR, "logs")
 
@@ -974,6 +973,7 @@ class MainWindow(QMainWindow):
 
         # Initialize global database connection for coverage calculations
         from db import connection
+
         connection.initialize_database(in_memory=True)
 
         # Theme
@@ -1280,6 +1280,7 @@ class MainWindow(QMainWindow):
         self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
         self.statusBar().addPermanentWidget(self.space_badge)
         self._init_sheet_manager()
+
     def _on_space_combo_changed(self, idx: int):
         if self.space_lock.isChecked():
             # Revert change if locked
@@ -1396,7 +1397,7 @@ class MainWindow(QMainWindow):
         self._set_osnap("intersect", self.act_os_int.isChecked())
         self._set_osnap("perp", self.act_os_perp.isChecked())
 
-        # No toolbars for base feel; reserve top bar for AutoFire items later
+        # No toolbars for base feel; reserve top bar for LV CAD items later
 
         # Status bar Grid controls
         sb = self.statusBar()
@@ -1446,7 +1447,7 @@ class MainWindow(QMainWindow):
         cmd_l.addWidget(self.cmd)
         sb.addPermanentWidget(cmd_wrap, 1)
 
-        # Toolbars removed: keeping top bar clean for AutoFire-specific UI later
+        # Toolbars removed: keeping top bar clean for LV CAD-specific UI later
 
         # Left panel (device palette)
         self._build_left_panel()
@@ -2153,6 +2154,7 @@ class MainWindow(QMainWindow):
         # subset of the QTreeWidget API used by headless simulators.
         if getattr(self, "device_tree", None) is None:
             try:
+
                 class SimpleTreeItem:
                     def __init__(self, text):
                         self._text = text
@@ -2800,6 +2802,7 @@ class MainWindow(QMainWindow):
                 "color": color_hex,
                 "orig_color": grp.data(2002),
             }
+
         # sketch geometry
         def _line_json(it: QtWidgets.QGraphicsLineItem):
             l = it.line()
@@ -3173,13 +3176,11 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("New project")
 
     def save_project_as(self):
-        p, _ = QFileDialog.getSaveFileName(
-            self, "Save Project As", "", "AutoFire Bundle (*.autofire)"
-        )
+        p, _ = QFileDialog.getSaveFileName(self, "Save Project As", "", "LV CAD Bundle (*.lvcad)")
         if not p:
             return
-        if not p.lower().endswith(".autofire"):
-            p += ".autofire"
+        if not p.lower().endswith(".lvcad"):
+            p += ".lvcad"
         try:
             data = self.serialize_state()
             with zipfile.ZipFile(p, "w", compression=zipfile.ZIP_DEFLATED) as z:
@@ -3189,7 +3190,7 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Save Project Error", str(ex))
 
     def open_project(self):
-        p, _ = QFileDialog.getOpenFileName(self, "Open Project", "", "AutoFire Bundle (*.autofire)")
+        p, _ = QFileDialog.getOpenFileName(self, "Open Project", "", "LV CAD Bundle (*.lvcad)")
         if not p:
             return
         try:
@@ -4317,14 +4318,17 @@ Keyboard Shortcuts
 â€¢ F2 Fit View
 """
 
+
 # factory for boot.py
 def create_window():
     from app.app_controller import AppController
+
     return AppController()
 
 
 def main():
     from app.app_controller import main as app_main
+
     return app_main()
 
 

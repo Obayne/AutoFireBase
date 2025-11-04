@@ -1,12 +1,12 @@
 
 Write-Host "==============================================="
-Write-Host "  AutoFire PowerShell Build (safe, improved)"
+Write-Host "  LV CAD PowerShell Build (safe, improved)"
 Write-Host "==============================================="
 
 # Warn for OneDrive (can lock files)
 if ($PWD.Path -match "OneDrive") {
   Write-Warning "You're building inside OneDrive. Sync can lock files and break the build."
-  Write-Warning "If you hit 'Access is denied', consider pausing OneDrive or moving the project to C:\Dev\AutoFireBase"
+  Write-Warning "If you hit 'Access is denied', consider pausing OneDrive or moving the project to C:\Dev\LV_CAD"
 }
 
 # Ensure deps
@@ -14,8 +14,8 @@ Write-Host "Installing build requirements (pip, PySide6, ezdxf, packaging, pyins
 python -m pip install -U pip PySide6 ezdxf packaging pyinstaller | Out-Null
 
 # Stop any running EXE and clean prior outputs
-Write-Host "Stopping any running AutoFire.exe ..."
-Get-Process AutoFire -ErrorAction SilentlyContinue | Stop-Process -Force
+Write-Host "Stopping any running LV_CAD.exe ..."
+Get-Process LV_CAD -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Milliseconds 600
 
 function SafeRemove($path) {
@@ -29,34 +29,34 @@ function SafeRemove($path) {
   }
 }
 
-SafeRemove ".\dist\AutoFire"
-SafeRemove ".\build\AutoFire"
+SafeRemove ".\dist\LV_CAD"
+SafeRemove ".\build\LV_CAD"
 
 # Primary build
-$dist = ".\dist\AutoFire"
-$work = ".\build\AutoFire"
+$dist = ".\dist\LV_CAD"
+$work = ".\build\LV_CAD"
 
-Write-Host "Building AutoFire.exe ..."
-pyinstaller --noconfirm --distpath $dist --workpath $work AutoFire.spec
+Write-Host "Building LV_CAD.exe ..."
+pyinstaller --noconfirm --distpath $dist --workpath $work LV_CAD.spec
 $code = $LASTEXITCODE
 
 if ($code -ne 0) {
   Write-Warning "Primary build failed with exit code $code. Retrying with a fresh dist folder ..."
   $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
-  $dist2 = ".\dist\AutoFire_$stamp"
+  $dist2 = ".\dist\LV_CAD_$stamp"
   # Try again
-  pyinstaller --noconfirm --distpath $dist2 --workpath $work AutoFire.spec
+  pyinstaller --noconfirm --distpath $dist2 --workpath $work LV_CAD.spec
   $code = $LASTEXITCODE
   if ($code -ne 0) {
     Write-Error "PyInstaller failed again (exit $code). Check the console above for details."
     exit $code
   } else {
     Write-Host "Build complete. EXE:"
-    Write-Host (Resolve-Path "$dist2\AutoFire\AutoFire.exe")
+    Write-Host (Resolve-Path "$dist2\LV_CAD\LV_CAD.exe")
     exit 0
   }
 } else {
   Write-Host "Build complete. EXE:"
-  Write-Host (Resolve-Path "$dist\AutoFire\AutoFire.exe")
+  Write-Host (Resolve-Path "$dist\LV_CAD\LV_CAD.exe")
   exit 0
 }

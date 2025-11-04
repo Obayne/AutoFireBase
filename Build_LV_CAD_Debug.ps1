@@ -1,7 +1,7 @@
 Param()
 
 Write-Host "==============================================="
-Write-Host "  AutoFire PowerShell Build (DEBUG console)"
+Write-Host "  LV CAD PowerShell Build (DEBUG console)"
 Write-Host "==============================================="
 
 if (!(Test-Path .\app)) { Write-Host "ERROR: 'app' folder not found here." -ForegroundColor Red; exit 1 }
@@ -15,9 +15,9 @@ Write-Host "Installing build requirements (pip, PySide6, ezdxf, packaging, pyins
 & $py -m pip install --upgrade pip
 & $py -m pip install PySide6 ezdxf packaging pyinstaller
 
-Write-Host "Building AutoFire_Debug.exe (console visible) ..."
+Write-Host "Building LV_CAD_Debug.exe (console visible) ..."
 
-& $py -m PyInstaller --noconfirm --clean --console --name AutoFire_Debug --paths . --add-data "VERSION.txt;." `
+& $py -m PyInstaller --noconfirm --clean --console --name LV_CAD_Debug --paths . --add-data "VERSION.txt;." `
   --hidden-import app `
   --hidden-import app.main `
   --hidden-import app.minwin `
@@ -35,4 +35,4 @@ Write-Host "Building AutoFire_Debug.exe (console visible) ..."
 if ($LASTEXITCODE -ne 0) { Write-Host "ERROR: PyInstaller failed." -ForegroundColor Red; exit 1 }
 
 Write-Host "Run this to see live logs and errors:" -ForegroundColor Yellow
-Write-Host ".\dist\AutoFire_Debug\AutoFire_Debug.exe"
+Write-Host ".\dist\LV_CAD_Debug\LV_CAD_Debug.exe"
