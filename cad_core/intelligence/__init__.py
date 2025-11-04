@@ -464,6 +464,16 @@ from .ai_floor_plan_processor import (
     process_floor_plans_for_low_voltage,
 )
 
+# CAD Layer Intelligence exports
+from .layer_intelligence import (
+    CADDevice,
+    CADLayerIntelligence,
+    EZDXF_AVAILABLE,
+    LayerClassification,
+    LayerInfo,
+    enhance_autofire_with_layer_intelligence,
+)
+
 __all__ = [
     # Core enums and data classes
     "PageType",
@@ -499,4 +509,11 @@ __all__ = [
     "SimplifiedFloorPlan",
     "process_floor_plans_for_low_voltage",
     "generate_complete_low_voltage_design",
+    # CAD Layer Intelligence
+    "CADLayerIntelligence",
+    "LayerClassification",
+    "CADDevice",
+    "LayerInfo",
+    "enhance_autofire_with_layer_intelligence",
+    "EZDXF_AVAILABLE",
 ]
