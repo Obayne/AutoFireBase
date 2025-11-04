@@ -93,7 +93,7 @@ class ThemeMetadata:
     author: str = "AutoFire"
     version: str = "1.0"
     created_date: str = ""
-    preview_image: Optional[str] = None
+    preview_image: str | None = None
     
     # Theme settings
     font_family: str = "Segoe UI"
@@ -350,7 +350,7 @@ class ThemeEditor(QWidget):
     
     theme_saved = Signal(AutoFireTheme)
     
-    def __init__(self, theme: Optional[AutoFireTheme] = None):
+    def __init__(self, theme: AutoFireTheme | None = None):
         super().__init__()
         self.current_theme = theme or AutoFireTheme(
             metadata=ThemeMetadata(

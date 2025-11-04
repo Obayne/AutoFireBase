@@ -77,7 +77,7 @@
 
 ### Directory Structure:
 - cad_core: EXISTS
-- cad_core/intelligence: EXISTS  
+- cad_core/intelligence: EXISTS
 - Projects: EXISTS
 
 ## PROOF OF FUNCTIONALITY

@@ -77,7 +77,8 @@ def ai_comprehensive_fire_alarm_design():
     print("\n2️⃣ AI MANUAL PULL STATION PLACEMENT")
     print("-" * 35)
     pull_result = ai_engine.place_devices_ai_optimized(
-        device_type=DeviceType.PULL_STATION, target_coverage=1.0  # Full egress coverage required
+        device_type=DeviceType.PULL_STATION,
+        target_coverage=1.0,  # Full egress coverage required
     )
 
     print(f"✓ Placed {pull_result.total_devices} manual pull stations")

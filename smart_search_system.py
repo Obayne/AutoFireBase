@@ -164,7 +164,7 @@ class SearchIndex:
             for variation in variations:
                 self.fuzzy_index[variation] = base_word
     
-    def search(self, query: str, filters: Optional[List[SearchFilter]] = None, max_results: int = 100) -> List[SearchResult]:
+    def search(self, query: str, filters: List[SearchFilter] | None = None, max_results: int = 100) -> List[SearchResult]:
         """Perform intelligent search with optional filters."""
         if not self.built:
             return []

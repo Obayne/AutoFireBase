@@ -6,4 +6,3 @@ Total Pages: 1
 Floor Plans: 1
 Result Type: <class 'cad_core.intelligence.ConstructionAnalysis'>
 Status: AutoFire AI successfully processed PDF
-

@@ -38,10 +38,10 @@ print(f'     {i}. {rfi.title} ({rfi.priority.value})')
 #### ✅ **AFTER (Fixed)**:
 ```python
 # Try different possible attribute names
-title = (safe_get_attribute(rfi, 'title') or 
-        safe_get_attribute(rfi, 'description') or 
-        safe_get_attribute(rfi, 'issue') or 
-        safe_get_attribute(rfi, 'summary') or 
+title = (safe_get_attribute(rfi, 'title') or
+        safe_get_attribute(rfi, 'description') or
+        safe_get_attribute(rfi, 'issue') or
+        safe_get_attribute(rfi, 'summary') or
         f'RFI Item #{i}')
 
 priority = safe_get_attribute(rfi, 'priority', 'Medium')

@@ -50,7 +50,7 @@ class ThemePersistence:
             if not theme_file.exists():
                 self.save_theme(theme, str(theme_file))
     
-    def save_theme(self, theme: AutoFireTheme, file_path: Optional[str] = None) -> str:
+    def save_theme(self, theme: AutoFireTheme, file_path: str | None = None) -> str:
         """Save theme to file."""
         if file_path is None:
             # Auto-generate filename
@@ -143,7 +143,7 @@ class ThemePersistence:
             print(f"❌ Export failed: {e}")
             return False
     
-    def import_theme(self, import_path: str) -> Optional[AutoFireTheme]:
+    def import_theme(self, import_path: str) -> AutoFireTheme | None:
         """Import theme from external file."""
         try:
             with open(import_path, 'r', encoding='utf-8') as f:
@@ -175,7 +175,7 @@ class ThemePersistence:
         self.settings.setValue("active_theme", theme_name)
         print(f"🎨 Active theme set: {theme_name}")
     
-    def get_active_theme(self) -> Optional[AutoFireTheme]:
+    def get_active_theme(self) -> AutoFireTheme | None:
         """Get the currently active theme."""
         theme_name = self.settings.value("active_theme", "classic")
         
@@ -623,7 +623,7 @@ class ThemeApplicationService:
         }
         return circuit_classes.get(circuit_type, "")
     
-    def reload_active_theme(self) -> Optional[str]:
+    def reload_active_theme(self) -> str | None:
         """Reload and apply the active theme."""
         active_theme = self.persistence.get_active_theme()
         if active_theme:

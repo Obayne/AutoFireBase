@@ -28,14 +28,14 @@ function Grant-FullControl {
         [string]$Path,
         [string]$User = $env:USERNAME
     )
-    
+
     try {
         if (Test-Path $Path) {
             Write-Host "✅ Granting full control to: $Path" -ForegroundColor Green
-            
+
             # Get current ACL
             $acl = Get-Acl $Path
-            
+
             # Create new access rule for full control
             $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
                 $User,
@@ -44,11 +44,11 @@ function Grant-FullControl {
                 "None",
                 "Allow"
             )
-            
+
             # Add the rule and apply
             $acl.SetAccessRule($accessRule)
             Set-Acl -Path $Path -AclObject $acl
-            
+
             if ($Verbose) {
                 Write-Host "   Full control granted for user: $User" -ForegroundColor Gray
             }
@@ -65,14 +65,14 @@ function Grant-FullControl {
 function Set-VSCodeRegistryPermissions {
     try {
         Write-Host "🔧 Setting VS Code registry permissions..." -ForegroundColor Cyan
-        
+
         $registryPaths = @(
             "HKCU:\Software\Microsoft\VSCode",
             "HKCU:\Software\Classes\.py",
             "HKCU:\Software\Classes\.json",
             "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Code.exe"
         )
-        
+
         foreach ($regPath in $registryPaths) {
             if (Test-Path $regPath -ErrorAction SilentlyContinue) {
                 Write-Host "   ✅ Registry access: $regPath" -ForegroundColor Green
@@ -87,10 +87,10 @@ function Set-VSCodeRegistryPermissions {
 function Set-PythonPermissions {
     try {
         Write-Host "🐍 Setting Python execution permissions..." -ForegroundColor Cyan
-        
+
         # Find Python installations
         $pythonPaths = @()
-        
+
         # Check common Python locations
         $commonPaths = @(
             "$env:LOCALAPPDATA\Programs\Python",
@@ -98,17 +98,17 @@ function Set-PythonPermissions {
             "$env:PROGRAMFILES(X86)\Python*",
             "$ProjectPath\.venv"
         )
-        
+
         foreach ($path in $commonPaths) {
             if (Test-Path $path) {
                 $pythonPaths += $path
             }
         }
-        
+
         foreach ($pyPath in $pythonPaths) {
             Grant-FullControl -Path $pyPath
         }
-        
+
         # Set execution policy for PowerShell if needed
         try {
             $currentPolicy = Get-ExecutionPolicy -Scope CurrentUser
@@ -119,7 +119,7 @@ function Set-PythonPermissions {
         } catch {
             Write-Host "   ⚠️  Could not update PowerShell execution policy" -ForegroundColor Yellow
         }
-        
+
     } catch {
         Write-Host "   ❌ Python permissions setup failed" -ForegroundColor Red
     }
@@ -129,12 +129,12 @@ function Set-PythonPermissions {
 function Create-VSCodeWorkspaceSettings {
     try {
         Write-Host "⚙️  Creating VS Code workspace settings..." -ForegroundColor Cyan
-        
+
         $vscodeDir = Join-Path $ProjectPath ".vscode"
         if (-not (Test-Path $vscodeDir)) {
             New-Item -ItemType Directory -Path $vscodeDir -Force | Out-Null
         }
-        
+
         $settingsPath = Join-Path $vscodeDir "settings.json"
         $workspaceSettings = @{
             "python.defaultInterpreterPath" = ".\.venv\Scripts\python.exe"
@@ -158,12 +158,12 @@ function Create-VSCodeWorkspaceSettings {
             "editor.formatOnSave" = $true
             "python.formatting.provider" = "black"
         }
-        
+
         $workspaceSettings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding UTF8
-        
+
         Grant-FullControl -Path $vscodeDir
         Write-Host "   ✅ VS Code workspace settings created" -ForegroundColor Green
-        
+
     } catch {
         Write-Host "   ❌ Failed to create VS Code settings" -ForegroundColor Red
     }
@@ -173,10 +173,10 @@ function Create-VSCodeWorkspaceSettings {
 function Set-EnvironmentVariables {
     try {
         Write-Host "🌍 Setting environment variables..." -ForegroundColor Cyan
-        
+
         # Set AutoFire project path
         [Environment]::SetEnvironmentVariable("AUTOFIRE_PROJECT_PATH", $ProjectPath, "User")
-        
+
         # Add Python virtual environment to PATH if it exists
         $venvPath = Join-Path $ProjectPath ".venv\Scripts"
         if (Test-Path $venvPath) {
@@ -185,9 +185,9 @@ function Set-EnvironmentVariables {
                 [Environment]::SetEnvironmentVariable("PATH", "$venvPath;$currentPath", "User")
             }
         }
-        
+
         Write-Host "   ✅ Environment variables set" -ForegroundColor Green
-        
+
     } catch {
         Write-Host "   ❌ Failed to set environment variables" -ForegroundColor Red
     }
@@ -239,18 +239,18 @@ try {
     # Test write access
     $testFile = Join-Path $ProjectPath "vscode_rights_test.tmp"
     "VS Code rights test" | Out-File $testFile -Force
-    
+
     if (Test-Path $testFile) {
         Remove-Item $testFile -Force
         Write-Host "   ✅ Write access confirmed" -ForegroundColor Green
     }
-    
+
     # Test Python execution
     $pythonTest = Join-Path $ProjectPath ".venv\Scripts\python.exe"
     if (Test-Path $pythonTest) {
         Write-Host "   ✅ Python environment accessible" -ForegroundColor Green
     }
-    
+
 } catch {
     Write-Host "   ⚠️  Some access issues may remain" -ForegroundColor Yellow
 }

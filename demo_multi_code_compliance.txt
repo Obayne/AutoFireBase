@@ -36,4 +36,3 @@
 - Option 2: FA contractor furnishes and installs complete
 - Coordinate access, mounting, and wiring requirements
 - Specify shutdown relay locations and responsibilities
-

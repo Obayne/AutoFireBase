@@ -4,4 +4,3 @@ Time: 2025-11-03 21:17:37.609854
 PDFConstructionAnalyzer: <class 'cad_core.intelligence.pdf_analyzer.PDFConstructionAnalyzer'>
 RFIIntelligenceEngine: <class 'cad_core.intelligence.rfi_engine.RFIIntelligenceEngine'>
 Status: AutoFire modules successfully imported
-

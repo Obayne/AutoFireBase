@@ -18,7 +18,7 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 
 @lru_cache(maxsize=1)
@@ -73,10 +73,10 @@ def lookup_docs_for_item(item: Any) -> dict[str, str]:
 
 def lookup_docs_for_spec(
     *,
-    manufacturer: Optional[str] = None,  # reserved for future disambiguation
-    model: Optional[str] = None,
-    name: Optional[str] = None,
-    part_number: Optional[str] = None,
+    manufacturer: str | None = None,  # reserved for future disambiguation
+    model: str | None = None,
+    name: str | None = None,
+    part_number: str | None = None,
 ) -> dict[str, str]:
     """Lookup documentation URLs by loose device spec fields.
 
