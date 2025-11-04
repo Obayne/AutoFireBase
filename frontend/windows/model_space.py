@@ -22,6 +22,9 @@ from app.tools.draw import (
     DrawController,
     DrawMode,
 )
+
+# Device placement system
+from device_browser import DeviceBrowserDock, DevicePlacementTool
 from backend import branding
 
 # Backend services
@@ -190,6 +193,7 @@ class ModelSpaceWindow(QMainWindow):
         # Place device
         place_device_action = toolbar.addAction("Device")
         place_device_action.setCheckable(True)
+        place_device_action.triggered.connect(self._toggle_device_browser)
 
         # Wire routing
         wire_action = toolbar.addAction("Wire")
@@ -335,119 +339,36 @@ class ModelSpaceWindow(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, left_dock)
 
     def _setup_device_palette_tab(self):
-        """Setup device palette tab with professional-grade filtering."""
-        w = QtWidgets.QWidget()
-        lay = QtWidgets.QVBoxLayout(w)
+        """Setup device palette tab with our new device browser."""
+        # Create our device browser
+        self.device_browser = DeviceBrowserDock()
 
-        # Search and Filter Controls
-        search_frame = QtWidgets.QFrame()
-        search_layout = QtWidgets.QVBoxLayout(search_frame)
-        search_frame.setStyleSheet(
-            "QFrame { background-color: #2d2d30; border: 1px solid #3c3c3c; border-radius: 4px; }"
-        )
+        # Connect device selection to placement
+        self.device_browser.device_selected.connect(self._start_device_placement)
 
-        # Search box with advanced features
-        search_row = QtWidgets.QHBoxLayout()
-        search_label = QtWidgets.QLabel("Search:")
-        self.device_search = QtWidgets.QLineEdit()
-        self.device_search.setPlaceholderText(
-            "Search devices, manufacturers, part numbers... (supports AND/OR)"
-        )
-        self.device_search.textChanged.connect(self._filter_devices)
-        search_row.addWidget(search_label)
-        search_row.addWidget(self.device_search)
-        search_layout.addLayout(search_row)
+        # Add to tab widget
+        self.left_tab_widget.addTab(self.device_browser.widget(), "🔥 Devices")
 
-        # Advanced filter row
-        filter_row1 = QtWidgets.QHBoxLayout()
+    def _start_device_placement(self, device_proto):
+        """Start device placement mode when user selects a device."""
+        if not hasattr(self, "device_placement_tool"):
+            self.device_placement_tool = DevicePlacementTool(self)
 
-        # Device type filter
-        type_label = QtWidgets.QLabel("Type:")
-        self.filter_combo = QtWidgets.QComboBox()
-        self.filter_combo.addItems(
-            [
-                "All Types",
-                "Smoke Detectors",
-                "Heat Detectors",
-                "Manual Pull Stations",
-                "Horn/Strobes",
-                "Speakers",
-                "Control Modules",
-                "Monitor Modules",
-                "Panels",
-                "Annunciators",
-            ]
-        )
-        self.filter_combo.currentTextChanged.connect(self._filter_devices)
+        self.device_placement_tool.set_device_prototype(device_proto)
 
-        # Manufacturer filter
-        mfg_label = QtWidgets.QLabel("Manufacturer:")
-        self.manufacturer_combo = QtWidgets.QComboBox()
-        self.manufacturer_combo.addItem("All Manufacturers")
-        self.manufacturer_combo.currentTextChanged.connect(self._filter_devices)
+    def _toggle_device_browser(self, checked):
+        """Toggle device browser visibility."""
+        if hasattr(self, "left_tab_widget"):
+            # Switch to device tab when button is pressed
+            for i in range(self.left_tab_widget.count()):
+                if "Devices" in self.left_tab_widget.tabText(i):
+                    self.left_tab_widget.setCurrentIndex(i)
+                    break
 
-        filter_row1.addWidget(type_label)
-        filter_row1.addWidget(self.filter_combo)
-        filter_row1.addStretch()
-        filter_row1.addWidget(mfg_label)
-        filter_row1.addWidget(self.manufacturer_combo)
-        search_layout.addLayout(filter_row1)
-
-        # Control buttons row
-        filter_row2 = QtWidgets.QHBoxLayout()
-
-        # Clear button
-        clear_btn = QtWidgets.QPushButton("Clear All")
-        clear_btn.clicked.connect(self._clear_filters)
-        clear_btn.setMaximumWidth(80)
-
-        # Advanced search toggle
-        advanced_btn = QtWidgets.QPushButton("Advanced")
-        advanced_btn.setCheckable(True)
-        advanced_btn.setMaximumWidth(80)
-        advanced_btn.toggled.connect(self._toggle_advanced_search)
-
-        filter_row2.addStretch()
-        filter_row2.addWidget(advanced_btn)
-        filter_row2.addWidget(clear_btn)
-        search_layout.addLayout(filter_row2)
-
-        lay.addWidget(search_frame)
-
-        # Results count
-        self.results_label = QtWidgets.QLabel("Loading devices...")
-        self.results_label.setStyleSheet("color: #cccccc; font-size: 11px; margin: 5px;")
-        lay.addWidget(self.results_label)
-
-        # Device tree with improved structure
-        self.device_tree = QtWidgets.QTreeWidget()
-        self.device_tree.setColumnCount(3)
-        self.device_tree.setHeaderLabels(["Device", "Manufacturer", "Part Number"])
-        self.device_tree.setAlternatingRowColors(True)
-        self.device_tree.setSortingEnabled(True)
-        self.device_tree.setRootIsDecorated(True)
-        self.device_tree.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        self.device_tree.customContextMenuRequested.connect(self._on_device_tree_context_menu)
-
-        # Store all devices for filtering
-        self.all_devices = []
-        self.device_type_mapping = {
-            "Smoke Detectors": ["smoke", "photo", "ionization"],
-            "Heat Detectors": ["heat", "thermal", "fixed_temperature", "rate_of_rise"],
-            "Manual Pull Stations": ["pull", "manual", "station"],
-            "Horn/Strobes": ["horn", "strobe", "speaker_strobe", "notification"],
-            "Speakers": ["speaker", "audio", "voice"],
-            "Control Modules": ["control", "relay", "output"],
-            "Monitor Modules": ["monitor", "input", "supervision"],
-            "Panels": ["panel", "facp", "controller"],
-            "Annunciators": ["annunciator", "display", "lcd", "led"],
-        }
-
-        # Populate device tree
-        self._populate_device_tree()
-
-        lay.addWidget(self.device_tree)
-        self.left_tab_widget.addTab(w, "Devices")
+            # Show/hide the left dock based on button state
+            left_dock = self.findChild(QtWidgets.QDockWidget, "Tools")
+            if left_dock:
+                left_dock.setVisible(checked)
 
     def _setup_wire_spool_tab(self):
         """Setup wire spool tab with professional-grade filtering."""
