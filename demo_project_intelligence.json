@@ -1,0 +1,50 @@
+{
+  "project_name": "Corporate Office Building - Fire Alarm System",
+  "executive_summary": {
+    "project_scope": "1700 sq ft office building with 4 fire alarm devices",
+    "estimated_cost": 6041.79,
+    "project_complexity": "Medium",
+    "estimated_duration": "3-4 weeks",
+    "key_challenges": [
+      "3 design issues requiring resolution",
+      "NFPA 72 compliance verification needed",
+      "Coordination with other trades required"
+    ]
+  },
+  "technical_analysis": {
+    "system_size": "4 devices across 1 floors",
+    "detection_coverage": "425 sq ft per device",
+    "compliance_status": "Requires review",
+    "manufacturer": "Simplex (primary), mixed specifications noted",
+    "special_requirements": [
+      "Data center protection",
+      "ADA compliance"
+    ]
+  },
+  "risk_assessment": {
+    "schedule_risk": "Medium - RFI resolution may delay construction",
+    "cost_risk": "Low - Standard fire alarm installation",
+    "compliance_risk": "Medium - NFPA spacing violations identified",
+    "coordination_risk": "Medium - Missing coverage in some areas",
+    "mitigation_strategies": [
+      "Resolve RFIs before permit submission",
+      "Conduct NFPA 72 compliance review",
+      "Coordinate with architectural team on coverage gaps"
+    ]
+  },
+  "cost_analysis": {
+    "cost_per_device": 1510.4475,
+    "cost_per_sq_ft": 3.5539941176470586,
+    "material_percentage": 51.061026616284245,
+    "labor_percentage": 26.15119029294298,
+    "markup_percentage": 22.787783090772766
+  },
+  "recommendations": [
+    "Address critical RFI items before proceeding with installation",
+    "Verify NFPA 72 spacing compliance in all areas",
+    "Complete device specifications for missing areas",
+    "Coordinate fire alarm design with architectural plans",
+    "Consider value engineering for cost optimization"
+  ],
+  "generated_date": "2025-11-03T18:26:41.497843"
+}

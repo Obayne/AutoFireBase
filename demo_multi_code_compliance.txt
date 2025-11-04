@@ -1,0 +1,39 @@
+# MULTI-CODE COMPLIANCE ANALYSIS
+
+**Project:** Corporate Campus Building - Multi-Code Compliance Demo
+**Generated:** 2025-11-03T18:37:10.023240
+
+## Code Compliance Summary
+
+- **NFPA 72**: requires_review (1 issues)
+- **IBC**: requires_review (1 issues)
+- **ADA**: requires_review (2 issues)
+- **IMC**: requires_review (2 issues)
+
+## Specification Analysis
+- Manufacturers: EST, Edwards, Simplex, est
+- Testing requirements: 3
+- Warranty requirements: 1
+
+## Specification Gotchas (3)
+- **VERSION_AMBIGUITY**: Specification references "latest version" without specific edition
+  - Severity: medium
+  - Recommendation: Specify exact code edition and standard versions
+
+- **COORDINATION_REQUIRED**: Specification requires coordination with other trades
+  - Severity: high
+  - Recommendation: Identify specific coordination requirements and responsible parties
+
+- **DUCT_DETECTOR_RESPONSIBILITY**: GOTCHA: Duct detector responsibility not clearly specified
+  - Severity: critical
+  - Recommendation: Clarify if mechanical or fire alarm contractor provides and installs duct detectors
+
+## Trade Coordination Issues (4)
+### CRITICAL ITEMS (1)
+- **Trade Coordination - Duct Detectors**: CRITICAL: Duct detector installation responsibility unclear - Mechanical or Fire Alarm contractor?
+  - Resolution: Clarify duct detector installation responsibility:
+- Option 1: Mechanical contractor installs, FA contractor wires/programs
+- Option 2: FA contractor furnishes and installs complete
+- Coordinate access, mounting, and wiring requirements
+- Specify shutdown relay locations and responsibilities
+

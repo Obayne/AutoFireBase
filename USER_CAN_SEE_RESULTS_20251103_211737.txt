@@ -1,0 +1,9 @@
+USER VISIBLE PROOF - AUTOFIRE PROCESSING RESULTS
+===============================================
+Time: 2025-11-03 21:17:37.619517
+Project Name: Sample Floor plan
+Total Pages: 1
+Floor Plans: 1
+Result Type: <class 'cad_core.intelligence.ConstructionAnalysis'>
+Status: AutoFire AI successfully processed PDF
+

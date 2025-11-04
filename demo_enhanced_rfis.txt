@@ -1,0 +1,122 @@
+# REQUEST FOR INFORMATION (RFI)
+
+**Project:** Corporate Campus Building - Multi-Code Compliance Demo
+**Generated:** 2025-11-03T18:37:10.023240
+**Total Issues:** 16
+
+## Priority Summary
+- Critical: 2
+- High: 5
+- Medium: 9
+- Low: 0
+
+## Issues by Category
+- NFPA Spacing Violation: 1
+- Mixed Manufacturers: 1
+- NFPA 72 Mass Notification: 1
+- IBC Egress Notification: 1
+- ADA Pull Station Height: 1
+- ADA Accessible Route Notification: 1
+- IMC Duct Detector Requirements: 1
+- IMC Computer Room Protection: 1
+- Trade Coordination - Duct Detectors: 2
+- Electrical Coordination - Power: 2
+- Mechanical Coordination - HVAC Shutdown: 2
+- General Coordination - Ceiling Access: 2
+
+## Detailed Issues
+
+### 1. NFPA Spacing Violation (HIGH)
+**Description:** Smoke detector at (60, 10) may exceed 30-foot spacing requirement
+**Reference:** FA-101
+**Suggested Resolution:** Verify spacing meets NFPA 72 Section 17.7.3.2.3.1
+
+### 2. Mixed Manufacturers (MEDIUM)
+**Description:** Multiple manufacturers specified: simplex, edwards
+**Reference:** Specifications
+**Suggested Resolution:** Clarify if mixed manufacturer system is acceptable or standardize on single manufacturer
+
+### 3. NFPA 72 Mass Notification (MEDIUM)
+**Description:** Assembly occupancy may require mass notification system
+**Reference:** FA-101
+**Suggested Resolution:** Verify mass notification requirements per NFPA 72 Chapter 24
+
+### 4. IBC Egress Notification (HIGH)
+**Description:** Corridors require notification appliances per IBC egress requirements
+**Reference:** A-101
+**Suggested Resolution:** Add notification appliances in egress corridors per IBC Section 1006
+
+### 5. ADA Pull Station Height (MEDIUM)
+**Description:** Verify pull station mounting heights comply with ADA (15" min, 48" max to operable part)
+**Reference:** FA-101
+**Suggested Resolution:** Confirm pull station heights meet ADA Section 205 reach range requirements
+
+### 6. ADA Accessible Route Notification (MEDIUM)
+**Description:** Verify notification appliances provide adequate coverage along accessible routes
+**Reference:** A-101
+**Suggested Resolution:** Ensure 75 cd minimum in corridors and accessible routes per ADA
+
+### 7. IMC Duct Detector Requirements (HIGH)
+**Description:** Mechanical rooms present but no duct detectors specified
+**Reference:** A-101
+**Suggested Resolution:** Verify duct detector requirements per IMC Section 606.2 and coordinate installation trade
+
+### 8. IMC Computer Room Protection (MEDIUM)
+**Description:** Computer/data rooms may require special fire protection systems
+**Reference:** A-101
+**Suggested Resolution:** Verify IMC requirements for computer rooms and coordinate with mechanical systems
+
+### 9. Trade Coordination - Duct Detectors (CRITICAL)
+**Description:** CRITICAL: Duct detector installation responsibility unclear - Mechanical or Fire Alarm contractor?
+**Reference:** General
+**Location:** HVAC systems
+**Suggested Resolution:** Clarify duct detector installation responsibility:
+- Option 1: Mechanical contractor installs, FA contractor wires/programs
+- Option 2: FA contractor furnishes and installs complete
+- Coordinate access, mounting, and wiring requirements
+- Specify shutdown relay locations and responsibilities
+
+### 10. Electrical Coordination - Power (MEDIUM)
+**Description:** Fire alarm panel power supply coordination required with electrical contractor
+**Reference:** General
+**Suggested Resolution:** Coordinate dedicated 20A circuit, surge protection, and emergency power requirements
+
+### 11. Mechanical Coordination - HVAC Shutdown (HIGH)
+**Description:** HVAC system shutdown coordination required for fire alarm activation
+**Reference:** A-101
+**Suggested Resolution:** Coordinate HVAC shutdown relays, fan control, and damper operation with mechanical contractor
+
+### 12. General Coordination - Ceiling Access (MEDIUM)
+**Description:** Fire alarm device installation requires ceiling coordination
+**Reference:** General
+**Suggested Resolution:** Coordinate ceiling grid modifications, access panels, and patching requirements
+
+### 13. Trade Coordination - Duct Detectors (CRITICAL)
+**Description:** CRITICAL: Duct detector installation responsibility unclear - Mechanical or Fire Alarm contractor?
+**Reference:** General
+**Location:** HVAC systems
+**Suggested Resolution:** Clarify duct detector installation responsibility:
+- Option 1: Mechanical contractor installs, FA contractor wires/programs
+- Option 2: FA contractor furnishes and installs complete
+- Coordinate access, mounting, and wiring requirements
+- Specify shutdown relay locations and responsibilities
+
+### 14. Electrical Coordination - Power (MEDIUM)
+**Description:** Fire alarm panel power supply coordination required with electrical contractor
+**Reference:** General
+**Suggested Resolution:** Coordinate dedicated 20A circuit, surge protection, and emergency power requirements
+
+### 15. Mechanical Coordination - HVAC Shutdown (HIGH)
+**Description:** HVAC system shutdown coordination required for fire alarm activation
+**Reference:** A-101
+**Suggested Resolution:** Coordinate HVAC shutdown relays, fan control, and damper operation with mechanical contractor
+
+### 16. General Coordination - Ceiling Access (MEDIUM)
+**Description:** Fire alarm device installation requires ceiling coordination
+**Reference:** General
+**Suggested Resolution:** Coordinate ceiling grid modifications, access panels, and patching requirements
+
+## Recommendations
+- Address 2 critical issues before proceeding with construction
+- Verify all designs meet current NFPA 72 requirements
+- Consider design review meeting to address multiple issues

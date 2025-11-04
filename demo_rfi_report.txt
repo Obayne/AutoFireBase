@@ -1,0 +1,37 @@
+# REQUEST FOR INFORMATION (RFI)
+
+**Project:** Corporate Office Building - Fire Alarm System
+**Generated:** 2025-11-03T18:26:41.499360
+**Total Issues:** 3
+
+## Priority Summary
+- Critical: 0
+- High: 1
+- Medium: 2
+- Low: 0
+
+## Issues by Category
+- Missing Detection: 1
+- Mixed Manufacturers: 1
+- Room Coordination: 1
+
+## Detailed Issues
+
+### 1. Missing Detection (HIGH)
+**Description:** Room 'Storage Room' requires fire detection but none shown on fire alarm plans
+**Reference:** A-101
+**Location:** Storage Room
+**Suggested Resolution:** Add appropriate smoke or heat detector per NFPA 72 requirements
+
+### 2. Mixed Manufacturers (MEDIUM)
+**Description:** Multiple manufacturers specified: edwards, simplex
+**Reference:** Specifications
+**Suggested Resolution:** Clarify if mixed manufacturer system is acceptable or standardize on single manufacturer
+
+### 3. Room Coordination (MEDIUM)
+**Description:** Rooms on architectural plans not addressed in fire alarm design: Data Center, Storage Room
+**Reference:** Cross-reference
+**Suggested Resolution:** Verify fire alarm coverage for all architectural spaces
+
+## Recommendations
+- Review fire alarm coverage in all occupied spaces

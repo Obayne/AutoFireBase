@@ -1,0 +1,16 @@
+{
+  "project_name": "Corporate Office Building - Fire Alarm System",
+  "building_area": 1700.0,
+  "device_count": 4,
+  "rfi_count": 3,
+  "estimated_cost": 6041.79,
+  "cost_per_sq_ft": 3.5539941176470586,
+  "critical_issues": 0,
+  "recommendations": [
+    "Address critical RFI items before proceeding with installation",
+    "Verify NFPA 72 spacing compliance in all areas",
+    "Complete device specifications for missing areas",
+    "Coordinate fire alarm design with architectural plans",
+    "Consider value engineering for cost optimization"
+  ]
+}

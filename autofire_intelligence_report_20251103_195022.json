@@ -1,0 +1,43 @@
+{
+  "project_info": {
+    "source_document": "C:\\Dev\\rfp-24-001-general-contractor-construction-drawings.pdf",
+    "analysis_date": "2025-11-03T19:50:22.294314",
+    "autofire_version": "2.0.0-ai-enhanced"
+  },
+  "construction_analysis": {
+    "total_pages": 25,
+    "floor_plans_count": 1,
+    "project_name": "RFP-24-001 General Contractor Construction Project"
+  },
+  "rfi_analysis": {
+    "total_rfis": 4,
+    "priority_breakdown": {
+      "high": 3,
+      "medium": 1
+    },
+    "category_breakdown": {
+      "Missing Detection": 2,
+      "Missing Device Schedule": 1,
+      "Insufficient Coverage": 1
+    }
+  },
+  "compliance_analysis": {
+    "nfpa_72": {
+      "code": "NFPA 72",
+      "issues": [],
+      "compliance_status": "compliant"
+    },
+    "ibc": {
+      "code": "IBC",
+      "issues": [],
+      "compliance_status": "compliant"
+    },
+    "ada": {
+      "code": "ADA",
+      "issues": [],
+      "compliance_status": "compliant"
+    },
+    "imc": {
+      "code": "IMC",
+      "issues": [
+        

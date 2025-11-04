@@ -1,0 +1,5 @@
+AUTOFIRE AI - CONSTRUCTION SET PROCESSING ERROR
+==============================================
+Time: 2025-11-03 21:24:54.416779
+Error: No module named 'cad_core.intelligence.multi_code_compliance_engine'
+File: C:/Dev/rfp-24-001-general-contractor-construction-drawings.pdf

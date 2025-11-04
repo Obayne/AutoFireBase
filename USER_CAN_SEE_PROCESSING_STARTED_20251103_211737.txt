@@ -1,0 +1,7 @@
+USER VISIBLE PROOF - PDF PROCESSING STARTED
+==========================================
+Time: 2025-11-03 21:17:37.613451
+PDF Path: C:/Dev/Autofire/Projects/floorplan-sample.pdf
+PDF Size: 95897 bytes
+Status: About to process PDF with AutoFire AI
+

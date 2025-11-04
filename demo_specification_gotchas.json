@@ -1,0 +1,20 @@
+[
+  {
+    "type": "version_ambiguity",
+    "description": "Specification references \"latest version\" without specific edition",
+    "severity": "medium",
+    "recommendation": "Specify exact code edition and standard versions"
+  },
+  {
+    "type": "coordination_required",
+    "description": "Specification requires coordination with other trades",
+    "severity": "high",
+    "recommendation": "Identify specific coordination requirements and responsible parties"
+  },
+  {
+    "type": "duct_detector_responsibility",
+    "description": "GOTCHA: Duct detector responsibility not clearly specified",
+    "severity": "critical",
+    "recommendation": "Clarify if mechanical or fire alarm contractor provides and installs duct detectors"
+  }
+]

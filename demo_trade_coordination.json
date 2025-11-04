@@ -1,0 +1,51 @@
+{
+  "critical_items": [
+    {
+      "category": "Trade Coordination - Duct Detectors",
+      "description": "CRITICAL: Duct detector installation responsibility unclear - Mechanical or Fire Alarm contractor?",
+      "priority": "critical",
+      "reference_drawing": "General",
+      "location": "HVAC systems",
+      "suggested_resolution": "Clarify duct detector installation responsibility:\n- Option 1: Mechanical contractor installs, FA contractor wires/programs\n- Option 2: FA contractor furnishes and installs complete\n- Coordinate access, mounting, and wiring requirements\n- Specify shutdown relay locations and responsibilities",
+      "created_date": "2025-11-03T18:37:10.019732"
+    }
+  ],
+  "all_issues": [
+    {
+      "category": "Trade Coordination - Duct Detectors",
+      "description": "CRITICAL: Duct detector installation responsibility unclear - Mechanical or Fire Alarm contractor?",
+      "priority": "critical",
+      "reference_drawing": "General",
+      "location": "HVAC systems",
+      "suggested_resolution": "Clarify duct detector installation responsibility:\n- Option 1: Mechanical contractor installs, FA contractor wires/programs\n- Option 2: FA contractor furnishes and installs complete\n- Coordinate access, mounting, and wiring requirements\n- Specify shutdown relay locations and responsibilities",
+      "created_date": "2025-11-03T18:37:10.019732"
+    },
+    {
+      "category": "Electrical Coordination - Power",
+      "description": "Fire alarm panel power supply coordination required with electrical contractor",
+      "priority": "medium",
+      "reference_drawing": "General",
+      "location": null,
+      "suggested_resolution": "Coordinate dedicated 20A circuit, surge protection, and emergency power requirements",
+      "created_date": "2025-11-03T18:37:10.019732"
+    },
+    {
+      "category": "Mechanical Coordination - HVAC Shutdown",
+      "description": "HVAC system shutdown coordination required for fire alarm activation",
+      "priority": "high",
+      "reference_drawing": "A-101",
+      "location": null,
+      "suggested_resolution": "Coordinate HVAC shutdown relays, fan control, and damper operation with mechanical contractor",
+      "created_date": "2025-11-03T18:37:10.019732"
+    },
+    {
+      "category": "General Coordination - Ceiling Access",
+      "description": "Fire alarm device installation requires ceiling coordination",
+      "priority": "medium",
+      "reference_drawing": "General",
+      "location": null,
+      "suggested_resolution": "Coordinate ceiling grid modifications, access panels, and patching requirements",
+      "created_date": "2025-11-03T18:37:10.019732"
+    }
+  ]
+}

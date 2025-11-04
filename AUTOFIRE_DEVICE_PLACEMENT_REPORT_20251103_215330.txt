@@ -1,0 +1,3948 @@
+AUTOFIRE INTELLIGENT DEVICE PLACEMENT REPORT
+==================================================
+Generated: 2025-11-03 21:53:30.301650
+
+AUTOFIRE CAN INTELLIGENTLY PLACE FIRE ALARM DEVICES!
+
+Room: Room 1 (587,710 sq ft)
+NFPA Compliance: Compliant
+Devices Required: 656
+
+  Smoke Detector:
+    Location: (174, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #1 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #2 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #3 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #4 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #5 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #6 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #7 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #8 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #9 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #10 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #11 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #12 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #13 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #14 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #15 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #16 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #17 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #18 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #19 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #20 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #21 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #22 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #23 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #24 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #25 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 124)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #26 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #27 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #28 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #29 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #30 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #31 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #32 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #33 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #34 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #35 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #36 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #37 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #38 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #39 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #40 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #41 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #42 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #43 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #44 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #45 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #46 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #47 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #48 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #49 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #50 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #51 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 373)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #52 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #53 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #54 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #55 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #56 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #57 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #58 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #59 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #60 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #61 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #62 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #63 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #64 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #65 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #66 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #67 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #68 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #69 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #70 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #71 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #72 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #73 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #74 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #75 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #76 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #77 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 622)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #78 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #79 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #80 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #81 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #82 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #83 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #84 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #85 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #86 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #87 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #88 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #89 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #90 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #91 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #92 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #93 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #94 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #95 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #96 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #97 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #98 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #99 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #100 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #101 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #102 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #103 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 872)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #104 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #105 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #106 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #107 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #108 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #109 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #110 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #111 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #112 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #113 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #114 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #115 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #116 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #117 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #118 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #119 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #120 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #121 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #122 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #123 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #124 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #125 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #126 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #127 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #128 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #129 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 1121)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #130 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #131 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #132 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #133 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #134 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #135 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #136 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #137 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #138 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #139 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #140 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #141 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #142 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #143 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #144 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #145 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #146 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #147 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #148 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #149 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #150 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #151 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #152 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #153 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #154 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #155 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 1370)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #156 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #157 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #158 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #159 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #160 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #161 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #162 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #163 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #164 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #165 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #166 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #167 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #168 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #169 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #170 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #171 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #172 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #173 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #174 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #175 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #176 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #177 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #178 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #179 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #180 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #181 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 1619)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #182 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #183 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #184 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #185 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #186 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #187 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #188 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #189 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #190 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #191 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #192 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #193 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #194 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #195 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #196 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #197 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #198 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #199 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #200 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #201 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #202 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #203 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #204 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #205 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #206 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #207 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 1868)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #208 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #209 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #210 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #211 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #212 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #213 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #214 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #215 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #216 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #217 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #218 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #219 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #220 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #221 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #222 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #223 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #224 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #225 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #226 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #227 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #228 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #229 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #230 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #231 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #232 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #233 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 2118)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #234 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #235 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #236 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #237 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #238 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #239 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #240 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #241 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #242 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #243 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #244 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #245 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #246 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #247 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #248 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #249 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #250 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #251 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #252 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #253 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #254 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #255 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #256 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #257 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #258 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #259 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 2367)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #260 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #261 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #262 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #263 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #264 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #265 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #266 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #267 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #268 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #269 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #270 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #271 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #272 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #273 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #274 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #275 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #276 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #277 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #278 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #279 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #280 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #281 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #282 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #283 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #284 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #285 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 2616)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #286 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #287 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #288 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #289 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #290 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #291 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #292 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #293 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #294 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #295 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #296 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #297 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #298 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #299 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #300 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #301 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #302 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #303 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #304 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #305 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #306 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #307 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #308 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #309 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #310 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #311 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 2865)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #312 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #313 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #314 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #315 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #316 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #317 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #318 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #319 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #320 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #321 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #322 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #323 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #324 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #325 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #326 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #327 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #328 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #329 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #330 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #331 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #332 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #333 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #334 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #335 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #336 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #337 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 3114)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #338 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #339 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #340 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #341 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #342 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #343 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #344 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #345 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #346 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #347 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #348 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #349 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #350 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #351 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #352 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #353 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #354 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #355 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #356 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #357 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #358 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #359 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #360 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #361 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #362 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #363 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 3364)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #364 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #365 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #366 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #367 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #368 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #369 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #370 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #371 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #372 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #373 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #374 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #375 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #376 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #377 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #378 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #379 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #380 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #381 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #382 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #383 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #384 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #385 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #386 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #387 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #388 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #389 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 3613)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #390 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #391 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #392 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #393 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #394 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #395 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #396 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #397 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #398 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #399 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #400 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #401 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #402 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #403 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #404 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #405 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #406 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #407 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #408 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #409 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #410 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #411 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #412 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #413 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #414 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #415 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 3862)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #416 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #417 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #418 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #419 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #420 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #421 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #422 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #423 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #424 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #425 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #426 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #427 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #428 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #429 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #430 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #431 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #432 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #433 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #434 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #435 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #436 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #437 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #438 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #439 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #440 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #441 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 4111)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #442 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #443 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #444 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #445 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #446 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #447 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #448 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #449 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #450 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #451 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #452 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #453 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #454 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #455 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #456 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #457 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #458 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #459 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #460 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #461 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #462 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #463 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #464 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #465 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #466 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #467 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 4360)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #468 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #469 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #470 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #471 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #472 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #473 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #474 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #475 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #476 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #477 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #478 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #479 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #480 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #481 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #482 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #483 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #484 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #485 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #486 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #487 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #488 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #489 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #490 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #491 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #492 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #493 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 4610)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #494 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #495 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #496 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #497 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #498 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #499 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #500 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #501 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #502 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #503 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #504 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #505 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #506 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #507 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #508 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #509 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #510 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #511 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #512 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #513 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #514 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #515 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #516 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #517 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #518 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #519 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 4859)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #520 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #521 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #522 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #523 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #524 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #525 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #526 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #527 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #528 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #529 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #530 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #531 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #532 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #533 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #534 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #535 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #536 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #537 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #538 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #539 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #540 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #541 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #542 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #543 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #544 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #545 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 5108)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #546 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #547 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #548 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #549 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #550 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #551 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #552 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #553 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #554 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #555 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #556 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #557 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #558 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #559 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #560 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #561 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #562 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #563 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #564 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #565 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #566 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #567 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #568 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #569 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #570 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #571 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 5357)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #572 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #573 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #574 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #575 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #576 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #577 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #578 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #579 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #580 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #581 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #582 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #583 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #584 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #585 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #586 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #587 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #588 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #589 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #590 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #591 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #592 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #593 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #594 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #595 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #596 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #597 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 5606)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #598 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #599 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #600 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #601 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #602 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #603 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #604 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #605 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #606 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #607 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #608 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #609 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #610 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #611 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #612 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #613 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #614 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #615 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #616 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #617 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #618 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #619 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #620 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #621 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #622 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #623 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 5856)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #624 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #625 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #626 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #627 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #628 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1569, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #629 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1918, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #630 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2267, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #631 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2616, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #632 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (2965, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #633 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3314, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #634 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (3663, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #635 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4012, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #636 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4361, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #637 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (4709, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #638 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5058, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #639 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5407, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #640 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (5756, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #641 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6105, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #642 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6454, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #643 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (6803, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #644 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7152, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #645 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7501, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #646 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (7849, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #647 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8198, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #648 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8547, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #649 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (8896, 6105)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #650 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (174, 6354)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #651 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (523, 6354)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #652 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (872, 6354)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #653 for 587710 sq ft room (30' max spacing)
+
+  Smoke Detector:
+    Location: (1221, 6354)
+    Coverage: 15.0 ft
+    NFPA Rule: NFPA 72: 7.6.3.2.3
+    Reasoning: Grid placement #654 for 587710 sq ft room (30' max spacing)
+
+  Horn/Strobe:
+    Location: (4535, 1619)
+    Coverage: 25.0 ft
+    NFPA Rule: NFPA 72: 7.4.2.1
+    Reasoning: Room 587710 sq ft requires audible/visual notification
+
+  Manual Pull Station:
+    Location: (100, 3240)
+    Coverage: 200.0 ft
+    NFPA Rule: NFPA 72: 7.5.1.1
+    Reasoning: Located within 200 ft travel distance of room occupants
+
+STATUS: AUTOFIRE PROVIDES INTELLIGENT DEVICE PLACEMENT
+Complete with NFPA 72 compliance and engineering reasoning!
