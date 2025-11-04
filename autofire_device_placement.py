@@ -6,10 +6,6 @@ Intelligent fire alarm device placement with NFPA 72 compliance
 This shows EXACTLY where AutoFire would place devices and WHY.
 """
 
-import sys
-
-sys.path.append("C:/Dev/Autofire")
-
 import math
 from dataclasses import dataclass
 from datetime import datetime

@@ -646,6 +646,185 @@ class ConstructionDrawingIntelligence:
     def _validate_device_placement(self, autofire_devices: List, symbols: List, scale_info: Dict) -> Dict:
         """Validate device placement against professional standards."""
         return {"validation_passed": True, "issues": []}
+    
+    # Additional placeholder methods for title block extraction
+    def _extract_scale_info(self, text: str) -> str:
+        """Extract scale information from text."""
+        return ""
+    
+    def _extract_date_info(self, text: str) -> str:
+        """Extract date information from text."""
+        return ""
+    
+    def _extract_revision_info(self, text: str) -> str:
+        """Extract revision information from text."""
+        return ""
+    
+    # Additional placeholder methods for structural analysis
+    def _identify_doors_from_medium_lines(self, medium_lines: List) -> List:
+        """Identify doors from medium line analysis."""
+        return []
+    
+    def _identify_windows_from_medium_lines(self, medium_lines: List) -> List:
+        """Identify windows from medium line analysis."""
+        return []
+    
+    def _identify_structural_columns(self, image: np.ndarray) -> List:
+        """Identify structural columns."""
+        return []
+    
+    def _define_room_boundaries(self, walls: List, doors: List, windows: List) -> List:
+        """Define room boundaries from walls, doors, and windows."""
+        return []
+    
+    def _identify_foundation_elements(self, thick_lines: List) -> List:
+        """Identify foundation elements."""
+        return []
+    
+    def _identify_beams(self, image: np.ndarray) -> List:
+        """Identify structural beams."""
+        return []
+    
+    def _analyze_load_paths(self, image: np.ndarray) -> List:
+        """Analyze structural load paths."""
+        return []
+    
+    def _identify_rebar_callouts(self, image: np.ndarray) -> List:
+        """Identify rebar callouts."""
+        return []
+    
+    # Additional placeholder methods for MEP element detection
+    def _detect_ductwork(self, image: np.ndarray) -> List:
+        """Detect HVAC ductwork."""
+        return []
+    
+    def _detect_diffusers(self, image: np.ndarray) -> List:
+        """Detect HVAC diffusers."""
+        return []
+    
+    def _detect_hvac_equipment(self, image: np.ndarray) -> List:
+        """Detect HVAC equipment."""
+        return []
+    
+    def _detect_thermostats(self, image: np.ndarray) -> List:
+        """Detect thermostats."""
+        return []
+    
+    def _detect_electrical_outlets(self, image: np.ndarray) -> List:
+        """Detect electrical outlets."""
+        return []
+    
+    def _detect_light_switches(self, image: np.ndarray) -> List:
+        """Detect light switches."""
+        return []
+    
+    def _detect_electrical_panels(self, image: np.ndarray) -> List:
+        """Detect electrical panels."""
+        return []
+    
+    def _detect_lighting_fixtures(self, image: np.ndarray) -> List:
+        """Detect lighting fixtures."""
+        return []
+    
+    def _detect_fire_alarm_devices(self, image: np.ndarray) -> List:
+        """Detect fire alarm devices."""
+        return []
+    
+    def _detect_plumbing_fixtures(self, image: np.ndarray) -> List:
+        """Detect plumbing fixtures."""
+        return []
+    
+    def _detect_pipe_runs(self, image: np.ndarray) -> List:
+        """Detect pipe runs."""
+        return []
+    
+    def _detect_valves(self, image: np.ndarray) -> List:
+        """Detect valves."""
+        return []
+    
+    def _detect_floor_drains(self, image: np.ndarray) -> List:
+        """Detect floor drains."""
+        return []
+    
+    # Additional placeholder methods for scale detection
+    def _parse_title_block_scale(self, scale_text: str) -> Dict:
+        """Parse scale from title block text."""
+        return {
+            "detected_scale": scale_text,
+            "scale_ratio": 48.0,
+            "pixels_per_foot": 48.0
+        }
+    
+    def _has_dimension_callouts(self, image: np.ndarray) -> bool:
+        """Check if image has dimension callouts."""
+        return False
+    
+    def _calibrate_from_dimensions(self, image: np.ndarray) -> Dict:
+        """Calibrate scale from dimension callouts."""
+        return {
+            "detected_scale": "calibrated",
+            "scale_ratio": 48.0,
+            "pixels_per_foot": 48.0
+        }
+    
+    def _calibrate_from_standard_elements(self, image: np.ndarray) -> Dict:
+        """Calibrate scale from standard elements."""
+        return {
+            "detected_scale": "estimated",
+            "scale_ratio": 48.0,
+            "pixels_per_foot": 48.0
+        }
+    
+    # Additional placeholder methods for coordination checking
+    def _elements_intersect(self, element1, element2) -> bool:
+        """Check if two elements intersect."""
+        return False
+    
+    def _check_panel_accessibility(self, panel, structural: Dict) -> bool:
+        """Check if panel meets accessibility requirements."""
+        return True
+    
+    # Additional placeholder methods for quality checking
+    def _check_drawing_quality(self, image: np.ndarray, symbols: List) -> List[str]:
+        """Check drawing quality."""
+        return []
+    
+    def _check_industry_standards(self, title_block: TitleBlockInfo, symbols: List, structural: Dict) -> Dict:
+        """Check industry standards compliance."""
+        return {"compliant": True, "issues": []}
+    
+    # Additional placeholder methods for symbol detection
+    def _get_symbol_description(self, symbol_type: str) -> str:
+        """Get description for symbol type."""
+        descriptions = {
+            "door": "Door opening with swing direction",
+            "window": "Window opening",
+            "outlet": "Electrical outlet",
+            "switch": "Light switch",
+            "smoke_detector": "Smoke detection device",
+            "sprinkler": "Fire sprinkler head",
+            "diffuser": "HVAC air diffuser",
+            "thermostat": "Temperature control",
+            "panel": "Electrical panel",
+            "fixture": "Plumbing fixture"
+        }
+        return descriptions.get(symbol_type, "Unknown symbol")
+    
+    def _get_standard_meaning(self, symbol_type: str) -> str:
+        """Get standard meaning for symbol type."""
+        meanings = {
+            "door": "Entry/exit point with traffic flow direction",
+            "window": "Natural light and ventilation opening",
+            "outlet": "Power connection point",
+            "switch": "Lighting control point",
+            "smoke_detector": "Fire detection and early warning",
+            "sprinkler": "Automatic fire suppression",
+            "diffuser": "Conditioned air distribution",
+            "thermostat": "Temperature monitoring and control",
+            "panel": "Electrical distribution and circuit protection",
+            "fixture": "Water supply or drainage point"
+        }
+        return meanings.get(symbol_type, "Industry standard element")
 
 # Integration function for AutoFire
 def enhance_autofire_with_construction_intelligence(autofire_results: Dict, image: np.ndarray) -> Dict:

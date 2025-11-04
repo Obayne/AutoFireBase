@@ -2,3 +2,7 @@ PySide6
 ezdxf
 reportlab
 shapely
+opencv-python
+PyMuPDF
+numpy
+Pillow
