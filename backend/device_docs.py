@@ -13,6 +13,7 @@ JSON format (backend/device_docs.json):
   "sd-355": {"cutsheet": "https://..."}
 }
 """
+
 from __future__ import annotations
 
 import json
@@ -123,10 +124,10 @@ def export_device_docs_html(items, dest_path: str) -> str:
     headers = ["manufacturer", "part_number", "name", "cutsheet", "manual"]
     thead = "".join(f"<th>{h}</th>" for h in headers)
     tbody = "\n".join(
-        "<tr>" +
-        f"<td>{mfg}</td><td>{pn}</td><td>{name}</td>" +
-        f"<td>{cell_link(c)}</td><td>{cell_link(man)}</td>" +
-        "</tr>"
+        "<tr>"
+        + f"<td>{mfg}</td><td>{pn}</td><td>{name}</td>"
+        + f"<td>{cell_link(c)}</td><td>{cell_link(man)}</td>"
+        + "</tr>"
         for (mfg, pn, name, c, man) in rows
     )
 
