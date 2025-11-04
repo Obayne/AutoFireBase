@@ -6,10 +6,6 @@ Intelligent fire alarm device placement with NFPA 72 compliance
 This shows EXACTLY where AutoFire would place devices and WHY.
 """
 
-import sys
-
-sys.path.append("C:/Dev/Autofire")
-
 import math
 from dataclasses import dataclass
 from datetime import datetime
@@ -336,7 +332,7 @@ def demonstrate_intelligent_device_placement():
 
     # Create visual placement image
     print("🖼️ Creating device placement visualization...")
-    placement_image = placement_engine.create_device_placement_image(construction_set, 0, designs)
+    placement_engine.create_device_placement_image(construction_set, 0, designs)
 
     # Save detailed report
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
