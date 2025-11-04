@@ -301,26 +301,26 @@ class ThemeApplicationService:
         stylesheet = f"""
         /* AutoFire Application Stylesheet */
         /* Theme: {theme.metadata.display_name} */
-        
+
         /* Main Application */
         QApplication {{
             font: {base_font};
             color: {colors.text_primary};
             background-color: {colors.background_primary};
         }}
-        
+
         QMainWindow {{
             background-color: {colors.background_primary};
             color: {colors.text_primary};
         }}
-        
+
         /* General Widgets */
         QWidget {{
             background-color: {colors.background_primary};
             color: {colors.text_primary};
             border: none;
         }}
-        
+
         /* Buttons */
         QPushButton {{
             background-color: {colors.primary};
@@ -330,23 +330,23 @@ class ThemeApplicationService:
             border-radius: {border_radius};
             font-weight: bold;
         }}
-        
+
         QPushButton:hover {{
             background-color: {colors.secondary};
             border-color: {colors.secondary};
         }}
-        
+
         QPushButton:pressed {{
             background-color: {colors.secondary};
             border-color: {colors.text_primary};
         }}
-        
+
         QPushButton:disabled {{
             background-color: {colors.background_tertiary};
             color: {colors.text_disabled};
             border-color: {colors.border};
         }}
-        
+
         /* Input Fields */
         QLineEdit, QTextEdit, QPlainTextEdit {{
             background-color: {colors.input_background};
@@ -355,11 +355,11 @@ class ThemeApplicationService:
             padding: 6px;
             border-radius: {border_radius};
         }}
-        
+
         QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {{
             border-color: {colors.border_active};
         }}
-        
+
         /* Combo Boxes */
         QComboBox {{
             background-color: {colors.input_background};
@@ -368,23 +368,23 @@ class ThemeApplicationService:
             padding: 6px;
             border-radius: {border_radius};
         }}
-        
+
         QComboBox:focus {{
             border-color: {colors.border_active};
         }}
-        
+
         QComboBox::drop-down {{
             border: none;
             width: 20px;
         }}
-        
+
         QComboBox::down-arrow {{
             image: none;
             border-left: 5px solid transparent;
             border-right: 5px solid transparent;
             border-top: 5px solid {colors.text_primary};
         }}
-        
+
         /* Lists and Trees */
         QListWidget, QTreeWidget, QTableWidget {{
             background-color: {colors.background_secondary};
@@ -392,22 +392,22 @@ class ThemeApplicationService:
             border: 1px solid {colors.border};
             alternate-background-color: {colors.background_tertiary};
         }}
-        
+
         QListWidget::item:selected, QTreeWidget::item:selected, QTableWidget::item:selected {{
             background-color: {colors.primary};
             color: {colors.text_inverse};
         }}
-        
+
         QListWidget::item:hover, QTreeWidget::item:hover, QTableWidget::item:hover {{
             background-color: {colors.background_tertiary};
         }}
-        
+
         /* Tabs */
         QTabWidget::pane {{
             border: 1px solid {colors.border};
             background-color: {colors.background_secondary};
         }}
-        
+
         QTabBar::tab {{
             background-color: {colors.background_tertiary};
             color: {colors.text_primary};
@@ -418,16 +418,16 @@ class ThemeApplicationService:
             border-top-left-radius: {border_radius};
             border-top-right-radius: {border_radius};
         }}
-        
+
         QTabBar::tab:selected {{
             background-color: {colors.background_secondary};
             border-bottom: 2px solid {colors.primary};
         }}
-        
+
         QTabBar::tab:hover {{
             background-color: {colors.background_primary};
         }}
-        
+
         /* Group Boxes */
         QGroupBox {{
             font-weight: bold;
@@ -437,13 +437,13 @@ class ThemeApplicationService:
             margin-top: 10px;
             padding-top: 10px;
         }}
-        
+
         QGroupBox::title {{
             subcontrol-origin: margin;
             left: 10px;
             padding: 0 5px 0 5px;
         }}
-        
+
         /* Sliders */
         QSlider::groove:horizontal {{
             border: 1px solid {colors.border};
@@ -451,7 +451,7 @@ class ThemeApplicationService:
             background: {colors.background_tertiary};
             border-radius: 4px;
         }}
-        
+
         QSlider::handle:horizontal {{
             background: {colors.primary};
             border: 1px solid {colors.border_active};
@@ -459,11 +459,11 @@ class ThemeApplicationService:
             margin: -5px 0;
             border-radius: 9px;
         }}
-        
+
         QSlider::handle:horizontal:hover {{
             background: {colors.secondary};
         }}
-        
+
         /* Progress Bars */
         QProgressBar {{
             border: 1px solid {colors.border};
@@ -471,45 +471,45 @@ class ThemeApplicationService:
             text-align: center;
             background-color: {colors.background_tertiary};
         }}
-        
+
         QProgressBar::chunk {{
             background-color: {colors.success};
             border-radius: {border_radius};
         }}
-        
+
         /* Scroll Bars */
         QScrollBar:vertical {{
             background: {colors.background_tertiary};
             width: 12px;
             border-radius: 6px;
         }}
-        
+
         QScrollBar::handle:vertical {{
             background: {colors.primary};
             border-radius: 6px;
             min-height: 20px;
         }}
-        
+
         QScrollBar::handle:vertical:hover {{
             background: {colors.secondary};
         }}
-        
+
         QScrollBar:horizontal {{
             background: {colors.background_tertiary};
             height: 12px;
             border-radius: 6px;
         }}
-        
+
         QScrollBar::handle:horizontal {{
             background: {colors.primary};
             border-radius: 6px;
             min-width: 20px;
         }}
-        
+
         QScrollBar::handle:horizontal:hover {{
             background: {colors.secondary};
         }}
-        
+
         /* Status indicators */
         .status-success {{
             background-color: {colors.success};
@@ -517,69 +517,69 @@ class ThemeApplicationService:
             border-radius: {border_radius};
             padding: 4px 8px;
         }}
-        
+
         .status-warning {{
             background-color: {colors.warning};
             color: black;
             border-radius: {border_radius};
             padding: 4px 8px;
         }}
-        
+
         .status-danger {{
             background-color: {colors.danger};
             color: white;
             border-radius: {border_radius};
             padding: 4px 8px;
         }}
-        
+
         .status-info {{
             background-color: {colors.info};
             color: white;
             border-radius: {border_radius};
             padding: 4px 8px;
         }}
-        
+
         /* CAD-specific styles */
         .cad-drawing-area {{
             background-color: {colors.cad_background};
             border: 2px solid {colors.border};
         }}
-        
+
         .cad-toolbar {{
             background-color: {colors.background_tertiary};
             border-bottom: 1px solid {colors.border};
         }}
-        
+
         /* Fire alarm device colors */
         .device-smoke {{
             color: {colors.smoke_detector};
         }}
-        
+
         .device-heat {{
             color: {colors.heat_detector};
         }}
-        
+
         .device-pull {{
             color: {colors.pull_station};
         }}
-        
+
         .device-horn-strobe {{
             color: {colors.horn_strobe};
         }}
-        
+
         .device-panel {{
             color: {colors.panel};
         }}
-        
+
         /* Circuit colors */
         .circuit-slc {{
             color: {colors.slc_circuit};
         }}
-        
+
         .circuit-nac {{
             color: {colors.nac_circuit};
         }}
-        
+
         .circuit-power {{
             color: {colors.power_circuit};
         }}
@@ -588,12 +588,12 @@ class ThemeApplicationService:
         # Add shadow effects if enabled
         if metadata.shadow_effects:
             stylesheet += f"""
-            
+
             /* Shadow Effects */
             QPushButton {{
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             }}
-            
+
             QGroupBox {{
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             }}

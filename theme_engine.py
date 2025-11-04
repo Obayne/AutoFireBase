@@ -1040,7 +1040,8 @@ def create_theme_manager_demo():
             print(f"   Background: {theme.colors.background_primary}")
 
             # Here you would apply the theme to the entire application
-            self.setStyleSheet(f"""
+            self.setStyleSheet(
+                f"""
                 QMainWindow {{
                     background-color: {theme.colors.background_primary};
                     color: {theme.colors.text_primary};
@@ -1059,7 +1060,8 @@ def create_theme_manager_demo():
                 QPushButton:hover {{
                     background-color: {theme.colors.secondary};
                 }}
-            """)
+            """
+            )
 
     app = QApplication(sys.argv)
 

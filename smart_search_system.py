@@ -428,7 +428,8 @@ class SmartSearchWidget(QWidget):
         self.search_input.setPlaceholderText(
             "Search devices, codes, standards... (e.g., 'smoke detector system sensor')"
         )
-        self.search_input.setStyleSheet(f"""
+        self.search_input.setStyleSheet(
+            f"""
             QLineEdit {{
                 background: {AutoFireColor.BACKGROUND};
                 color: {AutoFireColor.TEXT};
@@ -440,7 +441,8 @@ class SmartSearchWidget(QWidget):
             QLineEdit:focus {{
                 border-color: {AutoFireColor.PRIMARY};
             }}
-        """)
+        """
+        )
         self.search_input.textChanged.connect(self._on_search_changed)
         search_layout.addWidget(self.search_input)
 
@@ -551,7 +553,8 @@ class SmartSearchWidget(QWidget):
 
         # Results list
         self.results_list = QListWidget()
-        self.results_list.setStyleSheet(f"""
+        self.results_list.setStyleSheet(
+            f"""
             QListWidget {{
                 background: {AutoFireColor.BACKGROUND};
                 color: {AutoFireColor.TEXT};
@@ -568,7 +571,8 @@ class SmartSearchWidget(QWidget):
             QListWidget::item:hover {{
                 background: {AutoFireColor.BORDER};
             }}
-        """)
+        """
+        )
         self.results_list.itemDoubleClicked.connect(self._on_result_selected)
         layout.addWidget(self.results_list)
 
@@ -938,14 +942,16 @@ class SmartSearchDemo(QMainWindow):
             "• Auto-complete suggestions\n"
             "• Search history and favorites"
         )
-        info.setStyleSheet(f"""
-            background: {AutoFireColor.SURFACE}; 
-            color: {AutoFireColor.TEXT}; 
-            padding: 15px; 
+        info.setStyleSheet(
+            f"""
+            background: {AutoFireColor.SURFACE};
+            color: {AutoFireColor.TEXT};
+            padding: 15px;
             border-radius: 8px;
             font-size: 13px;
             line-height: 1.4;
-        """)
+        """
+        )
         layout.addWidget(info)
 
         # Search widget
@@ -954,7 +960,8 @@ class SmartSearchDemo(QMainWindow):
         layout.addWidget(self.search_widget)
 
         # Apply styling
-        self.setStyleSheet(f"""
+        self.setStyleSheet(
+            f"""
             QMainWindow {{
                 background-color: {AutoFireColor.BACKGROUND};
             }}
@@ -990,7 +997,8 @@ class SmartSearchDemo(QMainWindow):
                 background-color: {AutoFireColor.PRIMARY};
                 border: 1px solid {AutoFireColor.PRIMARY};
             }}
-        """)
+        """
+        )
 
     def setup_shortcuts(self):
         """Setup keyboard shortcuts."""
