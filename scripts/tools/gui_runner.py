@@ -3,15 +3,17 @@
 This runs headless enough (no user interaction) by scheduling actions via QTimer.
 It will exit on its own. Run with the project venv python.
 """
+
 import sys
 from pathlib import Path
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer  # noqa: E402
+from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from app.main import MainWindow
+from app.main import MainWindow  # noqa: E402
 
 
 def safe_call(win, name):

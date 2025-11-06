@@ -103,7 +103,7 @@ class ScaleUnderlayDragTool:
             return
         # scale factor from horizontal drag distance
         try:
-            view = self.win.view
+            _view = self.win.view
             cur = p
             dx = cur.x() - self.anchor.x()
             factor = max(0.01, 1.0 + dx / 200.0)

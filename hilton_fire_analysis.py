@@ -311,13 +311,13 @@ def main():
     hilton_analyzer = HiltonFireAnalysis()
 
     # Perform comprehensive analysis
-    results = hilton_analyzer.analyze_fire_protection_drawings()
+    _results = hilton_analyzer.analyze_fire_protection_drawings()
 
     # Generate competitive comparison
-    comparison = hilton_analyzer.generate_competitive_analysis()
+    _comparison = hilton_analyzer.generate_competitive_analysis()
 
     # Generate professional deliverables
-    deliverables = hilton_analyzer.generate_deliverables()
+    _deliverables = hilton_analyzer.generate_deliverables()
 
     # Final summary
     print("🏆 AUTOFIRE SUCCESS VALIDATION")

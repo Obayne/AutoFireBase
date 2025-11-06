@@ -15,4 +15,3 @@ Standards
 - Docstrings for public functions/classes; type hints on new code.
 - Prefer pure functions in `cad_core/`; side effects in `frontend/` only.
 - Keep PRs small and focused; update docs when behavior changes.
-

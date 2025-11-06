@@ -13,8 +13,9 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent))
 
 from autofire_device_placement import AutoFireDevicePlacement
-from autofire_layer_intelligence import CADLayerIntelligence
 from autofire_visual_processor import AutoFireVisualProcessor
+
+from autofire_layer_intelligence import CADLayerIntelligence
 
 
 def demonstrate_breakthrough_integration():
@@ -26,9 +27,9 @@ def demonstrate_breakthrough_integration():
     print()
 
     # Initialize all engines
-    visual_processor = AutoFireVisualProcessor()
-    device_placement = AutoFireDevicePlacement()
-    layer_intelligence = CADLayerIntelligence()
+    _visual_processor = AutoFireVisualProcessor()
+    _device_placement = AutoFireDevicePlacement()
+    _layer_intelligence = CADLayerIntelligence()
 
     print("✅ All AutoFire engines initialized")
     print("   - Visual Processing (OpenCV)")

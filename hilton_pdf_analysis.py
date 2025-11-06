@@ -216,10 +216,10 @@ def main():
     analyzer = HiltonPDFAnalyzer()
 
     # Analyze all fire protection PDFs
-    results = analyzer.analyze_fire_protection_plans()
+    _results = analyzer.analyze_fire_protection_plans()
 
     # Generate summary report
-    summary = analyzer.generate_summary_report()
+    _summary = analyzer.generate_summary_report()
 
     print("🎯 MARKET VALIDATION COMPLETE")
     print("AutoFire successfully analyzed real Hilton hotel")

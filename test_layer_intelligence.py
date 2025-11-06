@@ -148,7 +148,7 @@ def demonstrate_layer_intelligence():
     print("engineering data and computer vision approximations!")
     print()
 
-    return layer_results
+    assert isinstance(layer_results, dict)
 
 
 def test_integration_with_autofire():
@@ -259,7 +259,7 @@ def test_integration_with_autofire():
     print("   ✅ Approximation → Professional precision")
     print()
 
-    return layer_enhanced_results
+    assert isinstance(layer_enhanced_results, dict)
 
 
 def main():
@@ -272,13 +272,13 @@ def main():
     print()
 
     # Demonstrate core capabilities
-    layer_results = demonstrate_layer_intelligence()
+    _layer_results = demonstrate_layer_intelligence()
 
     print()
     print("🔗" + "=" * 68)
 
     # Test AutoFire integration
-    integration_results = test_integration_with_autofire()
+    _integration_results = test_integration_with_autofire()
 
     print()
     print("🎉 CONCLUSION:")
@@ -288,11 +288,7 @@ def main():
     print()
     print("Ready to revolutionize construction AI with precise layer analysis! 🚀")
 
-    return {
-        "layer_capabilities": layer_results,
-        "integration_test": integration_results,
-        "status": "BREAKTHROUGH_COMPLETE",
-    }
+    return None
 
 
 if __name__ == "__main__":

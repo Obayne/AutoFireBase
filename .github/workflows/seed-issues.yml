@@ -71,4 +71,3 @@ jobs:
                 labels: item.labels,
               });
             }
-

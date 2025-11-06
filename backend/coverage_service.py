@@ -1,9 +1,7 @@
 # backend/coverage_service.py
-import sqlite3
-from db.coverage_tables import WALL_STROBE_TABLE_NAME, CEILING_STROBE_TABLE_NAME
 from db.connection import get_connection
+from db.coverage_tables import CEILING_STROBE_TABLE_NAME, WALL_STROBE_TABLE_NAME
 
-from db.connection import get_connection
 
 def get_required_wall_strobe_candela(room_size: int) -> int | None:
     """
@@ -29,6 +27,7 @@ def get_required_wall_strobe_candela(room_size: int) -> int | None:
     )
     result = cur.fetchone()
     return result[0] if result else None
+
 
 def get_required_ceiling_strobe_candela(ceiling_height: int, room_size: int) -> int | None:
     """

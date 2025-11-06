@@ -19,7 +19,6 @@ from tkinter import filedialog, messagebox, scrolledtext, ttk
 # Import core engines
 try:
     from autofire_layer_intelligence import CADLayerIntelligence
-
     from fire_pilot import AiHJ
 
     HAS_ENGINES = True
@@ -338,8 +337,9 @@ class LVCADMainWindow:
                 # Update UI in main thread
                 self.root.after(0, lambda: self.display_cad_results("".join(results)))
 
-            except Exception:
-                self.root.after(0, lambda: self.log_message(f"Analysis error: {e}", "ERROR"))
+            except Exception as e:
+                # capture 'e' into the lambda default to avoid late-binding/undefined-name lint
+                self.root.after(0, lambda e=e: self.log_message(f"Analysis error: {e}", "ERROR"))
             finally:
                 self.root.after(0, lambda: self.progress_bar.stop())
                 self.root.after(0, lambda: self.update_status("CAD analysis complete"))
@@ -372,9 +372,10 @@ Fire Protection Terms:
 
                 self.root.after(0, lambda: self.display_doc_results(result_text))
 
-            except Exception:
+            except Exception as e:
+                # capture 'e' into the lambda default to avoid late-binding/undefined-name lint
                 self.root.after(
-                    0, lambda: self.log_message(f"Document analysis error: {e}", "ERROR")
+                    0, lambda e=e: self.log_message(f"Document analysis error: {e}", "ERROR")
                 )
             finally:
                 self.root.after(0, lambda: self.progress_bar.stop())

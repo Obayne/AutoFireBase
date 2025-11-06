@@ -571,7 +571,7 @@ class MainWindow(QMainWindow):
         for it in list(self.layer_devices.childItems()): it.scene().removeItem(it)
         for it in list(self.layer_wires.childItems()): it.scene().removeItem(it)
         self.scene.snap_enabled = bool(data.get("snap", True)); self.act_view_snap.setChecked(self.scene.snap_enabled)
-        self.scene.grid_size = int(data.get("grid", DEFAULT_GRID_SIZE)); 
+        self.scene.grid_size = int(data.get("grid", DEFAULT_GRID_SIZE));
         if hasattr(self, "spin_grid"): self.spin_grid.setValue(self.scene.grid_size)
         self.px_per_ft = float(data.get("px_per_ft", self.px_per_ft))
         self.snap_step_in = float(data.get("snap_step_in", self.snap_step_in))
@@ -605,7 +605,7 @@ class MainWindow(QMainWindow):
     def _on_selection_changed(self):
         d = self._get_selected_device()
         if not d:
-            self._enable_props(False); 
+            self._enable_props(False);
             return
         self._enable_props(True)
         # label + offset in ft

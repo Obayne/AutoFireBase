@@ -4,6 +4,7 @@ Creates backups with suffix '.bak-strip-stashed'.
 Run from repo root with the repo Python:
     & .venv/Scripts/python.exe scripts/tools/strip_stashed_markers.py
 """
+
 import sys
 from pathlib import Path
 
@@ -21,11 +22,7 @@ def _strip_markers(text: str) -> list[str]:
     out: list[str] = []
     for ln in text.splitlines():
         s = ln.strip()
-        if (
-            s.startswith("<<<<<<<")
-            or s.startswith("=======")
-            or s.startswith(">>>>>>>>")
-        ):
+        if s.startswith("<<<<<<<") or s.startswith("=======") or s.startswith(">>>>>>>>"):
             # don't try to auto-resolve real conflict blocks here
             return []
         if "Stashed changes" in ln or "stash" in ln.lower():

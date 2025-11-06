@@ -6,20 +6,18 @@ Creates a docked panel for browsing and selecting fire protection devices
 from the catalog for placement on the CAD canvas.
 """
 
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore
 from PySide6.QtWidgets import (
     QDockWidget,
+    QLabel,
+    QTreeWidget,
+    QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
-    QListWidget,
-    QListWidgetItem,
-    QLabel,
-    QHBoxLayout,
 )
 
 try:
     from app.catalog import load_catalog
-    from app.device import DeviceItem
 
     HAS_CATALOG = True
 except ImportError:
@@ -53,11 +51,17 @@ class DeviceBrowserDock(QDockWidget):
         title_label.setStyleSheet("font-weight: bold; font-size: 14px; padding: 5px;")
         layout.addWidget(title_label)
 
-        # Device list
-        self.device_list = QListWidget()
-        self.device_list.setDragDropMode(QListWidget.DragDropMode.DragOnly)
-        self.device_list.itemClicked.connect(self._on_device_clicked)
-        layout.addWidget(self.device_list)
+        # Device tree
+        self.device_tree = QTreeWidget()
+        self.device_tree.setHeaderLabels(["Devices"])
+        self.device_tree.setAlternatingRowColors(True)
+        self.device_tree.setSortingEnabled(True)
+        try:
+            self.device_tree.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+        except Exception:
+            pass
+        self.device_tree.itemClicked.connect(self._on_device_clicked)
+        layout.addWidget(self.device_tree)
 
         # Instructions
         instructions = QLabel("💡 Click device to place on canvas")
@@ -92,28 +96,28 @@ class DeviceBrowserDock(QDockWidget):
                 device_types[device_type] = []
             device_types[device_type].append(device)
 
-        # Add devices to list by category
+        # Add devices to tree by category
         for device_type, type_devices in device_types.items():
             # Add category header
-            header_item = QListWidgetItem(f"📁 {device_type}")
-            header_item.setFlags(QtCore.Qt.ItemFlag.NoItemFlags)  # Not selectable
-            header_item.setBackground(QtGui.QColor("#f0f0f0"))
-            font = header_item.font()
-            font.setBold(True)
-            header_item.setFont(font)
-            self.device_list.addItem(header_item)
+            cat_item = QTreeWidgetItem([f"{device_type} ({len(type_devices)})"])
+            cat_item.setExpanded(True)  # Expand categories by default
 
-            # Add devices in this category
             for device in type_devices:
-                item = QListWidgetItem()
-                item.setText(f"  {device.get('symbol', '?')} - {device.get('name', 'Unknown')}")
-                item.setData(QtCore.Qt.ItemDataRole.UserRole, device)  # Store device data
-                item.setToolTip(
-                    f"Type: {device.get('type', 'Unknown')}\n"
-                    f"Manufacturer: {device.get('manufacturer', 'Unknown')}\n"
-                    f"Part: {device.get('part_number', 'Unknown')}"
-                )
-                self.device_list.addItem(item)
+                name_txt = f"{device.get('name','<unknown>')}"
+                symbol = device.get("symbol", "")
+                if symbol:
+                    name_txt += f" ({symbol})"
+
+                mfg_txt = device.get("manufacturer", "") or ""
+                pn_txt = device.get("part_number", "") or ""
+
+                it = QTreeWidgetItem([name_txt, mfg_txt, pn_txt])
+                it.setData(0, QtCore.Qt.ItemDataRole.UserRole, device)
+                cat_item.addChild(it)
+
+            self.device_tree.addTopLevelItem(cat_item)
+
+        self.device_tree.expandAll()
 
     def _on_device_clicked(self, item):
         """Handle device selection."""
@@ -143,7 +147,8 @@ class DevicePlacementTool:
         self.current_device_proto = device_proto
         self.placement_active = True
         self.window.statusBar().showMessage(
-            f"Device Placement: {device_proto.get('name', 'Unknown')} - Click to place, Esc to cancel"
+            f"Device Placement: {device_proto.get('name', 'Unknown')} - "
+            "Click to place, Esc to cancel"
         )
 
     def place_device_at(self, scene_pos):
@@ -169,7 +174,8 @@ class DevicePlacementTool:
             device.setParentItem(self.window.devices_group)
 
             print(
-                f"Placed device: {self.current_device_proto.get('name')} at ({scene_pos.x():.1f}, {scene_pos.y():.1f})"
+                f"Placed device: {self.current_device_proto.get('name')} at "
+                f"({scene_pos.x():.1f}, {scene_pos.y():.1f})"
             )
 
             # Continue placement mode (user can place multiple)

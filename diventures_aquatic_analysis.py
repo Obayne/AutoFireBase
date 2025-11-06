@@ -280,10 +280,10 @@ def main():
     analyzer = DiventuresAquaticAnalysis()
 
     # Perform comprehensive analysis
-    results = analyzer.analyze_diventures_project()
+    _results = analyzer.analyze_diventures_project()
 
     # Show AutoFire advantages
-    advantages = analyzer.generate_autofire_advantages()
+    _advantages = analyzer.generate_autofire_advantages()
 
     print()
     print("🏆 AUTOFIRE SUCCESS - LARGE PROJECT VALIDATION")

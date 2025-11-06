@@ -772,7 +772,7 @@ class MainWindow(QMainWindow):
 
     def show_about(self):
         QtWidgets.QMessageBox.information(self,"About", f"Auto-Fire\\nVersion {APP_VERSION}")
-    
+
 def main():
     app = QApplication([])
     win = MainWindow(); win.show()

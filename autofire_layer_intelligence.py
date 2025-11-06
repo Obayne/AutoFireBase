@@ -94,7 +94,7 @@ class CADLayerIntelligence:
             logger.info(f"Starting CAD analysis: {file_path}")
 
             # Simulate layer analysis (would use ezdxf for real CAD files)
-            analysis_results = {
+            _analysis_results = {
                 "file_path": file_path,
                 "total_layers": 0,
                 "fire_layers": [],

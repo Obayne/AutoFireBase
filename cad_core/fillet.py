@@ -12,10 +12,10 @@ def _len(v: Point) -> float:
 
 
 def _norm(v: Point) -> Point:
-    l = _len(v)
-    if l <= 0.0:
+    length = _len(v)
+    if length <= 0.0:
         return Point(0.0, 0.0)
-    return Point(v.x / l, v.y / l)
+    return Point(v.x / length, v.y / length)
 
 
 def _sub(a: Point, b: Point) -> Point:
@@ -34,31 +34,30 @@ def _dot(a: Point, b: Point) -> float:
     return a.x * b.x + a.y * b.y
 
 
-def fillet_line_line(
+def _legacy_fillet_line_line(
     l1: Line, l2: Line, radius: float, tol: float = 1e-9
 ) -> tuple[Point, Point, Point] | None:
-    """Compute fillet between two infinite lines.
+    """Original legacy implementation (kept as fallback).
 
-    Returns (p1, p2, center) where p1 lies on l1, p2 lies on l2, and the
-    arc of radius `radius` centered at `center` is tangent to both lines.
-
-    None if lines are parallel or radius is non-positive.
+    This implementation was copied from the file before we delegate to the
+    new `lv_cad` implementation. It's preserved here to provide a safe
+    fallback if the new package is unavailable or raises unexpected errors.
     """
 
     if radius <= tol:
         return None
 
-    I = intersection_line_line(l1, l2, tol=tol)
-    if I is None:
+    ip = intersection_line_line(l1, l2, tol=tol)
+    if ip is None:
         return None
 
     # Choose directions away from intersection along each line
     # Prefer the endpoint farther from I to get a stable direction.
     def away_dir(L: Line) -> Point:
-        d_a = _len(_sub(L.a, I))
-        d_b = _len(_sub(L.b, I))
+        d_a = _len(_sub(L.a, ip))
+        d_b = _len(_sub(L.b, ip))
         # Prefer endpoint b when distances are equal to avoid sign flip
-        v = _sub(L.b, I) if d_b >= d_a else _sub(L.a, I)
+        v = _sub(L.b, ip) if d_b >= d_a else _sub(L.a, ip)
         return _norm(v)
 
     u1 = away_dir(l1)
@@ -82,10 +81,36 @@ def fillet_line_line(
     # Center distance from intersection along bisector
     d = radius / math.sin(half)
 
-    p1 = _add(I, _scale(u1, t))
-    p2 = _add(I, _scale(u2, t))
-    center = _add(I, _scale(b, d))
+    p1 = _add(ip, _scale(u1, t))
+    p2 = _add(ip, _scale(u2, t))
+    center = _add(ip, _scale(b, d))
     return (p1, p2, center)
+
+
+def fillet_line_line(l1: Line, l2: Line, radius: float, tol: float = 1e-9):
+    """Primary entry point for fillet_line_line.
+
+    Attempt to delegate to the migrated `lv_cad` implementation for the
+    strangler migration. If that import fails or the new code raises an
+    exception, fall back to the preserved legacy implementation to avoid
+    regressions.
+    """
+
+    try:
+        # Prefer the migrated implementation; handle import errors separately
+        from lv_cad.cad_core.fillet import fillet_line_line as _lv_fillet
+    except (ImportError, ModuleNotFoundError):
+        return _legacy_fillet_line_line(l1, l2, radius, tol=tol)
+    try:
+        return _lv_fillet(l1, l2, radius, tol=tol)
+    except Exception:
+        # The migrated implementation should be compatible, but if it
+        # raises unexpectedly, log the failure and fall back to the
+        # legacy implementation to avoid regressions.
+        import logging
+
+        logging.getLogger(__name__).exception("lv_cad.fillet failed; falling back to legacy fillet")
+        return _legacy_fillet_line_line(l1, l2, radius, tol=tol)
 
 
 __all__ = ["fillet_line_line"]
@@ -115,7 +140,7 @@ def fillet_line_circle(line: Line, circle: Circle, radius: float, tol: float = 1
     normals = [(nx, ny), (-nx, -ny)]
 
     results = []
-    for (nx, ny) in normals:
+    for nx, ny in normals:
         # Offset line for centers: any point C must satisfy n·(C - A) = r
         # We parametrize center candidates along the original line direction
         # and solve intersection with the circle of radius R' around circle.center.

@@ -38,4 +38,3 @@
   - New `frontend/app.py` (or similar) hosts Qt app/boot.
   - Legacy code imports adjusted minimally; app still runs.
   - No geometry logic moved into UI; keep seams.
-

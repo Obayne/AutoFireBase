@@ -57,6 +57,8 @@ def _iter_patch_zips(d: Path):
 
 def _apply_patch_zip(zip_path: Path, target_root: Path) -> bool:
     """Very small patcher: expects manifest.json + files (relative paths)."""
+    # Files we never want to allow being written by updates (safety denylist)
+    DENYLIST = {"app/main_fixed.py", "main_fixed.py"}
     with zipfile.ZipFile(zip_path, "r") as z:
         try:
             manifest = json.loads(z.read("manifest.json").decode("utf-8"))
@@ -73,6 +75,16 @@ def _apply_patch_zip(zip_path: Path, target_root: Path) -> bool:
         for info in z.infolist():
             name = info.filename
             if name.endswith("/") or name == "manifest.json":
+                continue
+            # Normalize and check denylist
+            norm = Path(name).as_posix().lstrip("./").lower()
+            if any(
+                norm == d or norm.endswith("/" + d) or norm.endswith("\\" + d) for d in DENYLIST
+            ):
+                try:
+                    _log(f"Skipping denied file from patch: {name}")
+                except Exception:
+                    pass
                 continue
             # normalize to Windows separators
             dest = (target_root / Path(name)).resolve()

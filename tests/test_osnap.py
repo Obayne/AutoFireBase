@@ -1,14 +1,19 @@
-import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
+
 from PySide6 import QtCore, QtWidgets
 
+from app import main as app_main
 from app.main import CanvasView
+
+# Enable debug logging in app.main for these tests so diagnostic
+# messages from _compute_osnap are visible during failures.
+app_main._logger.setLevel(10)
 
 
 class TestOSNAP:
     """Test OSNAP (Object Snap) functionality."""
 
-    def test_canvas_view_osnap_init(self):
+    def test_canvas_view_osnap_init(self, qtbot):
         """Test CanvasView OSNAP initialization."""
         mock_scene = Mock()
         mock_devices = Mock()
@@ -17,7 +22,9 @@ class TestOSNAP:
         mock_overlay = Mock()
         mock_window = Mock()
 
-        view = CanvasView(mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window)
+        view = CanvasView(
+            mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window
+        )
 
         # Check OSNAP toggles are initialized
         assert view.osnap_end is True
@@ -30,8 +37,7 @@ class TestOSNAP:
         assert view.osnap_marker is not None
         assert isinstance(view.osnap_marker, QtWidgets.QGraphicsEllipseItem)
 
-    @patch('app.main.QtWidgets.QGraphicsLineItem')
-    def test_compute_osnap_line_endpoints(self, mock_line_item):
+    def test_compute_osnap_line_endpoints(self, qtbot):
         """Test OSNAP finds line endpoints."""
         mock_scene = Mock()
         mock_devices = Mock()
@@ -40,16 +46,14 @@ class TestOSNAP:
         mock_overlay = Mock()
         mock_window = Mock()
 
-        view = CanvasView(mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window)
+        view = CanvasView(
+            mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window
+        )
 
-        # Create mock line item
-        mock_line = Mock()
-        mock_line.x1.return_value = 0.0
-        mock_line.y1.return_value = 0.0
-        mock_line.x2.return_value = 10.0
-        mock_line.y2.return_value = 10.0
-        mock_line_item.line.return_value = mock_line
-        mock_line_item.return_value = mock_line_item
+        # Create mock line item that returns a real QLineF
+        qline = QtCore.QLineF(0.0, 0.0, 10.0, 10.0)
+        mock_line_item = Mock()
+        mock_line_item.line.return_value = qline
 
         # Mock scene items
         mock_scene.items.return_value = [mock_line_item]
@@ -63,8 +67,7 @@ class TestOSNAP:
         assert abs(result.x() - 0.0) < 1e-6
         assert abs(result.y() - 0.0) < 1e-6
 
-    @patch('app.main.QtWidgets.QGraphicsEllipseItem')
-    def test_compute_osnap_circle_center(self, mock_ellipse_item):
+    def test_compute_osnap_circle_center(self, qtbot):
         """Test OSNAP finds circle centers."""
         mock_scene = Mock()
         mock_devices = Mock()
@@ -73,12 +76,17 @@ class TestOSNAP:
         mock_overlay = Mock()
         mock_window = Mock()
 
-        view = CanvasView(mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window)
+        view = CanvasView(
+            mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window
+        )
 
-        # Create mock ellipse item (circle)
-        mock_rect = Mock()
-        mock_rect.center.return_value = QtCore.QPointF(5.0, 5.0)
-        mock_ellipse_item.rect.return_value = mock_rect
+        # Create mock ellipse item (circle) returning a rect-like object
+        class RectLike:
+            def center(self):
+                return QtCore.QPointF(5.0, 5.0)
+
+        mock_ellipse_item = Mock()
+        mock_ellipse_item.rect.return_value = RectLike()
 
         # Mock scene items
         mock_scene.items.return_value = [mock_ellipse_item]
@@ -92,8 +100,7 @@ class TestOSNAP:
         assert abs(result.x() - 5.0) < 1e-6
         assert abs(result.y() - 5.0) < 1e-6
 
-    @patch('app.main.QtWidgets.QGraphicsLineItem')
-    def test_compute_osnap_line_intersection(self, mock_line_item):
+    def test_compute_osnap_line_intersection(self, qtbot):
         """Test OSNAP finds line intersections."""
         mock_scene = Mock()
         mock_devices = Mock()
@@ -102,25 +109,18 @@ class TestOSNAP:
         mock_overlay = Mock()
         mock_window = Mock()
 
-        view = CanvasView(mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window)
+        view = CanvasView(
+            mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window
+        )
 
-        # Create two mock line items that intersect
-        mock_line1 = Mock()
-        mock_line1.x1.return_value = 0.0
-        mock_line1.y1.return_value = 0.0
-        mock_line1.x2.return_value = 10.0
-        mock_line1.y2.return_value = 10.0
-
-        mock_line2 = Mock()
-        mock_line2.x1.return_value = 0.0
-        mock_line2.y1.return_value = 10.0
-        mock_line2.x2.return_value = 10.0
-        mock_line2.y2.return_value = 0.0
+        # Create two mock line items that intersect using real QLineF
+        ql1 = QtCore.QLineF(0.0, 0.0, 10.0, 10.0)
+        ql2 = QtCore.QLineF(0.0, 10.0, 10.0, 0.0)
 
         mock_line_item1 = Mock()
-        mock_line_item1.line.return_value = mock_line1
+        mock_line_item1.line.return_value = ql1
         mock_line_item2 = Mock()
-        mock_line_item2.line.return_value = mock_line2
+        mock_line_item2.line.return_value = ql2
 
         # Mock scene items
         mock_scene.items.return_value = [mock_line_item1, mock_line_item2]
@@ -134,7 +134,7 @@ class TestOSNAP:
         assert abs(result.x() - 5.0) < 1e-6
         assert abs(result.y() - 5.0) < 1e-6
 
-    def test_osnap_disabled(self):
+    def test_osnap_disabled(self, qtbot):
         """Test OSNAP when all snaps are disabled."""
         mock_scene = Mock()
         mock_devices = Mock()
@@ -143,7 +143,9 @@ class TestOSNAP:
         mock_overlay = Mock()
         mock_window = Mock()
 
-        view = CanvasView(mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window)
+        view = CanvasView(
+            mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window
+        )
 
         # Disable all OSNAP
         view.osnap_end = False
@@ -161,7 +163,7 @@ class TestOSNAP:
         # Should return None when no snaps enabled
         assert result is None
 
-    def test_osnap_marker_properties(self):
+    def test_osnap_marker_properties(self, qtbot):
         """Test OSNAP marker visual properties."""
         mock_scene = Mock()
         mock_devices = Mock()
@@ -170,7 +172,9 @@ class TestOSNAP:
         mock_overlay = Mock()
         mock_window = Mock()
 
-        view = CanvasView(mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window)
+        view = CanvasView(
+            mock_scene, mock_devices, mock_wires, mock_sketch, mock_overlay, mock_window
+        )
 
         marker = view.osnap_marker
 

@@ -10,17 +10,23 @@ import sys
 import time
 from pathlib import Path
 
+import pytest
+
 
 def test_executable():
     """Test the built LV CAD executable."""
+    import os
+
+    # Skip by default to avoid launching built executables during unit testing
+    if not os.getenv("RUN_BUILD_TESTS"):
+        pytest.skip("Skipping build/executable tests (set RUN_BUILD_TESTS=1 to enable)")
     print("🔍 TESTING LV CAD BUILD")
     print("=" * 30)
 
     exe_path = Path("dist/LV_CAD/LV_CAD.exe")
 
     if not exe_path.exists():
-        print(f"❌ Executable not found: {exe_path}")
-        return False
+        pytest.skip(f"Executable not found: {exe_path}")
 
     print(f"✅ Executable found: {exe_path}")
     print(f"📦 Size: {exe_path.stat().st_size / 1024 / 1024:.1f} MB")
@@ -42,11 +48,12 @@ def test_executable():
         else:
             print(f"⚠️  Command line test failed with code {result.returncode}")
             print(f"Error: {result.stderr}")
+            pytest.fail(f"Command line invocation failed with code {result.returncode}")
 
     except subprocess.TimeoutExpired:
-        print("⏰ Command line test timed out")
+        pytest.fail("Command line test timed out")
     except Exception as e:
-        print(f"❌ Command line test error: {e}")
+        pytest.fail(f"Command line test error: {e}")
 
     # Test GUI launch (brief)
     try:
@@ -65,18 +72,18 @@ def test_executable():
                 print(f"Error: {stderr.decode()}")
 
     except Exception as e:
-        print(f"❌ GUI test error: {e}")
+        pytest.fail(f"GUI test error: {e}")
 
     print("\n🎯 BUILD TEST SUMMARY:")
     print(f"   📦 Executable: {exe_path}")
     print(f"   📏 Size: {exe_path.stat().st_size / 1024 / 1024:.1f} MB")
     print("   ✅ Build appears successful")
     print("   🚀 Ready for distribution")
-
-    return True
+    assert True
 
 
 if __name__ == "__main__":
-    success = test_executable()
-    print(f"\n🏁 Test completed: {'SUCCESS' if success else 'FAILED'}")
-    sys.exit(0 if success else 1)
+    # Run as script for manual checks; exit 0 on completion
+    test_executable()
+    print("\n🏁 Test completed: SUCCESS")
+    sys.exit(0)

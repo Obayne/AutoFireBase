@@ -1,0 +1,7 @@
+name,manufacturer,part_number,local_path,url,missing
+Heat Detector,(Any),GEN-HD,,https://example.com/docs/heat-detector.pdf,False
+Horn Strobe,(Any),GEN-HS,C:\\Dev\\cutsheets\System Sensor\P2RK\Outdoor_Wall_Horns_Strobe_HornStrobes_DataSheet_AVDS115.pdf,,False
+Pull Station,(Any),GEN-PS,,,True
+Smoke Detector,(Any),GEN-SD,,https://example.com/docs/smoke-detector.pdf,False
+Speaker,(Any),GEN-SPK,C:\\Dev\\cutsheets\System Sensor\SPSCWL\AVDS866-03_Speakers_Strobes_Ceil_DataSheet_web.pdf,,False
+Strobe,(Any),GEN-S,C:\\Dev\\cutsheets\System Sensor\HW-LF\hbt-fire-LowFrequency_Sounders_SounderStrobes_DataSheet_AVDS164.pdf,,False

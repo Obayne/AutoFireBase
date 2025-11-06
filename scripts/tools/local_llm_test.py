@@ -5,7 +5,7 @@ If the model file is missing, it exits with a helpful message.
 Usage:
   .\.venv\Scripts\python.exe .\scripts\tools\local_llm_test.py
 """
-import os
+
 import sys
 from pathlib import Path
 
@@ -13,14 +13,14 @@ MODEL_DIR = Path(r"C:/Dev/Models")
 MODEL_NAME = "gpt4all-j.bin"  # change if you prefer a different filename
 MODEL_PATH = MODEL_DIR / MODEL_NAME
 
-PROMPT = "Summarize the AutoFire repository in 3 concise bullets for a developer." 
+PROMPT = "Summarize the AutoFire repository in 3 concise bullets for a developer."
 
 
 def main():
     print(f"Python: {sys.executable}")
     print(f"Model path: {MODEL_PATH}")
     if not MODEL_PATH.exists():
-        print("MODEL_MISSING: model file not found. Please download the model to: {}".format(MODEL_PATH))
+        print(f"MODEL_MISSING: model file not found. Please download the model to: {MODEL_PATH}")
         return 2
 
     try:
@@ -44,5 +44,5 @@ def main():
         return 4
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())

@@ -315,7 +315,7 @@ def main():
 
     # For demo, analyze the diventures project
     extractor = RealPDFContentExtractor("C:/Dev/diventures full")
-    results = extractor.analyze_project(max_files=3)  # Analyze first 3 PDFs in detail
+    _results = extractor.analyze_project(max_files=3)  # Analyze first 3 PDFs in detail
 
     print("\n🎯 EXTRACTION COMPLETE!")
     print("This shows exactly what AutoFire sees in your construction drawings.")

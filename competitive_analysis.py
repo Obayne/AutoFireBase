@@ -170,7 +170,7 @@ class CompetitiveAnalysis:
         Calculate total addressable market and revenue potential.
         """
         # Based on FireWire Designs metrics as market indicator
-        firewire_metrics = self.competitors.get("firewire_designs", {}).get("key_metrics", {})
+        _firewire_metrics = self.competitors.get("firewire_designs", {}).get("key_metrics", {})
 
         market_calculation = {
             "current_market_indicators": {
