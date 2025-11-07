@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # Python (pip)
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "05:00"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly

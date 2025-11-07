@@ -1,0 +1,25 @@
+name: Close stale issues and PRs
+
+on:
+  schedule:
+    - cron: "30 2 * * *" # daily at 02:30 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 45
+          days-before-close: 7
+          stale-issue-label: "stale"
+          stale-pr-label: "stale"
+          exempt-issue-labels: "pinned,security"
+          exempt-pr-labels: "work-in-progress,security"
+          close-issue-message: "Closing as stale. Reopen with more info if needed."
+          close-pr-message: "Closing as stale. Reopen if still relevant."

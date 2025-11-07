@@ -1,41 +1,20 @@
-name: Release
+name: Release on tag
 
 on:
   push:
     tags:
-      - 'v*'
+      - "v*.*.*" # e.g. v1.2.3
+
+permissions:
+  contents: write
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Build (PyInstaller)
-        shell: pwsh
-        run: |
-          ./Build_AutoFire.ps1
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: AutoFire-windows
-          path: dist/AutoFire/AutoFire/AutoFire.exe
-
   release:
-    needs: build-windows
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: AutoFire-windows
-          path: artifacts
+      - uses: actions/checkout@v4
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/AutoFire.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          generate_release_notes: true
 
