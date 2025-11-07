@@ -73,13 +73,18 @@ jobs:
             });
             
             // Check for approvals (need at least one approval)
+            // Use only the most recent review per user (not dismissed)
             const latestReviews = {};
             for (const review of reviews) {
-              latestReviews[review.user.login] = review.state;
+              if (review.state !== 'DISMISSED') {
+                if (!latestReviews[review.user.login] || new Date(review.submitted_at) > new Date(latestReviews[review.user.login].submitted_at)) {
+                  latestReviews[review.user.login] = review;
+                }
+              }
             }
             
-            const approvalCount = Object.values(latestReviews).filter(state => state === 'APPROVED').length;
-            const changesRequestedCount = Object.values(latestReviews).filter(state => state === 'CHANGES_REQUESTED').length;
+            const approvalCount = Object.values(latestReviews).filter(review => review.state === 'APPROVED').length;
+            const changesRequestedCount = Object.values(latestReviews).filter(review => review.state === 'CHANGES_REQUESTED').length;
             
             core.info(`Reviews: ${approvalCount} approvals, ${changesRequestedCount} changes requested`);
             
@@ -101,11 +106,16 @@ jobs:
             });
             
             const failedChecks = checkRuns.check_runs.filter(
-              check => check.conclusion === 'failure' || check.conclusion === 'cancelled'
+              check => check.conclusion === 'failure' || check.conclusion === 'cancelled' || 
+                       check.conclusion === 'timed_out' || check.conclusion === 'action_required'
             );
             
             const pendingChecks = checkRuns.check_runs.filter(
               check => check.status !== 'completed'
+            );
+            
+            const successChecks = checkRuns.check_runs.filter(
+              check => check.conclusion === 'success' || check.conclusion === 'neutral' || check.conclusion === 'skipped'
             );
             
             if (failedChecks.length > 0) {

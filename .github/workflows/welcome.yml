@@ -63,8 +63,7 @@ jobs:
                 'Thank you for opening your first issue. We appreciate your contribution to the project!\n\n' +
                 'Here are some helpful resources:\n' +
                 '- [README](../blob/main/README.md) - Project overview and quick start guide\n' +
-                '- [AGENTS.md](../blob/main/AGENTS.md) - Contributing guidelines\n' +
-                '- [Code of Conduct](../blob/main/CODEOWNERS) - Our community standards\n\n' +
+                '- [AGENTS.md](../blob/main/AGENTS.md) - Contributing guidelines\n\n' +
                 'A maintainer will review your issue soon. Feel free to ask questions if you need any clarification!';
               
               await github.rest.issues.createComment({
