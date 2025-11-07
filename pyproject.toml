@@ -15,5 +15,25 @@ select = [
   "UP", # pyupgrade
 ]
 
+# Temporarily relax strict rules in specific areas to keep CI green
+# while migration/strangler work lands. Tighten incrementally.
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+  "E741", # ambiguous variable names common in small geometry examples
+  "F401", # unused imports in test scaffolding
+  "F841", # assigned but unused variables in parity scaffolding
+  "I001", # import sort during churn
+]
+"app/app_controller.py" = [
+  "E402", # import not at top (logging setup sequencing)
+]
+"cad_core/geom_adapter.py" = [
+  "E402", # intentional import/definition ordering for legacy fallback
+]
+"lv_cad/cad_core/__init__.py" = [
+  "E402", # allow exports to follow docstring
+  "I001", # keep export order stable during migration
+]
+
 [tool.ruff.format]
 quote-style = "double"
