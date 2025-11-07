@@ -1,0 +1,26 @@
+name: Auto-merge when eligible (draft)
+
+# WARNING: This workflow is a draft. It will only add a check indicating eligibility.
+# Actual auto-merge actions that perform merges should be enabled only after admins approve and
+# branch-protection rules are in place.
+
+on:
+    pull_request:
+        types: [labeled, unlabeled, opened, edited, synchronize]
+
+jobs:
+    check-auto-merge:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check conditions for auto-merge
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const pr = context.payload.pull_request;
+                      if (!pr) return;
+                      const labels = pr.labels.map(l => l.name);
+                      const hasAuto = labels.includes('auto-merge');
+                      const isDraft = pr.draft;
+                      // Do not perform merges here. Post status comment about eligibility.
+                      const body = hasAuto && !isDraft ? 'PR is eligible for auto-merge (human review required before enabling actual merge).' : 'PR is not eligible for auto-merge.';
+                      await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: pr.number, body });

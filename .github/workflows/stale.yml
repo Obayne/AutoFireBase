@@ -1,0 +1,24 @@
+name: Stale management
+
+on:
+    schedule:
+        - cron: "0 0 * * *" # daily
+    workflow_dispatch: {}
+
+jobs:
+    stale:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Close stale issues and PRs
+              uses: actions/stale@v6
+              with:
+                  repo-token: "${{ secrets.GITHUB_TOKEN }}"
+                  days-before-stale: 30
+                  days-before-close: 60
+                  stale-issue-message: |
+                      This issue has been automatically marked as stale because it has not had recent activity.
+                      If you think this is in error, please leave a comment.
+                  stale-pr-message: |
+                      This PR has been automatically marked as stale because it has not had recent activity.
+                      If you think this is in error, please leave a comment.
+                  operations-per-run: 100

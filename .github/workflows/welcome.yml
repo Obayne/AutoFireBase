@@ -1,0 +1,23 @@
+name: Welcome first-time contributors
+
+on:
+    pull_request:
+        types: [opened]
+    issues:
+        types: [opened]
+
+jobs:
+    welcome:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Welcome new contributor
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const isFirst = (await github.rest.repos.getCollaboratorPermissionLevel({ owner: context.repo.owner, repo: context.repo.repo, username: context.actor })).data.permission === 'none';
+                      const number = context.payload.issue ? context.payload.issue.number : context.payload.pull_request.number;
+                      const body = `Thanks for your contribution! Please see CONTRIBUTING.md and our PR template for guidance. A maintainer will review soon.`;
+                      if (number) {
+                        await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: number, body });
+                      }

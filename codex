@@ -1,0 +1,130 @@
+# Codex onboarding payload
+
+Welcome, Codex. This file contains the canonical onboarding and operational instructions for the review-only Codex assistant in the AutoFireBase repository.
+
+IMPORTANT: This assistant is review-only. Do NOT merge PRs or change repository settings. If any action requires admin privileges or writing to secrets, stop and request a human reviewer (@Obayne).
+
+Contents
+
+- Role & constraints
+- Quick commands (what to run locally / in CI)
+- PR checklist and branch naming
+- Labeling rules and size thresholds
+- Parity & migration rules (what to look for in `/cad_core`, `/lv_cad`, `/backend`)
+- Automation workflows you may interact with
+- VS Code workspace verification snippet
+- Example review comments and failure reports
+- Contact & escalation
+
+1) Role & constraints
+
+- Role: review-only code assistant for this repository. You may comment, label, suggest changes, and open draft PRs for trivial fixes (formatting, pinning dev-deps).
+- Forbidden actions (do not do these):
+  - Merge PRs or enable auto-merge.
+  - Modify repository secrets or branch protection settings.
+  - Push to `main` or perform destructive changes without explicit human approval.
+
+2) Quick commands (run in PR workflows or locally)
+
+- Lint & auto-fix formatting:
+  - ruff check --fix .
+  - black .
+- Tests:
+  - pytest tests/unit -q
+  - pytest -q  # full suite
+
+3) PR checklist (validate for every PR touching core areas)
+
+- Branch naming: `feat/...`, `fix/...`, `chore/...`, `feat/strangler/...` for migrations.
+- PR title format: `scope: short-summary` (e.g., `feat(strangler): migrate fillet to lv_cad`).
+- Verify before marking ready-for-review:
+  - [ ] Lint and format run and no style regressions
+  - [ ] Unit tests (fast subset) pass
+  - [ ] Parity test present and passing for migrations (if applicable)
+  - [ ] No secrets included
+  - [ ] PR body includes local test steps and acceptance criteria
+
+4) Labeling rules
+
+- Apply `strangler` label for migration PRs (moving code to `lv_cad`).
+- Area labels from branch name:
+  - `feat/*` → `feature`
+  - `fix/*` → `fix`
+  - `*-frontend-*` → `frontend`
+  - `feat/strangler/*` → `strangler`
+- PR size labels (based on additions+deletions):
+  - `pr-size: XS` `<10 lines`
+  - `pr-size: S` `10–100 lines`
+  - `pr-size: M` `100–500 lines`
+  - `pr-size: L` `500–2000 lines`
+  - `pr-size: XL` `>2000 lines`
+
+5) Parity & migration rules (special care for `/cad_core`, `/lv_cad`, `/backend`)
+
+- For each migration PR, ensure a parity test exists and passes:
+  - Import the legacy module and the `lv_cad` copy
+  - Execute representative inputs
+  - Compare outputs using tolerant comparisons for floats when needed
+- Ensure the legacy shim still falls back to the original behavior if the `lv_cad` import fails.
+- Do NOT move GUI or PySide6-dependent code into `lv_cad` (keep `lv_cad` focused on algorithmic, pure‑Python code).
+
+6) Automation workflows interaction
+
+- Dependabot PRs: label `devops` and summarize dependency changes. If tests fail, suggest pin updates or note transient failures.
+- Stale workflow: ensure thresholds are respected and do not close issues/PRs with active human assignment or recent activity.
+
+7) VS Code workspace verification (one-line checks)
+
+- Windows PowerShell (with venv):
+  . .venv/Scripts/Activate.ps1 ; python -c "import frontend.windows.model_space; print('OK')"
+- macOS/Linux (bash):
+  source .venv/bin/activate ; python -c "import frontend.windows.model_space; print('OK')"
+
+8) Actionable failure report template
+Title: `ci-fail: <short description>`
+Body:
+
+- What I ran: `ruff check --fix .`, `pytest tests/unit -q`
+- Failing tests (include pytest node ids):
+  - `tests/foo/test_bar.py::test_baz` — AssertionError: message
+- Reproduction command:
+  - pytest tests/foo/test_bar.py::test_baz -q
+- Suggested next steps (concrete):
+  1. If parity-related: add a small failing unit test to lock expected behavior, and propose a minimal fix to `lv_cad`.
+  2. If environment-related: mark `windows-only` and request a Windows CI run.
+
+9) Example OK review comment (when lint/tests pass)
+Quick run summary: lint OK, unit tests OK (x tests), parity tests OK. Changes are small and well-tested. Recommend one human reviewer to verify domain intent before merge. Labels applied: `ci-pass`, `needs-review`.
+
+10) Escalation and contact
+
+- If any action requires admin rights (branch protection, secrets, enabling auto-merge), stop and request @Obayne with a short rationale.
+
+11) Where to write outputs
+
+- Post review comments on the PR; include reproduction commands, failing node ids, and short diffs or suggested patches.
+
+Security reminder: do NOT paste secrets or tokens. If a PR includes a secret, notify a human immediately and avoid echoing it in comments.
+
+If you want additional sections (full VS Code guide, automation flow diagrams, README updates), update this file with those contents or request the human owner to create separate draft PRs.
+
+-- End of instruction payload --
+
+You may now be pointed at this file by the Codex instance. If you want me to also create a PR and wire more automation files (Dependabot, stale, size-labeler, VS Code workspace), tell me "create automation PRs" and I will prepare draft PRs with the relevant YAML and docs.# Codex onboarding payload
+
+This file is a placeholder instruction document intended for the `codex` reviewer/assistant.
+
+Usage:
+
+- Point your Codex instance to this repository path: `C:/Dev/Autofire/codex`.
+- Replace the contents of this file with the full instruction payload (the detailed review rules, workflows, and templates) when ready. The file may include long text and multiple sections.
+
+Security note:
+
+- Do NOT include secrets, tokens, or credentials in this file.
+
+Current state:
+
+- This is a short placeholder. You can overwrite it with the full instruction content for Codex.
+
+If you want, I can populate this file with the full instructions we discussed (PR checklist, workflow descriptions, labeling rules, VS Code guide summary). Reply "populate" and I will write the complete payload into this file.

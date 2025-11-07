@@ -1,0 +1,11 @@
+# CODEOWNERS
+
+# Automatically assign a single review-only assistant for migration and core-area changes
+
+# Chosen handle: @codex
+
+# Note: this file was added by the assistant at the user's request. Adjust the handle if needed
+
+/cad_core/ @codex
+/lv_cad/ @codex
+/backend/ @codex
