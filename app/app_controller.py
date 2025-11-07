@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING, Any
 if __package__ in (None, ""):
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+import logging
+
 from PySide6 import QtCore, QtGui
 from PySide6.QtWidgets import (
     QApplication,
@@ -30,7 +32,6 @@ if TYPE_CHECKING:
 
 # Ensure logging is configured early
 setup_logging()
-import logging
 
 _logger = logging.getLogger(__name__)
 
