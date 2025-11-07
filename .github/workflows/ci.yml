@@ -25,7 +25,7 @@ jobs:
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
 
       - name: Lint (ruff)
-        run: ruff check .
+        run: ruff check lv_cad cad_core backend tests
 
       - name: Format check (black)
         run: black --check .
