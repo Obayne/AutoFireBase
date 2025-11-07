@@ -5,12 +5,10 @@
     }
   ],
   "settings": {
-    // Python settings
     "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
     "python.terminal.activateEnvironment": true,
     "python.analysis.typeCheckingMode": "basic",
     
-    // Formatting
     "[python]": {
       "editor.defaultFormatter": "ms-python.black-formatter",
       "editor.formatOnSave": true,
@@ -19,24 +17,20 @@
       }
     },
     
-    // Black formatter settings
     "black-formatter.args": [
       "--line-length=100"
     ],
     
-    // Ruff linter settings
     "ruff.lineLength": 100,
     "ruff.lint.args": [
       "--config=pyproject.toml"
     ],
     
-    // File associations
     "files.associations": {
       "*.spec": "python",
       "*.ps1": "powershell"
     },
     
-    // Exclude patterns
     "files.exclude": {
       "**/__pycache__": true,
       "**/*.pyc": true,
@@ -45,7 +39,6 @@
       "**/.mypy_cache": true
     },
     
-    // Search exclude
     "search.exclude": {
       "**/build": true,
       "**/dist": true,
@@ -53,19 +46,15 @@
       "**/node_modules": true
     },
     
-    // Git settings
     "git.ignoreLimitWarning": true,
     "git.autofetch": true,
     
-    // Editor settings
     "editor.rulers": [100],
     "editor.minimap.enabled": true,
     "editor.suggestSelection": "first",
     
-    // Terminal settings
     "terminal.integrated.defaultProfile.windows": "PowerShell",
     
-    // Testing
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
     "python.testing.pytestArgs": [
@@ -73,7 +62,6 @@
       "-v"
     ],
     
-    // Task auto-detection
     "task.autoDetect": "on"
   },
   "extensions": {

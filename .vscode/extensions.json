@@ -1,39 +1,31 @@
 {
   "recommendations": [
-    // Python essentials
     "ms-python.python",
     "ms-python.vscode-pylance",
     "ms-python.black-formatter",
     "charliermarsh.ruff",
     
-    // GitHub integration
     "github.vscode-github-actions",
     "github.vscode-pull-request-github",
     "github.copilot",
     "github.copilot-chat",
     
-    // Git tools
     "eamodio.gitlens",
     "donjayamanne.githistory",
     "mhutchie.git-graph",
     
-    // Markdown
     "bierner.markdown-preview-github-styles",
     "yzhang.markdown-all-in-one",
     
-    // PowerShell
     "ms-vscode.powershell",
     
-    // UI/UX enhancements
     "pkief.material-icon-theme",
     "usernamehw.errorlens",
     "oderwat.indent-rainbow",
     "streetsidesoftware.code-spell-checker",
     
-    // Testing
     "littlefoxteam.vscode-python-test-adapter",
     
-    // Productivity
     "gruntfuggly.todo-tree",
     "wayou.vscode-todo-highlight",
     "aaron-bond.better-comments"

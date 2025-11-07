@@ -59,16 +59,13 @@ jobs:
             
             // Welcome first-time contributors
             if (isIssue && issueCount === 1) {
-              const message = `👋 Welcome to AutoFireBase, @${author}! 
-
-Thank you for opening your first issue. We appreciate your contribution to the project!
-
-Here are some helpful resources:
-- [README](../blob/main/README.md) - Project overview and quick start guide
-- [AGENTS.md](../blob/main/AGENTS.md) - Contributing guidelines
-- [Code of Conduct](../blob/main/CODEOWNERS) - Our community standards
-
-A maintainer will review your issue soon. Feel free to ask questions if you need any clarification!`;
+              const message = '👋 Welcome to AutoFireBase, @' + author + '!\n\n' +
+                'Thank you for opening your first issue. We appreciate your contribution to the project!\n\n' +
+                'Here are some helpful resources:\n' +
+                '- [README](../blob/main/README.md) - Project overview and quick start guide\n' +
+                '- [AGENTS.md](../blob/main/AGENTS.md) - Contributing guidelines\n' +
+                '- [Code of Conduct](../blob/main/CODEOWNERS) - Our community standards\n\n' +
+                'A maintainer will review your issue soon. Feel free to ask questions if you need any clarification!';
               
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -79,17 +76,14 @@ A maintainer will review your issue soon. Feel free to ask questions if you need
               
               core.info('Welcomed first-time issue author!');
             } else if (isPR && prCount === 1) {
-              const message = `👋 Welcome to AutoFireBase, @${author}! 
-
-Thank you for opening your first pull request! We're excited to review your contribution.
-
-Before your PR can be merged, please ensure:
-- ✅ Your code follows our style guide (run \`ruff check --fix .\` and \`black .\`)
-- ✅ All tests pass (run \`pytest\`)
-- ✅ Your changes are focused and well-documented
-- ✅ You've reviewed the [contributing guidelines](../blob/main/AGENTS.md)
-
-A maintainer will review your PR soon. Don't hesitate to ask questions!`;
+              const message = '👋 Welcome to AutoFireBase, @' + author + '!\n\n' +
+                'Thank you for opening your first pull request! We\'re excited to review your contribution.\n\n' +
+                'Before your PR can be merged, please ensure:\n' +
+                '- ✅ Your code follows our style guide (run `ruff check --fix .` and `black .`)\n' +
+                '- ✅ All tests pass (run `pytest`)\n' +
+                '- ✅ Your changes are focused and well-documented\n' +
+                '- ✅ You\'ve reviewed the [contributing guidelines](../blob/main/AGENTS.md)\n\n' +
+                'A maintainer will review your PR soon. Don\'t hesitate to ask questions!';
               
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
