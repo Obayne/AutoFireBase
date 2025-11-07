@@ -16,7 +16,6 @@ if __package__ in (None, ""):
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtWidgets import (
-    QApplication,
     QCheckBox,
     QComboBox,
     QDockWidget,
@@ -41,27 +40,26 @@ from app import catalog, dxf_import
 from app.logging_config import setup_logging
 
 # Grid scene and defaults used by the main window
-from app.scene import GridScene, DEFAULT_GRID_SIZE
+from app.scene import DEFAULT_GRID_SIZE, GridScene
 
 # Ensure logging is configured early so module-level loggers emit during
 # headless simulators and when the app starts from __main__.
 setup_logging()
-import logging
+import logging  # noqa: E402
 
-from app.device import DeviceItem
-from app.tools import draw as draw_tools
-from app.tools.chamfer_tool import ChamferTool
-from app.tools.extend_tool import ExtendTool
+from app.device import DeviceItem  # noqa: E402
+from app.tools import draw as draw_tools  # noqa: E402
+from app.tools.chamfer_tool import ChamferTool  # noqa: E402
+from app.tools.extend_tool import ExtendTool  # noqa: E402
 
 _logger = logging.getLogger(__name__)
-from app.tools.fillet_radius_tool import FilletRadiusTool
-from app.tools.fillet_tool import FilletTool
-from app.tools.freehand import FreehandTool
-from app.tools.leader import LeaderTool
+from app.layout import PageFrame, TitleBlock, ViewportItem  # noqa: E402
+from app.tools.fillet_radius_tool import FilletRadiusTool  # noqa: E402
+from app.tools.fillet_tool import FilletTool  # noqa: E402
+from app.tools.freehand import FreehandTool  # noqa: E402
+from app.tools.leader import LeaderTool  # noqa: E402
 from app.tools.measure_tool import MeasureTool
 from app.tools.mirror_tool import MirrorTool
-from app.tools.text_tool import MTextTool, TextTool
-from app.layout import PageFrame, TitleBlock, ViewportItem
 from app.tools.move_tool import MoveTool
 from app.tools.revision_cloud import RevisionCloudTool
 from app.tools.rotate_tool import RotateTool
@@ -71,6 +69,7 @@ from app.tools.scale_underlay import (
     ScaleUnderlayRefTool,
     scale_underlay_by_factor,
 )
+from app.tools.text_tool import MTextTool, TextTool
 from app.tools.trim_tool import TrimTool
 
 try:
@@ -974,6 +973,7 @@ class MainWindow(QMainWindow):
 
         # Initialize global database connection for coverage calculations
         from db import connection
+
         connection.initialize_database(in_memory=True)
 
         # Theme
@@ -1280,6 +1280,7 @@ class MainWindow(QMainWindow):
         self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
         self.statusBar().addPermanentWidget(self.space_badge)
         self._init_sheet_manager()
+
     def _on_space_combo_changed(self, idx: int):
         if self.space_lock.isChecked():
             # Revert change if locked
@@ -2153,6 +2154,7 @@ class MainWindow(QMainWindow):
         # subset of the QTreeWidget API used by headless simulators.
         if getattr(self, "device_tree", None) is None:
             try:
+
                 class SimpleTreeItem:
                     def __init__(self, text):
                         self._text = text
@@ -2353,20 +2355,6 @@ class MainWindow(QMainWindow):
         """Open the riser diagram dialog."""
         dialog = RiserDiagramDialog(self)
         dialog.exec()
-
-    def add_viewport(self):
-        """Adds a new viewport to the current paperspace layout."""
-        if not self.in_paper_space:
-            QtWidgets.QMessageBox.warning(
-                self, "Add Viewport", "Please switch to Paper Space first."
-            )
-            return
-
-        # Create a new viewport item
-        new_viewport = ViewportItem(self.scene, QtCore.QRectF(0, 0, 500, 400), self)
-        self.paper_scene.addItem(new_viewport)
-        self.push_history()
-        self.statusBar().showMessage("New viewport added to Paperspace.")
 
     def show_job_info_dialog(self):
         """Open the job information dialog."""
@@ -2800,6 +2788,7 @@ class MainWindow(QMainWindow):
                 "color": color_hex,
                 "orig_color": grp.data(2002),
             }
+
         # sketch geometry
         def _line_json(it: QtWidgets.QGraphicsLineItem):
             l = it.line()
@@ -2912,8 +2901,6 @@ class MainWindow(QMainWindow):
             )
             self.layer_underlay.setTransform(tr)
         # restore sketch
-        from PySide6 import QtGui
-
         for s in data.get("sketch", []):
             t = s.get("type")
             if t == "line":
@@ -4317,14 +4304,17 @@ Keyboard Shortcuts
 â€¢ F2 Fit View
 """
 
+
 # factory for boot.py
 def create_window():
     from app.app_controller import AppController
+
     return AppController()
 
 
 def main():
     from app.app_controller import main as app_main
+
     return app_main()
 
 

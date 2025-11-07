@@ -14,6 +14,16 @@ select = [
   "I",  # isort
   "UP", # pyupgrade
 ]
+ignore = [
+  "E501",  # Line too long - black handles line length
+  "E402",  # Module level import not at top of file - intentional for logging setup
+  "F841",  # Local variable assigned but never used - common in tests and development
+  "E741",  # Ambiguous variable name - l, I are common in mathematical code
+]
+
+[tool.ruff.lint.per-file-ignores]
+"app/main.py" = ["F821"]  # Undefined names - some conditional/dynamic imports
+"cad_core/fillet.py" = []  # Mathematical code with single-letter variables
 
 [tool.ruff.format]
 quote-style = "double"

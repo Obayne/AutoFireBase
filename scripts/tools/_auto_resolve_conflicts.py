@@ -41,12 +41,12 @@ def _split_conflict_blocks(text: str) -> tuple[bool, str]:
         # keep the section between '=======' and the '>>>>>>>' line (stashed/local side)
         stashed = text[e + len("=======") : line_start]
         # Remove leading newline if present (from the ======= line)
-        if stashed.startswith('\n'):
+        if stashed.startswith("\n"):
             stashed = stashed[1:]
         # Remove trailing newline if present (before >>>>>>> line)
-        if stashed.endswith('\n'):
+        if stashed.endswith("\n"):
             stashed = stashed[:-1]
-        parts.append(stashed + '\n')
+        parts.append(stashed + "\n")
         i = text.find("\n", g)
         if i == -1:
             i = len(text)
