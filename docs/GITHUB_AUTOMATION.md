@@ -178,8 +178,8 @@ Follow these patterns for automatic labels:
 
 **Linting Errors:**
 ```bash
-ruff check --fix .
-black .
+python -m ruff check --fix .
+python -m black .
 git add .
 git commit -m "fix: apply linting fixes"
 git push
@@ -187,7 +187,7 @@ git push
 
 **Test Failures:**
 ```bash
-pytest -v  # See which tests fail
+python -m pytest -v  # See which tests fail
 # Fix the code or tests
 git add .
 git commit -m "fix: resolve test failures"

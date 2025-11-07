@@ -32,8 +32,8 @@ dist/
 htmlcov/
 
 # Editors/OS
-# Allow .vscode/ workspace settings but exclude user-specific files
-.vscode/*.code-workspace
+# Allow .vscode/ workspace settings for team but exclude user-specific files
+# Note: Workspace file is at root (AutoFireBase.code-workspace), not in .vscode/
 .vscode/settings.local.json
 .idea/
 .DS_Store

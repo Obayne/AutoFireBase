@@ -67,4 +67,9 @@ This repository includes comprehensive GitHub automation:
 - **Welcome bot**: First-time contributors get helpful welcome messages
 - **Release automation**: Tagged commits trigger automatic builds and releases
 
+**Learn More:**
+- 📊 [Visual Automation Flow](docs/AUTOMATION_FLOW.md) - See how automation works
+- 📖 [GitHub Automation Guide](docs/GITHUB_AUTOMATION.md) - Quick reference
+- 💻 [VS Code Workflow Guide](docs/VS_CODE_GUIDE.md) - GUI-based development
+
 See individual workflow files in `.github/workflows/` for details.
