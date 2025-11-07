@@ -1,0 +1,152 @@
+name: Auto-Merge PRs
+
+on:
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to auto-merge'
+        required: true
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            let prNumber;
+            
+            if (context.eventName === 'workflow_dispatch') {
+              prNumber = parseInt(context.payload.inputs.pr_number);
+              core.info(`Manual trigger for PR #${prNumber}`);
+            } else if (context.payload.pull_request) {
+              prNumber = context.payload.pull_request.number;
+            } else {
+              core.info('No PR number found, exiting.');
+              return;
+            }
+            
+            // Get PR details
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+            
+            core.info(`Checking PR #${prNumber}: ${pr.title}`);
+            
+            // Check if PR has auto-merge label
+            const hasAutoMergeLabel = pr.labels.some(l => l.name === 'auto-merge');
+            if (!hasAutoMergeLabel) {
+              core.info('PR does not have auto-merge label, skipping.');
+              return;
+            }
+            
+            // Check if PR is mergeable
+            if (pr.mergeable === false) {
+              core.warning('PR has merge conflicts, cannot auto-merge.');
+              return;
+            }
+            
+            if (pr.merged) {
+              core.info('PR is already merged.');
+              return;
+            }
+            
+            if (pr.state !== 'open') {
+              core.info(`PR state is ${pr.state}, not open.`);
+              return;
+            }
+            
+            // Get reviews
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+            
+            // Check for approvals (need at least one approval)
+            const latestReviews = {};
+            for (const review of reviews) {
+              latestReviews[review.user.login] = review.state;
+            }
+            
+            const approvalCount = Object.values(latestReviews).filter(state => state === 'APPROVED').length;
+            const changesRequestedCount = Object.values(latestReviews).filter(state => state === 'CHANGES_REQUESTED').length;
+            
+            core.info(`Reviews: ${approvalCount} approvals, ${changesRequestedCount} changes requested`);
+            
+            if (approvalCount === 0) {
+              core.info('No approvals yet, cannot auto-merge.');
+              return;
+            }
+            
+            if (changesRequestedCount > 0) {
+              core.warning('Changes requested on this PR, cannot auto-merge.');
+              return;
+            }
+            
+            // Check CI status
+            const { data: checkRuns } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: pr.head.sha,
+            });
+            
+            const failedChecks = checkRuns.check_runs.filter(
+              check => check.conclusion === 'failure' || check.conclusion === 'cancelled'
+            );
+            
+            const pendingChecks = checkRuns.check_runs.filter(
+              check => check.status !== 'completed'
+            );
+            
+            if (failedChecks.length > 0) {
+              core.warning(`${failedChecks.length} check(s) failed, cannot auto-merge.`);
+              return;
+            }
+            
+            if (pendingChecks.length > 0) {
+              core.info(`${pendingChecks.length} check(s) still pending, waiting...`);
+              return;
+            }
+            
+            // All checks passed, merge the PR
+            core.info('All conditions met, merging PR...');
+            
+            try {
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                merge_method: 'squash',
+                commit_title: pr.title,
+                commit_message: `Auto-merged PR #${prNumber}\n\n${pr.body || ''}`,
+              });
+              
+              core.info('✅ PR successfully auto-merged!');
+              
+              // Add a comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: '✅ This PR has been automatically merged after receiving approval and passing all checks.',
+              });
+            } catch (error) {
+              core.error(`Failed to merge PR: ${error.message}`);
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: `⚠️ Auto-merge failed: ${error.message}\n\nPlease merge manually.`,
+              });
+            }

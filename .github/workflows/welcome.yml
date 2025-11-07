@@ -1,0 +1,102 @@
+name: Welcome First-Time Contributors
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const isIssue = context.payload.issue != null;
+            const isPR = context.payload.pull_request != null;
+            const author = isIssue ? context.payload.issue.user.login : context.payload.pull_request.user.login;
+            const number = isIssue ? context.payload.issue.number : context.payload.pull_request.number;
+            
+            core.info(`Checking if @${author} is a first-time contributor...`);
+            
+            // Check if this is their first contribution
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: number,
+            });
+            
+            // Check if we've already welcomed them
+            const alreadyWelcomed = comments.some(c => 
+              c.user.type === 'Bot' && c.body.includes('Welcome to AutoFireBase!')
+            );
+            
+            if (alreadyWelcomed) {
+              core.info('Already welcomed this user.');
+              return;
+            }
+            
+            // Get all issues and PRs by this author
+            const issuesQuery = `repo:${context.repo.owner}/${context.repo.repo} author:${author} is:issue`;
+            const prsQuery = `repo:${context.repo.owner}/${context.repo.repo} author:${author} is:pr`;
+            
+            const { data: issueResults } = await github.rest.search.issuesAndPullRequests({
+              q: issuesQuery,
+            });
+            
+            const { data: prResults } = await github.rest.search.issuesAndPullRequests({
+              q: prsQuery,
+            });
+            
+            const issueCount = issueResults.total_count;
+            const prCount = prResults.total_count;
+            
+            core.info(`@${author} has ${issueCount} issue(s) and ${prCount} PR(s)`);
+            
+            // Welcome first-time contributors
+            if (isIssue && issueCount === 1) {
+              const message = `👋 Welcome to AutoFireBase, @${author}! 
+
+Thank you for opening your first issue. We appreciate your contribution to the project!
+
+Here are some helpful resources:
+- [README](../blob/main/README.md) - Project overview and quick start guide
+- [AGENTS.md](../blob/main/AGENTS.md) - Contributing guidelines
+- [Code of Conduct](../blob/main/CODEOWNERS) - Our community standards
+
+A maintainer will review your issue soon. Feel free to ask questions if you need any clarification!`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: number,
+                body: message,
+              });
+              
+              core.info('Welcomed first-time issue author!');
+            } else if (isPR && prCount === 1) {
+              const message = `👋 Welcome to AutoFireBase, @${author}! 
+
+Thank you for opening your first pull request! We're excited to review your contribution.
+
+Before your PR can be merged, please ensure:
+- ✅ Your code follows our style guide (run \`ruff check --fix .\` and \`black .\`)
+- ✅ All tests pass (run \`pytest\`)
+- ✅ Your changes are focused and well-documented
+- ✅ You've reviewed the [contributing guidelines](../blob/main/AGENTS.md)
+
+A maintainer will review your PR soon. Don't hesitate to ask questions!`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: number,
+                body: message,
+              });
+              
+              core.info('Welcomed first-time PR author!');
+            }

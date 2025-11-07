@@ -1,0 +1,194 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    // Python settings
+    "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.typeCheckingMode": "basic",
+    
+    // Formatting
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+      }
+    },
+    
+    // Black formatter settings
+    "black-formatter.args": [
+      "--line-length=100"
+    ],
+    
+    // Ruff linter settings
+    "ruff.lineLength": 100,
+    "ruff.lint.args": [
+      "--config=pyproject.toml"
+    ],
+    
+    // File associations
+    "files.associations": {
+      "*.spec": "python",
+      "*.ps1": "powershell"
+    },
+    
+    // Exclude patterns
+    "files.exclude": {
+      "**/__pycache__": true,
+      "**/*.pyc": true,
+      "**/.pytest_cache": true,
+      "**/.ruff_cache": true,
+      "**/.mypy_cache": true
+    },
+    
+    // Search exclude
+    "search.exclude": {
+      "**/build": true,
+      "**/dist": true,
+      "**/.venv": true,
+      "**/node_modules": true
+    },
+    
+    // Git settings
+    "git.ignoreLimitWarning": true,
+    "git.autofetch": true,
+    
+    // Editor settings
+    "editor.rulers": [100],
+    "editor.minimap.enabled": true,
+    "editor.suggestSelection": "first",
+    
+    // Terminal settings
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    
+    // Testing
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+      "tests",
+      "-v"
+    ],
+    
+    // Task auto-detection
+    "task.autoDetect": "on"
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.black-formatter",
+      "charliermarsh.ruff",
+      "ms-python.vscode-pylance",
+      "github.vscode-github-actions",
+      "github.vscode-pull-request-github",
+      "eamodio.gitlens",
+      "donjayamanne.githistory",
+      "bierner.markdown-preview-github-styles",
+      "ms-vscode.powershell"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Python: AutoFire App",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${workspaceFolder}/app/main.py",
+        "console": "integratedTerminal",
+        "justMyCode": false
+      },
+      {
+        "name": "Python: Current File",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${file}",
+        "console": "integratedTerminal",
+        "justMyCode": true
+      },
+      {
+        "name": "Python: Pytest Current File",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "pytest",
+        "args": [
+          "${file}",
+          "-v"
+        ],
+        "console": "integratedTerminal",
+        "justMyCode": false
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Run AutoFire",
+        "type": "shell",
+        "command": "python",
+        "args": ["app/main.py"],
+        "problemMatcher": [],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Run Tests",
+        "type": "shell",
+        "command": "pytest",
+        "args": ["-v"],
+        "problemMatcher": [],
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Format Code (Black)",
+        "type": "shell",
+        "command": "black",
+        "args": ["."],
+        "problemMatcher": []
+      },
+      {
+        "label": "Lint Code (Ruff)",
+        "type": "shell",
+        "command": "ruff",
+        "args": ["check", "--fix", "."],
+        "problemMatcher": []
+      },
+      {
+        "label": "Format & Lint",
+        "dependsOn": ["Format Code (Black)", "Lint Code (Ruff)"],
+        "problemMatcher": []
+      },
+      {
+        "label": "Build Executable",
+        "type": "shell",
+        "command": "powershell",
+        "args": ["-File", "Build_AutoFire.ps1"],
+        "problemMatcher": [],
+        "windows": {
+          "command": "powershell",
+          "args": ["-File", "Build_AutoFire.ps1"]
+        }
+      },
+      {
+        "label": "Setup Dev Environment",
+        "type": "shell",
+        "command": "powershell",
+        "args": ["-File", "setup_dev.ps1"],
+        "problemMatcher": [],
+        "windows": {
+          "command": "powershell",
+          "args": ["-File", "setup_dev.ps1"]
+        }
+      }
+    ]
+  }
+}

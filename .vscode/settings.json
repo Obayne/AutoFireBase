@@ -1,0 +1,114 @@
+{
+  // Python settings
+  "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  
+  // Formatting
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  
+  // Black formatter settings
+  "black-formatter.args": [
+    "--line-length=100"
+  ],
+  
+  // Ruff linter settings
+  "ruff.lineLength": 100,
+  "ruff.lint.args": [
+    "--config=pyproject.toml"
+  ],
+  "ruff.enable": true,
+  "ruff.organizeImports": true,
+  
+  // File associations
+  "files.associations": {
+    "*.spec": "python",
+    "*.ps1": "powershell"
+  },
+  
+  // Exclude patterns from file explorer
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/.mypy_cache": true
+  },
+  
+  // Search exclude
+  "search.exclude": {
+    "**/build": true,
+    "**/dist": true,
+    "**/.venv": true,
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  },
+  
+  // Git settings
+  "git.ignoreLimitWarning": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.suggestSmartCommit": true,
+  
+  // Editor settings
+  "editor.rulers": [100],
+  "editor.minimap.enabled": true,
+  "editor.suggestSelection": "first",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  
+  // Terminal settings
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.env.windows": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+  
+  // Testing
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": [
+    "tests",
+    "-v"
+  ],
+  "python.testing.autoTestDiscoverOnSaveEnabled": true,
+  
+  // Task auto-detection
+  "task.autoDetect": "on",
+  
+  // GitHub settings
+  "githubPullRequests.pullBranch": "never",
+  "githubIssues.queries": [
+    {
+      "label": "My Issues",
+      "query": "assignee:${user} state:open repo:${owner}/${repository} sort:updated-desc"
+    },
+    {
+      "label": "Sprint 01",
+      "query": "label:sprint:01 state:open repo:${owner}/${repository} sort:updated-desc"
+    },
+    {
+      "label": "Recent Issues",
+      "query": "state:open repo:${owner}/${repository} sort:updated-desc"
+    }
+  ],
+  
+  // File nesting (cleaner view)
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*.py": "${capture}.pyc",
+    "*.spec": "${capture}_Debug.spec",
+    "requirements.txt": "requirements-*.txt",
+    ".gitignore": ".gitattributes, .pre-commit-config.yaml",
+    "README.md": "AGENTS.md, CHANGELOG.md, RELEASE.md, CODEOWNERS"
+  }
+}

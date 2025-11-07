@@ -32,7 +32,9 @@ dist/
 htmlcov/
 
 # Editors/OS
-.vscode/
+# Allow .vscode/ workspace settings but exclude user-specific files
+.vscode/*.code-workspace
+.vscode/settings.local.json
 .idea/
 .DS_Store
 Thumbs.db

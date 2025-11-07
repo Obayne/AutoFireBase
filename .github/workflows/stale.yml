@@ -1,0 +1,53 @@
+name: Stale Issue and PR Management
+
+on:
+  schedule:
+    # Run daily at 1:00 AM UTC
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          # Stale issue configuration
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has not had 
+            recent activity. It will be closed in 7 days if no further activity occurs.
+            
+            If this issue is still relevant, please leave a comment to keep it open.
+            Thank you for your contributions!
+          close-issue-message: |
+            This issue was automatically closed because it has been stale for 7 days 
+            with no activity. If you believe this issue should be reopened, please 
+            create a new issue with updated context or reference this issue.
+          days-before-issue-stale: 60
+          days-before-issue-close: 7
+          stale-issue-label: 'stale'
+          exempt-issue-labels: 'pinned,security,sprint:01,agent:auto'
+          
+          # Stale PR configuration
+          stale-pr-message: |
+            This pull request has been automatically marked as stale because it has 
+            not had recent activity. It will be closed in 14 days if no further 
+            activity occurs.
+            
+            If this PR is still relevant, please update it or leave a comment.
+            Thank you for your contributions!
+          close-pr-message: |
+            This pull request was automatically closed due to inactivity. If you'd 
+            like to continue this work, please reopen the PR or create a new one.
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          stale-pr-label: 'stale'
+          exempt-pr-labels: 'pinned,security,in-progress'
+          
+          # Additional settings
+          operations-per-run: 100
+          remove-stale-when-updated: true
+          ascending: true

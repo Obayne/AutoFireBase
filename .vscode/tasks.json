@@ -1,0 +1,160 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run AutoFire",
+      "type": "shell",
+      "command": "${config:python.defaultInterpreterPath}",
+      "args": ["app/main.py"],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Run Tests",
+      "type": "shell",
+      "command": "${config:python.defaultInterpreterPath}",
+      "args": ["-m", "pytest", "-v"],
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Format Code (Black)",
+      "type": "shell",
+      "command": "${config:python.defaultInterpreterPath}",
+      "args": ["-m", "black", "."],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Lint Code (Ruff)",
+      "type": "shell",
+      "command": "${config:python.defaultInterpreterPath}",
+      "args": ["-m", "ruff", "check", "--fix", "."],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Format & Lint",
+      "dependsOn": ["Format Code (Black)", "Lint Code (Ruff)"],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Type Check (mypy)",
+      "type": "shell",
+      "command": "${config:python.defaultInterpreterPath}",
+      "args": ["-m", "mypy", "."],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Build Executable",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-File", "${workspaceFolder}/Build_AutoFire.ps1"],
+      "problemMatcher": [],
+      "windows": {
+        "command": "powershell",
+        "args": ["-File", "${workspaceFolder}/Build_AutoFire.ps1"]
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Build Executable (Debug)",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-File", "${workspaceFolder}/Build_AutoFire_Debug.ps1"],
+      "problemMatcher": [],
+      "windows": {
+        "command": "powershell",
+        "args": ["-File", "${workspaceFolder}/Build_AutoFire_Debug.ps1"]
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Setup Dev Environment",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-File", "${workspaceFolder}/setup_dev.ps1"],
+      "problemMatcher": [],
+      "windows": {
+        "command": "powershell",
+        "args": ["-File", "${workspaceFolder}/setup_dev.ps1"]
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Clean Build Artifacts",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-File", "${workspaceFolder}/Build_Clean.ps1"],
+      "problemMatcher": [],
+      "windows": {
+        "command": "powershell",
+        "args": ["-File", "${workspaceFolder}/Build_Clean.ps1"]
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Git: Pull & Update",
+      "type": "shell",
+      "command": "git",
+      "args": ["pull"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Git: Push",
+      "type": "shell",
+      "command": "git",
+      "args": ["push"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}
