@@ -1,0 +1,140 @@
+"""Parity copy of backend.catalog_store migrated to lv_cad.backend.
+
+This is intended as a parity copy; tests will avoid writing to the real
+user AutoFire folder by monkeypatching expanduser when needed.
+"""
+
+import json
+import os
+import sqlite3
+from pathlib import Path
+from typing import Any
+
+from db import loader as db_loader
+
+
+def get_catalog_path() -> str:
+    home = Path(os.path.expanduser("~"))
+    base = home / "AutoFire"
+    base.mkdir(parents=True, exist_ok=True)
+    return str(base / "catalog.db")
+
+
+def _connect() -> sqlite3.Connection:
+    path = get_catalog_path()
+    con = sqlite3.connect(path)
+    con.row_factory = sqlite3.Row
+    db_loader.ensure_schema(con)
+    return con
+
+
+def seed_defaults() -> None:
+    con = _connect()
+    cur = con.cursor()
+    types = [
+        ("strobe", "Strobe / Notification Appliance"),
+        ("speaker", "Speaker / Audio Appliance"),
+        ("smoke", "Smoke / Heat / Detector"),
+        ("pull", "Pull Station"),
+        ("panel", "Fire Alarm Panel"),
+    ]
+    for code, desc in types:
+        cur.execute(
+            "INSERT OR IGNORE INTO device_types(code, description) VALUES(?,?)", (code, desc)
+        )
+    cur.execute("INSERT OR IGNORE INTO manufacturers(name) VALUES(?)", ("Generic",))
+    con.commit()
+    con.close()
+
+
+def add_device(
+    manufacturer: str,
+    type_code: str,
+    model: str,
+    name: str,
+    symbol: str = "",
+    specs: dict[str, Any] | None = None,
+) -> int:
+    con = _connect()
+    cur = con.cursor()
+    cur.execute("INSERT OR IGNORE INTO manufacturers(name) VALUES(?)", (manufacturer,))
+    cur.execute("SELECT id FROM manufacturers WHERE name=?)", (manufacturer,))
+    mid = cur.fetchone()[0]
+    cur.execute("SELECT id FROM device_types WHERE code=?", (type_code,))
+    row = cur.fetchone()
+    if not row:
+        raise ValueError(f"Unknown device type code: {type_code}")
+    tid = row[0]
+    props = json.dumps({})
+    cur.execute(
+        "INSERT INTO devices(manufacturer_id,type_id,model,name,symbol,properties_json)"
+        " VALUES(?,?,?,?,?,?)",
+        (mid, tid, model, name, symbol, props),
+    )
+    lid = cur.lastrowid
+    if lid is None:
+        lid = 0
+    did = int(lid)
+    if specs:
+        cur.execute(
+            "INSERT OR REPLACE INTO device_specs(device_id, strobe_candela,"
+            " speaker_db_at10ft, smoke_spacing_ft, current_a, voltage_v, notes)"
+            " VALUES(?,?,?,?,?,?,?)",
+            (
+                did,
+                specs.get("strobe_candela"),
+                specs.get("speaker_db_at10ft"),
+                specs.get("smoke_spacing_ft"),
+                specs.get("current_a"),
+                specs.get("voltage_v"),
+                specs.get("notes"),
+            ),
+        )
+    con.commit()
+    con.close()
+    return did
+
+
+def list_devices(type_code: str | None = None) -> list[dict[str, Any]]:
+    con = _connect()
+    cur = con.cursor()
+    if type_code:
+        cur.execute(
+            """
+            SELECT d.id, m.name AS manufacturer, dt.code AS type, d.model, d.name, d.symbol
+            FROM devices d
+            LEFT JOIN manufacturers m ON m.id = d.manufacturer_id
+            LEFT JOIN device_types dt ON dt.id = d.type_id
+            WHERE dt.code=?
+            ORDER BY manufacturer, model
+            """,
+            (type_code,),
+        )
+    else:
+        cur.execute(
+            """
+            SELECT d.id, m.name AS manufacturer, dt.code AS type, d.model, d.name, d.symbol
+            FROM devices d
+            LEFT JOIN manufacturers m ON m.id = d.manufacturer_id
+            LEFT JOIN device_types dt ON dt.id = d.type_id
+            ORDER BY manufacturer, model
+            """
+        )
+    rows = [dict(r) for r in cur.fetchall()]
+    con.close()
+    return rows
+
+
+def get_device_specs(device_id: int) -> dict[str, Any] | None:
+    con = _connect()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT strobe_candela, speaker_db_at10ft, smoke_spacing_ft,"
+        " current_a, voltage_v, notes FROM device_specs WHERE device_id=?",
+        (device_id,),
+    )
+    row = cur.fetchone()
+    con.close()
+    if not row:
+        return None
+    return dict(row)
