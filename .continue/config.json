@@ -1,0 +1,25 @@
+{
+    "$schema": "https://raw.githubusercontent.com/continuedev/continue/main/website/static/schemas/config_v1.json",
+    "models": [
+        {
+            "title": "DeepSeek Coder",
+            "provider": "openai",
+            "model": "deepseek-coder",
+            "apiBase": "https://api.deepseek.com/v1",
+            "apiKey": "${env:DEEPSEEK_API_KEY}"
+        },
+        {
+            "title": "Claude (via OpenRouter)",
+            "provider": "openai",
+            "model": "anthropic/claude-3.5-sonnet",
+            "apiBase": "https://openrouter.ai/api/v1",
+            "apiKey": "${env:OPENROUTER_API_KEY}"
+        }
+    ],
+    "tabAutocompleteModel": "DeepSeek Coder",
+    "chatModel": "Claude (via OpenRouter)",
+    "modelRoles": {
+        "editModel": "Claude (via OpenRouter)"
+    },
+    "allowAnonymousTelemetry": false
+}
