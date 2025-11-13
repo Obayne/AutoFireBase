@@ -1,0 +1,49 @@
+name: lv_cad CI
+
+on:
+    pull_request:
+        paths:
+            - "lv_cad/**"
+            - "docs/**"
+            - ".github/workflows/lv_cad-ci.yml"
+            - "requirements*.txt"
+            - "backend/tracing.py"
+    push:
+        branches: [main]
+        paths:
+            - "lv_cad/**"
+            - ".github/workflows/lv_cad-ci.yml"
+
+jobs:
+    test:
+        name: Lint and Test (lv_cad)
+        strategy:
+            matrix:
+                os: [ubuntu-latest, windows-latest]
+                python-version: ["3.11"]
+        runs-on: ${{ matrix.os }}
+        env:
+            QT_QPA_PLATFORM: offscreen
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install -U pip
+                  pip install -r requirements.txt
+                  pip install -r requirements-dev.txt
+
+            - name: Lint (ruff)
+              run: ruff check lv_cad
+
+            - name: Format check (black)
+              run: black --check lv_cad
+
+            - name: Run tests (lv_cad)
+              run: pytest -q lv_cad/tests
