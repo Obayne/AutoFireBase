@@ -13,8 +13,9 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent))
 
 from autofire_device_placement import AutoFireDevicePlacement
-from autofire_layer_intelligence import CADLayerIntelligence
 from autofire_visual_processor import AutoFireVisualProcessor
+
+from autofire_layer_intelligence import CADLayerIntelligence
 
 
 def demonstrate_breakthrough_integration():

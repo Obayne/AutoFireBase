@@ -224,6 +224,7 @@ def _circle_from_3pts(a: QtCore.QPointF, b: QtCore.QPointF, c: QtCore.QPointF):
     a0 = ang(ax, ay)
     a1 = ang(bx, by)
     a2 = ang(cx, cy)
+
     # sweep from a0->a2 passing near a1; choose smaller abs sweep that still passes a1 heuristically
     def norm(x):
         while x <= -180:

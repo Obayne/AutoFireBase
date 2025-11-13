@@ -15,6 +15,30 @@ select = [
   "UP", # pyupgrade
 ]
 
-[tool.ruff.format]
-quote-style = "double"
+[tool.coverage.run]
+source = ["lv_cad", "app", "cad_core", "frontend", "backend"]
+omit = ["*/tests/*", "*/__pycache__/*", "build/*", "dist/*"]
 
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "PySide6.*",
+    "ezdxf.*",
+    "cad_core.*",  # legacy, untyped
+]
+ignore_missing_imports = true

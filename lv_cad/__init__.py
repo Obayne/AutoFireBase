@@ -4,9 +4,9 @@ Public surface intentionally small during migration.
 """
 
 from . import geometry, operations, util
-from .geometry.point import Point, Vector  # re-export convenience
-from .geometry.line import Line
 from .geometry.arc import Arc
+from .geometry.line import Line
+from .geometry.point import Point, Vector  # re-export convenience
 from .operations.fillet import fillet  # parity wrapper
 
 __all__ = [

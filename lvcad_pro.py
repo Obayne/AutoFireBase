@@ -19,7 +19,6 @@ from tkinter import filedialog, messagebox, scrolledtext, ttk
 # Import core engines
 try:
     from autofire_layer_intelligence import CADLayerIntelligence
-
     from fire_pilot import AiHJ
 
     HAS_ENGINES = True

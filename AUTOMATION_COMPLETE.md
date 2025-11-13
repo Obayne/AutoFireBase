@@ -74,9 +74,11 @@ python app/main.py
 - ✅ Syntax error detection
 - ✅ TODO/FIXME finder
 - ✅ Auto-formatting (ruff + black)
-- ✅ Test execution
+- ✅ Test execution with ETA estimates
 - ✅ Dependency verification
 - ✅ Build validation
+- ✅ Historical timing tracking
+- ✅ ETA predictions for long operations
 
 **Usage:**
 ```powershell
@@ -99,7 +101,10 @@ python app/main.py
 **Output:**
 - Colored status report
 - Issue highlights
+- **ETA estimates for long-running tasks** (e.g., "Test Execution... (ETA: 2s)")
+- Actual completion times (e.g., "Test Execution complete (2.1s)")
 - Next steps suggestions
+- Historical timing data stored in `.automation_timings.json`
 
 ---
 

@@ -21,11 +21,19 @@ Quick Start (Windows, PowerShell)
 Daily Workflow
 
 - Activate venv: `. .venv/Scripts/Activate.ps1`
-- Sync: `git pull` (ensure you’re on the correct branch).
+- Sync: `git pull` (ensure you're on the correct branch).
 - Code changes.
 - Format/lint: `ruff check --fix .` and `black .` (pre-commit will also run these on commit).
 - Commit: `git add -A && git commit -m "..."`
 - Push: `git push` and open a PR.
+
+Automation
+
+- One-command PR: `./scripts/auto_pr.ps1 -Branch "chore/auto/<name>" -Draft` (runs lint/test, commits, pushes, opens PR).
+- Maintenance: `./scripts/auto_maintain.ps1 -Mode daily` (or weekly/full; can schedule with `-Schedule`).
+- Release: `./scripts/auto_release.ps1 -Version "1.0.0"` (bumps version, builds, releases).
+- Complete suite: `./scripts/auto_complete.ps1` (analyze, fix, test, build).
+- See `docs/AUTOMATION.md` for details.
 
 Code Style & Tooling
 

@@ -30,6 +30,19 @@ jobs:
       - name: Format check (black)
         run: black --check .
 
-      - name: Run tests
-        run: pytest -q
+      - name: Security scan (bandit)
+        run: bandit -r . -f json -o security-results.json || true
 
+      - name: Dependency vulnerability check (safety)
+        run: safety check --json || true
+
+      - name: Code quality (flake8)
+        run: flake8 . --max-line-length=100 --extend-ignore=E203,W503 || true
+
+      - name: Run tests with coverage
+        run: pytest --cov=. --cov-report=xml --cov-report=html
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml

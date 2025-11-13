@@ -11,22 +11,6 @@ if __package__ in (None, ""):
 
 import logging
 
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (
-    QMainWindow,
-)
-
-# Drawing tools for wire routing
-from app.tools.draw import (
-    DrawController,
-    DrawMode,
-)
-
-# Device placement system
-from device_browser import DeviceBrowserDock, DevicePlacementTool
-from backend import branding
-
 # Backend services
 from backend.catalog import load_catalog
 from backend.logging_config import setup_logging
@@ -52,6 +36,21 @@ from frontend.widgets.canvas_status_summary import CanvasStatusSummary
 
 # Grid scene and defaults used by the main window
 from frontend.windows.scene import DEFAULT_GRID_SIZE, CanvasView, GridScene
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
+    QMainWindow,
+)
+
+# Drawing tools for wire routing
+from app.tools.draw import (
+    DrawController,
+    DrawMode,
+)
+from backend import branding
+
+# Device placement system
+from device_browser import DeviceBrowserDock, DevicePlacementTool
 
 # Ensure logging is configured early so module-level loggers emit during
 # headless simulators and when the app starts from __main__.
@@ -2825,10 +2824,9 @@ class ModelSpaceWindow(QMainWindow):
             return
         device_item = selected_items[0]
         try:
+            from backend.device_docs import lookup_docs_for_item
             from PySide6.QtCore import QUrl
             from PySide6.QtGui import QDesktopServices
-
-            from backend.device_docs import lookup_docs_for_item
 
             docs = lookup_docs_for_item(device_item)
             url = docs.get(kind)
@@ -2851,10 +2849,9 @@ class ModelSpaceWindow(QMainWindow):
         if not chosen:
             return
         try:
+            from backend.device_docs import lookup_docs_for_spec
             from PySide6.QtCore import QUrl
             from PySide6.QtGui import QDesktopServices
-
-            from backend.device_docs import lookup_docs_for_spec
 
             docs = lookup_docs_for_spec(
                 manufacturer=dev.get("manufacturer"),

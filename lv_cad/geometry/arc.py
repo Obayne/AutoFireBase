@@ -22,7 +22,7 @@ class Arc:
         }
 
     @staticmethod
-    def from_dict(d: dict[str, float | int | str]) -> "Arc":
+    def from_dict(d: dict[str, float | int | str]) -> Arc:
         return Arc(
             float(d.get("cx", 0.0)),
             float(d.get("cy", 0.0)),

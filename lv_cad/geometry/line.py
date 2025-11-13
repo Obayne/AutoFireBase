@@ -20,7 +20,7 @@ class Line:
         }
 
     @staticmethod
-    def from_dict(d: dict[str, float | int | str]) -> "Line":
+    def from_dict(d: dict[str, float | int | str]) -> Line:
         return Line(
             float(d.get("x1", 0.0)),
             float(d.get("y1", 0.0)),

@@ -1,0 +1,43 @@
+[MASTER]
+disable=C0114,C0115,C0116,R0903,R0912,R0915,W0613
+max-line-length=100
+extension-pkg-whitelist=PySide6
+
+[MESSAGES CONTROL]
+disable=too-few-public-methods,
+        too-many-arguments,
+        too-many-instance-attributes,
+        too-many-locals,
+        too-many-branches,
+        too-many-statements,
+        line-too-long,
+        invalid-name,
+        missing-docstring,
+        bad-whitespace,
+        trailing-whitespace,
+        unused-import,
+        unused-variable,
+        redefined-outer-name,
+        import-outside-toplevel
+
+[FORMAT]
+max-line-length=100
+good-names=i,j,k,ex,Run,_,id,x,y,z,w,h
+
+[BASIC]
+good-names=i,j,k,ex,Run,_,id,x,y,z,w,h
+
+[DESIGN]
+max-args=10
+max-locals=20
+max-returns=10
+max-branches=20
+max-statements=50
+max-parents=10
+
+[REPORTS]
+output-format=text
+include-ids=yes
+files-output=no
+reports=no
+score=no

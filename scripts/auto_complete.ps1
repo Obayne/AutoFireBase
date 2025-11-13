@@ -25,6 +25,78 @@ function Write-Warning($msg) { Write-Host "⚠ $msg" -ForegroundColor Yellow }
 function Write-Error($msg) { Write-Host "✗ $msg" -ForegroundColor Red }
 function Write-Info($msg) { Write-Host "ℹ $msg" -ForegroundColor Blue }
 
+# ETA tracking functions
+$timingData = @{}
+$startTime = Get-Date
+
+function Start-TimedOperation($operationName) {
+    $timingData[$operationName] = @{
+        StartTime = Get-Date
+        EstimatedDuration = Get-EstimatedDuration $operationName
+    }
+    if ($timingData[$operationName].EstimatedDuration) {
+        Write-Info "$operationName... (ETA: $([math]::Round($timingData[$operationName].EstimatedDuration.TotalSeconds, 0))s)"
+    } else {
+        Write-Info "$operationName..."
+    }
+}
+
+function Complete-TimedOperation($operationName) {
+    if ($timingData.ContainsKey($operationName)) {
+        $duration = (Get-Date) - $timingData[$operationName].StartTime
+        $timingData[$operationName].Duration = $duration
+        Save-TimingData $operationName $duration
+        Write-Success "$operationName complete ($([math]::Round($duration.TotalSeconds, 1))s)"
+    }
+}
+
+function Get-EstimatedDuration($operationName) {
+    $timingFile = ".automation_timings.json"
+    if (Test-Path $timingFile) {
+        try {
+            $timings = Get-Content $timingFile | ConvertFrom-Json
+            if ($timings.PSObject.Properties.Name -contains $operationName) {
+                $avgSeconds = $timings.$operationName.AverageSeconds
+                return [TimeSpan]::FromSeconds($avgSeconds)
+            }
+        } catch { }
+    }
+    return $null
+}
+
+function Save-TimingData($operationName, $duration) {
+    $timingFile = ".automation_timings.json"
+
+    # Read existing timings or create empty hashtable
+    $timings = @{}
+    if (Test-Path $timingFile) {
+        try {
+            $jsonData = Get-Content $timingFile | ConvertFrom-Json
+            # Convert PSObject to hashtable for easier manipulation
+            foreach ($prop in $jsonData.PSObject.Properties) {
+                $timings[$prop.Name] = $prop.Value
+            }
+        } catch { }
+    }
+
+    # Initialize operation data if it doesn't exist
+    if (-not $timings.ContainsKey($operationName)) {
+        $timings[$operationName] = @{
+            Runs = 0
+            TotalSeconds = 0
+            AverageSeconds = 0
+        }
+    }
+
+    # Update timing data
+    $timings[$operationName].Runs = $timings[$operationName].Runs + 1
+    $timings[$operationName].TotalSeconds = $timings[$operationName].TotalSeconds + $duration.TotalSeconds
+    $timings[$operationName].AverageSeconds = $timings[$operationName].TotalSeconds / $timings[$operationName].Runs
+
+    # Save back to JSON
+    $timings | ConvertTo-Json | Set-Content $timingFile
+}
+
 # Ensure virtual environment
 Write-Header "Checking Virtual Environment"
 if (-not (Test-Path ".venv")) {
@@ -81,18 +153,70 @@ for issue in issues:
         Write-Warning "Found $($todos.Count) action items:"
         $todos | ForEach-Object { Write-Host "  $($_.Filename):$($_.LineNumber) - $($_.Line.Trim())" }
     }
+
+    # Check for untyped functions
+    Write-Info "Checking for untyped functions..."
+    $untypedFunctions = & $venvPython -c @"
+import ast
+import os
+from pathlib import Path
+
+def has_type_hints(func_node):
+    return bool(func_node.returns or func_node.args.args and any(arg.annotation for arg in func_node.args.args))
+
+issues = []
+for root, dirs, files in os.walk('app'):
+    for file in files:
+        if file.endswith('.py'):
+            path = os.path.join(root, file)
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    tree = ast.parse(f.read())
+                    for node in ast.walk(tree):
+                        if isinstance(node, ast.FunctionDef) and not has_type_hints(node):
+                            issues.append(f'{path}:{node.lineno} - Untyped function: {node.name}')
+            except Exception as e:
+                pass
+
+for issue in issues[:20]:  # Limit output
+    print(issue)
+"@
+
+    if ($untypedFunctions) {
+        Write-Warning "Found $($untypedFunctions.Count) untyped functions (first 20):"
+        $untypedFunctions | ForEach-Object { Write-Host "  $_" }
+    } else {
+        Write-Success "All functions appear typed"
+    }
+
+    # Check for high-complexity code (simple line count proxy)
+    Write-Info "Checking for potentially complex functions..."
+    $complexFunctions = Get-ChildItem -Path "app", "cad_core", "frontend" -Filter "*.py" -Recurse | ForEach-Object {
+        $content = Get-Content $_.FullName -Raw
+        $lines = ($content -split "`n").Count
+        if ($lines -gt 50) {
+            "$($_.FullName): $lines lines"
+        }
+    } | Select-Object -First 10
+
+    if ($complexFunctions) {
+        Write-Warning "Found potentially complex files (>50 lines):"
+        $complexFunctions | ForEach-Object { Write-Host "  $_" }
+    }
 }
 
 # Step 2: Linting and Formatting
 if ($Mode -in @("fix", "all")) {
     Write-Header "Code Formatting & Linting"
 
+    Start-TimedOperation "Code Formatting"
     Write-Info "Running ruff..."
     & $venvPython -m ruff check --fix . 2>&1 | Out-Null
     Write-Success "Ruff complete"
 
     Write-Info "Running black..."
     & $venvPython -m black . 2>&1 | Out-Null
+    Complete-TimedOperation "Code Formatting"
     Write-Success "Black complete"
 }
 
@@ -100,8 +224,9 @@ if ($Mode -in @("fix", "all")) {
 if ($Mode -in @("test", "all")) {
     Write-Header "Running Tests"
 
-    Write-Info "Executing pytest..."
+    Start-TimedOperation "Test Execution"
     $testResult = & $venvPython -m pytest tests/ -v --tb=short 2>&1
+    Complete-TimedOperation "Test Execution"
 
     if ($LASTEXITCODE -eq 0) {
         $testCount = ($testResult | Select-String "passed").Line -replace '.*?(\d+) passed.*','$1'

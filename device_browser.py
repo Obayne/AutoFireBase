@@ -6,15 +6,14 @@ Creates a docked panel for browsing and selecting fire protection devices
 from the catalog for placement on the CAD canvas.
 """
 
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui
 from PySide6.QtWidgets import (
     QDockWidget,
-    QVBoxLayout,
-    QWidget,
+    QLabel,
     QListWidget,
     QListWidgetItem,
-    QLabel,
-    QHBoxLayout,
+    QVBoxLayout,
+    QWidget,
 )
 
 try:

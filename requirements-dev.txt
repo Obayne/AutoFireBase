@@ -3,3 +3,15 @@ black
 ruff
 mypy
 pytest
+pytest-cov
+flake8
+pylint
+bandit
+safety
+sphinx
+sphinx-rtd-theme
+coverage
+pytest-benchmark
+pytest-xdist
+selenium
+webdriver-manager

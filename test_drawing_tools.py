@@ -40,7 +40,7 @@ def test_drawing_tools_import():
 
 def test_frontend_import():
     """Test that frontend can import drawing tools correctly."""
-    print(f"\n🎨 TESTING FRONTEND IMPORT")
+    print("\n🎨 TESTING FRONTEND IMPORT")
     print("=" * 40)
 
     try:
@@ -83,7 +83,7 @@ def test_frontend_import():
 
 def test_ui_integration():
     """Test UI integration points."""
-    print(f"\n🖱️ TESTING UI INTEGRATION")
+    print("\n🖱️ TESTING UI INTEGRATION")
     print("=" * 40)
 
     try:
@@ -93,7 +93,7 @@ def test_ui_integration():
         print("✅ PySide6 components available")
 
         # Test graphics components used by drawing tools
-        from PySide6.QtWidgets import QGraphicsLineItem, QGraphicsRectItem, QGraphicsEllipseItem
+        from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsRectItem
 
         print("✅ Graphics components available")
 
@@ -121,7 +121,7 @@ def main():
         success = test_func()
         results.append((test_name, success))
 
-    print(f"\n📊 TEST RESULTS SUMMARY")
+    print("\n📊 TEST RESULTS SUMMARY")
     print("=" * 30)
 
     passed = sum(1 for _, success in results if success)
@@ -137,7 +137,7 @@ def main():
         print("\n🎉 SUCCESS: Drawing tools are ready for UI testing!")
         print("💡 NEXT STEP: Launch LV CAD and test toolbar buttons")
     else:
-        print(f"\n⚠️  Some tests failed. Check errors above.")
+        print("\n⚠️  Some tests failed. Check errors above.")
 
     return passed == total
 
