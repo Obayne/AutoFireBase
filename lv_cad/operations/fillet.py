@@ -122,6 +122,10 @@ def fillet_line_line_native(
     if _norm(ux, uy) < 1e-12 or _norm(vx, vy) < 1e-12:
         return None
 
+    # Orient directions to form the smaller interior angle (maximize dot product)
+    if _dot(ux, uy, vx, vy) < 0.0:
+        ux, uy = -ux, -uy
+
     # Angle between rays
     c = _clamp(_dot(ux, uy, vx, vy), -1.0, 1.0)
     theta = acos(c)
