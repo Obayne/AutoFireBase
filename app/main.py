@@ -3032,12 +3032,6 @@ class MainWindow(QMainWindow):
         self.scene.grid_size = max(2, int(v))
         self.scene.update()
 
-    def start_dimension(self):
-        try:
-            self.dim_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Dimension Tool Error", str(ex))
-
     def fit_view_to_content(self):
         rect = self.scene.itemsBoundingRect().adjusted(-100, -100, 100, 100)
         if rect.isNull():
@@ -3196,12 +3190,6 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Underlay transform reset")
         except Exception as ex:
             QMessageBox.critical(self, "Reset Underlay Error", str(ex))
-
-    def start_measure(self):
-        try:
-            self.measure_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Measure Tool Error", str(ex))
 
     # ---------- modify: trim ----------
     def start_trim(self):

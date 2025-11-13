@@ -22,6 +22,8 @@ def setup_event_handlers(window: MainWindow) -> None:
     window.start_freehand = lambda: start_freehand(window)
     window.start_leader = lambda: start_leader(window)
     window.start_cloud = lambda: start_cloud(window)
+    window.start_dimension = lambda: start_dimension(window)
+    window.start_measure = lambda: start_measure(window)
 
 
 def new_project(window: MainWindow) -> None:
@@ -126,3 +128,23 @@ def start_cloud(window: MainWindow) -> None:
         from PySide6.QtWidgets import QMessageBox
 
         QMessageBox.critical(window, "Revision Cloud Tool Error", str(ex))
+
+
+def start_dimension(window: MainWindow) -> None:
+    """Start the dimension tool."""
+    from PySide6.QtWidgets import QMessageBox
+
+    try:
+        window.dim_tool.start()
+    except Exception as ex:
+        QMessageBox.critical(window, "Dimension Tool Error", str(ex))
+
+
+def start_measure(window: MainWindow) -> None:
+    """Start the measure tool."""
+    from PySide6.QtWidgets import QMessageBox
+
+    try:
+        window.measure_tool.start()
+    except Exception as ex:
+        QMessageBox.critical(window, "Measure Tool Error", str(ex))
