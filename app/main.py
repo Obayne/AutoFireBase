@@ -2,7 +2,6 @@ import json
 import math
 import os
 import sys
-import zipfile
 
 # Many UI style blocks and template strings in this file intentionally exceed
 # the project's line-length setting. To reduce noisy E501 (line too long)
@@ -1138,11 +1137,11 @@ class MainWindow(QMainWindow):
         self.fillet_radius_tool = FilletRadiusTool(self, self.layer_sketch)
 
         # Menus
-        from app.ui_setup import setup_menus
         from app.event_handlers import setup_event_handlers
+        from app.ui_setup import setup_menus
 
-        setup_menus(self)
         setup_event_handlers(self)
+        setup_menus(self)
 
     def _on_space_combo_changed(self, idx: int):
         if self.space_lock.isChecked():

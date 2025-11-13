@@ -32,10 +32,11 @@ def new_project(window: MainWindow) -> None:
 
 def save_project_as(window: MainWindow) -> None:
     """Save the current project to a file."""
-    from PySide6.QtWidgets import QFileDialog, QMessageBox
-    import zipfile
     import json
     import os
+    import zipfile
+
+    from PySide6.QtWidgets import QFileDialog, QMessageBox
 
     p, _ = QFileDialog.getSaveFileName(window, "Save Project As", "", "LV CAD Bundle (*.lvcad)")
     if not p:
@@ -53,10 +54,11 @@ def save_project_as(window: MainWindow) -> None:
 
 def open_project(window: MainWindow) -> None:
     """Open a project from a file."""
-    from PySide6.QtWidgets import QFileDialog, QMessageBox
-    import zipfile
     import json
     import os
+    import zipfile
+
+    from PySide6.QtWidgets import QFileDialog, QMessageBox
 
     p, _ = QFileDialog.getOpenFileName(window, "Open Project", "", "LV CAD Bundle (*.lvcad)")
     if not p:
