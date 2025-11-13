@@ -512,7 +512,7 @@ class CanvasView(QGraphicsView):
         except Exception:
             pass
         self.win.statusBar().showMessage(
-            f"x={dx_ft:.2f} ft   y={dy_ft:.2f} ft   scale={self.win.px_per_ft:.2f} px/ft  snap={self.win.snap_label}{draw_info}"
+            f"x={dx_ft:.2f} ft   y={dy_ft:.2f} ft   scale={self.win.px_per_ft:.2f} px/ft  snap={getattr(self.win, 'snap_label', getattr(self.win, 'sheet_label', ''))}{draw_info}"
         )
 
     def wheelEvent(self, e: QtGui.QWheelEvent):
@@ -1138,10 +1138,11 @@ class MainWindow(QMainWindow):
 
         # Menus
         from app.event_handlers import setup_event_handlers
-        from app.ui_setup import setup_menus
+        from app.ui_setup import setup_menus, setup_toolbar
 
         setup_event_handlers(self)
         setup_menus(self)
+        setup_toolbar(self)
 
     def _on_space_combo_changed(self, idx: int):
         if self.space_lock.isChecked():
@@ -1157,192 +1158,6 @@ class MainWindow(QMainWindow):
         # not every time the user switches the space. Avoid referencing local
         # variables here which may not be in scope.
         self.toggle_paper_space(idx == 1)
-
-        # Modify menu
-        m_modify = menubar.addMenu("&Modify")
-        m_modify.addAction("Offset Selectedâ€¦", self.offset_selected_dialog)
-        m_modify.addAction("Trim Lines", self.start_trim)
-        m_modify.addAction("Finish Trim", self.finish_trim)
-        m_modify.addAction("Extend Lines", self.start_extend)
-        m_modify.addAction("Fillet (Corner)", self.start_fillet)
-        m_modify.addAction("Fillet (Radius)â€¦", self.start_fillet_radius)
-        m_modify.addAction("Move", self.start_move)
-        m_modify.addAction("Copy", self.start_copy)
-        m_modify.addAction("Rotate", self.start_rotate)
-        m_modify.addAction("Mirror", self.start_mirror)
-        m_modify.addAction("Scale", self.start_scale)
-        m_modify.addAction("Chamferâ€¦", self.start_chamfer)
-
-        # Help menu
-        m_help = menubar.addMenu("&Help")
-        m_help.addAction("User Guide", self.show_user_guide)
-        m_help.addAction("Keyboard Shortcuts", self.show_shortcuts)
-        m_help.addSeparator()
-        m_help.addAction("About Auto-Fire", self.show_about)
-
-        m_view = menubar.addMenu("&View")
-        self.act_view_grid = QtGui.QAction("Grid", self, checkable=True)
-        self.act_view_grid.setChecked(True)
-        self.act_view_grid.toggled.connect(self.toggle_grid)
-        m_view.addAction(self.act_view_grid)
-        self.act_view_snap = QtGui.QAction("Snap", self, checkable=True)
-        self.act_view_snap.setChecked(self.scene.snap_enabled)
-        self.act_view_snap.toggled.connect(self.toggle_snap)
-        m_view.addAction(self.act_view_snap)
-        self.act_view_cross = QtGui.QAction("Crosshair (X)", self, checkable=True)
-        self.act_view_cross.setChecked(True)
-        self.act_view_cross.toggled.connect(self.toggle_crosshair)
-        m_view.addAction(self.act_view_cross)
-        self.act_paperspace = QtGui.QAction("Paper Space Mode", self, checkable=True)
-        self.act_paperspace.setChecked(False)
-        self.act_paperspace.toggled.connect(self.toggle_paper_space)
-        m_view.addAction(self.act_paperspace)
-        self.show_coverage = bool(self.prefs.get("show_coverage", True))
-        self.act_view_cov = QtGui.QAction("Show Device Coverage", self, checkable=True)
-        self.act_view_cov.setChecked(self.show_coverage)
-        self.act_view_cov.toggled.connect(self.toggle_coverage)
-        m_view.addAction(self.act_view_cov)
-        self.act_view_place_cov = QtGui.QAction(
-            "Show Coverage During Placement", self, checkable=True
-        )
-        self.act_view_place_cov.setChecked(bool(self.prefs.get("show_placement_coverage", True)))
-        self.act_view_place_cov.toggled.connect(self.toggle_placement_coverage)
-        m_view.addAction(self.act_view_place_cov)
-        m_view.addSeparator()
-        act_scale = QtGui.QAction("Set Pixels per Footâ€¦", self)
-        act_scale.triggered.connect(self.set_px_per_ft)
-        m_view.addAction(act_scale)
-        act_gridstyle = QtGui.QAction("Grid Styleâ€¦", self)
-        act_gridstyle.triggered.connect(self.grid_style_dialog)
-        m_view.addAction(act_gridstyle)
-        # Quick snap step presets (guardrail: snap to fixed inch steps or grid)
-        snap_menu = m_view.addMenu("Snap Step")
-
-        def add_snap(label, inches):
-            act = QtGui.QAction(label, self)
-            act.triggered.connect(lambda v=inches: self.set_snap_inches(v))
-            snap_menu.addAction(act)
-
-        add_snap("Grid (default)", 0.0)
-        add_snap("3 inches", 3.0)
-        add_snap("6 inches", 6.0)
-        add_snap("12 inches", 12.0)
-        add_snap("24 inches", 24.0)
-
-        # Object Snaps (OSNAP) toggles in View menu
-        m_view.addSeparator()
-        m_osnap = m_view.addMenu("Object Snaps")
-        self.act_os_end = QtGui.QAction("Endpoint", self, checkable=True)
-        self.act_os_mid = QtGui.QAction("Midpoint", self, checkable=True)
-        self.act_os_cen = QtGui.QAction("Center", self, checkable=True)
-        self.act_os_int = QtGui.QAction("Intersection", self, checkable=True)
-        self.act_os_perp = QtGui.QAction("Perpendicular", self, checkable=True)
-        self.act_os_end.setChecked(bool(self.prefs.get("osnap_end", True)))
-        self.act_os_mid.setChecked(bool(self.prefs.get("osnap_mid", True)))
-        self.act_os_cen.setChecked(bool(self.prefs.get("osnap_center", True)))
-        self.act_os_int.setChecked(bool(self.prefs.get("osnap_intersect", True)))
-        self.act_os_perp.setChecked(bool(self.prefs.get("osnap_perp", False)))
-        self.act_os_end.toggled.connect(lambda v: self._set_osnap("end", v))
-        self.act_os_mid.toggled.connect(lambda v: self._set_osnap("mid", v))
-        self.act_os_cen.toggled.connect(lambda v: self._set_osnap("center", v))
-        self.act_os_int.toggled.connect(lambda v: self._set_osnap("intersect", v))
-        self.act_os_perp.toggled.connect(lambda v: self._set_osnap("perp", v))
-        m_osnap.addAction(self.act_os_end)
-        m_osnap.addAction(self.act_os_mid)
-        m_osnap.addAction(self.act_os_cen)
-        m_osnap.addAction(self.act_os_int)
-        m_osnap.addAction(self.act_os_perp)
-        # apply initial states to view
-        self._set_osnap("end", self.act_os_end.isChecked())
-        self._set_osnap("mid", self.act_os_mid.isChecked())
-        self._set_osnap("center", self.act_os_cen.isChecked())
-        self._set_osnap("intersect", self.act_os_int.isChecked())
-        self._set_osnap("perp", self.act_os_perp.isChecked())
-
-        # No toolbars for base feel; reserve top bar for LV CAD items later
-
-        # Status bar Grid controls
-        sb = self.statusBar()
-        wrap = QWidget()
-        lay = QHBoxLayout(wrap)
-        lay.setContentsMargins(6, 0, 6, 0)
-        lay.setSpacing(10)
-        # Grid opacity control
-        lay.addWidget(QLabel("Grid"))
-        self.slider_grid = QtWidgets.QSlider(Qt.Horizontal)
-        self.slider_grid.setMinimum(10)
-        self.slider_grid.setMaximum(100)
-        self.slider_grid.setFixedWidth(110)
-        cur_op = float(self.prefs.get("grid_opacity", 0.25))
-        self.slider_grid.setValue(int(max(10, min(100, round(cur_op * 100)))))
-        self.lbl_gridp = QLabel(f"{int(self.slider_grid.value())}%")
-        lay.addWidget(self.slider_grid)
-        lay.addWidget(self.lbl_gridp)
-        # Grid size control
-        lay.addWidget(QLabel("Size"))
-        self.spin_grid_status = QSpinBox()
-        self.spin_grid_status.setRange(2, 500)
-        self.spin_grid_status.setValue(self.scene.grid_size)
-        self.spin_grid_status.setFixedWidth(70)
-        lay.addWidget(self.spin_grid_status)
-        sb.addPermanentWidget(wrap)
-
-        def _apply_grid_op(val: int):
-            op = max(0.10, min(1.00, val / 100.0))
-            self.scene.set_grid_style(opacity=op)
-            self.prefs["grid_opacity"] = op
-            save_prefs(self.prefs)
-            self.lbl_gridp.setText(f"{int(val)}%")
-
-        self.slider_grid.valueChanged.connect(_apply_grid_op)
-        self.spin_grid_status.valueChanged.connect(self.change_grid_size)
-
-        # Command bar
-        cmd_wrap = QWidget()
-        cmd_l = QHBoxLayout(cmd_wrap)
-        cmd_l.setContentsMargins(6, 0, 6, 0)
-        cmd_l.setSpacing(6)
-        cmd_l.addWidget(QLabel("Cmd:"))
-        self.cmd = QLineEdit()
-        self.cmd.setPlaceholderText("Type command (e.g., L, RECT, MOVE)â€¦")
-        self.cmd.returnPressed.connect(self._run_command)
-        cmd_l.addWidget(self.cmd)
-        sb.addPermanentWidget(cmd_wrap, 1)
-
-        # Toolbars removed: keeping top bar clean for LV CAD-specific UI later
-
-        # Left panel (device palette)
-        self._build_left_panel()
-
-        # Right dock: Layers & Properties
-        self._build_layers_and_props_dock()
-        # DXF Layers dock
-        self._dxf_layers = {}
-        self._build_dxf_layers_dock()
-
-        # Shortcuts
-        QtGui.QShortcut(QtGui.QKeySequence("D"), self, activated=self.start_dimension)
-        QtGui.QShortcut(QtGui.QKeySequence("Esc"), self, activated=self.cancel_active_tool)
-        QtGui.QShortcut(QtGui.QKeySequence("F2"), self, activated=self.fit_view_to_content)
-
-        # Selection change â†’ update Properties
-        self.scene.selectionChanged.connect(self._on_selection_changed)
-
-        # Initialize history structures before any tool or placement may push state.
-        self.history = []
-        self.history_index = -1
-        # Push initial state
-        try:
-            self.push_history()
-        except Exception:
-            # If push_history depends on other init steps not yet complete,
-            # leave the empty history in place; callers will handle gracefully.
-            pass
-        # Fit view after UI ready
-        try:
-            QtCore.QTimer.singleShot(0, self.fit_view_to_content)
-        except Exception:
-            pass
 
     # ---------- Theme ----------
     def apply_dark_theme(self):
@@ -4105,9 +3920,25 @@ Keyboard Shortcuts
 
 # factory for boot.py
 def create_window():
+    import sys
+
+    # Ensure QApplication exists before any Qt imports
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication(sys.argv)
+        app.setApplicationName("LV CAD")
+        app.setApplicationVersion("0.6.0")
+
     from app.app_controller import AppController
 
-    return AppController()
+    controller = AppController()
+
+    # Apply modern dark theme
+    controller._apply_modern_theme()
+
+    return controller
 
 
 def main():

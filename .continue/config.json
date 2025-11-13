@@ -2,24 +2,43 @@
     "$schema": "https://raw.githubusercontent.com/continuedev/continue/main/website/static/schemas/config_v1.json",
     "models": [
         {
-            "title": "DeepSeek Coder",
-            "provider": "openai",
-            "model": "deepseek-coder",
-            "apiBase": "https://api.deepseek.com/v1",
-            "apiKey": "${env:DEEPSEEK_API_KEY}"
+            "title": "DeepSeek Coder (Ollama)",
+            "provider": "ollama",
+            "model": "deepseek-coder:latest",
+            "apiBase": "http://localhost:11434"
         },
         {
-            "title": "Claude (via OpenRouter)",
-            "provider": "openai",
-            "model": "anthropic/claude-3.5-sonnet",
-            "apiBase": "https://openrouter.ai/api/v1",
-            "apiKey": "${env:OPENROUTER_API_KEY}"
+            "title": "DeepSeek v3.1 (Ollama)",
+            "provider": "ollama",
+            "model": "deepseek-v3.1:671b-cloud",
+            "apiBase": "http://localhost:11434"
+        },
+        {
+            "title": "DeepSeek Coder Base (Ollama)",
+            "provider": "ollama",
+            "model": "deepseek-coder:base",
+            "apiBase": "http://localhost:11434"
         }
+        // External models (commented out - require API keys)
+        // {
+        //     "title": "DeepSeek Coder",
+        //     "provider": "openai",
+        //     "model": "deepseek-coder",
+        //     "apiBase": "https://api.deepseek.com/v1",
+        //     "apiKey": "${env:DEEPSEEK_API_KEY}"
+        // },
+        // {
+        //     "title": "Claude (via OpenRouter)",
+        //     "provider": "openai",
+        //     "model": "anthropic/claude-3.5-sonnet",
+        //     "apiBase": "https://openrouter.ai/api/v1",
+        //     "apiKey": "${env:OPENROUTER_API_KEY}"
+        // }
     ],
-    "tabAutocompleteModel": "DeepSeek Coder",
-    "chatModel": "Claude (via OpenRouter)",
+    "tabAutocompleteModel": "DeepSeek Coder (Ollama)",
+    "chatModel": "DeepSeek Coder (Ollama)",
     "modelRoles": {
-        "editModel": "Claude (via OpenRouter)"
+        "editModel": "DeepSeek Coder (Ollama)"
     },
     "allowAnonymousTelemetry": false
 }

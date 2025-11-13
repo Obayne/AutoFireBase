@@ -16,7 +16,7 @@ def _exe_dir():
 
 def _log(msg: str):
     try:
-        base = Path.home() / "AutoFire" / "logs"
+        base = Path.home() / "LV CAD" / "logs"
         base.mkdir(parents=True, exist_ok=True)
         with (base / "updater.log").open("a", encoding="utf-8") as f:
             f.write(time.strftime("[%Y-%m-%d %H:%M:%S] ") + msg + "\n")
@@ -26,15 +26,15 @@ def _log(msg: str):
 
 def _candidate_update_dirs():
     # environment override first
-    env = os.environ.get("AUTO_FIRE_UPDATES_DIR")
+    env = os.environ.get("LV_CAD_UPDATES_DIR")
     base = _exe_dir()
     dirs = []
     if env:
         dirs.append(Path(env))
     # common locations
     dirs += [
-        Path("C:/AutoFireUpdates"),
-        Path.home() / "AutoFireUpdates",
+        Path("C:/LV_CAD_Updates"),
+        Path.home() / "LV_CAD_Updates",
         base / "updates",
     ]
     # unique-ify while preserving order

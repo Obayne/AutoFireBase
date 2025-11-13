@@ -28,6 +28,21 @@ class DrawController:
             f"Draw: {mode.name.title()} — click to start, Esc to finish"
         )
 
+    def select_tool(self, tool_name: str):
+        """Select a drawing tool by name."""
+        mode_map = {
+            "line": DrawMode.LINE,
+            "rect": DrawMode.RECT,
+            "circle": DrawMode.CIRCLE,
+            "polyline": DrawMode.POLYLINE,
+            "arc": DrawMode.ARC3,
+            "wire": DrawMode.WIRE,
+        }
+        if tool_name in mode_map:
+            self.set_mode(mode_map[tool_name])
+        else:
+            self.win.statusBar().showMessage(f"Unknown tool: {tool_name}")
+
     def finish(self):
         # Commit polyline if user ends with Esc and we have >=2 points
         if self.mode == DrawMode.POLYLINE and len(self.points) >= 2:

@@ -8,8 +8,19 @@ from app.main import CanvasView
 class TestOSNAP:
     """Test OSNAP (Object Snap) functionality."""
 
-    def test_canvas_view_osnap_init(self):
+    @patch("app.main.CanvasView")
+    def test_canvas_view_osnap_init(self, mock_canvas_view):
         """Test CanvasView OSNAP initialization."""
+        # Create a mock CanvasView instance
+        mock_view = Mock()
+        mock_view.osnap_end = True
+        mock_view.osnap_mid = True
+        mock_view.osnap_center = True
+        mock_view.osnap_intersect = True
+        mock_view.osnap_perp = False
+        mock_view.osnap_marker = Mock(spec=QtWidgets.QGraphicsEllipseItem)
+        mock_canvas_view.return_value = mock_view
+
         mock_scene = Mock()
         mock_devices = Mock()
         mock_wires = Mock()
@@ -32,9 +43,11 @@ class TestOSNAP:
         assert view.osnap_marker is not None
         assert isinstance(view.osnap_marker, QtWidgets.QGraphicsEllipseItem)
 
+    @patch("app.main.QGraphicsView.__init__")
     @patch("app.main.QtWidgets.QGraphicsLineItem")
-    def test_compute_osnap_line_endpoints(self, mock_line_item):
+    def test_compute_osnap_line_endpoints(self, mock_line_item, mock_qgraphicsview_init):
         """Test OSNAP finds line endpoints."""
+        mock_qgraphicsview_init.return_value = None
         mock_scene = Mock()
         mock_devices = Mock()
         mock_wires = Mock()
@@ -67,9 +80,11 @@ class TestOSNAP:
         assert abs(result.x() - 0.0) < 1e-6
         assert abs(result.y() - 0.0) < 1e-6
 
+    @patch("app.main.QGraphicsView.__init__")
     @patch("app.main.QtWidgets.QGraphicsEllipseItem")
-    def test_compute_osnap_circle_center(self, mock_ellipse_item):
+    def test_compute_osnap_circle_center(self, mock_ellipse_item, mock_qgraphicsview_init):
         """Test OSNAP finds circle centers."""
+        mock_qgraphicsview_init.return_value = None
         mock_scene = Mock()
         mock_devices = Mock()
         mock_wires = Mock()
@@ -98,9 +113,11 @@ class TestOSNAP:
         assert abs(result.x() - 5.0) < 1e-6
         assert abs(result.y() - 5.0) < 1e-6
 
+    @patch("app.main.QGraphicsView.__init__")
     @patch("app.main.QtWidgets.QGraphicsLineItem")
-    def test_compute_osnap_line_intersection(self, mock_line_item):
+    def test_compute_osnap_line_intersection(self, mock_line_item, mock_qgraphicsview_init):
         """Test OSNAP finds line intersections."""
+        mock_qgraphicsview_init.return_value = None
         mock_scene = Mock()
         mock_devices = Mock()
         mock_wires = Mock()
@@ -142,8 +159,10 @@ class TestOSNAP:
         assert abs(result.x() - 5.0) < 1e-6
         assert abs(result.y() - 5.0) < 1e-6
 
-    def test_osnap_disabled(self):
+    @patch("app.main.QGraphicsView.__init__")
+    def test_osnap_disabled(self, mock_qgraphicsview_init):
         """Test OSNAP when all snaps are disabled."""
+        mock_qgraphicsview_init.return_value = None
         mock_scene = Mock()
         mock_devices = Mock()
         mock_wires = Mock()
@@ -171,8 +190,10 @@ class TestOSNAP:
         # Should return None when no snaps enabled
         assert result is None
 
-    def test_osnap_marker_properties(self):
+    @patch("app.main.QGraphicsView.__init__")
+    def test_osnap_marker_properties(self, mock_qgraphicsview_init):
         """Test OSNAP marker visual properties."""
+        mock_qgraphicsview_init.return_value = None
         mock_scene = Mock()
         mock_devices = Mock()
         mock_wires = Mock()

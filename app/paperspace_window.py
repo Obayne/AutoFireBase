@@ -36,7 +36,7 @@ class PaperspaceWindow(QMainWindow):
         super().__init__(parent)
         self.app_controller = app_controller
         self.model_scene = model_scene  # Reference to model space scene
-        self.setWindowTitle("AutoFire - Paperspace")
+        self.setWindowTitle("LV CAD - Paperspace")
         self.setObjectName("PaperspaceWindow")
 
         # Initialize core attributes

@@ -146,6 +146,79 @@ def setup_menus(window: MainWindow) -> None:
         add_scale(lbl, v)
     scale_menu.addAction("Custom…", window.set_print_scale_custom)
 
+    # Modify menu
+    m_modify = menubar.addMenu("&Modify")
+    m_modify.addAction("Offset Selected…", window.offset_selected_dialog)
+    m_modify.addAction("Trim Lines", window.start_trim)
+    m_modify.addAction("Finish Trim", window.finish_trim)
+    m_modify.addAction("Extend Lines", window.start_extend)
+    m_modify.addAction("Fillet (Corner)", window.start_fillet)
+    m_modify.addAction("Fillet (Radius)…", window.start_fillet_radius)
+    m_modify.addAction("Move", window.start_move)
+    m_modify.addAction("Copy", window.start_copy)
+    m_modify.addAction("Rotate", window.start_rotate)
+    m_modify.addAction("Mirror", window.start_mirror)
+    m_modify.addAction("Scale", window.start_scale)
+    m_modify.addAction("Chamfer…", window.start_chamfer)
+
+    # Help menu
+    m_help = menubar.addMenu("&Help")
+    m_help.addAction("User Guide", window.show_user_guide)
+    m_help.addAction("Keyboard Shortcuts", window.show_shortcuts)
+    m_help.addSeparator()
+    m_help.addAction("About", window.show_about)
+
+    # View menu
+    m_view = menubar.addMenu("&View")
+    window.act_view_grid = QtGui.QAction("Grid", window, checkable=True)
+    window.act_view_grid.setChecked(True)
+    window.act_view_grid.toggled.connect(window.toggle_grid)
+    m_view.addAction(window.act_view_grid)
+    window.act_view_snap = QtGui.QAction("Snap", window, checkable=True)
+    window.act_view_snap.setChecked(window.scene.snap_enabled)
+    window.act_view_snap.toggled.connect(window.toggle_snap)
+    m_view.addAction(window.act_view_snap)
+    window.act_view_cross = QtGui.QAction("Crosshair (X)", window, checkable=True)
+    window.act_view_cross.setChecked(True)
+    window.act_view_cross.toggled.connect(window.toggle_crosshair)
+    m_view.addAction(window.act_view_cross)
+    window.act_paperspace = QtGui.QAction("Paper Space Mode", window, checkable=True)
+    window.act_paperspace.setChecked(False)
+    window.act_paperspace.toggled.connect(window.toggle_paper_space)
+    m_view.addAction(window.act_paperspace)
+    window.show_coverage = bool(window.prefs.get("show_coverage", True))
+    window.act_view_cov = QtGui.QAction("Show Device Coverage", window, checkable=True)
+    window.act_view_cov.setChecked(window.show_coverage)
+    window.act_view_cov.toggled.connect(window.toggle_coverage)
+    m_view.addAction(window.act_view_cov)
+    window.act_view_place_cov = QtGui.QAction(
+        "Show Coverage During Placement", window, checkable=True
+    )
+    window.act_view_place_cov.setChecked(bool(window.prefs.get("show_placement_coverage", True)))
+    window.act_view_place_cov.toggled.connect(window.toggle_placement_coverage)
+    m_view.addAction(window.act_view_place_cov)
+    m_view.addSeparator()
+    act_scale = QtGui.QAction("Set Pixels per Foot…", window)
+    act_scale.triggered.connect(window.set_px_per_ft)
+    m_view.addAction(act_scale)
+    act_gridstyle = QtGui.QAction("Grid Style…", window)
+    act_gridstyle.triggered.connect(window.grid_style_dialog)
+    m_view.addAction(act_gridstyle)
+    # Quick snap step presets (guardrail: snap to fixed inch steps or grid)
+    snap_menu = m_view.addMenu("Snap Step")
+    for lbl, v in [
+        ('1"', 12.0),
+        ('1/2"', 6.0),
+        ('1/4"', 3.0),
+        ('1/8"', 1.5),
+        ('1/16"', 0.75),
+        ('1/32"', 0.375),
+        ("Grid", 0.0),
+    ]:
+        act = QtGui.QAction(lbl, window)
+        act.triggered.connect(lambda checked=False, val=v: window.set_snap_step(val))
+        snap_menu.addAction(act)
+
     # Status bar: left space selector/lock; right badges
     window.space_combo = QtWidgets.QComboBox()
     window.space_combo.addItems(["Model", "Paper"])
@@ -165,3 +238,55 @@ def setup_menus(window: MainWindow) -> None:
     window.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
     window.statusBar().addPermanentWidget(window.space_badge)
     window._init_sheet_manager()
+
+
+def setup_toolbar(window: MainWindow) -> None:
+    """Set up the main toolbar with drawing and view tools."""
+    from PySide6 import QtCore, QtGui, QtWidgets
+    from PySide6.QtCore import QSize
+    from PySide6.QtGui import QColor, QIcon, QPainter, QPixmap
+
+    def create_text_icon(text: str, color: str = "#ffffff") -> QIcon:
+        """Create a simple text-based icon."""
+        pixmap = QPixmap(16, 16)
+        pixmap.fill(QColor(0, 0, 0, 0))  # Transparent background
+        painter = QPainter(pixmap)
+        painter.setPen(QColor(color))
+        painter.setFont(QtGui.QFont("Arial", 8, QtGui.QFont.Weight.Bold))
+        painter.drawText(pixmap.rect(), QtCore.Qt.AlignmentFlag.AlignCenter, text)
+        painter.end()
+        return QIcon(pixmap)
+
+    # Create main toolbar
+    tb = QtWidgets.QToolBar("Main")
+    tb.setIconSize(QSize(16, 16))
+    tb.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+    window.addToolBar(tb)
+
+    # Add view controls with icons
+    window.act_view_grid.setIcon(create_text_icon("⊞", "#888888"))
+    window.act_view_snap.setIcon(create_text_icon("⊡", "#888888"))
+    window.act_view_cross.setIcon(create_text_icon("✛", "#888888"))
+    tb.addAction(window.act_view_grid)
+    tb.addAction(window.act_view_snap)
+    tb.addAction(window.act_view_cross)
+    tb.addSeparator()
+
+    # Add drawing tools with icons
+    window.act_draw_line.setIcon(create_text_icon("/", "#00ff00"))
+    window.act_draw_rect.setIcon(create_text_icon("□", "#00ff00"))
+    window.act_draw_circle.setIcon(create_text_icon("○", "#00ff00"))
+    window.act_draw_poly.setIcon(create_text_icon("△", "#00ff00"))
+    window.act_draw_arc3.setIcon(create_text_icon("⌒", "#00ff00"))
+    tb.addAction(window.act_draw_line)
+    tb.addAction(window.act_draw_rect)
+    tb.addAction(window.act_draw_circle)
+    tb.addAction(window.act_draw_poly)
+    tb.addAction(window.act_draw_arc3)
+    tb.addSeparator()
+
+    # Add other tools with icons
+    window.act_draw_wire.setIcon(create_text_icon("⚡", "#ffff00"))
+    window.act_text.setIcon(create_text_icon("T", "#ffffff"))
+    tb.addAction(window.act_draw_wire)
+    tb.addAction(window.act_text)

@@ -1,11 +1,11 @@
-<!-- Auto-generated guidance for AI coding agents working on AutoFireBase -->
-# AutoFireBase — Copilot instructions
+<!-- Auto-generated guidance for AI coding agents working on LV CAD -->
+# LV CAD — Copilot instructions
 
 Keep guidance short and actionable. Focus on the concrete patterns and commands used by this repo.
 
 - Big picture
   - Python desktop CAD-style app (PySide6 GUI) with core algorithms in `cad_core/`, UI in `frontend/` and `app/`, and non-UI glue in `backend/`.
-  - `app/main.py` is the primary entrypoint for local development (`python app/main.py`). The project also uses PyInstaller specs (`AutoFire.spec`, `AutoFire_Debug.spec`) for builds.
+  - `app/main.py` is the primary entrypoint for local development (`python app/main.py`). The project also uses PyInstaller specs (`LV_CAD.spec`, `LV_CAD_Debug.spec`) for builds.
 
 - Developer workflows (copy-pasteable)
   - Dev setup (Windows PowerShell): `./setup_dev.ps1` — creates `.venv`, installs requirements, and sets up pre-commit.

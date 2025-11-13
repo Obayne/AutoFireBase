@@ -44,7 +44,7 @@ from app.tools.scale_underlay import (
     ScaleUnderlayDragTool,
     ScaleUnderlayRefTool,
 )
-from app.tools.text_tool import TextTool
+from app.tools.text_tool import MTextTool, TextTool
 from app.tools.trim_tool import TrimTool
 
 try:
@@ -221,8 +221,9 @@ class ModelSpaceWindow(QMainWindow):
 
     def _setup_system_builder_dock(self):
         """Setup the system builder dock for automatic system design."""
-        # SystemBuilder will be instantiated when first used
-        pass
+        # from app.system_builder import SystemBuilder
+
+        # self.system_builder = SystemBuilder()
 
         dock = QtWidgets.QDockWidget("System Builder", self)
         w = QtWidgets.QWidget()
@@ -467,175 +468,54 @@ class ModelSpaceWindow(QMainWindow):
     def start_chamfer(self):
         self.chamfer_tool.start()
 
-    def _initialize_tools(self):
-        """Initialize CAD tools and drawing state."""
-        # Initialize drawing tools
-        self.draw = draw_tools.DrawController(self, self.layer_sketch)
-
-        # Initialize modify tools
-        self.trim_tool = TrimTool(self)
-        self.extend_tool = ExtendTool(self)
-        self.fillet_tool = FilletTool(self)
-        self.fillet_radius_tool = FilletRadiusTool(self, self.layer_sketch)
-        self.move_tool = MoveTool(self)
-        self.rotate_tool = RotateTool(self)
-        self.mirror_tool = MirrorTool(self)
-        self.scale_tool = ScaleTool(self)
-        self.chamfer_tool = ChamferTool(self)
-
-        # Initialize text and dimension tools
-        self.text_tool = TextTool(self, self.layer_sketch)
-        try:
-            self.dim_tool = DimensionTool(self, self.layer_overlay)
-        except Exception:
-            # Fallback if dimension tool fails to load
-            self.dim_tool = type("DummyDimTool", (), {"start": lambda: None, "active": False})()
-
-        # Initialize other tools
-        self.freehand_tool = FreehandTool(self, self.layer_sketch)
-        self.leader_tool = LeaderTool(self, self.layer_overlay)
-        self.measure_tool = MeasureTool(self, self.layer_overlay)
-        self.revision_cloud_tool = RevisionCloudTool(self, self.layer_overlay)
-
-        # Initialize scale underlay tools
-        self.scale_underlay_drag_tool = ScaleUnderlayDragTool(self, self.layer_underlay)
-        self.scale_underlay_ref_tool = ScaleUnderlayRefTool(self, self.layer_underlay)
-
-    def select_tool(self, tool_name):
-        """Select a drawing tool by name."""
-        from app.tools.draw import DrawMode
-
-        mode_map = {
-            "line": DrawMode.LINE,
-            "rect": DrawMode.RECT,
-            "circle": DrawMode.CIRCLE,
-            "polyline": DrawMode.POLYLINE,
-            "arc": DrawMode.ARC3,
-            "wire": DrawMode.WIRE,
-        }
-        if tool_name in mode_map:
-            self.draw.set_mode(mode_map[tool_name])
-            self.statusBar().showMessage(f"Selected {tool_name} tool")
-        else:
-            self.statusBar().showMessage(f"Unknown tool: {tool_name}")
-
     def offset_selected_dialog(self):
-        """Show offset dialog for selected items."""
         # Placeholder for offset tool
         pass
-
-    def toggle_grid(self):
-        """Toggle grid visibility."""
-        # Placeholder for grid toggle
-        pass
-
-    def toggle_snap(self):
-        """Toggle snap functionality."""
-        # Placeholder for snap toggle
-        pass
-
-    def cancel_active_tool(self):
-        """Cancel any active tool."""
-        # Cancel drawing tool
-        if hasattr(self, "draw"):
-            self.draw.finish()
-        # Cancel other active tools
-        for tool_name in [
-            "trim_tool",
-            "extend_tool",
-            "fillet_tool",
-            "move_tool",
-            "rotate_tool",
-            "mirror_tool",
-            "scale_tool",
-            "chamfer_tool",
-            "text_tool",
-            "dim_tool",
-            "freehand_tool",
-            "leader_tool",
-            "measure_tool",
-            "revision_cloud_tool",
-        ]:
-            tool = getattr(self, tool_name, None)
-            if tool and hasattr(tool, "cancel"):
-                tool.cancel()
-        self.statusBar().showMessage("Active tool cancelled")
-
-    def push_history(self):
-        """Push current state to history (placeholder)."""
-        # Placeholder for undo/redo functionality
-        pass
-
-    def canvas_menu(self, pos):
-        """Show context menu at position (placeholder)."""
-        # Placeholder for canvas context menu
-        pass
-
-    def _connect_signals(self):
-        """Connect to app controller signals."""
-        # Connect to app controller signals for inter-window communication
-        if hasattr(self.app_controller, "model_space_changed"):
-            # Connect any model space change signals if needed
-            pass
 
     # System builder methods
     def design_system(self):
         """Automatically design a fire alarm system based on building parameters."""
-        try:
-            # Lazy import and instantiation of SystemBuilder
-            if not hasattr(self, "system_builder"):
-                from app.system_builder import SystemBuilder
+        system_type = self.system_type_combo.currentText()
+        area = self.building_area.value()
+        stories = self.stories.value()
+        occupancy = self.occupancy_type.currentText()
 
-                self.system_builder = SystemBuilder()
-
-            system_type = self.system_type_combo.currentText()
-            area = self.building_area.value()
-            stories = self.stories.value()
-            occupancy = self.occupancy_type.currentText()
-
-            # Use real SystemBuilder for design
-            design_result = self.system_builder.design_system(
-                system_type=system_type,
-                building_area=area,
-                stories=stories,
-                occupancy_type=occupancy,
-            )
-
-            # Display the formatted design result
-            self.results_text.setPlainText(design_result)
-
-        except Exception as e:
-            self.results_text.setPlainText(f"❌ System Design Error: {str(e)}")
-            _logger.error(f"System design failed: {e}", exc_info=True)
+        result = f"System design placeholder for {system_type}, {area} sq ft, {stories} stories, {occupancy} occupancy"
+        self.results_text.setPlainText(result)
 
     def calculate_wiring(self):
         """Calculate wiring requirements for the system."""
-        try:
-            # Ensure SystemBuilder is available
-            if not hasattr(self, "system_builder"):
-                from app.system_builder import SystemBuilder
+        result = "Wiring calculation placeholder"
+        self.results_text.setPlainText(result)
 
-                self.system_builder = SystemBuilder()
+    def generate_wire_spool(self):
+        """Generate wire spool list for installation."""
+        result = "Wire spool placeholder"
+        self.results_text.setPlainText(result)
+{chr(10).join(f"• Circuit {i+1}: {circuit['devices']} devices ({circuit['current']:.1f}A load, {circuit['wire_size']} AWG)"
+              for i, circuit in enumerate(wiring_result['circuits']))}
 
-            # Get current design parameters
-            system_type = self.system_type_combo.currentText()
-            area = self.building_area.value()
-            stories = self.stories.value()
-            occupancy = self.occupancy_type.currentText()
+• Maximum Voltage Drop: {wiring_result['voltage_drop']['max_drop']:.1f}V ({wiring_result['voltage_drop']['percentage']:.1f}%)
+• Recommended Wire Size: {wiring_result['voltage_drop']['recommended_wire']} AWG
+• Maximum Circuit Length: {wiring_result['voltage_drop']['max_length']:.0f} ft
 
-            # First design the system to get device counts
-            design_result = self.system_builder.design_system(
-                system_type=system_type,
-                building_area=area,
-                stories=stories,
-                occupancy_type=occupancy,
-            )
+• Primary Supply: {wiring_result['power']['primary_voltage']}VAC, {wiring_result['power']['primary_current']:.1f}A
+• Secondary Distribution: {wiring_result['power']['secondary_voltage']}VDC, {wiring_result['power']['secondary_current']:.1f}A
+• Battery Charging: {wiring_result['power']['battery_charging_current']:.1f}A
 
-            # Calculate wiring requirements
-            wiring_result = self.system_builder.calculate_wiring()
+• Ground Wire Size: {wiring_result['grounding']['ground_wire_size']} AWG
+• Conduit Size: {wiring_result['grounding']['conduit_size']}"
+• Overcurrent Protection: {wiring_result['grounding']['overcurrent_protection']}A breakers
 
-            # Display the formatted wiring result
-            self.results_text.setPlainText(wiring_result)
+• Loop Length: {wiring_result['slc']['max_length']:.0f} ft maximum
+• Wire Type: {wiring_result['slc']['wire_type']}
+• Total Resistance: {wiring_result['slc']['total_resistance']:.2f} ohms
+
+{chr(10).join(f"• {req}" for req in wiring_result['compliance_requirements'])}
+
+{chr(10).join(f"• {req}" for req in wiring_result['installation_requirements'])}"""
+
+            self.results_text.setPlainText(result)
 
         except Exception as e:
             self.results_text.setPlainText(f"❌ Wiring Calculation Error: {str(e)}")

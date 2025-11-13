@@ -1,12 +1,12 @@
 {
   "Test Execution": {
-    "AverageSeconds": 1.97116145,
-    "TotalSeconds": 3.9423229,
-    "Runs": 2
+    "AverageSeconds": 1.9146101666666668,
+    "TotalSeconds": 5.7438305000000005,
+    "Runs": 3
   },
   "Code Formatting": {
-    "AverageSeconds": 1.7599041,
-    "TotalSeconds": 3.5198082,
-    "Runs": 2
+    "AverageSeconds": 1.7508637333333332,
+    "TotalSeconds": 5.2525911999999995,
+    "Runs": 3
   }
 }
