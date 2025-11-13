@@ -17,6 +17,11 @@ def setup_event_handlers(window: MainWindow) -> None:
     window.new_project = lambda: new_project(window)
     window.save_project_as = lambda: save_project_as(window)
     window.open_project = lambda: open_project(window)
+    window.start_text = lambda: start_text(window)
+    window.start_mtext = lambda: start_mtext(window)
+    window.start_freehand = lambda: start_freehand(window)
+    window.start_leader = lambda: start_leader(window)
+    window.start_cloud = lambda: start_cloud(window)
 
 
 def new_project(window: MainWindow) -> None:
@@ -71,3 +76,53 @@ def open_project(window: MainWindow) -> None:
         window.statusBar().showMessage(f"Opened: {os.path.basename(p)}")
     except Exception as ex:
         QMessageBox.critical(window, "Open Project Error", str(ex))
+
+
+def start_text(window: MainWindow) -> None:
+    """Start the text tool."""
+    from PySide6.QtWidgets import QMessageBox
+
+    try:
+        window.text_tool.start()
+    except Exception as ex:
+        QMessageBox.critical(window, "Text Tool Error", str(ex))
+
+
+def start_mtext(window: MainWindow) -> None:
+    """Start the mtext tool."""
+    from PySide6.QtWidgets import QMessageBox
+
+    try:
+        window.mtext_tool.start()
+    except Exception as ex:
+        QMessageBox.critical(window, "MText Tool Error", str(ex))
+
+
+def start_freehand(window: MainWindow) -> None:
+    """Start the freehand tool."""
+    try:
+        window.freehand_tool.start()
+    except Exception as ex:
+        from PySide6.QtWidgets import QMessageBox
+
+        QMessageBox.critical(window, "Freehand Tool Error", str(ex))
+
+
+def start_leader(window: MainWindow) -> None:
+    """Start the leader tool."""
+    try:
+        window.leader_tool.start()
+    except Exception as ex:
+        from PySide6.QtWidgets import QMessageBox
+
+        QMessageBox.critical(window, "Leader Tool Error", str(ex))
+
+
+def start_cloud(window: MainWindow) -> None:
+    """Start the revision cloud tool."""
+    try:
+        window.cloud_tool.start()
+    except Exception as ex:
+        from PySide6.QtWidgets import QMessageBox
+
+        QMessageBox.critical(window, "Revision Cloud Tool Error", str(ex))

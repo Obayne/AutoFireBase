@@ -3121,40 +3121,10 @@ class MainWindow(QMainWindow):
         self.push_history()
 
     # ---------- text / wire ----------
-    def start_text(self):
-        try:
-            self.text_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Text Tool Error", str(ex))
-
     def _set_wire_mode(self):
         # temporarily direct draw controller to wires layer for wire mode
         self.draw.layer = self.layer_wires
         self.draw.set_mode(draw_tools.DrawMode.WIRE)
-
-    def start_mtext(self):
-        try:
-            self.mtext_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "MText Tool Error", str(ex))
-
-    def start_freehand(self):
-        try:
-            self.freehand_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Freehand Tool Error", str(ex))
-
-    def start_leader(self):
-        try:
-            self.leader_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Leader Tool Error", str(ex))
-
-    def start_cloud(self):
-        try:
-            self.cloud_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Revision Cloud Error", str(ex))
 
     # ---------- underlay scaling ----------
     def start_underlay_scale_ref(self):
