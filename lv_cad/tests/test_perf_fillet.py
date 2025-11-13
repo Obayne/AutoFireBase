@@ -28,7 +28,7 @@ RUN_PERF = os.environ.get("RUN_PERF") == "1"
     legacy_fillet_line_line is None or Line is None or Point is None,
     reason="legacy fillet unavailable",
 )
-def test_perf_fillet_line_line_basic():
+def test_perf_fillet_line_line_basic() -> None:
     # Simple perpendicular lines sharing origin
     l1 = Line(Point(-100.0, 0.0), Point(100.0, 0.0))
     l2 = Line(Point(0.0, -100.0), Point(0.0, 100.0))

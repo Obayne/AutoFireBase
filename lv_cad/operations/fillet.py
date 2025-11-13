@@ -29,7 +29,7 @@ except ImportError:  # pragma: no cover
 # unified convenience wrapper (example signature kept simple for now)
 
 
-def fillet(*args: Any, **kwargs: Any):  # noqa: ANN401 - intentionally generic
+def fillet(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401 - intentionally generic
     """General fillet convenience wrapper.
 
     For now just forwards to line-line variant if available.
@@ -39,19 +39,19 @@ def fillet(*args: Any, **kwargs: Any):  # noqa: ANN401 - intentionally generic
     return _legacy_fillet_line_line(*args, **kwargs)
 
 
-def fillet_line_line(*args: Any, **kwargs: Any):  # noqa: ANN401
+def fillet_line_line(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
     if _legacy_fillet_line_line is None:  # pragma: no cover
         raise RuntimeError("Legacy fillet_line_line unavailable.")
     return _legacy_fillet_line_line(*args, **kwargs)
 
 
-def fillet_line_circle(*args: Any, **kwargs: Any):  # noqa: ANN401
+def fillet_line_circle(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
     if _legacy_fillet_line_circle is None:  # pragma: no cover
         raise RuntimeError("Legacy fillet_line_circle unavailable.")
     return _legacy_fillet_line_circle(*args, **kwargs)
 
 
-def fillet_circle_circle(*args: Any, **kwargs: Any):  # noqa: ANN401
+def fillet_circle_circle(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
     if _legacy_fillet_circle_circle is None:  # pragma: no cover
         raise RuntimeError("Legacy fillet_circle_circle unavailable.")
     return _legacy_fillet_circle_circle(*args, **kwargs)

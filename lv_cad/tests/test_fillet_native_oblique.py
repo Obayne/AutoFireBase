@@ -15,7 +15,7 @@ def _dot(ax: float, ay: float, bx: float, by: float) -> float:
     return ax * bx + ay * by
 
 
-def test_fillet_line_line_native_oblique():
+def test_fillet_line_line_native_oblique() -> None:
     # Lines: u along +X; v at +60 degrees
     a1, a2 = Point(-100.0, 0.0), Point(100.0, 0.0)
     ang = math.radians(60.0)
