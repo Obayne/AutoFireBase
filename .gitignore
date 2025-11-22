@@ -42,3 +42,10 @@ Thumbs.db
 .eggs/
 *.dist-info/
 pip-wheel-metadata/
+
+# Security - prevent accidental commits
+.env
+*.env
+api_keys.txt
+chat log*.txt
+*.secret
