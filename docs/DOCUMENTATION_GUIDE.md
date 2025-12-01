@@ -7,12 +7,14 @@ AutoFire uses [Sphinx](https://www.sphinx-doc.org/) for automatic documentation 
 ### Build Documentation Locally
 
 **Windows:**
+
 ```powershell
 cd docs
 .\build.ps1 html
 ```
 
 **Linux/Mac:**
+
 ```bash
 cd docs
 make html
@@ -21,6 +23,7 @@ make html
 ### View Documentation
 
 **Open in browser:**
+
 ```powershell
 # Windows
 Start-Process docs\_build\html\index.html
@@ -30,13 +33,14 @@ open docs/_build/html/index.html
 ```
 
 **Or serve locally:**
+
 ```powershell
 cd docs
 .\build.ps1 serve  # Windows
 make serve         # Linux/Mac
 ```
 
-Then open http://localhost:8000
+Then open <http://localhost:8000>
 
 ## Features
 
@@ -115,7 +119,7 @@ docs/
 
 Documentation is automatically built and deployed to GitHub Pages on every push to `main`.
 
-### Setup (One-Time):
+### Setup (One-Time)
 
 1. **Enable GitHub Pages**
    - Go to repository Settings → Pages
@@ -127,9 +131,10 @@ Documentation is automatically built and deployed to GitHub Pages on every push 
    - Builds on every push to `main`
    - Deploys to `https://<username>.github.io/<repo>/`
 
-### View Published Docs:
+### View Published Docs
 
 After setup, docs are available at:
+
 ```
 https://obayne.github.io/AutoFireBase/
 ```
@@ -147,6 +152,7 @@ Documentation builds run in CI:
 ```
 
 **Benefits:**
+
 - ✅ Catch doc build errors in PRs
 - ✅ Preview docs before merge
 - ✅ Auto-deploy to GitHub Pages
@@ -295,6 +301,7 @@ html_theme = "sphinx_rtd_theme"  # Current
 
 **Cause**: Sphinx can't import your code
 **Fix**: Add to `docs/conf.py`:
+
 ```python
 sys.path.insert(0, os.path.abspath(".."))
 ```
@@ -303,6 +310,7 @@ sys.path.insert(0, os.path.abspath(".."))
 
 **Cause**: New .rst file not added to toctree
 **Fix**: Add to `index.rst` or parent .rst file:
+
 ```rst
 .. toctree::
    :maxdepth: 2
@@ -313,12 +321,14 @@ sys.path.insert(0, os.path.abspath(".."))
 ### Build warnings/errors
 
 **Check build output:**
+
 ```powershell
 cd docs
 .\build.ps1 html  # Shows all warnings/errors
 ```
 
 **Common fixes:**
+
 - Fix malformed docstrings
 - Add missing type hints
 - Escape special characters in docstrings
@@ -326,6 +336,7 @@ cd docs
 ### GitHub Pages not updating
 
 **Troubleshooting:**
+
 1. Check Actions tab for workflow status
 2. Verify Pages is enabled (Settings → Pages)
 3. Check workflow file: `.github/workflows/docs.yml`
@@ -341,6 +352,7 @@ cd docs
 ## Cost
 
 **$0.00** - Completely free:
+
 - Sphinx: Free, open source
 - Read the Docs theme: Free
 - GitHub Pages: Free hosting

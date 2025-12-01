@@ -29,7 +29,8 @@ _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pa
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
-from autofire_layer_intelligence import CADLayerIntelligence  # type: ignore
+from autofire_layer_intelligence import CADLayerIntelligence  # type: ignore  # noqa: E402
+from backend.monitoring import init_monitoring  # noqa: E402
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -49,6 +50,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    init_monitoring()
     args = build_parser().parse_args(argv)
     intel = CADLayerIntelligence()
 

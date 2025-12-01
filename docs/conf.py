@@ -1,90 +1,10 @@
-# Configuration file for the Sphinx documentation builder.
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
-import os
-import sys
-
-# Add project root to path for autodoc
-sys.path.insert(0, os.path.abspath(".."))
-
-# -- Project information -----------------------------------------------------
-project = "AutoFire"
-copyright = "2024-2025, AutoFire Team"
-author = "AutoFire Team"
-
-# Read version from VERSION.txt
-with open("../VERSION.txt") as f:
-    version = f.read().strip()
-release = version
-
-# -- General configuration ---------------------------------------------------
+project = "LV CAD (AutoFire)"
+author = "AutoFire Contributors"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.todo",
-    "sphinx.ext.coverage",
-    "sphinx.ext.githubpages",
-    "sphinx_autodoc_typehints",
 ]
-
-templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
-
-# -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_rtd_theme"
-html_static_path = ["_static"]
-html_title = f"AutoFire v{version}"
-html_short_title = "AutoFire"
-html_favicon = None  # Add favicon.ico to _static/ if available
-
-html_theme_options = {
-    "navigation_depth": 4,
-    "collapse_navigation": False,
-    "sticky_navigation": True,
-    "includehidden": True,
-    "titles_only": False,
-}
-
-# -- Extension configuration -------------------------------------------------
-
-# Napoleon settings (Google/NumPy docstring support)
-napoleon_google_docstring = True
-napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = True
-napoleon_include_private_with_doc = False
-napoleon_include_special_with_doc = True
-napoleon_use_admonition_for_examples = False
-napoleon_use_admonition_for_notes = False
-napoleon_use_admonition_for_references = False
-napoleon_use_ivar = False
-napoleon_use_param = True
-napoleon_use_rtype = True
-napoleon_preprocess_types = False
-napoleon_type_aliases = None
-napoleon_attr_annotations = True
-
-# Autodoc settings
-autodoc_default_options = {
-    "members": True,
-    "member-order": "bysource",
-    "special-members": "__init__",
-    "undoc-members": True,
-    "exclude-members": "__weakref__",
-}
-
-autodoc_typehints = "description"
-autodoc_typehints_description_target = "documented"
-
-# Intersphinx mapping
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
-    "pyside6": ("https://doc.qt.io/qtforpython-6/", None),
-}
-
-# Todo extension
-todo_include_todos = True
-
-# GitHub Pages - create .nojekyll file
-html_extra_path = []
+templates_path = ["_templates"]
+exclude_patterns = []
