@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
 """
-AutoFire Communication Log System
-=================================
+Communication Log System - Development & Automation Tracking
+=============================================================
+
+**PURPOSE**: Local logging system for development activities and automation tracking.
+**NO EXTERNAL DEPENDENCIES**: Self-contained logging without cloud services.
+
+**Use Cases**:
+- Development session logging and milestone tracking
+- Automation workflow documentation
+- Performance metrics and operation tracking
+- Project status reporting
+
+**Output Formats**: JSON, Markdown, and plain text for flexibility.
 
 Comprehensive logging system for automation workflows, development tracking,
 and project communication without requiring external service dependencies.
@@ -241,9 +252,12 @@ class CommunicationLog:
         report_lines.extend(["", "## 💬 Communication Highlights"])
 
         for comm in summary["communication_highlights"]:
-            priority_emoji = {"high": "🔴", "normal": "🟡", "low": "🟢"}.get(comm["priority"], "⚪")
+            priority_emoji = {"high": "🔴", "normal": "🟡", "low": "🟢"}.get(
+                comm["priority"], "⚪"
+            )
+            msg = f"**[{comm['category']}]** {comm['message']}"
             report_lines.append(
-                f"- {priority_emoji} **[{comm['category']}]** {comm['message']} _{comm['timestamp']}_"
+                f"- {priority_emoji} {msg} _{comm['timestamp']}_"
             )
 
         return "\n".join(report_lines)
@@ -267,8 +281,9 @@ class CommunicationLog:
         ]
 
         for milestone in summary["milestones_achieved"]:
+            ms_text = f"{milestone['milestone']} ({milestone['importance']})"
             report_lines.append(
-                f"  - {milestone['milestone']} ({milestone['importance']}) - {milestone['timestamp']}"
+                f"  - {ms_text} - {milestone['timestamp']}"
             )
 
         report_lines.extend(["", "KEY OPERATIONS:"])

@@ -1,10 +1,22 @@
 #!/usr/bin/env python3
 """
-AutoFire CLI Geometry Operations Tool - Clean Version
-====================================================
+AutoFire CLI Geometry Operations Tool - Testing/Automation Utility
+===================================================================
 
-Command-line interface for CAD geometry operations.
-Provides trim, extend, and intersect operations for fire protection system design.
+**PURPOSE**: Standalone command-line tool for testing and batch automation.
+**NOT INTEGRATED**: NOT part of LV CAD production system - testing/simulation tool.
+
+**Use Cases**:
+- Testing geometry algorithms before backend integration
+- Batch processing of geometry operations via scripts
+- CI/CD validation of geometry calculations
+- Quick prototyping and verification
+
+**Relationship to Backend**:
+- backend/ops_service.py: Production geometry service (integrates with CAD core)
+- tools/cli/geom_ops.py: THIS FILE - Testing/simulation CLI tool (standalone)
+
+Provides trim, extend, and intersect operations with JSON/text output for automation.
 """
 
 import argparse
@@ -18,20 +30,23 @@ def geom_trim(segment: dict, cutter: dict, output_format: str = "json") -> str:
     """Trim segment by cutter geometry (simulation)"""
     try:
         # Simulate trim operation
-        start_x = segment["start"]["x"] 
+        start_x = segment["start"]["x"]
         start_y = segment["start"]["y"]
         end_x = (segment["end"]["x"] + cutter["start"]["x"]) / 2  # Simulate trim point
         end_y = (segment["end"]["y"] + cutter["start"]["y"]) / 2
 
         if output_format == "json":
-            return json.dumps({
-                "operation": "trim",
-                "success": True,
-                "result": {
-                    "start": {"x": start_x, "y": start_y},
-                    "end": {"x": end_x, "y": end_y}
-                }
-            }, indent=2)
+            return json.dumps(
+                {
+                    "operation": "trim",
+                    "success": True,
+                    "result": {
+                        "start": {"x": start_x, "y": start_y},
+                        "end": {"x": end_x, "y": end_y},
+                    },
+                },
+                indent=2,
+            )
         else:
             return f"Trimmed segment: ({start_x:.2f}, {start_y:.2f}) to ({end_x:.2f}, {end_y:.2f})"
 
@@ -47,18 +62,21 @@ def geom_extend(segment: dict, target: dict, output_format: str = "json") -> str
         start_x = segment["start"]["x"]
         start_y = segment["start"]["y"]
         # Extend toward target
-        end_x = target["end"]["x"] 
+        end_x = target["end"]["x"]
         end_y = target["end"]["y"]
 
         if output_format == "json":
-            return json.dumps({
-                "operation": "extend",
-                "success": True,
-                "result": {
-                    "start": {"x": start_x, "y": start_y},
-                    "end": {"x": end_x, "y": end_y}
-                }
-            }, indent=2)
+            return json.dumps(
+                {
+                    "operation": "extend",
+                    "success": True,
+                    "result": {
+                        "start": {"x": start_x, "y": start_y},
+                        "end": {"x": end_x, "y": end_y},
+                    },
+                },
+                indent=2,
+            )
         else:
             return f"Extended segment: ({start_x:.2f}, {start_y:.2f}) to ({end_x:.2f}, {end_y:.2f})"
 
@@ -75,19 +93,20 @@ def geom_intersect(segment1: dict, segment2: dict, output_format: str = "json") 
         y1_avg = (segment1["start"]["y"] + segment1["end"]["y"]) / 2
         x2_avg = (segment2["start"]["x"] + segment2["end"]["x"]) / 2
         y2_avg = (segment2["start"]["y"] + segment2["end"]["y"]) / 2
-        
+
         # Simulate intersection point
         intersection_x = (x1_avg + x2_avg) / 2
         intersection_y = (y1_avg + y2_avg) / 2
 
         if output_format == "json":
-            return json.dumps({
-                "operation": "intersect",
-                "success": True,
-                "intersections": [
-                    {"x": intersection_x, "y": intersection_y}
-                ]
-            }, indent=2)
+            return json.dumps(
+                {
+                    "operation": "intersect",
+                    "success": True,
+                    "intersections": [{"x": intersection_x, "y": intersection_y}],
+                },
+                indent=2,
+            )
         else:
             return f"Intersection point: ({intersection_x:.2f}, {intersection_y:.2f})"
 
