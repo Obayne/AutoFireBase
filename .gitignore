@@ -33,6 +33,11 @@ htmlcov/
 runs.json
 PROJECT_STATUS_REPORT.md
 
+# Communication logs (CLI automation)
+communication_logs/
+*.communication.json
+*_communication_log.json
+
 # Editors/OS
 .vscode/
 .idea/
