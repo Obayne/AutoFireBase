@@ -25,6 +25,15 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --strict-markers"
 
+# Benchmark configuration
+[tool.pytest-benchmark]
+# Disable benchmarks by default in regular test runs
+disable_gc = true
+min_rounds = 5
+timer = "time.perf_counter"
+calibration_precision = 10
+warmup = true
+
 [tool.coverage.run]
 source = ["backend", "cad_core", "frontend", "app"]
 omit = [

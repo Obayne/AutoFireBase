@@ -3,3 +3,7 @@ black
 ruff
 mypy
 pytest
+pytest-benchmark
+sphinx
+sphinx-rtd-theme
+sphinx-autodoc-typehints
