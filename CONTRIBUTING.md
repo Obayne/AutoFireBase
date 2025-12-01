@@ -78,7 +78,7 @@ Thank you for your interest in contributing to AutoFireBase! This guide will hel
 
 ### Project Structure
 
-```
+```text
 AutoFireBase/
 ├── app/           # Application entry point, dialogs, UI glue
 │   ├── main.py    # Primary entry point
@@ -311,7 +311,7 @@ def test_bench_intersection_line_line(benchmark, perpendicular_lines):
 
 ### Test Organization
 
-```
+```text
 tests/
 ├── benchmarks/           # Performance benchmarks
 │   ├── test_bench_lines.py
@@ -356,7 +356,7 @@ git checkout -b chore/update-dependencies
 
 ### 3. Write Clear Commit Messages
 
-```
+```text
 <type>: <short summary> (50 chars max)
 
 <detailed explanation if needed>
@@ -370,7 +370,7 @@ Types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `perf`
 
 Examples:
 
-```
+```text
 feat: Add circle-circle fillet tool
 
 Implements geometric algorithm for filleting two circles with

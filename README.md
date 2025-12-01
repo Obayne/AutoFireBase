@@ -158,7 +158,7 @@ pytest --benchmark-only --benchmark-autosave
 
 ## Project Structure
 
-```
+```text
 AutoFireBase/
 ├── app/           # Application entry point, dialogs, UI glue
 ├── frontend/      # Qt widgets, views, input handling

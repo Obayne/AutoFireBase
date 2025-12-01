@@ -109,7 +109,7 @@ report = log.generate_report(format="markdown")
 
 ### Architecture Diagram
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    PRODUCTION SYSTEMS                        │
 ├─────────────────────────────────────────────────────────────┤

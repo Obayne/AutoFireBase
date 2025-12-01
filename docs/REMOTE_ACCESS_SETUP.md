@@ -165,7 +165,7 @@ code tunnel service install
 
 Then access from your Android phone at:
 
-```
+```text
 https://vscode.dev/tunnel/<your-tunnel-name>
 ```
 

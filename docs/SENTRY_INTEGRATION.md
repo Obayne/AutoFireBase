@@ -24,7 +24,7 @@ AutoFire uses [Sentry](https://sentry.io/) for automatic error tracking and perf
 
 After creating project, copy the DSN (looks like):
 
-```
+```text
 https://abc123def456@o1234567.ingest.sentry.io/7654321
 ```
 
