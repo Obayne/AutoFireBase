@@ -30,6 +30,8 @@ dist/
 .coverage
 .coverage.*
 htmlcov/
+runs.json
+PROJECT_STATUS_REPORT.md
 
 # Editors/OS
 .vscode/
