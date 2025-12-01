@@ -69,8 +69,8 @@ class OpsService:
         else:
             logger.warning("No intersection found for extend operation")
             return segment
-    
-    def intersect_segments(self, segments: List[SegmentDTO]) -> List[PointDTO]:
+
+    def intersect_segments(self, segments: list[SegmentDTO]) -> list[PointDTO]:
         """
         Find all intersection points between segments
 
@@ -101,7 +101,7 @@ class OpsService:
 
         # Line 2: seg2.a to seg2.b
         x3, y3 = seg2.a.x, seg2.a.y
-        x4, y4 = seg2.b.x, seg2.b.y        # Calculate denominators
+        x4, y4 = seg2.b.x, seg2.b.y  # Calculate denominators
         denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
 
         if abs(denom) < 1e-10:  # Lines are parallel
@@ -123,22 +123,22 @@ class OpsService:
     def _extend_line(self, segment: SegmentDTO, distance: float) -> PointDTO:
         """Extend a line segment by a given distance"""
         # Calculate direction vector
-        dx = segment.end.x - segment.start.x
-        dy = segment.end.y - segment.start.y
+        dx = segment.b.x - segment.a.x
+        dy = segment.b.y - segment.a.y
 
         # Calculate length
         length = (dx**2 + dy**2) ** 0.5
 
         if length == 0:
-            return segment.end
+            return segment.b
 
         # Normalize direction vector
         unit_dx = dx / length
         unit_dy = dy / length
 
         # Extend by distance
-        new_x = segment.end.x + unit_dx * distance
-        new_y = segment.end.y + unit_dy * distance
+        new_x = segment.b.x + unit_dx * distance
+        new_y = segment.b.y + unit_dy * distance
 
         return PointDTO(x=new_x, y=new_y)
 

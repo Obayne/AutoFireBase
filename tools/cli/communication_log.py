@@ -252,13 +252,9 @@ class CommunicationLog:
         report_lines.extend(["", "## 💬 Communication Highlights"])
 
         for comm in summary["communication_highlights"]:
-            priority_emoji = {"high": "🔴", "normal": "🟡", "low": "🟢"}.get(
-                comm["priority"], "⚪"
-            )
+            priority_emoji = {"high": "🔴", "normal": "🟡", "low": "🟢"}.get(comm["priority"], "⚪")
             msg = f"**[{comm['category']}]** {comm['message']}"
-            report_lines.append(
-                f"- {priority_emoji} {msg} _{comm['timestamp']}_"
-            )
+            report_lines.append(f"- {priority_emoji} {msg} _{comm['timestamp']}_")
 
         return "\n".join(report_lines)
 
@@ -282,9 +278,7 @@ class CommunicationLog:
 
         for milestone in summary["milestones_achieved"]:
             ms_text = f"{milestone['milestone']} ({milestone['importance']})"
-            report_lines.append(
-                f"  - {ms_text} - {milestone['timestamp']}"
-            )
+            report_lines.append(f"  - {ms_text} - {milestone['timestamp']}")
 
         report_lines.extend(["", "KEY OPERATIONS:"])
 
