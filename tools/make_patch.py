@@ -1,4 +1,9 @@
-import argparse, json, os, zipfile, hashlib
+import argparse
+import hashlib
+import json
+import os
+import zipfile
+
 
 def sha256_file(p):
     h = hashlib.sha256()
@@ -6,6 +11,7 @@ def sha256_file(p):
         for chunk in iter(lambda: f.read(65536), b""):
             h.update(chunk)
     return h.hexdigest()
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -16,19 +22,29 @@ def main():
     args = ap.parse_args()
 
     manifest = {"name": "AutoFire patch", "version": args.version, "files": []}
+    import logging
+
+    from app.logging_config import setup_logging
+
+    setup_logging()
+    logger = logging.getLogger(__name__)
+
     with zipfile.ZipFile(args.out, "w", compression=zipfile.ZIP_DEFLATED) as z:
         for rel in args.files:
             src = os.path.join(args.project, rel)
             if not os.path.isfile(src):
                 raise SystemExit(f"Not found: {src}")
             z.write(src, arcname=rel)
-            manifest["files"].append({
-                "path": rel.replace("\\","/"),
-                "sha256": sha256_file(src),
-                "bytes": os.path.getsize(src)
-            })
+            manifest["files"].append(
+                {
+                    "path": rel.replace("\\", "/"),
+                    "sha256": sha256_file(src),
+                    "bytes": os.path.getsize(src),
+                }
+            )
         z.writestr("manifest.json", json.dumps(manifest, indent=2))
-    print(f"Wrote {args.out}")
+    logger.info("Wrote %s", args.out)
+
 
 if __name__ == "__main__":
     main()

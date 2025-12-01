@@ -21,3 +21,6 @@ Testing
 - Keep `cad_core/` pure and covered by unit tests.
 - Avoid GUI in tests; mock Qt where needed.
 
+See Also
+- Data Model and serialization details: `docs/DATA_MODEL.md`
+

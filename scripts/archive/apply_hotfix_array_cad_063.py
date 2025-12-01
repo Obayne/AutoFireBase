@@ -10,7 +10,9 @@ ROOT = Path(".").resolve()
 
 FILES = {}
 
-FILES["app/tools/array.py"] = r'''
+FILES[
+    "app/tools/array.py"
+] = r'''
 from PySide6 import QtCore, QtGui, QtWidgets
 from app.device import DeviceItem
 
@@ -125,7 +127,9 @@ class ArrayTool:
         return True
 '''
 
-FILES["app/main.py"] = r'''
+FILES[
+    "app/main.py"
+] = r"""
 import os, json, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -624,7 +628,8 @@ def main():
     win = create_window()
     win.show()
     app.exec()
-'''
+"""
+
 
 def write(rel, content):
     path = ROOT / rel
@@ -636,11 +641,13 @@ def write(rel, content):
     path.write_text(content.lstrip("\n"), encoding="utf-8")
     print(f"wrote   -> {path}")
 
+
 def main():
     print("== Auto-Fire hotfix (array+cad) 0.6.3 ==")
     for k, v in FILES.items():
         write(k, v)
     print("Done. Launch with:  py -3 -m app.boot")
+
 
 if __name__ == "__main__":
     main()

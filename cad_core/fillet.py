@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
-from typing import Optional, Tuple
 
-from .lines import Line, Point, intersection_line_line
-from .arc import Arc, arc_from_points
+from .arc import arc_from_points
 from .circle import Circle
+from .lines import Line, Point, intersection_line_line
 
 
 def _len(v: Point) -> float:
@@ -36,7 +34,9 @@ def _dot(a: Point, b: Point) -> float:
     return a.x * b.x + a.y * b.y
 
 
-def fillet_line_line(l1: Line, l2: Line, radius: float, tol: float = 1e-9) -> Optional[Tuple[Point, Point, Point]]:
+def fillet_line_line(
+    l1: Line, l2: Line, radius: float, tol: float = 1e-9
+) -> tuple[Point, Point, Point] | None:
     """Compute fillet between two infinite lines.
 
     Returns (p1, p2, center) where p1 lies on l1, p2 lies on l2, and the
@@ -57,7 +57,8 @@ def fillet_line_line(l1: Line, l2: Line, radius: float, tol: float = 1e-9) -> Op
     def away_dir(L: Line) -> Point:
         d_a = _len(_sub(L.a, I))
         d_b = _len(_sub(L.b, I))
-        v = _sub(L.a, I) if d_a >= d_b else _sub(L.b, I)
+        # Prefer endpoint b when distances are equal to avoid sign flip
+        v = _sub(L.b, I) if d_b >= d_a else _sub(L.a, I)
         return _norm(v)
 
     u1 = away_dir(l1)
@@ -88,7 +89,8 @@ def fillet_line_line(l1: Line, l2: Line, radius: float, tol: float = 1e-9) -> Op
 
 
 __all__ = ["fillet_line_line"]
- 
+
+
 def fillet_line_circle(line: Line, circle: Circle, radius: float, tol: float = 1e-9):
     """Fillet between an infinite line and a circle (arc). Returns candidates.
 
@@ -208,7 +210,9 @@ def fillet_circle_circle(c1: Circle, c2: Circle, radius: float, tol: float = 1e-
     return results
 
 
-def fillet_segments_line_line(seg1: Line, seg2: Line, pick1: Point, pick2: Point, radius: float, tol: float = 1e-9):
+def fillet_segments_line_line(
+    seg1: Line, seg2: Line, pick1: Point, pick2: Point, radius: float, tol: float = 1e-9
+):
     """Fillet two line segments with given pick points and radius.
 
     Returns (new_seg1, new_seg2, arc) or None if fillet cannot be constructed.

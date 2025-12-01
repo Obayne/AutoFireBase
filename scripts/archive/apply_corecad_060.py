@@ -2,7 +2,7 @@
 # Writes a minimal, stable CAD core for Auto-Fire (v0.6.0-corecad)
 # Safe to run multiple times; backs up any existing target files to *.bak-YYYYmmdd_HHMMSS
 
-import os, sys, time
+import time
 from pathlib import Path
 
 STAMP = time.strftime("%Y%m%d_%H%M%S")
@@ -10,11 +10,10 @@ ROOT = Path(".").resolve()
 
 FILES = {
     # ---------------- app package ----------------
-    "app/__init__.py": '''
+    "app/__init__.py": """
 # Auto-Fire app package marker
-''',
-
-    "app/minwin.py": r'''
+""",
+    "app/minwin.py": r"""
 from PySide6 import QtWidgets
 
 class MinimalWindow(QtWidgets.QMainWindow):
@@ -25,9 +24,8 @@ class MinimalWindow(QtWidgets.QMainWindow):
         lab.setMargin(16)
         self.setCentralWidget(lab)
         self.resize(900, 600)
-''',
-
-    "app/boot.py": r'''
+""",
+    "app/boot.py": r"""
 # Robust loader that works when run as a module (-m app.boot) or as a script (py app\boot.py)
 import sys, importlib, importlib.util, types
 from pathlib import Path
@@ -86,9 +84,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-''',
-
-    "app/scene.py": r'''
+""",
+    "app/scene.py": r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 
 DEFAULT_GRID_SIZE = 24  # pixels
@@ -125,14 +122,12 @@ class GridScene(QtWidgets.QGraphicsScene):
             return p
         s = self.snap_step_px if self.snap_step_px > 0 else self.grid_size
         return QtCore.QPointF(round(p.x()/s)*s, round(p.y()/s)*s)
-''',
-
+""",
     # ---------------- tools ----------------
-    "app/tools/__init__.py": '''
+    "app/tools/__init__.py": """
 # tools package
-''',
-
-    "app/tools/draw.py": r'''
+""",
+    "app/tools/draw.py": r"""
 from enum import IntEnum
 from PySide6 import QtCore, QtGui, QtWidgets
 
@@ -243,9 +238,8 @@ class DrawController:
                 self.points.append(pt_scene)
                 return False
         return False
-''',
-
-    "app/tools/dimension.py": r'''
+""",
+    "app/tools/dimension.py": r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 
 def fmt_ft_inches(px: float, px_per_ft: float) -> str:
@@ -299,9 +293,8 @@ class DimensionTool:
         self.start_pt = None
         self.win.statusBar().showMessage("Dimension placed")
         return True
-''',
-
-    "app/main.py": r'''
+""",
+    "app/main.py": r"""
 import json
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -505,14 +498,12 @@ def create_window(): return MainWindow()
 def main():
     app = QApplication([])
     w = create_window(); w.show(); app.exec()
-''',
-
+""",
     # ---------------- core package ----------------
-    "core/__init__.py": '''
+    "core/__init__.py": """
 # Auto-Fire core package
-''',
-
-    "core/logger.py": r'''
+""",
+    "core/logger.py": r"""
 import logging
 from pathlib import Path
 
@@ -528,9 +519,8 @@ def get_logger(name="autofire"):
         fh.setFormatter(fmt)
         logger.addHandler(fh)
     return logger
-''',
-
-    "core/error_hook.py": r'''
+""",
+    "core/error_hook.py": r"""
 import sys, traceback, datetime
 from pathlib import Path
 from PySide6 import QtWidgets
@@ -555,8 +545,9 @@ def excepthook(exctype, value, tb):
 
 def install():
     sys.excepthook = excepthook
-''',
+""",
 }
+
 
 def write_file(rel_path: str, content: str):
     dst = ROOT / rel_path
@@ -572,6 +563,7 @@ def write_file(rel_path: str, content: str):
         f.write(content.lstrip("\n"))
     print(f"wrote   -> {dst}")
 
+
 def main():
     print("== Auto-Fire v0.6.0-corecad — apply core CAD files ==")
     for p, c in FILES.items():
@@ -580,6 +572,7 @@ def main():
     print("  py -3 -m app.boot")
     print("  # or")
     print("  py -3 app\\boot.py")
+
 
 if __name__ == "__main__":
     main()

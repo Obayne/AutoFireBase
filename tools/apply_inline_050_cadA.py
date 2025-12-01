@@ -1,9 +1,17 @@
 # tools/apply_inline_050_cadA.py
 # Writes CAD/units upgrade files into the project.
-import os, io, sys, textwrap, json, pathlib
+#
+# This file contains many long, embedded triple-quoted template strings
+# (generated helper). Ruff flagged many E501 (line too long) issues for
+# lines inside those templates. To avoid noisy linter failures while
+# preserving the generated content intact, allow E501 for this file.
+# ruff: noqa: E501
+# noqa: E501
+import os
+import pathlib
 
 FILES = {
-r"app\units.py": r'''
+    r"app\units.py": r'''
 import math
 
 IN_PER_FT = 12.0
@@ -49,8 +57,7 @@ def strobe_radius_from_cd_lux(candela: float, lux: float, px_per_ft: float) -> f
     r_ft = r_m * 3.28084
     return r_ft * px_per_ft
 ''',
-
-r"app\dialogs\coverage.py": r'''
+    r"app\dialogs\coverage.py": r"""
 from PySide6 import QtWidgets, QtCore
 from app import units
 
@@ -174,9 +181,8 @@ class CoverageDialog(QtWidgets.QDialog):
         else:
             data["computed_radius_px"] = units.ft_to_px(data["radius_ft"], pxpf)
         return data
-''',
-
-r"app\dialogs\array.py": r'''
+""",
+    r"app\dialogs\array.py": r"""
 from PySide6 import QtWidgets
 from app import units
 
@@ -212,9 +218,8 @@ class ArrayDialog(QtWidgets.QDialog):
             "spacing_px": units.ft_to_px(self.spin_spacing_ft.value(), self.spin_px_per_ft.value()),
             "use_coverage_tile": self.chk_use_cov.isChecked(),
         }
-''',
-
-r"app\tools\array.py": r'''
+""",
+    r"app\tools\array.py": r"""
 from PySide6 import QtWidgets, QtCore
 from app.dialogs.array import ArrayDialog
 from app.device import DeviceItem
@@ -252,9 +257,8 @@ class ArrayTool:
                 it = DeviceItem(x, y, proto["symbol"], proto["name"], proto.get("manufacturer",""), proto.get("part_number",""))
                 it.setParentItem(self.layer_devices)
         self.win.push_history()
-''',
-
-r"app\device.py": r'''
+""",
+    r"app\device.py": r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 
 class DeviceItem(QtWidgets.QGraphicsItemGroup):
@@ -367,9 +371,8 @@ class DeviceItem(QtWidgets.QGraphicsItemGroup):
         cov = d.get("coverage")
         if cov: it.set_coverage(cov)
         return it
-''',
-
-r"app\main.py": r'''
+""",
+    r"app\main.py": r"""
 import os, json, zipfile
 import ezdxf
 
@@ -598,14 +601,36 @@ class MainWindow(QMainWindow):
         want_type = self.cmb_type.currentText()
         self.list.clear()
         for d in self.devices_all:
-            if want_mfr and want_mfr != "(Any)" and d.get("manufacturer") != want_mfr: continue
-            if want_type and want_type != "(Any)" and d.get("type") != want_type: continue
-            txt = f"{d['name']} ({d['symbol']})"
-            if q and q not in txt.lower() and q not in (d.get('part_number','').lower()): continue
-            it = QListWidgetItem(txt); it.setData(Qt.UserRole, d); self.list.addItem(it)
+            if want_mfr and want_mfr != "(Any)" and d.get("manufacturer") != want_mfr:
+                continue
+            if want_type and want_type != "(Any)" and d.get("type") != want_type:
+                continue
+            display_name = (d.get("name") or d.get("part_number") or d.get("symbol") or "<unknown>")
+            txt = f"{display_name} ({d.get('symbol','')})"
+            if q and q not in txt.lower() and q not in (d.get("part_number", "").lower()):
+                continue
+            it = QListWidgetItem(txt)
+            it.setData(Qt.UserRole, d)
+            self.list.addItem(it)
+
+    import logging
+    _logger = logging.getLogger(__name__)
 
     def choose_device(self, it: QListWidgetItem):
-        self.view.set_current_device(it.data(Qt.UserRole)); self.statusBar().showMessage(f"Selected: {it.data(Qt.UserRole)['name']}")
+        proto = it.data(Qt.UserRole)
+        try:
+            import json as _json
+
+            _logger.debug("tools.palette choose_device=%s", _json.dumps({
+                'symbol': proto.get('symbol'),
+                'name': proto.get('name'),
+                'part_number': proto.get('part_number'),
+            }))
+        except Exception:
+            _logger.debug("tools.palette choose_device=<unprintable>")
+        display_name = (proto.get("name") or proto.get("part_number") or proto.get("symbol") or "<unknown>")
+        self.view.set_current_device(proto)
+        self.statusBar().showMessage(f"Selected: {display_name}")
 
     # ---- view toggles ----
     def toggle_grid(self, on: bool): self.scene.show_grid = bool(on); self.scene.update()
@@ -755,9 +780,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-''',
-
-r"db\schema.py": r'''
+""",
+    r"db\schema.py": r'''
 # Minimal scaffolding for future SQLite catalog (not wired yet)
 import sqlite3, os
 from pathlib import Path
@@ -794,8 +818,7 @@ def ensure_db(path: str):
     """)
     con.commit(); con.close()
 ''',
-
-r"CHANGELOG.md": r'''
+    r"CHANGELOG.md": r"""
 ## 0.5.0-cadA
 - Units: feet & inches support; scale stored as `px_per_ft`; status bar shows ft/in.
 - Coverage: speaker supports physics (20log) or "per 10 ft" model; strobe coverage adds ceiling (circle inside square) and wall rectangle.
@@ -803,21 +826,30 @@ r"CHANGELOG.md": r'''
 - Arrays: new "Place Array…" tool to lay out rows/columns with spacing in feet (or use coverage tile).
 - Dialogs: Coverage dialog updated to ft/in scale.
 - DB scaffolding: added `db/schema.py` with SQLite schema (not yet wired).
-''',
+""",
 }
+
 
 def write(relpath, content):
     p = pathlib.Path(relpath)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(content, encoding="utf-8")
-    print("write", relpath)
+    import logging
+
+    logging.getLogger(__name__).info("write %s", relpath)
+
 
 def main():
     os.chdir(pathlib.Path(__file__).resolve().parents[1])
     for rel, content in FILES.items():
         write(rel, content)
-    print("Done. Now run:  Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned")
-    print("Then:           .\\Build_AutoFire.ps1")
+    import logging
+
+    logging.getLogger(__name__).info(
+        "Done. Now run:  Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned"
+    )
+    logging.getLogger(__name__).info("Then:           .\\Build_AutoFire.ps1")
+
 
 if __name__ == "__main__":
     main()

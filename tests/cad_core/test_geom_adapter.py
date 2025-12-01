@@ -1,5 +1,5 @@
-from cad_core.lines import Line, Point
 from cad_core.geom_adapter import segment_intersection, trim_segment_to_intersection
+from cad_core.lines import Line, Point
 
 
 def test_segment_intersection_basic():
@@ -16,4 +16,3 @@ def test_trim_segment_to_intersection_moves_endpoint():
     assert out is not None
     assert out.a == s1.a
     assert abs(out.b.x - 7.0) < 1e-9
-

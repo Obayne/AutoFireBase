@@ -63,6 +63,17 @@ def intersection_line_line(l1: Line, l2: Line, tol: float = 1e-9) -> Point | Non
     return _add(p, _scale(r, t))
 
 
+def is_parallel(l1: Line, l2: Line, tol: float = 1e-9) -> bool:
+    """Return True when the two infinite lines are parallel (within tol).
+
+    This uses the cross-product of direction vectors; if cross is near-zero the
+    lines are parallel (including collinear).
+    """
+    r = _sub(l1.b, l1.a)
+    s = _sub(l2.b, l2.a)
+    return abs(_cross(r, s)) < tol
+
+
 def nearest_point_on_line(line: Line, p: Point) -> Point:
     """Return the closest point to p on the infinite line through line.a->line.b."""
     a, b = line.a, line.b
@@ -150,17 +161,6 @@ def trim_segment_by_cutter(
     if ip is None:
         return None
     return extend_line_end_to_point(seg, ip, end=end)
-
-
-def is_parallel(l1: Line, l2: Line, tol: float = 1e-9) -> bool:
-    """Check if two lines are parallel within tolerance.
-
-    Lines are parallel if their direction vectors have near-zero cross product.
-    """
-    r = _sub(l1.b, l1.a)
-    s = _sub(l2.b, l2.a)
-    rxs = _cross(r, s)
-    return abs(rxs) < tol
 
 
 __all__ = [

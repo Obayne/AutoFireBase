@@ -5,22 +5,31 @@
 # - Grid lighter, with a View → Grid Style… dialog (opacity & width, persistent)
 # - Minimal, safe: backs up touched files with .bak-YYYYMMDD_HHMMSS
 
+import logging
+import shutil
+import time
 from pathlib import Path
-import time, shutil
+
+from app.logging_config import setup_logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 STAMP = time.strftime("%Y%m%d_%H%M%S")
-ROOT  = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent
+
 
 def backup_write(path: Path, content: str):
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists():
         bak = path.with_suffix(path.suffix + f".bak-{STAMP}")
         shutil.copy2(path, bak)
-        print(f"[backup] {bak}")
+        logger.info("[backup] %s", bak)
     path.write_text(content.strip() + "\n", encoding="utf-8")
-    print(f"[write ] {path}")
+    logger.info("[write ] %s", path)
 
-SCENE_PY = r'''
+
+SCENE_PY = r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 
 DEFAULT_GRID_SIZE = 24  # pixels between minor lines
@@ -108,9 +117,9 @@ class GridScene(QtWidgets.QGraphicsScene):
         painter.drawLine(0, int(rect.top()), 0, int(rect.bottom()))
         painter.drawLine(int(rect.left()), 0, int(rect.right()), 0)
         painter.restore()
-'''
+"""
 
-GRIDSTYLE_PY = r'''
+GRIDSTYLE_PY = r"""
 from PySide6 import QtCore, QtGui, QtWidgets
 
 class GridStyleDialog(QtWidgets.QDialog):
@@ -152,7 +161,7 @@ class GridStyleDialog(QtWidgets.QDialog):
             self.prefs["grid_width_px"] = wd
             self.prefs["grid_major_every"] = mj
         return op, wd, mj
-'''
+"""
 
 MAIN_PATCH = r'''
 import os, json, zipfile
@@ -631,7 +640,7 @@ if __name__ == "__main__":
     main()
 '''
 
-CHANGELOG_ADD = r'''
+CHANGELOG_ADD = r"""
 ## v0.6.3 – overlayB ({date})
 - **Overlays** now show **only** for strobe / speaker / smoke device types (no coverage on pull stations).
 - **Quick coverage adjust**:
@@ -639,24 +648,26 @@ CHANGELOG_ADD = r'''
   - **Alt+[ / Alt+]** → speaker **target dB −/+ 1 dB**
 - **Grid** is lighter by default; added **View → Grid Style…** for opacity, line width, and major-line interval (saved in prefs).
 - Persisted grid style in project saves; status bar messages clarify current adjustments.
-'''
+"""
+
 
 def main():
     # write files
-    backup_write(ROOT/"app"/"scene.py", SCENE_PY)
-    backup_write(ROOT/"app"/"dialogs"/"gridstyle.py", GRIDSTYLE_PY)
-    backup_write(ROOT/"app"/"main.py", MAIN_PATCH)
+    backup_write(ROOT / "app" / "scene.py", SCENE_PY)
+    backup_write(ROOT / "app" / "dialogs" / "gridstyle.py", GRIDSTYLE_PY)
+    backup_write(ROOT / "app" / "main.py", MAIN_PATCH)
 
     # changelog append
-    cl = ROOT/"CHANGELOG.md"
+    cl = ROOT / "CHANGELOG.md"
     existing = ""
     if cl.exists():
         existing = cl.read_text(encoding="utf-8")
     entry = CHANGELOG_ADD.replace("{date}", time.strftime("%Y-%m-%d"))
-    cl.write_text(existing.rstrip()+"\n\n"+entry, encoding="utf-8")
+    cl.write_text(existing.rstrip() + "\n\n" + entry, encoding="utf-8")
     print(f"[append] {cl} v0.6.3 entry added")
 
     print("\nDone. Launch with:\n  py -3 -m app.boot\n")
+
 
 if __name__ == "__main__":
     main()

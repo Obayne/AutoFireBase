@@ -49,3 +49,16 @@ pip-wheel-metadata/
 api_keys.txt
 chat log*.txt
 *.secret
+
+# Local model artifacts and caches (common local locations)
+models/
+Models/
+.models/
+.hf_cache/
+**/models/**/pytorch_model-*.bin
+**/models/**/pytorch_model.bin.index.json
+*.gguf
+*.ggml
+*.bin
+C:/Dev/Models/
+.dev_models/

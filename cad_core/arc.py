@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Tuple
 
 from .lines import Point, _sub
 
@@ -12,7 +11,7 @@ class Arc:
     center: Point
     radius: float
     start_angle: float  # radians
-    end_angle: float    # radians
+    end_angle: float  # radians
     ccw: bool = True
 
 
@@ -41,4 +40,3 @@ def arc_from_points(center: Point, p_start: Point, p_end: Point, prefer_short: b
 
 
 __all__ = ["Arc", "arc_from_points"]
-

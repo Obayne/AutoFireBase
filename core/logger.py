@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+
 def get_logger(name="autofire"):
     base = Path.home() / "AutoFire" / "logs"
     base.mkdir(parents=True, exist_ok=True)

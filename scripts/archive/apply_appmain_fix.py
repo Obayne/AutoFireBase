@@ -2,8 +2,15 @@
 # Fixes startup: ensures app/__init__.py, app/main.py has create_window(),
 # app/minwin.py fallback exists, and AutoFire.spec has required hiddenimports.
 
+import datetime
+import logging
+import re
 from pathlib import Path
-import re, datetime
+
+from app.logging_config import setup_logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 ROOT = Path(".")
 APP = ROOT / "app"
@@ -12,63 +19,78 @@ MAIN = APP / "main.py"
 MINWIN = APP / "minwin.py"
 SPEC = ROOT / "AutoFire.spec"
 
-def backup(p: Path):
+
+def backup(p: Path) -> None:
+    """Create a timestamped backup of the path if it exists."""
     if p.exists():
         ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        p.with_suffix(p.suffix + f".bak_{ts}").write_text(p.read_text(encoding="utf-8"), encoding="utf-8")
+        bak = p.with_suffix(p.suffix + f".bak_{ts}")
+        bak.write_text(p.read_text(encoding="utf-8"), encoding="utf-8")
 
-# 1) app/__init__.py  (turn app into a proper package)
-APP.mkdir(parents=True, exist_ok=True)
-if not APP_INIT.exists():
-    APP_INIT.write_text("# package marker\n", encoding="utf-8")
-    print("created", APP_INIT)
-else:
-    print("ok:", APP_INIT)
 
-# 2) Ensure app/main.py exists and provides create_window()
-if not MAIN.exists():
-    MAIN.write_text(
-        """from PySide6.QtWidgets import QApplication, QMainWindow
+def ensure_package() -> None:
+    APP.mkdir(parents=True, exist_ok=True)
+    if not APP_INIT.exists():
+        APP_INIT.write_text("# package marker\n", encoding="utf-8")
+        logger.info("created %s", APP_INIT)
+    else:
+        logger.debug("ok: %s exists", APP_INIT)
+
+
+def ensure_main() -> None:
+    minimal = """from PySide6.QtWidgets import QApplication, QMainWindow
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Auto-Fire — minimal main")
+
+
 def create_window():
     return MainWindow()
+
+
 def main():
     app = QApplication([])
     w = create_window()
     w.show()
     app.exec()
-""", encoding="utf-8")
-    print("created minimal", MAIN)
-else:
+"""
+
+    if not MAIN.exists():
+        MAIN.write_text(minimal, encoding="utf-8")
+        logger.info("created minimal %s", MAIN)
+        return
+
+    # If MAIN exists, ensure it exposes create_window(). If not, append a simple factory.
     txt = MAIN.read_text(encoding="utf-8")
-    # If it doesn't expose create_window(), add a tiny factory.
     if "def create_window" not in txt:
         backup(MAIN)
-        txt += """
-
+        logger.info("patching %s to add create_window() factory", MAIN)
+        addition = """
 # Added by apply_appmain_fix: factory for boot.py
 try:
     _MW = MainWindow  # type: ignore[name-defined]
+
     def create_window():
         return _MW()
 except Exception:
     # Fallback: if no MainWindow class name, just create a generic window.
     from PySide6.QtWidgets import QMainWindow
+
+
     def create_window():
         return QMainWindow()
 """
-        MAIN.write_text(txt, encoding="utf-8")
-        print("patched", MAIN, "to add create_window()")
+        MAIN.write_text(txt + addition, encoding="utf-8")
+        logger.info("patched %s", MAIN)
     else:
-        print("ok: create_window() already present in", MAIN)
+        logger.debug("ok: create_window() already present in %s", MAIN)
 
-# 3) Minimal fallback window (if main fails)
-if not MINWIN.exists():
-    MINWIN.write_text(
-        """from PySide6 import QtWidgets
+
+def ensure_minwin() -> None:
+    fallback = """from PySide6 import QtWidgets
+
 def run_minimal():
     app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
     w = QtWidgets.QMainWindow()
@@ -80,49 +102,52 @@ def run_minimal():
     w.show()
     if not QtWidgets.QApplication.instance().startingUp():
         app.exec()
-""", encoding="utf-8")
-    print("created", MINWIN)
-else:
-    print("ok:", MINWIN)
+"""
 
-# 4) Ensure AutoFire.spec includes hiddenimports so PyInstaller always bundles modules
-if SPEC.exists():
+    if not MINWIN.exists():
+        MINWIN.write_text(fallback, encoding="utf-8")
+        logger.info("created %s", MINWIN)
+
+
+def ensure_spec_hiddenimports() -> None:
+    if not SPEC.exists():
+        logger.warning("AutoFire.spec not found; skipping hiddenimports patch.")
+        return
+
     s = SPEC.read_text(encoding="utf-8")
-    if "hiddenimports" in s:
-        # Replace the list contents with a known-good set
-        s2 = re.sub(
-            r"hiddenimports\s*=\s*\[[^\]]*\]",
-            ("hiddenimports=["
-             "'app','app.main','app.minwin','app.scene','app.device','app.catalog',"
-             "'app.tools','app.tools.array','app.tools.draw','app.tools.dimension',"
-             "'core.logger','core.error_hook','core.logger_bridge','updater.auto_update'"+
-             "]"),
-            s, count=1
-        )
-        if s2 != s:
-            backup(SPEC)
-            SPEC.write_text(s2, encoding="utf-8")
-            print("patched hiddenimports in", SPEC)
-        else:
-            print("ok: hiddenimports present in", SPEC)
-    else:
-        # Insert hiddenimports argument into the Analysis(…) call
-        s2 = re.sub(
-            r"Analysis\(",
-            ("Analysis(hiddenimports=["
-             "'app','app.main','app.minwin','app.scene','app.device','app.catalog',"
-             "'app.tools','app.tools.array','app.tools.draw','app.tools.dimension',"
-             "'core.logger','core.error_hook','core.logger_bridge','updater.auto_update'"
-             "], "),
-            s, count=1
-        )
-        if s2 != s:
-            backup(SPEC)
-            SPEC.write_text(s2, encoding="utf-8")
-            print("injected hiddenimports into", SPEC)
-        else:
-            print("NOTE: could not find Analysis(…) in spec to inject hiddenimports.")
-else:
-    print("WARNING: AutoFire.spec not found; build will still work, but bundling may be incomplete.")
+    hidden_list = (
+        "'app','app.main','app.minwin','app.scene','app.device','app.catalog',"
+        "'app.tools','app.tools.array','app.tools.draw','app.tools.dimension',"
+        "'core.logger','core.error_hook','core.logger_bridge','updater.auto_update'"
+    )
 
-print("Done.")
+    if "hiddenimports" in s:
+        s2 = re.sub(r"hiddenimports\s*=\s*\[[^\]]*\]", f"hiddenimports=[{hidden_list}]", s, count=1)
+        if s2 != s:
+            backup(SPEC)
+            SPEC.write_text(s2, encoding="utf-8")
+            logger.info("patched hiddenimports in %s", SPEC)
+        else:
+            logger.debug("hiddenimports already present and unchanged in %s", SPEC)
+        return
+
+    # Attempt to inject into Analysis(…) call
+    s2 = re.sub(r"Analysis\(", f"Analysis(hiddenimports=[{hidden_list}], ", s, count=1)
+    if s2 != s:
+        backup(SPEC)
+        SPEC.write_text(s2, encoding="utf-8")
+        logger.info("injected hiddenimports into %s", SPEC)
+    else:
+        logger.warning("Could not find Analysis(...) in spec to inject hiddenimports.")
+
+
+def main_entry() -> None:
+    ensure_package()
+    ensure_main()
+    ensure_minwin()
+    ensure_spec_hiddenimports()
+    logger.info("apply_appmain_fix completed")
+
+
+if __name__ == "__main__":
+    main_entry()

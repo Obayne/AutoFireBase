@@ -2,9 +2,9 @@ import json
 import os
 import sqlite3
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from db.schema import ensure_db
+from db import loader as db_loader
 
 
 def get_catalog_path() -> str:
@@ -14,16 +14,22 @@ def get_catalog_path() -> str:
     return str(base / "catalog.db")
 
 
+# SQL and long docstrings are intentional; allow E501 for this file.
+# ruff: noqa: E501
+# noqa: E501
+
+
 def _connect() -> sqlite3.Connection:
     path = get_catalog_path()
-    ensure_db(path)
     con = sqlite3.connect(path)
     con.row_factory = sqlite3.Row
+    db_loader.ensure_schema(con)
     return con
 
 
 def seed_defaults() -> None:
-    con = _connect(); cur = con.cursor()
+    con = _connect()
+    cur = con.cursor()
     # Seed device types
     types = [
         ("strobe", "Strobe / Notification Appliance"),
@@ -33,14 +39,25 @@ def seed_defaults() -> None:
         ("panel", "Fire Alarm Panel"),
     ]
     for code, desc in types:
-        cur.execute("INSERT OR IGNORE INTO device_types(code, description) VALUES(?,?)", (code, desc))
+        cur.execute(
+            "INSERT OR IGNORE INTO device_types(code, description) VALUES(?,?)", (code, desc)
+        )
     # Seed a manufacturer
     cur.execute("INSERT OR IGNORE INTO manufacturers(name) VALUES(?)", ("Generic",))
-    con.commit(); con.close()
+    con.commit()
+    con.close()
 
 
-def add_device(manufacturer: str, type_code: str, model: str, name: str, symbol: str = "", specs: Optional[Dict[str, Any]] = None) -> int:
-    con = _connect(); cur = con.cursor()
+def add_device(
+    manufacturer: str,
+    type_code: str,
+    model: str,
+    name: str,
+    symbol: str = "",
+    specs: dict[str, Any] | None = None,
+) -> int:
+    con = _connect()
+    cur = con.cursor()
     # manufacturer id
     cur.execute("INSERT OR IGNORE INTO manufacturers(name) VALUES(?)", (manufacturer,))
     cur.execute("SELECT id FROM manufacturers WHERE name=?", (manufacturer,))
@@ -70,12 +87,14 @@ def add_device(manufacturer: str, type_code: str, model: str, name: str, symbol:
                 specs.get("notes"),
             ),
         )
-    con.commit(); con.close()
+    con.commit()
+    con.close()
     return did
 
 
-def list_devices(type_code: Optional[str] = None) -> List[Dict[str, Any]]:
-    con = _connect(); cur = con.cursor()
+def list_devices(type_code: str | None = None) -> list[dict[str, Any]]:
+    con = _connect()
+    cur = con.cursor()
     if type_code:
         cur.execute(
             """
@@ -103,14 +122,15 @@ def list_devices(type_code: Optional[str] = None) -> List[Dict[str, Any]]:
     return rows
 
 
-def get_device_specs(device_id: int) -> Optional[Dict[str, Any]]:
-    con = _connect(); cur = con.cursor()
+def get_device_specs(device_id: int) -> dict[str, Any] | None:
+    con = _connect()
+    cur = con.cursor()
     cur.execute(
         "SELECT strobe_candela, speaker_db_at10ft, smoke_spacing_ft, current_a, voltage_v, notes FROM device_specs WHERE device_id=?",
         (device_id,),
     )
-    row = cur.fetchone(); con.close()
+    row = cur.fetchone()
+    con.close()
     if not row:
         return None
     return dict(row)
-

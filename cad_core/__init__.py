@@ -2,4 +2,3 @@
 
 Contains pure-Python geometry utilities and operations (trim, fillet, extend, snaps).
 """
-

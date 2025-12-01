@@ -9,20 +9,24 @@
 #     * dark theme, status bar coord readout, grid/snap toggles
 # - does NOT touch other files
 
-from pathlib import Path
 import datetime
+from pathlib import Path
 
 ROOT = Path(".")
-APP  = ROOT / "app"
-TOOLS= APP / "tools"
-ARR  = TOOLS / "array.py"
-MAIN = APP  / "main.py"
-INIT = APP  / "__init__.py"
+APP = ROOT / "app"
+TOOLS = APP / "tools"
+ARR = TOOLS / "array.py"
+MAIN = APP / "main.py"
+INIT = APP / "__init__.py"
+
 
 def backup(p: Path):
     if p.exists():
         ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        p.with_suffix(p.suffix + f".bak_{ts}").write_text(p.read_text(encoding="utf-8"), encoding="utf-8")
+        p.with_suffix(p.suffix + f".bak_{ts}").write_text(
+            p.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+
 
 # --- ensure package ---
 APP.mkdir(parents=True, exist_ok=True)
@@ -61,7 +65,7 @@ backup(ARR)
 ARR.write_text(ARRAY_CODE, encoding="utf-8")
 
 # --- main.py (minimal but solid; uses your DeviceItem + GridScene if present) ---
-MAIN_CODE = r'''import json, os, zipfile
+MAIN_CODE = r"""import json, os, zipfile
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
@@ -336,14 +340,20 @@ def main():
     w = create_window()
     w.show()
     app.exec()
-'''
+"""
 backup(MAIN)
 MAIN.write_text(MAIN_CODE, encoding="utf-8")
+import logging
 
-print("Done. Wrote:")
-print(" -", ARR)
-print(" -", MAIN)
-print("\nNext steps:")
-print("  1) Run: py -3 app\\boot.py")
-print("  2) Select a device in the left list, then LEFT-CLICK on the canvas to place.")
-print("  3) Tools ▸ Array in Area… → click two corners to populate devices.")
+from app.logging_config import setup_logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
+
+logger.info("Done. Wrote:")
+logger.info(" - %s", ARR)
+logger.info(" - %s", MAIN)
+logger.info("Next steps:")
+logger.info("  1) Run: py -3 app\\boot.py")
+logger.info("  2) Select a device in the left list, then LEFT-CLICK on the canvas to place.")
+logger.info("  3) Tools ▸ Array in Area… → click two corners to populate devices.")

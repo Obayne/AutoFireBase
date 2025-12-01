@@ -1,5 +1,5 @@
+from PySide6 import QtGui, QtWidgets
 
-from PySide6 import QtCore, QtGui, QtWidgets
 
 class AssistantDock(QtWidgets.QDockWidget):
     def __init__(self, parent=None):
@@ -8,12 +8,16 @@ class AssistantDock(QtWidgets.QDockWidget):
         self.setWidget(w)
         layout = QtWidgets.QVBoxLayout(w)
 
-        self.txt_history = QtWidgets.QTextEdit(self); self.txt_history.setReadOnly(True)
-        self.txt_prompt = QtWidgets.QPlainTextEdit(self); self.txt_prompt.setPlaceholderText("Ask a question about this drawing… (offline stub)")
+        self.txt_history = QtWidgets.QTextEdit(self)
+        self.txt_history.setReadOnly(True)
+        self.txt_prompt = QtWidgets.QPlainTextEdit(self)
+        self.txt_prompt.setPlaceholderText("Ask a question about this drawing… (offline stub)")
         btns = QtWidgets.QHBoxLayout()
         self.btn_respond = QtWidgets.QPushButton("Respond (Stub)")
         self.btn_clear = QtWidgets.QPushButton("Clear")
-        btns.addWidget(self.btn_respond); btns.addWidget(self.btn_clear); btns.addStretch(1)
+        btns.addWidget(self.btn_respond)
+        btns.addWidget(self.btn_clear)
+        btns.addStretch(1)
 
         layout.addWidget(self.txt_history)
         layout.addWidget(self.txt_prompt, 1)

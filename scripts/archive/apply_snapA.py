@@ -6,7 +6,7 @@ import pathlib
 ROOT = pathlib.Path(".").resolve()
 
 FILES = {
-r"app\scene.py": """from PySide6 import QtCore, QtGui, QtWidgets
+    r"app\scene.py": """from PySide6 import QtCore, QtGui, QtWidgets
 
 DEFAULT_GRID_SIZE = 24  # pixels between grid lines (visual only)
 
@@ -42,7 +42,7 @@ class GridScene(QtWidgets.QGraphicsScene):
         gx = self.grid_size
         return QtCore.QPointF(round(pt.x()/gx)*gx, round(pt.y()/gx)*gx)
 """,
-r"app\tools\dimension.py": """from PySide6 import QtCore, QtGui, QtWidgets
+    r"app\tools\dimension.py": """from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF
 from app import units
 
@@ -108,7 +108,7 @@ class DimensionTool:
     def finish(self):
         self.active = False; self.dim_item = None; self.start_pt = None
 """,
-r"app\main.py": """import os, json, zipfile
+    r"app\main.py": """import os, json, zipfile
 
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QPointF, QSize
@@ -320,8 +320,15 @@ class MainWindow(QMainWindow):
         self.cmb_type.currentIndexChanged.connect(self._refresh_device_list)
         self.list.itemClicked.connect(self.choose_device)
 
-        splitter = QtWidgets.QSplitter(); splitter.addWidget(left); splitter.addWidget(self.view); splitter.setStretchFactor(1,1)
-        container = QWidget(); lay = QHBoxLayout(container); lay.addWidget(splitter); self.setCentralWidget(container)
+        splitter = QtWidgets.QSplitter()
+        splitter.addWidget(left)
+        splitter.addWidget(self.view)
+        splitter.setStretchFactor(1, 1)
+
+        container = QWidget()
+        lay = QHBoxLayout(container)
+        lay.addWidget(splitter)
+        self.setCentralWidget(container)
 
         dock = QDockWidget("Layers / Controls", self); panel = QWidget(); form = QVBoxLayout(panel)
         self.chk_underlay = QCheckBox("Underlay"); self.chk_underlay.setChecked(True); self.chk_underlay.toggled.connect(lambda v: self.layer_underlay.setVisible(v)); form.addWidget(self.chk_underlay)
@@ -542,14 +549,18 @@ if __name__ == "__main__":
 """,
 }
 
+
 def write_file(rel, content):
     p = ROOT / rel
     p.parent.mkdir(parents=True, exist_ok=True)
     if p.exists():
-        try: (p.parent / (p.name + ".bak")).write_bytes(p.read_bytes())
-        except Exception: pass
+        try:
+            (p.parent / (p.name + ".bak")).write_bytes(p.read_bytes())
+        except Exception:
+            pass
     p.write_text(content, encoding="utf-8")
     print("wrote", rel)
+
 
 for rel, content in FILES.items():
     write_file(rel, content)
