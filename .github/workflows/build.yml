@@ -72,10 +72,10 @@ jobs:
 
             - name: Run quick verification
               run: |
-                  if (Test-Path "dist\AutoFire\AutoFire.exe") {
-                    Write-Host "✓ Build successful - AutoFire.exe created"
-                    $size = (Get-Item "dist\AutoFire\AutoFire.exe").Length / 1MB
-                    Write-Host "  Size: $([math]::Round($size, 2)) MB"
+                  if (Test-Path "dist/AutoFire/AutoFire.exe") {
+                    Write-Host "Build successful - AutoFire.exe created"
+                    $size = (Get-Item "dist/AutoFire/AutoFire.exe").Length / 1MB
+                    Write-Host "Size: $([math]::Round($size, 2)) MB"
                   } else {
                     Write-Error "Build failed - AutoFire.exe not found"
                     exit 1
