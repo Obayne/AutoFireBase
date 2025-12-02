@@ -100,6 +100,15 @@ def resolve_create_window() -> Callable[[], QtWidgets.QWidget]:
 
 
 def main() -> None:
+    # Initialize tracing/monitoring before app starts
+    try:
+        from backend.tracing import init_tracing
+
+        init_tracing(service_name="AutoFire")
+    except Exception:
+        # Tracing is optional; continue without it
+        pass
+
     app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
     try:
         m = _load_app_main()
