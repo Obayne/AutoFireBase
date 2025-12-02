@@ -1,6 +1,7 @@
 # tests/test_db_loader.py
 import sqlite3
 import unittest
+
 from db import loader
 
 
@@ -11,6 +12,7 @@ class TestDbLoader(unittest.TestCase):
         self.con.row_factory = sqlite3.Row
         loader.ensure_schema(self.con)
         from db import coverage_tables
+
         coverage_tables.populate_tables(self.con)
 
     def tearDown(self):
@@ -38,11 +40,12 @@ class TestDbLoader(unittest.TestCase):
         """Test strobe radius lookup."""
         # Populate the coverage tables
         from db import coverage_tables
+
         coverage_tables.populate_tables(self.con)
-        
+
         # Should return None for unknown candela
         self.assertIsNone(loader.strobe_radius_for_candela(self.con, 999))
-        
+
         # Test known values
         self.assertEqual(loader.strobe_radius_for_candela(self.con, 15), 15.0)
         self.assertEqual(loader.strobe_radius_for_candela(self.con, 30), 20.0)

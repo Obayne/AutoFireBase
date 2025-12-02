@@ -25,4 +25,3 @@ body:
         - label: Tests added (round-trip, CRUD)
         - label: No module side effects
         - label: ≤300 LOC changed
-

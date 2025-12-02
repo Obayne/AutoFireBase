@@ -1,6 +1,7 @@
-import pytest
 from unittest.mock import Mock
-from PySide6 import QtCore, QtWidgets
+
+import pytest
+from PySide6 import QtCore
 
 from app.tools.move_tool import MoveTool
 
@@ -28,7 +29,9 @@ class TestMoveTool:
         assert tool.active is True
         assert tool.base is None
         assert tool.copy is False
-        mock_window.statusBar().showMessage.assert_called_with("Move: click base point, then destination")
+        mock_window.statusBar().showMessage.assert_called_with(
+            "Move: click base point, then destination"
+        )
 
     def test_start_copy(self):
         """Test starting copy tool."""
@@ -40,7 +43,9 @@ class TestMoveTool:
         assert tool.active is True
         assert tool.base is None
         assert tool.copy is True
-        mock_window.statusBar().showMessage.assert_called_with("Move: click base point, then destination")
+        mock_window.statusBar().showMessage.assert_called_with(
+            "Move: click base point, then destination"
+        )
 
     def test_cancel(self):
         """Test canceling move tool."""

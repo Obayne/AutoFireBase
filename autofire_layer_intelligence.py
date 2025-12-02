@@ -97,19 +97,6 @@ class CADLayerIntelligence:
             logger.info(f"Starting CAD analysis: {file_path}")
 
             # Simulate layer analysis (would use ezdxf for real CAD files)
-            analysis_results = {
-                "file_path": file_path,
-                "total_layers": 0,
-                "fire_layers": [],
-                "all_layers": [],
-                "devices_detected": [],
-                "analysis_timestamp": None,
-                "precision_data": {
-                    "total_fire_devices": 0,
-                    "layer_classification_accuracy": 0.0,
-                    "confidence_score": 0.95,
-                },
-            }
 
             # Check if file exists
             if not Path(file_path).exists():

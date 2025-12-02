@@ -1,4 +1,4 @@
-﻿import json
+import json
 import math
 import os
 import sys
@@ -16,7 +16,6 @@ if __package__ in (None, ""):
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtWidgets import (
-    QApplication,
     QCheckBox,
     QComboBox,
     QDockWidget,
@@ -41,7 +40,7 @@ from app import catalog, dxf_import
 from app.logging_config import setup_logging
 
 # Grid scene and defaults used by the main window
-from app.scene import GridScene, DEFAULT_GRID_SIZE
+from app.scene import DEFAULT_GRID_SIZE, GridScene
 
 # Ensure logging is configured early so module-level loggers emit during
 # headless simulators and when the app starts from __main__.
@@ -54,14 +53,13 @@ from app.tools.chamfer_tool import ChamferTool
 from app.tools.extend_tool import ExtendTool
 
 _logger = logging.getLogger(__name__)
+from app.layout import PageFrame, TitleBlock, ViewportItem
 from app.tools.fillet_radius_tool import FilletRadiusTool
 from app.tools.fillet_tool import FilletTool
 from app.tools.freehand import FreehandTool
 from app.tools.leader import LeaderTool
 from app.tools.measure_tool import MeasureTool
 from app.tools.mirror_tool import MirrorTool
-from app.tools.text_tool import MTextTool, TextTool
-from app.layout import PageFrame, TitleBlock, ViewportItem
 from app.tools.move_tool import MoveTool
 from app.tools.revision_cloud import RevisionCloudTool
 from app.tools.rotate_tool import RotateTool
@@ -71,6 +69,7 @@ from app.tools.scale_underlay import (
     ScaleUnderlayRefTool,
     scale_underlay_by_factor,
 )
+from app.tools.text_tool import MTextTool, TextTool
 from app.tools.trim_tool import TrimTool
 
 try:
@@ -314,8 +313,6 @@ class CanvasView(QGraphicsView):
         try:
             thr_scene = self._px_to_scene(12)
             box = QtCore.QRectF(p.x() - thr_scene, p.y() - thr_scene, thr_scene * 2, thr_scene * 2)
-            best = None
-            best_d = 1e18
             items = list(self.scene().items(box))
             # First pass: endpoint/mid/center
             cand = []
@@ -974,6 +971,7 @@ class MainWindow(QMainWindow):
 
         # Initialize global database connection for coverage calculations
         from db import connection
+
         connection.initialize_database(in_memory=True)
 
         # Theme
@@ -1280,6 +1278,7 @@ class MainWindow(QMainWindow):
         self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
         self.statusBar().addPermanentWidget(self.space_badge)
         self._init_sheet_manager()
+
     def _on_space_combo_changed(self, idx: int):
         if self.space_lock.isChecked():
             # Revert change if locked
@@ -2153,6 +2152,7 @@ class MainWindow(QMainWindow):
         # subset of the QTreeWidget API used by headless simulators.
         if getattr(self, "device_tree", None) is None:
             try:
+
                 class SimpleTreeItem:
                     def __init__(self, text):
                         self._text = text
@@ -2800,6 +2800,7 @@ class MainWindow(QMainWindow):
                 "color": color_hex,
                 "orig_color": grp.data(2002),
             }
+
         # sketch geometry
         def _line_json(it: QtWidgets.QGraphicsLineItem):
             l = it.line()
@@ -3219,10 +3220,35 @@ class MainWindow(QMainWindow):
 
     # ---------- underlay import ----------
     def import_dxf_underlay(self):
-        p, _ = QFileDialog.getOpenFileName(self, "Import DXF Underlay", "", "DXF Files (*.dxf)")
+        # Accept multiple CAD formats
+        p, _ = QFileDialog.getOpenFileName(
+            self,
+            "Import CAD Underlay",
+            "",
+            "All CAD Files (*.dxf *.dwg);;DXF Files (*.dxf);;DWG Files (*.dwg);;All Files (*)",
+        )
         if not p:
             return
+
         try:
+            from backend.file_converter import FileConverter, detect_format
+
+            # Auto-detect and convert if needed
+            fmt = detect_format(p)
+
+            if fmt == ".dwg":
+                # Convert DWG to temporary DXF
+                import tempfile
+
+                converter = FileConverter()
+                with tempfile.NamedTemporaryFile(suffix=".dxf", delete=False) as tmp:
+                    tmp_dxf = tmp.name
+
+                self.statusBar().showMessage(f"Converting DWG to DXF: {os.path.basename(p)}...")
+                converter.convert(p, tmp_dxf)
+                p = tmp_dxf  # Use converted file
+
+            # Import DXF (original or converted)
             bounds, layer_groups = dxf_import.import_dxf_into_group(
                 p, self.layer_underlay, self.px_per_ft
             )
@@ -3235,8 +3261,9 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(f"Imported underlay: {os.path.basename(p)}")
             self._dxf_layers = layer_groups
             self._refresh_dxf_layers_dock()
+
         except Exception as ex:
-            QMessageBox.critical(self, "DXF Import Error", str(ex))
+            QMessageBox.critical(self, "CAD Import Error", str(ex))
 
     def import_pdf_underlay(self):
         p, _ = QFileDialog.getOpenFileName(self, "Import PDF Underlay", "", "PDF Files (*.pdf)")
@@ -4221,7 +4248,6 @@ class MainWindow(QMainWindow):
         import csv
 
         # Count devices by model/name/symbol
-        rows = []
         counts = {}
         for it in self.layer_devices.childItems():
             if isinstance(it, DeviceItem):
@@ -4317,14 +4343,17 @@ Keyboard Shortcuts
 â€¢ F2 Fit View
 """
 
+
 # factory for boot.py
 def create_window():
     from app.app_controller import AppController
+
     return AppController()
 
 
 def main():
     from app.app_controller import main as app_main
+
     return app_main()
 
 

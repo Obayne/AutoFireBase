@@ -38,4 +38,3 @@ jobs:
           files: artifacts/AutoFire.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

@@ -62,4 +62,3 @@ jobs:
             } else {
               core.info(`PR already open: #${prs[0].number}`);
             }
-

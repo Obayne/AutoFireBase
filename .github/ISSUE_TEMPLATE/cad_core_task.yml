@@ -25,4 +25,3 @@ body:
         - label: Unit tests cover new functions
         - label: No UI imports or side effects
         - label: ≤300 LOC changed
-
