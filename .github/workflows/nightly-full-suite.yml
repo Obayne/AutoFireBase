@@ -1,5 +1,11 @@
 name: Nightly Full Test Suite
 
+permissions:
+    contents: write
+    pull-requests: write
+    issues: write
+    actions: read
+
 on:
     schedule:
         # Run every night at midnight UTC

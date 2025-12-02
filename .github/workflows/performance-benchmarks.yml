@@ -1,5 +1,11 @@
 name: Performance Benchmarks
 
+permissions:
+    contents: write
+    pull-requests: write
+    issues: write
+    actions: read
+
 on:
     push:
         branches: [main, develop]

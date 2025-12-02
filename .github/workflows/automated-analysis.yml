@@ -1,5 +1,11 @@
 name: Automated DXF Analysis
 
+permissions:
+    contents: write
+    pull-requests: write
+    issues: write
+    actions: read
+
 on:
     push:
         branches: ["**"]
