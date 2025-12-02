@@ -101,6 +101,7 @@ Write-Host "Backup completed at $timestamp"
 Use cloud storage for automatic backup:
 
 **OneDrive Setup**:
+
 ```powershell
 # Move projects to OneDrive
 Move-Item "C:\Projects" "$env:OneDrive\AutoFire_Projects"
@@ -110,6 +111,7 @@ New-Item -ItemType SymbolicLink -Path "C:\Projects" -Target "$env:OneDrive\AutoF
 ```
 
 **Google Drive / Dropbox**:
+
 - Configure sync folder
 - Move/link project directory
 - Enable version history
@@ -332,6 +334,6 @@ Get-ChildItem "C:\Backups\AutoFire" -Recurse -File |
 
 ## Resources
 
-- Windows Backup: https://support.microsoft.com/windows-backup
-- Git LFS for large files: https://git-lfs.github.com/
+- Windows Backup: <https://support.microsoft.com/windows-backup>
+- Git LFS for large files: <https://git-lfs.github.com/>
 - Cloud storage comparison: [Link to comparison guide]

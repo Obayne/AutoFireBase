@@ -8,7 +8,7 @@ AutoFireBase includes multiple monitoring capabilities for tracking application 
 
 ### Setup
 
-1. Create a Sentry account at https://sentry.io
+1. Create a Sentry account at <https://sentry.io>
 2. Create a new project for AutoFireBase
 3. Copy your DSN (Data Source Name)
 4. Configure in `app/logging_config.py`:
@@ -79,6 +79,7 @@ pytest tests/benchmarks/ --benchmark-only
 ```
 
 Key metrics tracked:
+
 - Geometry algorithm speed (trim, extend, intersect)
 - DXF import/export performance
 - UI responsiveness (frame time)
@@ -93,6 +94,7 @@ python -m pstats profile.stats
 ```
 
 Analyze with:
+
 ```python
 import pstats
 p = pstats.Stats('profile.stats')
@@ -104,6 +106,7 @@ p.sort_stats('cumulative').print_stats(20)
 ### Application Metrics
 
 AutoFireBase tracks:
+
 - Session duration
 - Feature usage frequency
 - File operations (opens, saves, exports)
@@ -113,6 +116,7 @@ AutoFireBase tracks:
 ### System Metrics
 
 Monitor:
+
 - CPU usage
 - Memory consumption
 - Disk I/O
@@ -153,6 +157,7 @@ def database_health():
 ### Sentry Alerts
 
 Configure in Sentry dashboard:
+
 - Alert on new error types
 - Alert on error spike (>10 in 5 minutes)
 - Alert on performance degradation
@@ -245,6 +250,7 @@ handler = RotatingFileHandler(
 ## Integration with CI/CD
 
 GitHub Actions automatically:
+
 - Run performance benchmarks
 - Upload benchmark results as artifacts
 - Fail on performance regressions >20%
@@ -260,6 +266,6 @@ GitHub Actions automatically:
 
 ## Resources
 
-- Sentry Documentation: https://docs.sentry.io/
-- Python logging: https://docs.python.org/3/library/logging.html
-- pytest-benchmark: https://pytest-benchmark.readthedocs.io/
+- Sentry Documentation: <https://docs.sentry.io/>
+- Python logging: <https://docs.python.org/3/library/logging.html>
+- pytest-benchmark: <https://pytest-benchmark.readthedocs.io/>

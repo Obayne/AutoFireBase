@@ -70,6 +70,7 @@ git push origin v0.4.8
 ```
 
 The workflow will:
+
 1. Build Windows executable
 2. Run all tests
 3. Create GitHub release
@@ -136,8 +137,8 @@ See [BACKUP_RECOVERY.md](./BACKUP_RECOVERY.md) for data protection strategies.
 
 ## Support
 
-- GitHub Issues: https://github.com/Obayne/AutoFireBase/issues
-- Documentation: https://obayne.github.io/AutoFireBase/
+- GitHub Issues: <https://github.com/Obayne/AutoFireBase/issues>
+- Documentation: <https://obayne.github.io/AutoFireBase/>
 - Email: [Support contact]
 
 ## Version Compatibility
