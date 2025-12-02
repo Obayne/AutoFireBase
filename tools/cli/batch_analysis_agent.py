@@ -101,13 +101,17 @@ class BatchAnalysisAgent:
         logger.info("🔍 Analyzing: %s", file_path.name)
 
         try:
-            # Run Layer Intelligence analysis
-            analysis = self.layer_intel.analyze_cad_file(str(file_path))
+            # Run Layer Intelligence analysis (use absolute path)
+            abs_path = file_path.resolve()
+            analysis = self.layer_intel.analyze_cad_file(str(abs_path))
 
             # Add file metadata
             analysis["file_name"] = file_path.name
             analysis["file_size_bytes"] = file_path.stat().st_size if file_path.exists() else 0
-            analysis["relative_path"] = str(file_path.relative_to(_ROOT))
+            try:
+                analysis["relative_path"] = str(file_path.relative_to(_ROOT))
+            except ValueError:
+                analysis["relative_path"] = str(file_path)
 
             return {
                 "status": "success",

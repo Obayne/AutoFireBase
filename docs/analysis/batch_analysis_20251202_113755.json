@@ -1,0 +1,24 @@
+{
+  "timestamp": "2025-12-02T11:37:55.980789",
+  "files_analyzed": [
+    {
+      "status": "error",
+      "file": "Projects\\Star-Wars-Logo.dxf",
+      "error": "'Projects\\\\Star-Wars-Logo.dxf' is not in the subpath of 'C:\\\\Dev\\\\Autofire' OR one path is relative and the other is absolute."
+    },
+    {
+      "status": "error",
+      "file": "Projects\\Star-Wars-Logo.dxf",
+      "error": "'Projects\\\\Star-Wars-Logo.dxf' is not in the subpath of 'C:\\\\Dev\\\\Autofire' OR one path is relative and the other is absolute."
+    }
+  ],
+  "summary": {
+    "total_files": 2,
+    "successful_analyses": 0,
+    "failed_analyses": 2,
+    "total_fire_devices": 0,
+    "total_fire_layers": 0,
+    "average_devices_per_file": 0
+  },
+  "errors": []
+}
