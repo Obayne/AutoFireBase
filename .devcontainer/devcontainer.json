@@ -1,0 +1,37 @@
+{
+    "name": "AutoFire LV CAD Development",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11",
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    "postCreateCommand": "pip install -r requirements.txt && pip install -r requirements-dev.txt",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "charliermarsh.ruff",
+                "ms-python.black-formatter",
+                "GitHub.copilot",
+                "GitHub.copilot-chat"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true,
+                "python.linting.ruffEnabled": true,
+                "python.formatting.provider": "black",
+                "editor.formatOnSave": true,
+                "files.trimTrailingWhitespace": true
+            }
+        }
+    },
+    "forwardPorts": [
+        5000,
+        8000
+    ],
+    "remoteUser": "vscode",
+    "mounts": [
+        "source=${localWorkspaceFolder}/Projects,target=/workspaces/AutoFireBase/Projects,type=bind,consistency=cached"
+    ]
+}
