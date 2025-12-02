@@ -85,6 +85,16 @@ class BatchAnalysisAgent:
             return []
 
         dxf_files = list(search_path.rglob("*.dxf")) + list(search_path.rglob("*.DXF"))
+        
+        # Also check test fixtures if analyzing from project root
+        if search_path == Path("Projects"):
+            fixtures_path = Path("tests/fixtures/dxf")
+            if fixtures_path.exists():
+                fixture_files = list(fixtures_path.rglob("*.dxf")) + list(
+                    fixtures_path.rglob("*.DXF")
+                )
+                dxf_files.extend(fixture_files)
+        
         logger.info("📁 Discovered %d DXF files in %s", len(dxf_files), search_path)
         return dxf_files
 

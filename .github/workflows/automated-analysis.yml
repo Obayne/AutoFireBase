@@ -11,6 +11,7 @@ on:
         branches: ["**"]
         paths:
             - "Projects/**/*.dxf"
+            - "tests/fixtures/dxf/**/*.dxf"
             - "autofire_layer_intelligence.py"
             - "tools/cli/**"
     pull_request:
