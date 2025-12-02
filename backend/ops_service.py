@@ -101,7 +101,9 @@ class OpsService:
 
         # Line 2: seg2.a to seg2.b
         x3, y3 = seg2.a.x, seg2.a.y
-        x4, y4 = seg2.b.x, seg2.b.y  # Calculate denominators
+        x4, y4 = seg2.b.x, seg2.b.y
+
+        # Calculate denominators
         denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
 
         if abs(denom) < 1e-10:  # Lines are parallel
