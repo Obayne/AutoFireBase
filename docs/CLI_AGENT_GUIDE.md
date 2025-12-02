@@ -265,6 +265,7 @@ Then commit the reports to docs/analysis/ with message:
 ```
 
 That's it! Copilot will:
+
 1. Set up the environment
 2. Run the analysis
 3. Generate reports
@@ -285,16 +286,19 @@ That's it! Copilot will:
 ## 🔍 Troubleshooting
 
 ### **No DXF files found**
+
 - Check `Projects/` directory exists
 - Verify DXF files have `.dxf` extension
 - Try custom search path: `--search-path "path/to/files"`
 
 ### **Analysis fails**
+
 - Verify DXF file is valid (open in CAD software)
 - Check for corrupted files
 - Review error messages in console output
 
 ### **No devices detected**
+
 - Verify layer names match expected patterns (FP-, FIRE-, etc.)
 - Check `autofire_layer_intelligence.py` layer detection logic
 - Add custom layer patterns if needed
