@@ -39,24 +39,24 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
-            - name: Lint (ruff)
-              run: ruff check lv_cad
+      - name: Lint (ruff)
+        run: ruff check lv_cad
 
-            - name: Format check (black)
-              run: black --check lv_cad
+      - name: Format check (black)
+        run: black --check lv_cad
 
-            - name: Type check (mypy)
-              run: mypy lv_cad
+      - name: Type check (mypy)
+        run: mypy lv_cad
 
-            - name: Run tests (lv_cad)
-              run: pytest -q lv_cad/tests
+      - name: Run tests (lv_cad)
+        run: pytest -q lv_cad/tests
 
-            - name: Run tests with coverage (lv_cad)
-              run: pytest --cov=lv_cad --cov-report=xml lv_cad/tests
+      - name: Run tests with coverage (lv_cad)
+        run: pytest --cov=lv_cad --cov-report=xml lv_cad/tests
 
-            - name: Upload coverage to Codecov
-              uses: codecov/codecov-action@v4
-              with:
-                file: ./coverage.xml
-                flags: lv_cad
-                name: lv_cad-coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: lv_cad
+          name: lv_cad-coverage
