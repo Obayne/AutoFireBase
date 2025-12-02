@@ -53,6 +53,8 @@ jobs:
         run: flake8 . --max-line-length=100 --extend-ignore=E203,W503 || true
 
       - name: Run tests with coverage
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: xvfb-run -a pytest --cov=. --cov-report=xml --cov-report=html
 
       - name: Upload coverage reports
