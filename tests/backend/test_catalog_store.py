@@ -39,7 +39,7 @@ class TestGetCatalogPath:
         """Test that catalog path creates AutoFire directory in home."""
         with patch("backend.catalog_store.os.path.expanduser", return_value=str(tmp_path)):
             path = get_catalog_path()
-            
+
             expected_dir = tmp_path / "AutoFire"
             assert expected_dir.exists()
             assert path == str(expected_dir / "catalog.db")
@@ -116,7 +116,7 @@ class TestAddDevice:
                 type_code="strobe",
                 model="TEST-100",
                 name="Test Strobe",
-                symbol="TS"
+                symbol="TS",
             )
 
             assert device_id > 0
@@ -130,7 +130,7 @@ class TestAddDevice:
                 "strobe_candela": 75,
                 "current_a": 0.115,
                 "voltage_v": 24,
-                "notes": "Test device"
+                "notes": "Test device",
             }
 
             device_id = add_device(
@@ -139,7 +139,7 @@ class TestAddDevice:
                 model="TEST-200",
                 name="Test Strobe with Specs",
                 symbol="TSS",
-                specs=specs
+                specs=specs,
             )
 
             assert device_id > 0
@@ -157,10 +157,7 @@ class TestAddDevice:
             seed_defaults()
 
             add_device(
-                manufacturer="NewCorp",
-                type_code="speaker",
-                model="NEW-100",
-                name="New Speaker"
+                manufacturer="NewCorp", type_code="speaker", model="NEW-100", name="New Speaker"
             )
 
             con = sqlite3.connect(temp_catalog_db)
@@ -181,7 +178,7 @@ class TestAddDevice:
                     manufacturer="TestCorp",
                     type_code="invalid_type",
                     model="TEST-999",
-                    name="Invalid Device"
+                    name="Invalid Device",
                 )
 
 
@@ -251,12 +248,10 @@ class TestGetDeviceSpecs:
                 "smoke_spacing_ft": 30,
                 "current_a": 0.15,
                 "voltage_v": 24,
-                "notes": "Full specs"
+                "notes": "Full specs",
             }
 
-            device_id = add_device(
-                "TestCorp", "strobe", "FULL", "Full Specs Device", specs=specs
-            )
+            device_id = add_device("TestCorp", "strobe", "FULL", "Full Specs Device", specs=specs)
 
             retrieved = get_device_specs(device_id)
 

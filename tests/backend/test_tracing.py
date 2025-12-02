@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -15,7 +15,7 @@ class TestTracingConfig:
     def test_default_config(self):
         """Test TracingConfig with default values."""
         config = TracingConfig(service_name="TestService")
-        
+
         assert config.service_name == "TestService"
         assert config.service_version is None
         assert config.otlp_endpoint == "http://localhost:4318"
@@ -27,9 +27,9 @@ class TestTracingConfig:
             service_name="AutoFire",
             service_version="1.2.3",
             otlp_endpoint="http://custom:4318",
-            console_export=True
+            console_export=True,
         )
-        
+
         assert config.service_name == "AutoFire"
         assert config.service_version == "1.2.3"
         assert config.otlp_endpoint == "http://custom:4318"
@@ -49,12 +49,12 @@ class TestReadVersion:
         """Test reading version from VERSION.txt."""
         version_file = tmp_path / "VERSION.txt"
         version_file.write_text("1.2.3\n", encoding="utf-8")
-        
+
         with patch("backend.tracing.Path") as mock_path:
             mock_path.return_value.resolve.return_value.parents = [tmp_path]
             result = _read_version()
             # Since we can't easily mock Path traversal, test with default
-        
+
         # Direct test with tmp_path
         result = version_file.read_text(encoding="utf-8").strip()
         assert result == "1.2.3"
@@ -80,7 +80,9 @@ class TestInitTracing:
     def test_missing_dependencies(self):
         """Test init_tracing gracefully handles missing OpenTelemetry."""
         # Mock import failure
-        with patch("builtins.__import__", side_effect=ImportError("No module named 'opentelemetry'")):
+        with patch(
+            "builtins.__import__", side_effect=ImportError("No module named 'opentelemetry'")
+        ):
             # Should not raise, just return early
             init_tracing(service_name="TestService")
             # No assertion needed - success is not raising
@@ -106,11 +108,14 @@ class TestInitTracing:
         mock_trace.NoOpTracerProvider = type("NoOpTracerProvider", (), {})
         mock_trace.get_tracer_provider.return_value = noop_instance
         noop_instance.__class__ = mock_trace.NoOpTracerProvider
-        
-        with patch.dict(os.environ, {
-            "OTEL_EXPORTER_OTLP_ENDPOINT": "http://custom:9999",
-            "AUTOFIRE_TRACING_CONSOLE": "true"
-        }):
+
+        with patch.dict(
+            os.environ,
+            {
+                "OTEL_EXPORTER_OTLP_ENDPOINT": "http://custom:9999",
+                "AUTOFIRE_TRACING_CONSOLE": "true",
+            },
+        ):
             # Just verify it doesn't crash with env vars set
             try:
                 init_tracing(service_name="TestService")
@@ -128,11 +133,15 @@ class TestInitTracing:
             ("false", False),
             ("", False),
         ]
-        
+
         for env_val, expected_truthy in test_values:
             with patch.dict(os.environ, {"AUTOFIRE_TRACING_CONSOLE": env_val}):
                 # Verify parsing logic
-                result = str(os.getenv("AUTOFIRE_TRACING_CONSOLE", "")).lower() in {"1", "true", "yes"}
+                result = str(os.getenv("AUTOFIRE_TRACING_CONSOLE", "")).lower() in {
+                    "1",
+                    "true",
+                    "yes",
+                }
                 assert result == expected_truthy
 
     def test_instrumentation_error_handled(self):
@@ -140,6 +149,7 @@ class TestInitTracing:
         # This tests the try/except around RequestsInstrumentor().instrument()
         # The actual test would require complex mocking, so we verify the pattern exists
         import inspect
+
         source = inspect.getsource(init_tracing)
         assert "RequestsInstrumentor" in source
         assert "try:" in source or "except" in source
