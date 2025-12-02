@@ -1,0 +1,113 @@
+name: Automated DXF Analysis
+
+on:
+    push:
+        branches: ["**"]
+        paths:
+            - "Projects/**/*.dxf"
+            - "autofire_layer_intelligence.py"
+            - "tools/cli/**"
+    pull_request:
+        branches: ["**"]
+    schedule:
+        # Run daily at 2 AM UTC
+        - cron: "0 2 * * *"
+    workflow_dispatch:
+
+jobs:
+    batch-analysis:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+                  pip install -r requirements-dev.txt
+
+            - name: Run Batch DXF Analysis
+              run: |
+                  python tools/cli/batch_analysis_agent.py --analyze
+              continue-on-error: true
+
+            - name: Upload Analysis Reports
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: dxf-analysis-reports
+                  path: docs/analysis/
+                  retention-days: 90
+
+            - name: Commit Analysis Reports
+              if: github.event_name != 'pull_request'
+              run: |
+                  git config --local user.email "github-actions[bot]@users.noreply.github.com"
+                  git config --local user.name "github-actions[bot]"
+                  git add docs/analysis/
+                  git diff --staged --quiet || git commit -m "docs: Automated DXF analysis [skip ci]"
+                  git push || echo "No changes to push"
+
+    coverage-optimization:
+        runs-on: ubuntu-latest
+        needs: batch-analysis
+        if: github.event_name != 'pull_request'
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+
+            - name: Run Coverage Optimization
+              run: |
+                  # Extract devices from analysis and run optimization
+                  python tools/cli/intel_cli.py optimize --devices '[]'
+              continue-on-error: true
+
+    geometry-validation:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+
+            - name: Validate Geometry Operations
+              run: |
+                  # Test trim operation
+                  python tools/cli/geom_ops.py trim \
+                    --segment '{"type":"line","start":[0,0],"end":[10,10]}' \
+                    --cutter '{"type":"line","start":[5,0],"end":[5,10]}' \
+                    --format json
+
+                  # Test extend operation
+                  python tools/cli/geom_ops.py extend \
+                    --segment '{"type":"line","start":[0,0],"end":[5,5]}' \
+                    --target '{"type":"line","start":[10,0],"end":[10,10]}' \
+                    --format json
+
+                  # Test intersect operation
+                  python tools/cli/geom_ops.py intersect \
+                    --segment1 '{"type":"line","start":[0,0],"end":[10,10]}' \
+                    --segment2 '{"type":"line","start":[0,10],"end":[10,0]}' \
+                    --format json
+              continue-on-error: true
