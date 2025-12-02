@@ -1,0 +1,40 @@
+[
+  {
+    "session_info": {
+      "session_id": "session_1763773325",
+      "start_time": "2025-11-21T19:02:05.038427",
+      "end_time": "2025-11-21T19:02:05.038427",
+      "duration_seconds": 0.0,
+      "duration_formatted": "0:00:00"
+    },
+    "statistics": {
+      "total_milestones": 0,
+      "total_operations": 0,
+      "total_communications": 0,
+      "total_errors_resolved": 0,
+      "success_rate": 1.0
+    },
+    "milestones_achieved": [],
+    "key_operations": [],
+    "communication_highlights": []
+  },
+  {
+    "session_info": {
+      "session_id": "session_1763773333",
+      "start_time": "2025-11-21T19:02:13.885132",
+      "end_time": "2025-11-21T19:02:13.885132",
+      "duration_seconds": 0.0,
+      "duration_formatted": "0:00:00"
+    },
+    "statistics": {
+      "total_milestones": 0,
+      "total_operations": 0,
+      "total_communications": 0,
+      "total_errors_resolved": 0,
+      "success_rate": 1.0
+    },
+    "milestones_achieved": [],
+    "key_operations": [],
+    "communication_highlights": []
+  }
+]
