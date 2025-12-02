@@ -1,4 +1,4 @@
-﻿import csv
+import csv
 import json
 import math
 import os

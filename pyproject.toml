@@ -5,7 +5,7 @@ target-version = ["py311"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-extend-exclude = ["build", "dist", ".venv", "scripts/archive"]
+extend-exclude = ["build", "dist", ".venv"]
 
 [tool.ruff.lint]
 select = [
@@ -18,3 +18,33 @@ select = [
 [tool.ruff.format]
 quote-style = "double"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"
+
+# Benchmark configuration
+[tool.pytest-benchmark]
+# Disable benchmarks by default in regular test runs
+disable_gc = true
+min_rounds = 5
+timer = "time.perf_counter"
+calibration_precision = 10
+warmup = true
+
+[tool.coverage.run]
+source = ["backend", "cad_core", "frontend", "app"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/dist/*",
+    "*/build/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false

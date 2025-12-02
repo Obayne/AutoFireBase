@@ -1,4 +1,4 @@
-﻿from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 PAGE_SIZES = {
     "Letter": (8.5, 11),
@@ -106,6 +106,7 @@ class TitleBlock(QtWidgets.QGraphicsItemGroup):
         box.setBrush(QtCore.Qt.NoBrush)
         self.addToGroup(box)
         self._items.append(box)
+
         # Text rows
         def add_line(label, value, y_off_in):
             y = rect.top() + self._inch_to_px(y_off_in)

@@ -16,4 +16,3 @@ Acceptance
 
 Branch
 - `feat/backend-geom-repo-service`
-

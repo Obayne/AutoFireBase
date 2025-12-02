@@ -2,6 +2,7 @@
 
 Run with the repo venv python to verify installation and show module/version.
 """
+
 from __future__ import annotations
 
 import importlib

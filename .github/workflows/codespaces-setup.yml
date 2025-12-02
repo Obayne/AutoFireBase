@@ -1,0 +1,15 @@
+name: Setup Codespaces for Mobile Development
+
+on:
+    workflow_dispatch:
+
+jobs:
+    configure-codespace:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Validate devcontainer configuration
+              run: |
+                  echo "Codespaces configuration ready"
+                  echo "Access at: https://github.com/codespaces"

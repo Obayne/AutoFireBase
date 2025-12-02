@@ -1,0 +1,100 @@
+name: Nightly Full Test Suite
+
+permissions:
+    contents: write
+    pull-requests: write
+    issues: write
+    actions: read
+
+on:
+    schedule:
+        # Run every night at midnight UTC
+        - cron: "0 0 * * *"
+    workflow_dispatch:
+
+jobs:
+    comprehensive-analysis:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+                  pip install -r requirements-dev.txt
+
+            - name: Run full test suite
+              run: |
+                  pytest -v --cov --cov-report=html --cov-report=json
+
+            - name: Run batch DXF analysis
+              run: |
+                  python tools/cli/batch_analysis_agent.py --analyze
+
+            - name: Run coverage optimization
+              run: |
+                  python tools/cli/intel_cli.py optimize --devices '[]'
+              continue-on-error: true
+
+            - name: Generate comprehensive report
+              run: |
+                  echo "# Nightly Test Suite Report" > nightly-report.md
+                  echo "" >> nightly-report.md
+                  echo "**Date**: $(date)" >> nightly-report.md
+                  echo "" >> nightly-report.md
+                  echo "## Test Results" >> nightly-report.md
+                  pytest --collect-only -q | head -20 >> nightly-report.md
+                  echo "" >> nightly-report.md
+                  echo "## Coverage Summary" >> nightly-report.md
+                  coverage report >> nightly-report.md
+
+            - name: Upload comprehensive results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: nightly-full-suite
+                  path: |
+                      htmlcov/
+                      coverage.json
+                      docs/analysis/
+                      nightly-report.md
+                  retention-days: 30
+
+            - name: Commit nightly reports
+              run: |
+                  git config --local user.email "github-actions[bot]@users.noreply.github.com"
+                  git config --local user.name "github-actions[bot]"
+                  mkdir -p docs/nightly-reports
+                  cp nightly-report.md docs/nightly-reports/report-$(date +%Y%m%d).md
+                  git add docs/
+                  git diff --staged --quiet || git commit -m "docs: Nightly test suite report [skip ci]"
+                  git push || echo "No changes to push"
+
+    dependency-audit:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Audit dependencies
+              run: |
+                  python -m pip install --upgrade pip pip-audit
+                  pip install -r requirements.txt
+                  pip-audit --format json --output audit-report.json || true
+                  pip-audit || true
+
+            - name: Upload audit results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: dependency-audit
+                  path: audit-report.json
+                  retention-days: 30

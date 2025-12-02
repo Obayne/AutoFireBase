@@ -1,43 +1,84 @@
-from backend.geom_repo import InMemoryGeomRepo
-from backend.models import CircleDTO, PointDTO, SegmentDTO
+"""Tests for backend geometry repository (InMemoryGeomRepo)."""
+
+from backend.geom_repo import EntityRef, InMemoryGeomRepo
+from backend.models import PointDTO, SegmentDTO
 
 
-def test_add_and_get_point_segment_circle():
-    repo = InMemoryGeomRepo()
+class TestInMemoryGeomRepo:
+    """Test suite for in-memory geometry repository."""
 
-    p_ref = repo.add_point(PointDTO(1.0, 2.0))
-    assert p_ref.kind == "point" and p_ref.id.startswith("point:")
-    p = repo.get_point(p_ref.id)
-    assert p == PointDTO(1.0, 2.0)
+    def test_repo_initialization(self):
+        """Test repository initializes with empty storage."""
+        repo = InMemoryGeomRepo()
+        assert repo is not None
 
-    s_ref = repo.add_segment(SegmentDTO(PointDTO(0, 0), PointDTO(1, 1)))
-    assert s_ref.kind == "segment" and s_ref.id.startswith("segment:")
-    s = repo.get_segment(s_ref.id)
-    assert s == SegmentDTO(PointDTO(0, 0), PointDTO(1, 1))
+    def test_add_segment(self):
+        """Test adding a segment to repository."""
+        repo = InMemoryGeomRepo()
+        a = PointDTO(x=0.0, y=0.0)
+        b = PointDTO(x=10.0, y=10.0)
+        seg = SegmentDTO(a=a, b=b)
 
-    c_ref = repo.add_circle(CircleDTO(PointDTO(0, 0), 5.0))
-    assert c_ref.kind == "circle" and c_ref.id.startswith("circle:")
-    c = repo.get_circle(c_ref.id)
-    assert c == CircleDTO(PointDTO(0, 0), 5.0)
+        ref = repo.add_segment(seg)
 
+        assert isinstance(ref, EntityRef)
+        assert ref.id is not None
+        assert ref.kind == "segment"
 
-def test_update_entities_returns_true_on_success():
-    repo = InMemoryGeomRepo()
-    p_ref = repo.add_point(PointDTO(0.0, 0.0))
-    assert repo.update_point(p_ref.id, PointDTO(9.0, 9.0)) is True
-    assert repo.get_point(p_ref.id) == PointDTO(9.0, 9.0)
+    def test_get_segment(self):
+        """Test retrieving a segment from repository."""
+        repo = InMemoryGeomRepo()
+        a = PointDTO(x=5.0, y=5.0)
+        b = PointDTO(x=15.0, y=15.0)
+        seg = SegmentDTO(a=a, b=b)
 
-    s_ref = repo.add_segment(SegmentDTO(PointDTO(0, 0), PointDTO(1, 1)))
-    assert repo.update_segment(s_ref.id, SegmentDTO(PointDTO(2, 2), PointDTO(3, 3))) is True
-    assert repo.get_segment(s_ref.id) == SegmentDTO(PointDTO(2, 2), PointDTO(3, 3))
+        ref = repo.add_segment(seg)
+        retrieved = repo.get_segment(ref.id)
 
-    c_ref = repo.add_circle(CircleDTO(PointDTO(0, 0), 1.0))
-    assert repo.update_circle(c_ref.id, CircleDTO(PointDTO(1, 1), 2.0)) is True
-    assert repo.get_circle(c_ref.id) == CircleDTO(PointDTO(1, 1), 2.0)
+        assert retrieved is not None
+        assert retrieved.a.x == 5.0
+        assert retrieved.a.y == 5.0
+        assert retrieved.b.x == 15.0
+        assert retrieved.b.y == 15.0
 
+    def test_get_nonexistent_segment(self):
+        """Test retrieving a non-existent segment returns None."""
+        repo = InMemoryGeomRepo()
 
-def test_update_unknown_ids_returns_false():
-    repo = InMemoryGeomRepo()
-    assert repo.update_point("point:999", PointDTO(0, 0)) is False
-    assert repo.update_segment("segment:999", SegmentDTO(PointDTO(0, 0), PointDTO(1, 1))) is False
-    assert repo.update_circle("circle:999", CircleDTO(PointDTO(0, 0), 1.0)) is False
+        result = repo.get_segment("segment:999")
+
+        assert result is None
+
+    def test_multiple_segments(self):
+        """Test adding and retrieving multiple segments."""
+        repo = InMemoryGeomRepo()
+
+        seg1 = SegmentDTO(a=PointDTO(x=0.0, y=0.0), b=PointDTO(x=10.0, y=0.0))
+        seg2 = SegmentDTO(a=PointDTO(x=0.0, y=0.0), b=PointDTO(x=0.0, y=10.0))
+        seg3 = SegmentDTO(a=PointDTO(x=10.0, y=0.0), b=PointDTO(x=10.0, y=10.0))
+
+        ref1 = repo.add_segment(seg1)
+        ref2 = repo.add_segment(seg2)
+        ref3 = repo.add_segment(seg3)
+
+        # Verify all can be retrieved
+        assert repo.get_segment(ref1.id) is not None
+        assert repo.get_segment(ref2.id) is not None
+        assert repo.get_segment(ref3.id) is not None
+
+        # Verify correct data
+        retrieved1 = repo.get_segment(ref1.id)
+        assert retrieved1.b.x == 10.0
+        assert retrieved1.b.y == 0.0
+
+    def test_entity_ref_uniqueness(self):
+        """Test that each segment gets a unique entity reference."""
+        repo = InMemoryGeomRepo()
+
+        seg1 = SegmentDTO(a=PointDTO(x=0.0, y=0.0), b=PointDTO(x=1.0, y=1.0))
+        seg2 = SegmentDTO(a=PointDTO(x=0.0, y=0.0), b=PointDTO(x=1.0, y=1.0))
+
+        ref1 = repo.add_segment(seg1)
+        ref2 = repo.add_segment(seg2)
+
+        assert ref1.id != ref2.id

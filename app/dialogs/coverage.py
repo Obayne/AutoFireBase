@@ -1,5 +1,4 @@
 from PySide6 import QtWidgets
-from db import loader
 
 # UI/dialog strings may be long for clarity. Allow E501 in this dialog.
 # ruff: noqa: E501
@@ -89,31 +88,6 @@ class CoverageDialog(QtWidgets.QDialog):
         self.ed_target.valueChanged.connect(self._on_manual_edit)
         self.ed_spacing.valueChanged.connect(self._on_manual_edit)
 
-    def suggest_candela(self):
-        try:
-            from backend.coverage_service import (
-                get_required_ceiling_strobe_candela,
-                get_required_wall_strobe_candela,
-            )
-
-            room_size = self.ed_room_size.value()
-            ceiling_height = self.ed_ceiling_height.value()
-            mount = self.cmb_mount.currentText()
-
-            candela = None
-            if mount == "wall":
-                candela = get_required_wall_strobe_candela(room_size)
-            else:  # ceiling
-                candela = get_required_ceiling_strobe_candela(ceiling_height, room_size)
-
-            if candela:
-                self.lbl_suggested_candela.setText(f"{candela} cd")
-            else:
-                self.lbl_suggested_candela.setText("N/A (out of range)")
-        except Exception as e:
-            self.lbl_suggested_candela.setText(f"Error: {e}")
-
-
         # load existing
         if existing:
             mode = existing.get("mode", "none")
@@ -135,7 +109,7 @@ class CoverageDialog(QtWidgets.QDialog):
                 self.ed_spacing.setValue(float(p.get("spacing_ft", 30.0)))
 
         # Set source based on existing data if available
-        self.source = existing.get("source", "manual")
+        self.source = existing.get("source", "manual") if existing else "manual"
 
     def _on_manual_edit(self):
         self.source = "manual"
@@ -169,7 +143,7 @@ class CoverageDialog(QtWidgets.QDialog):
                     95: 50,
                     135: 60,
                     185: 70,
-                    115: 60, # Ceiling values
+                    115: 60,  # Ceiling values
                     150: 70,
                     177: 80,
                 }

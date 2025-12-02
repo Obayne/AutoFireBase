@@ -2,3 +2,4 @@ PySide6
 ezdxf
 reportlab
 shapely
+sentry-sdk[pyside6]  # Error tracking and monitoring (optional, free tier: 5k events/month)

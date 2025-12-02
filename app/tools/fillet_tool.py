@@ -89,7 +89,7 @@ class FilletTool:
                 return False
             it1 = self.first
             it2 = it
-            for (li, item) in ((l1, it1), (l2, it2)):
+            for li, item in ((l1, it1), (l2, it2)):
                 d1 = QtCore.QLineF(ip, QtCore.QPointF(li.x1(), li.y1())).length()
                 d2 = QtCore.QLineF(ip, QtCore.QPointF(li.x2(), li.y2())).length()
                 if d1 < d2:
