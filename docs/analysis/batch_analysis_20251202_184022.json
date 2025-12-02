@@ -1,0 +1,120 @@
+{
+  "timestamp": "2025-12-02T18:40:22.050310",
+  "files_analyzed": [
+    {
+      "status": "success",
+      "file": "Projects/Star-Wars-Logo.dxf",
+      "analysis": {
+        "file_path": "demo_analysis.dwg",
+        "total_layers": 5,
+        "fire_layers": [
+          {
+            "name": "E-FIRE-SMOK",
+            "device_count": 2
+          },
+          {
+            "name": "E-FIRE-DEVICES",
+            "device_count": 2
+          }
+        ],
+        "all_layers": [
+          {
+            "name": "E-FIRE-SMOK",
+            "color": "#FF0000",
+            "device_count": 2
+          },
+          {
+            "name": "E-FIRE-DEVICES",
+            "color": "#FF8000",
+            "device_count": 2
+          },
+          {
+            "name": "E-SPKR",
+            "color": "#0080FF",
+            "device_count": 1
+          },
+          {
+            "name": "ARCHITECTURAL",
+            "color": "#808080",
+            "device_count": 0
+          },
+          {
+            "name": "ELECTRICAL",
+            "color": "#FFFF00",
+            "device_count": 0
+          }
+        ],
+        "devices_detected": [
+          {
+            "type": "smoke_detector",
+            "coordinates": [
+              20.0,
+              17.5
+            ],
+            "layer": "E-FIRE-SMOK",
+            "block_name": "SMOKE_DET_CEIL",
+            "room": "CONFERENCE_RM_101"
+          },
+          {
+            "type": "smoke_detector",
+            "coordinates": [
+              40.0,
+              15.0
+            ],
+            "layer": "E-FIRE-SMOK",
+            "block_name": "SMOKE_DET_WALL",
+            "room": "OFFICE_102"
+          },
+          {
+            "type": "manual_pull_station",
+            "coordinates": [
+              15.0,
+              4.0
+            ],
+            "layer": "E-FIRE-DEVICES",
+            "block_name": "PULL_STATION_ADA",
+            "room": "HALLWAY_100"
+          },
+          {
+            "type": "horn_strobe",
+            "coordinates": [
+              40.0,
+              4.0
+            ],
+            "layer": "E-FIRE-DEVICES",
+            "block_name": "HORN_STROBE_WALL",
+            "room": "HALLWAY_100"
+          },
+          {
+            "type": "sprinkler_head",
+            "coordinates": [
+              20.0,
+              17.5
+            ],
+            "layer": "E-SPKR",
+            "block_name": "SPRINKLER_PENDENT",
+            "room": "CONFERENCE_RM_101"
+          }
+        ],
+        "analysis_timestamp": "2025-12-02T18:40:22.051290",
+        "precision_data": {
+          "total_fire_devices": 4,
+          "layer_classification_accuracy": 0.4,
+          "confidence_score": 0.992
+        },
+        "file_name": "Star-Wars-Logo.dxf",
+        "file_size_bytes": 339093,
+        "relative_path": "Projects/Star-Wars-Logo.dxf"
+      }
+    }
+  ],
+  "summary": {
+    "total_files": 1,
+    "successful_analyses": 1,
+    "failed_analyses": 0,
+    "total_fire_devices": 4,
+    "total_fire_layers": 2,
+    "average_devices_per_file": 4.0
+  },
+  "errors": []
+}
