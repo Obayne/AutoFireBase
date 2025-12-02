@@ -41,22 +41,40 @@ class AIKnowledgeBase:
             "system_architecture": {
                 "fire_alarm_components": {
                     "control_panel": "Fire Alarm Control Panel (FACP)",
-                    "initiating_devices": ["Smoke Detectors", "Heat Detectors", "Manual Pull Stations", "Waterflow Switches"],
-                    "notification_appliances": ["Audible Horns", "Visual Strobes", "Combination Horn/Strobes", "Speakers"],
-                    "power_supplies": ["Primary Power (120/240VAC)", "Secondary Power (Battery Backup)", "Inverter Systems"],
-                    "annunciators": ["Remote Displays", "LED Panels", "LCD Displays"]
+                    "initiating_devices": [
+                        "Smoke Detectors",
+                        "Heat Detectors",
+                        "Manual Pull Stations",
+                        "Waterflow Switches",
+                    ],
+                    "notification_appliances": [
+                        "Audible Horns",
+                        "Visual Strobes",
+                        "Combination Horn/Strobes",
+                        "Speakers",
+                    ],
+                    "power_supplies": [
+                        "Primary Power (120/240VAC)",
+                        "Secondary Power (Battery Backup)",
+                        "Inverter Systems",
+                    ],
+                    "annunciators": ["Remote Displays", "LED Panels", "LCD Displays"],
                 },
                 "low_voltage_categories": {
                     "class_1": "Fire Alarm Systems (NEC Article 760)",
                     "class_2": "Limited Energy Systems (NEC Article 725)",
-                    "class_3": "Power-Limited Fire Alarm (NEC Article 760)"
-                }
+                    "class_3": "Power-Limited Fire Alarm (NEC Article 760)",
+                },
             },
             "code_hierarchy": {
                 "federal_codes": ["OSHA", "ADA", "Federal Energy Policy Act"],
                 "model_codes": ["IBC", "IFC", "NEC/NFPA 70"],
                 "industry_standards": ["NFPA 72", "NFPA 101", "UL Standards"],
-                "local_amendments": ["State Fire Marshal", "Local Building Department", "AHJ Interpretations"]
+                "local_amendments": [
+                    "State Fire Marshal",
+                    "Local Building Department",
+                    "AHJ Interpretations",
+                ],
             },
             "nfpa_72_deep_dive": {
                 "coverage_calculations": {
@@ -64,26 +82,26 @@ class AIKnowledgeBase:
                         "smooth_ceiling": 900,  # sq ft max
                         "ceiling_height_10ft": 900,
                         "ceiling_height_14ft": 640,
-                        "beam_depth_4ft": 640
+                        "beam_depth_4ft": 640,
                     },
                     "heat_detector_spacing": {
                         "light_hazard": 50,  # ft spacing
                         "ordinary_hazard": 40,
-                        "extra_hazard": 30
-                    }
+                        "extra_hazard": 30,
+                    },
                 },
                 "power_calculations": {
                     "battery_formula": "Capacity = (Current × Standby_Time) + (Alarm_Current × Alarm_Time) × Safety_Factor × Temp_Factor",
                     "standby_time": 24,  # hours
                     "alarm_time": 5,  # minutes
                     "safety_factor": 1.25,  # 25%
-                    "temperature_factor": 1.1  # 10% for temperature
+                    "temperature_factor": 1.1,  # 10% for temperature
                 },
                 "circuit_design": {
                     "copper_resistivity": 12.9,  # ohm-circular mils per foot at 75°C
                     "voltage_drop_limit": 0.1,  # 10% maximum
-                    "conductor_sizing": "NEC Table 310.15(B)(16)"
-                }
+                    "conductor_sizing": "NEC Table 310.15(B)(16)",
+                },
             },
             "occupancy_classifications": {
                 "assembly": {
@@ -91,22 +109,20 @@ class AIKnowledgeBase:
                     "A-2": "Restaurant, bar (>50 occupants)",
                     "A-3": "Church, library, museum",
                     "A-4": "Arena, skating rink",
-                    "A-5": "Stadium, amusement park"
+                    "A-5": "Stadium, amusement park",
                 },
-                "educational": {
-                    "E": "Preschool through grade 12"
-                },
+                "educational": {"E": "Preschool through grade 12"},
                 "healthcare": {
                     "H-1": "Hospital, nursing home",
                     "H-2": "Limited care facilities",
-                    "H-3": "Surgery centers, birthing centers"
+                    "H-3": "Surgery centers, birthing centers",
                 },
                 "residential": {
                     "R-1": "Hotels, motels",
                     "R-2": "Apartment buildings",
                     "R-3": "One- and two-family dwellings",
-                    "R-4": "Assisted living facilities"
-                }
+                    "R-4": "Assisted living facilities",
+                },
             },
             "special_hazard_applications": {
                 "hazardous_locations": {
@@ -114,13 +130,13 @@ class AIKnowledgeBase:
                     "class_II": "Combustible dusts",
                     "class_III": "Ignitable fibers/flyings",
                     "division_1": "Hazard present under normal conditions",
-                    "division_2": "Hazard present only under abnormal conditions"
+                    "division_2": "Hazard present only under abnormal conditions",
                 },
                 "clean_rooms_laboratories": {
                     "nfpa_45": "Fire Protection for Laboratories Using Chemicals",
                     "air_handling_detection": "Detection in air handling systems",
-                    "special_extinguishing": "Special extinguishing system interfaces"
-                }
+                    "special_extinguishing": "Special extinguishing system interfaces",
+                },
             },
             "system_integration": {
                 "hvac_integration": [
@@ -128,22 +144,22 @@ class AIKnowledgeBase:
                     "Duct detector monitoring",
                     "Emergency smoke purge activation",
                     "Temperature sensor inputs",
-                    "Building automation system (BAS) coordination"
+                    "Building automation system (BAS) coordination",
                 ],
                 "elevator_integration": [
                     "Fire service recall functions",
                     "Emergency voice communication",
                     "Floor indicator displays",
                     "Door hold/open functions",
-                    "Priority service for firefighters"
+                    "Priority service for firefighters",
                 ],
                 "security_integration": [
                     "Access control system coordination",
                     "Video surveillance triggering",
                     "Intrusion detection interfaces",
                     "Mass notification system links",
-                    "Emergency communication pathways"
-                ]
+                    "Emergency communication pathways",
+                ],
             },
             "sequence_of_operations": {
                 "fire_alarm_sequence": [
@@ -154,7 +170,7 @@ class AIKnowledgeBase:
                     "5. Elevator recall initiates",
                     "6. HVAC smoke purge activates",
                     "7. Fire department notification transmits",
-                    "8. Building automation system responds"
+                    "8. Building automation system responds",
                 ]
             },
             "documentation_requirements": {
@@ -163,48 +179,82 @@ class AIKnowledgeBase:
                     "Riser Diagrams",
                     "Wiring Diagrams",
                     "Panel Layouts",
-                    "Device Details"
+                    "Device Details",
                 ],
                 "calculations_package": [
                     "Battery capacity calculations",
                     "Voltage drop calculations",
                     "Coverage area verification",
                     "Circuit loading analysis",
-                    "Sound pressure level calculations"
-                ]
+                    "Sound pressure level calculations",
+                ],
             },
             "testing_commissioning": {
                 "acceptance_testing": {
-                    "visual_inspection": ["Equipment verification", "Wiring continuity", "Mounting/orientation", "Labels/identification"],
-                    "functional_testing": ["Device sensitivity", "Circuit supervision", "Appliance operation", "Communication testing"],
-                    "performance_testing": ["Battery discharge", "Power failure simulation", "Capacity verification", "End-to-end operation"]
+                    "visual_inspection": [
+                        "Equipment verification",
+                        "Wiring continuity",
+                        "Mounting/orientation",
+                        "Labels/identification",
+                    ],
+                    "functional_testing": [
+                        "Device sensitivity",
+                        "Circuit supervision",
+                        "Appliance operation",
+                        "Communication testing",
+                    ],
+                    "performance_testing": [
+                        "Battery discharge",
+                        "Power failure simulation",
+                        "Capacity verification",
+                        "End-to-end operation",
+                    ],
                 },
                 "maintenance_frequencies": {
                     "monthly": ["Battery checks", "Lamp tests"],
                     "quarterly": ["Functional tests of initiating devices"],
                     "semi_annually": ["Complete functional test"],
-                    "annually": ["Full system test and inspection"]
-                }
+                    "annually": ["Full system test and inspection"],
+                },
             },
             "practical_scenarios": {
                 "office_building": {
                     "parameters": "5-story, 50,000 sq ft per floor, business occupancy",
                     "smoke_detectors_per_floor": 56,  # 50000/900 = 56
-                    "total_system": "280 smoke detectors, 20 manual stations, 560 horn/strobes"
+                    "total_system": "280 smoke detectors, 20 manual stations, 560 horn/strobes",
                 },
                 "hospital_system": {
-                    "special_requirements": ["100% patient room coverage", "Emergency communication", "Medical gas integration"],
+                    "special_requirements": [
+                        "100% patient room coverage",
+                        "Emergency communication",
+                        "Medical gas integration",
+                    ],
                     "corridor_coverage": "Complete coverage per NFPA 72",
-                    "staff_assistance": "Emergency call stations at strategic locations"
+                    "staff_assistance": "Emergency call stations at strategic locations",
                 },
                 "high_rise_residential": {
-                    "challenges": ["Vertical transport", "Common area coverage", "Emergency communication"],
-                    "requirements": ["Smoke detectors in corridors/elevator lobbies", "Two-way communication in stairs"]
+                    "challenges": [
+                        "Vertical transport",
+                        "Common area coverage",
+                        "Emergency communication",
+                    ],
+                    "requirements": [
+                        "Smoke detectors in corridors/elevator lobbies",
+                        "Two-way communication in stairs",
+                    ],
                 },
                 "industrial_warehouse": {
-                    "challenges": ["Large open spaces", "High ceilings (40ft)", "Extra hazard classification"],
-                    "solutions": ["Beam detectors", "Aspirating smoke detection", "Extended spacing calculations"]
-                }
+                    "challenges": [
+                        "Large open spaces",
+                        "High ceilings (40ft)",
+                        "Extra hazard classification",
+                    ],
+                    "solutions": [
+                        "Beam detectors",
+                        "Aspirating smoke detection",
+                        "Extended spacing calculations",
+                    ],
+                },
             },
             "code_compliance_checklists": {
                 "nfpa_72_compliance": [
@@ -214,86 +264,90 @@ class AIKnowledgeBase:
                     "Wall proximity requirements met (17.6.3.4.3)",
                     "Ceiling obstructions evaluated (17.6.3.4.4)",
                     "Beam interference considered (17.6.3.4.5)",
-                    "Smooth vs suspended ceiling factors applied"
+                    "Smooth vs suspended ceiling factors applied",
                 ],
                 "nec_article_760": [
                     "FPLR cable used for power-limited circuits",
                     "Cable markings verified (760.3)",
                     "Support requirements met (760.24)",
                     "Bending radius observed (760.24)",
-                    "Cable tray installations per 760.26"
+                    "Cable tray installations per 760.26",
                 ],
                 "ada_accessibility": [
                     "Sleeping rooms have visual appliances (ADA 4.28.3)",
                     "Visual appliances within field of view (ADA 4.28.5)",
                     "Candela requirements met (UL 1638)",
                     "Flash rate 1-2 Hz (ADA 4.28.6)",
-                    "Sound level 15dB above ambient (NFPA 72 18.4.2)"
-                ]
+                    "Sound level 15dB above ambient (NFPA 72 18.4.2)",
+                ],
             },
             "troubleshooting_guide": {
                 "spacing_coverage_issues": {
                     "detector_spacing_exceeds_limits": {
                         "problem": "Large open office area with 35-foot spacing",
                         "solution": "Add intermediate detectors or use beam detection",
-                        "code_reference": "NFPA 72 Table 17.6.3.4.1 allows beam detectors for large areas"
+                        "code_reference": "NFPA 72 Table 17.6.3.4.1 allows beam detectors for large areas",
                     },
                     "ceiling_obstructions": {
                         "problem": "HVAC ducts and lighting fixtures blocking coverage",
                         "solution": "Calculate per NFPA 72 17.6.3.4.4 obstruction rules",
-                        "alternative": "Use beam detectors or relocate obstructions"
-                    }
+                        "alternative": "Use beam detectors or relocate obstructions",
+                    },
                 },
                 "power_supply_issues": {
                     "battery_calculations_inadequate": {
                         "problem": "Calculated capacity below NFPA 72 minimum",
                         "solution": "Review device counts, check for redundant devices",
-                        "action": "Add secondary battery or use larger capacity batteries"
+                        "action": "Add secondary battery or use larger capacity batteries",
                     },
                     "voltage_drop_exceeds_limits": {
                         "problem": "Long cable runs causing >10% voltage drop",
                         "solution": "Increase conductor size or add booster power supplies",
-                        "calculation": "Calculate using NEC Chapter 9 Table 8"
-                    }
+                        "calculation": "Calculate using NEC Chapter 9 Table 8",
+                    },
                 },
                 "ahj_review_responses": {
                     "spacing_justification_required": {
                         "response": "Provide detailed calculations showing equivalent coverage",
                         "reference": "NFPA 72 17.6.3.4.6 engineering analysis",
-                        "include": "Ceiling height adjustments and obstruction analysis"
+                        "include": "Ceiling height adjustments and obstruction analysis",
                     },
                     "battery_calculations_incomplete": {
                         "response": "Provide complete load analysis per NFPA 72 Chapter 12",
                         "include": "All devices, communication modules, and network devices",
-                        "show": "25% safety factor calculations"
-                    }
-                }
+                        "show": "25% safety factor calculations",
+                    },
+                },
             },
             "assessment_framework": {
                 "knowledge_tests": {
-                    "beginner": ["Code identification", "Basic calculations", "Component recognition"],
+                    "beginner": [
+                        "Code identification",
+                        "Basic calculations",
+                        "Component recognition",
+                    ],
                     "intermediate": ["System design", "Code application", "Power calculations"],
-                    "advanced": ["Complex integration", "AHJ coordination", "Troubleshooting"]
+                    "advanced": ["Complex integration", "AHJ coordination", "Troubleshooting"],
                 },
                 "performance_metrics": {
                     "accuracy_standards": {
                         "code_reference_accuracy": 0.95,  # 95%
                         "calculation_accuracy": 1.0,  # 100%
                         "design_compliance": 0.9,  # 90%
-                        "ahj_response_quality": 0.85  # 85%
+                        "ahj_response_quality": 0.85,  # 85%
                     },
                     "response_times": {
                         "basic_queries": 30,  # seconds
                         "design_calculations": 120,  # seconds
                         "complex_design": 600,  # seconds
-                        "code_research": 60  # seconds
-                    }
+                        "code_research": 60,  # seconds
+                    },
                 },
                 "certification_levels": {
                     "level_1": "Fire Alarm Design Assistant - Basic code knowledge and calculations",
                     "level_2": "Fire Alarm Design Specialist - Complex system design and AHJ coordination",
-                    "level_3": "Fire Alarm Design Expert - Advanced special hazard applications"
-                }
+                    "level_3": "Fire Alarm Design Expert - Advanced special hazard applications",
+                },
             },
             "core_responsibilities": {
                 "fire_alarm_systems": {
