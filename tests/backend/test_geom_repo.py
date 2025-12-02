@@ -41,3 +41,42 @@ def test_update_unknown_ids_returns_false():
     assert repo.update_point("point:999", PointDTO(0, 0)) is False
     assert repo.update_segment("segment:999", SegmentDTO(PointDTO(0, 0), PointDTO(1, 1))) is False
     assert repo.update_circle("circle:999", CircleDTO(PointDTO(0, 0), 1.0)) is False
+
+
+def test_iter_points():
+    """Test iterating over points."""
+    repo = InMemoryGeomRepo()
+    p1 = repo.add_point(PointDTO(1.0, 2.0))
+    p2 = repo.add_point(PointDTO(3.0, 4.0))
+    
+    items = list(repo.iter_points())
+    
+    assert len(items) == 2
+    assert items[0] == (p1.id, PointDTO(1.0, 2.0))
+    assert items[1] == (p2.id, PointDTO(3.0, 4.0))
+
+
+def test_iter_segments():
+    """Test iterating over segments."""
+    repo = InMemoryGeomRepo()
+    s1 = repo.add_segment(SegmentDTO(PointDTO(0, 0), PointDTO(1, 1)))
+    s2 = repo.add_segment(SegmentDTO(PointDTO(2, 2), PointDTO(3, 3)))
+    
+    items = list(repo.iter_segments())
+    
+    assert len(items) == 2
+    assert items[0] == (s1.id, SegmentDTO(PointDTO(0, 0), PointDTO(1, 1)))
+    assert items[1] == (s2.id, SegmentDTO(PointDTO(2, 2), PointDTO(3, 3)))
+
+
+def test_iter_circles():
+    """Test iterating over circles."""
+    repo = InMemoryGeomRepo()
+    c1 = repo.add_circle(CircleDTO(PointDTO(0, 0), 5.0))
+    c2 = repo.add_circle(CircleDTO(PointDTO(10, 10), 7.5))
+    
+    items = list(repo.iter_circles())
+    
+    assert len(items) == 2
+    assert items[0] == (c1.id, CircleDTO(PointDTO(0, 0), 5.0))
+    assert items[1] == (c2.id, CircleDTO(PointDTO(10, 10), 7.5))
