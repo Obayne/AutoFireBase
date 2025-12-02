@@ -52,10 +52,12 @@
 **Quick edits and monitoring** - lighter than Codespaces.
 
 ### **Install**
+
 - iOS: App Store → "GitHub"
 - Android: Play Store → "GitHub"
 
 ### **What You Can Do**
+
 ✅ **View code** (browse all files)
 ✅ **Quick edits** (small changes)
 ✅ **Monitor CI/CD** (watch workflows run)
@@ -66,6 +68,7 @@
 ❌ **Can't run CLI agents** (use Codespaces for this)
 
 ### **Best For**
+
 - Quick bug fixes
 - Documentation updates
 - Reviewing code
@@ -78,10 +81,12 @@
 **Microsoft's mobile app** - experimental, limited features.
 
 ### **Install**
+
 - Search "VS Code" in app store
 - Currently in preview/beta
 
 ### **Limitations**
+
 - Basic editing only
 - No terminal access
 - No extension support
@@ -94,6 +99,7 @@
 ## 🚀 Recommended Mobile Workflow
 
 ### **For Light Work** (Docs, quick fixes)
+
 ```
 GitHub Mobile App
 → Edit file
@@ -102,6 +108,7 @@ GitHub Mobile App
 ```
 
 ### **For Serious Development** (Testing, CLI agents)
+
 ```
 Browser → GitHub Codespaces
 → Full VS Code environment
@@ -111,6 +118,7 @@ Browser → GitHub Codespaces
 ```
 
 ### **For Monitoring** (Check build status)
+
 ```
 GitHub Mobile App
 → Notifications tab
@@ -123,16 +131,19 @@ GitHub Mobile App
 ## 💰 Codespaces Pricing (Free Tier Generous)
 
 **Free Tier** (GitHub Free account):
+
 - 120 core hours/month
 - 15 GB storage
 - 2-core machine default
 
 **What This Means**:
+
 - ~60 hours of 2-core usage/month
 - Perfect for mobile development sessions
 - Auto-stops when inactive (saves hours)
 
 **Cost If You Exceed Free Tier**:
+
 - 2-core: $0.18/hour
 - 4-core: $0.36/hour
 - Storage: $0.07/GB/month
@@ -148,6 +159,7 @@ GitHub Mobile App
 This repo is **already configured** with `.devcontainer/devcontainer.json`.
 
 On your phone:
+
 1. Browser → `github.com/Obayne/AutoFireBase`
 2. Tap **Code** → **Codespaces** → **Create codespace**
 3. Wait ~2 minutes (first time only)
@@ -158,6 +170,7 @@ On your phone:
 **Quick access**: `github.com/codespaces`
 
 Or:
+
 1. Go to any repo
 2. Tap **Code** → **Codespaces**
 3. Resume existing codespace (instant)
@@ -165,6 +178,7 @@ Or:
 ### **Step 3: Work Normally**
 
 **Everything works on mobile**:
+
 - Edit files (VS Code UI)
 - Run terminal commands (tap terminal icon)
 - Run tests: `pytest -q`
@@ -176,6 +190,7 @@ Or:
 ## 📱 Mobile-Optimized Workflows
 
 ### **Quick File Edit**
+
 ```
 1. Open GitHub app
 2. Navigate to file
@@ -185,6 +200,7 @@ Or:
 ```
 
 ### **Run Tests from Phone**
+
 ```
 1. Open Codespaces in browser
 2. Tap terminal icon
@@ -193,6 +209,7 @@ Or:
 ```
 
 ### **Run Batch Analysis from Phone**
+
 ```
 1. Open Codespaces
 2. Terminal: python tools/cli/batch_analysis_agent.py --analyze
@@ -202,6 +219,7 @@ Or:
 ```
 
 ### **Monitor CI/CD**
+
 ```
 1. Open GitHub app
 2. Tap Actions tab
@@ -214,6 +232,7 @@ Or:
 ## 🎯 Best Practices for Mobile Development
 
 ### **Do on Mobile** ✅
+
 - Quick bug fixes
 - Documentation updates
 - Code reviews
@@ -223,12 +242,14 @@ Or:
 - Small feature additions
 
 ### **Avoid on Mobile** ⚠️
+
 - Complex refactoring (use desktop)
 - Heavy GUI work (PySide6 requires desktop)
 - Large file operations (slow on mobile)
 - Multi-file search/replace (desktop faster)
 
 ### **Always Use** 💡
+
 - Codespaces for anything beyond simple edits
 - GitHub app for quick checks
 - Auto-save (enable in Codespaces settings)
@@ -239,6 +260,7 @@ Or:
 ## 🔐 Security on Mobile
 
 ### **Codespaces Security**
+
 ✅ **Encrypted** connection (HTTPS)
 ✅ **Automatic logout** after inactivity
 ✅ **No code stored on phone** (all in cloud)
@@ -246,6 +268,7 @@ Or:
 ✅ **2FA supported** (recommended)
 
 ### **GitHub App Security**
+
 ✅ **Biometric auth** (Face ID, fingerprint)
 ✅ **Token-based** (no password stored)
 ✅ **Logged actions** (audit trail)
@@ -263,6 +286,7 @@ Or:
 5. **You're coding from your phone!** 🎉
 
 **Everything in this repo works in Codespaces** - including:
+
 - Running tests
 - CLI batch analysis
 - Geometry validation
@@ -304,12 +328,14 @@ Or:
 ## 🔄 Syncing Between Phone and Desktop
 
 **With Codespaces**:
+
 - Same environment everywhere
 - Start on phone, finish on desktop
 - All extensions/settings sync
 - No setup needed
 
 **With Local Development**:
+
 - Push from phone (Codespaces)
 - Pull on desktop
 - Continue work seamlessly
@@ -318,9 +344,10 @@ Or:
 
 ---
 
-## ✅ You're Ready!
+## ✅ You're Ready
 
 **AutoFire is now mobile-ready**. You can:
+
 - Code from your phone anytime
 - Run all CLI tools remotely
 - Monitor builds on the go
