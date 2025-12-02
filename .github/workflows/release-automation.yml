@@ -1,103 +1,103 @@
 name: Release Automation
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to release (e.g., v0.4.8)"
-        required: true
-        type: string
+    push:
+        tags:
+            - "v*.*.*"
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Version to release (e.g., v0.4.8)"
+                required: true
+                type: string
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      - name: Get version
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          fi
+            - name: Get version
+              id: version
+              run: |
+                  if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+                    echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+                  else
+                    echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+                  fi
 
-      - name: Generate changelog
-        id: changelog
-        run: |
-          VERSION=${{ steps.version.outputs.version }}
-          PREV_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+            - name: Generate changelog
+              id: changelog
+              run: |
+                  VERSION=${{ steps.version.outputs.version }}
+                  PREV_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
 
-          if [ -z "$PREV_TAG" ]; then
-            CHANGES=$(git log --pretty=format:"- %s (%h)" --no-merges)
-          else
-            CHANGES=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
-          fi
+                  if [ -z "$PREV_TAG" ]; then
+                    CHANGES=$(git log --pretty=format:"- %s (%h)" --no-merges)
+                  else
+                    CHANGES=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+                  fi
 
-          echo "## What's Changed" > changelog.md
-          echo "" >> changelog.md
-          echo "$CHANGES" >> changelog.md
-          echo "" >> changelog.md
-          echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${VERSION}" >> changelog.md
+                  echo "## What's Changed" > changelog.md
+                  echo "" >> changelog.md
+                  echo "$CHANGES" >> changelog.md
+                  echo "" >> changelog.md
+                  echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${VERSION}" >> changelog.md
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version }}
-          body_path: changelog.md
-          draft: false
-          prerelease: false
-          generate_release_notes: true
+            - name: Create Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ steps.version.outputs.version }}
+                  name: Release ${{ steps.version.outputs.version }}
+                  body_path: changelog.md
+                  draft: false
+                  prerelease: false
+                  generate_release_notes: true
 
-  build-windows:
-    needs: release
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
+    build-windows:
+        needs: release
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: "pip"
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+                  cache: "pip"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+                  pip install pyinstaller
 
-      - name: Get version
-        id: version
-        shell: pwsh
-        run: |
-          $version = Get-Content VERSION.txt -Raw
-          $version = $version.Trim()
-          echo "version=$version" >> $env:GITHUB_OUTPUT
+            - name: Get version
+              id: version
+              shell: pwsh
+              run: |
+                  $version = Get-Content VERSION.txt -Raw
+                  $version = $version.Trim()
+                  echo "version=$version" >> $env:GITHUB_OUTPUT
 
-      - name: Build executable
-        shell: pwsh
-        run: |
-          pyinstaller AutoFire.spec
+            - name: Build executable
+              shell: pwsh
+              run: |
+                  pyinstaller AutoFire.spec
 
-      - name: Create distribution archive
-        shell: pwsh
-        run: |
-          Compress-Archive -Path "dist/AutoFire/*" -DestinationPath "AutoFire-v${{ steps.version.outputs.version }}-win64.zip"
+            - name: Create distribution archive
+              shell: pwsh
+              run: |
+                  Compress-Archive -Path "dist/AutoFire/*" -DestinationPath "AutoFire-v${{ steps.version.outputs.version }}-win64.zip"
 
-      - name: Upload Release Asset
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.release.outputs.version || github.ref_name }}
-          files: AutoFire-v${{ steps.version.outputs.version }}-win64.zip
+            - name: Upload Release Asset
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ needs.release.outputs.version || github.ref_name }}
+                  files: AutoFire-v${{ steps.version.outputs.version }}-win64.zip
