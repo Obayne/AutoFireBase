@@ -4,6 +4,8 @@ ruff
 mypy
 pytest
 pytest-cov
+pytest-qt
+pytest-asyncio
 flake8
 pylint
 bandit
