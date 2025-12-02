@@ -166,6 +166,7 @@ def capture_exception(exception: Exception, **kwargs) -> str | None:
     try:
         return sentry_sdk.capture_exception(exception, **kwargs)
     except Exception:
+        # Silently fail if Sentry capture fails - don't crash the app for monitoring issues
         return None
 
 
@@ -218,6 +219,7 @@ def set_user(user_id: str | None = None, email: str | None = None, **kwargs):
 
         sentry_sdk.set_user(user_data)
     except Exception:
+        # Silently fail if setting user context fails - non-critical operation
         pass
 
 
@@ -245,6 +247,7 @@ def add_breadcrumb(message: str, category: str = "default", level: str = "info",
             data=data,
         )
     except Exception:
+        # Silently fail if adding breadcrumb fails - non-critical operation
         pass
 
 
@@ -268,4 +271,5 @@ def configure_scope(callback):
     try:
         sentry_sdk.configure_scope(callback)
     except Exception:
+        # Silently fail if configuring scope fails - non-critical operation
         pass
