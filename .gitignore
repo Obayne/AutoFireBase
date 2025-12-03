@@ -14,6 +14,8 @@ ENV/
 # Build artifacts
 build/
 dist/
+*.exe  # Installer executables
+installer/*.exe  # NSIS installer outputs
 
 # Backups and temp files
 *.bak

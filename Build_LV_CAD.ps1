@@ -24,7 +24,8 @@ function SafeRemove($path) {
       Remove-Item $path -Recurse -Force -ErrorAction Stop
       Write-Host "Removed $path"
     } catch {
-      Write-Warning "Could not remove $path: $($_.Exception.Message)"
+      $errMsg = $_.Exception.Message
+      Write-Warning "Could not remove ${path}: $errMsg"
     }
   }
 }

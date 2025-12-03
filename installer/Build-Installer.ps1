@@ -29,19 +29,19 @@ if ($Clean) {
 if (-not $SkipBuild) {
     Write-Host "📦 Building executable with PyInstaller..." -ForegroundColor Yellow
 
-    # Check if spec file exists
-    $SpecFile = Join-Path $RepoRoot "AutoFire.spec"
-    if (-not (Test-Path $SpecFile)) {
-        Write-Host "❌ AutoFire.spec not found!" -ForegroundColor Red
+    # Check if build script exists
+    $BuildScript = Join-Path $RepoRoot "Build_LV_CAD.ps1"
+    if (-not (Test-Path $BuildScript)) {
+        Write-Host "❌ Build_LV_CAD.ps1 not found!" -ForegroundColor Red
         exit 1
     }
 
-    # Run PyInstaller
+    # Run the existing build script
     Push-Location $RepoRoot
     try {
-        pyinstaller AutoFire.spec --clean --noconfirm
+        & $BuildScript
         if ($LASTEXITCODE -ne 0) {
-            throw "PyInstaller failed with exit code $LASTEXITCODE"
+            throw "PyInstaller build failed with exit code $LASTEXITCODE"
         }
         Write-Host "✓ Executable built successfully`n" -ForegroundColor Green
     }
@@ -50,9 +50,10 @@ if (-not $SkipBuild) {
     }
 
     # Verify output
-    $ExePath = Join-Path $DistDir "AutoFire\AutoFire.exe"
+    $ExePath = Join-Path $DistDir "LV_CAD\LV_CAD\LV_CAD.exe"
     if (-not (Test-Path $ExePath)) {
-        Write-Host "❌ AutoFire.exe not found in dist folder!" -ForegroundColor Red
+        Write-Host "❌ LV_CAD.exe not found in dist folder!" -ForegroundColor Red
+        Write-Host "   Expected at: $ExePath" -ForegroundColor Yellow
         exit 1
     }
 
@@ -92,7 +93,7 @@ if (-not $SkipInstaller) {
     }
 
     # Verify installer
-    $InstallerPath = Join-Path $InstallerDir "AutoFire-$Version-Setup.exe"
+    $InstallerPath = Join-Path $InstallerDir "LV_CAD-$Version-Setup.exe"
     if (Test-Path $InstallerPath) {
         $InstallerSize = (Get-Item $InstallerPath).Length / 1MB
         Write-Host "  📊 Installer size: $([math]::Round($InstallerSize, 2)) MB" -ForegroundColor Gray

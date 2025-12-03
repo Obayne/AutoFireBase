@@ -1,11 +1,11 @@
 ; AutoFire NSIS Installer Script
 ; Requires NSIS 3.0 or later (https://nsis.sourceforge.io/)
 
-!define APP_NAME "AutoFire"
+!define APP_NAME "LV CAD"
 !define APP_VERSION "0.7.0"
 !define APP_PUBLISHER "LV CAD Systems"
 !define APP_DESCRIPTION "Low Voltage Fire Alarm CAD System"
-!define APP_EXE "AutoFire.exe"
+!define APP_EXE "LV_CAD.exe"
 !define INSTALL_DIR "$PROGRAMFILES64\${APP_NAME}"
 
 ; Modern UI
@@ -13,20 +13,22 @@
 
 ; General settings
 Name "${APP_NAME} ${APP_VERSION}"
-OutFile "AutoFire-${APP_VERSION}-Setup.exe"
+OutFile "LV_CAD-${APP_VERSION}-Setup.exe"
 InstallDir "${INSTALL_DIR}"
 InstallDirRegKey HKLM "Software\${APP_NAME}" "InstallPath"
 RequestExecutionLevel admin
 
 ; MUI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "..\app\data\icon.ico"
-!define MUI_UNICON "..\app\data\icon.ico"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "installer-banner.bmp"  ; 164x314 pixels
+; Icon files are optional - comment out if not available
+;!define MUI_ICON "..\app\data\icon.ico"
+;!define MUI_UNICON "..\app\data\icon.ico"
+;!define MUI_WELCOMEFINISHPAGE_BITMAP "installer-banner.bmp"  ; 164x314 pixels
 
 ; Pages
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "..\LICENSE"
+; License page commented out - uncomment when LICENSE file exists
+;!insertmacro MUI_PAGE_LICENSE "..\LICENSE"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -51,7 +53,7 @@ Section "Install"
   SetOutPath "$INSTDIR"
 
   ; Copy all files from dist folder (PyInstaller output)
-  File /r "..\dist\AutoFire\*.*"
+  File /r "..\dist\LV_CAD\LV_CAD\*.*"
 
   ; Create desktop shortcut
   CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${APP_EXE}" "" "$INSTDIR\${APP_EXE}" 0
