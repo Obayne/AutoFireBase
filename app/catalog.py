@@ -1,7 +1,9 @@
 # Minimal catalog; loads from SQLite if available, else builtin
 try:
+    from db import connection as db_connection
     from db import loader as db_loader
 except Exception:
+    db_connection = None
     db_loader = None
 
 
@@ -53,18 +55,26 @@ def _builtin():
 
 
 def load_catalog():
-    if db_loader is not None:
+    # Try to load from shared database connection first
+    if db_connection is not None and db_loader is not None:
         try:
-            con = db_loader.connect()
-            db_loader.ensure_schema(con)
-            db_loader.seed_demo(con)
+            con = db_connection.get_connection()
             devs = db_loader.fetch_devices(con)
-            con.close()
             if devs:
                 # Normalize DB results for UI safety
                 return [_normalize_proto(d) for d in devs]
         except Exception:
-            pass
+            # If shared connection fails, fall back to separate connection
+            try:
+                con = db_loader.connect()
+                db_loader.ensure_schema(con)
+                db_loader.seed_demo(con)
+                devs = db_loader.fetch_devices(con)
+                con.close()
+                if devs:
+                    return [_normalize_proto(d) for d in devs]
+            except Exception:
+                pass
     return [_normalize_proto(d) for d in _builtin()]
 
 

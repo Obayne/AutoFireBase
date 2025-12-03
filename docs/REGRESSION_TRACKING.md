@@ -33,25 +33,33 @@
 
 ### 2. Database Items Missing
 
-**Status**: 🟡 High Priority
+**Status**: ✅ Fixed
 **Discovered**: Dec 3, 2025 user feedback
+**Fixed**: Dec 3, 2025 - unified database connections
 **Symptom**: User reports database items are missing
 
-**Impact**:
+**Root Cause**:
+- Two separate database connections existed:
+  - `db/connection.py` - Used by coverage calculations (in-memory)
+  - `db/loader.py` - Used by catalog (separate file ~/LV_CAD/catalog.db)
+- Main initialization only populated connection.py
+- Catalog tried to load from unpopulated loader.py connection
+- Result: Device tables existed but were EMPTY
 
-- Data loss or corruption
-- Projects may not load correctly
-- Device catalog may be incomplete
+**Solution Implemented**:
+- ✅ Modified `db/connection.py` to call `loader.seed_demo()` during initialization
+- ✅ Modified `app/catalog.py` to use shared `db/connection` first
+- ✅ Falls back to separate connection if needed
+- ✅ Added row_factory for dict-like row access
+- ✅ Created regression tests in `tests/regression/test_database_connection.py`
 
-**Investigation Needed**:
+**Verification**:
+- Database now contains 6 devices, 3 device types, 1 manufacturer
+- Catalog loads 6 devices from database
+- Coverage tables properly populated (6 wall, 18 ceiling, 7 strobe)
+- All 5 regression tests passing
 
-- [ ] Identify which database items are missing
-- [ ] Check for migration failures
-- [ ] Verify SQLite database integrity
-- [ ] Check catalog JSON loading
-- [ ] Review recent schema changes
-
-**Test**: `tests/regression/test_ai_system.py::TestDatabaseIntegration::test_project_persistence`
+**Test**: `tests/regression/test_database_connection.py::TestDatabaseConnection`
 
 ---
 

@@ -1,7 +1,7 @@
 # db/connection.py
 import sqlite3
 
-from . import coverage_tables, schema
+from . import coverage_tables, loader, schema
 
 _connection: sqlite3.Connection | None = None
 
@@ -18,9 +18,17 @@ def initialize_database(in_memory: bool = True):
         # This path can be configured later
         _connection = sqlite3.connect("autofire.db")
 
+    # Set row factory for dict-like access
+    _connection.row_factory = sqlite3.Row
+
+    # Create schema
     schema.create_schema_tables(_connection)
     coverage_tables.create_tables(_connection)
+    
+    # Populate with data
+    loader.seed_demo(_connection)
     coverage_tables.populate_tables(_connection)
+    
     _connection.commit()
 
 
