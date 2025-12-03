@@ -19,6 +19,12 @@ select = [
 source = ["lv_cad", "app", "cad_core", "frontend", "backend"]
 omit = ["*/tests/*", "*/__pycache__/*", "build/*", "dist/*"]
 
+[tool.pytest.ini_options]
+markers = [
+    "benchmark: Performance benchmark tests (use --benchmark-only to run)",
+    "manual: Tests that require manual verification or external services",
+]
+
 [tool.mypy]
 python_version = "3.11"
 warn_return_any = true
