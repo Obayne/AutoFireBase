@@ -3,6 +3,7 @@
 ## Overview
 
 AutoFire uses NSIS (Nullsoft Scriptable Install System) to create a professional Windows installer that handles:
+
 - Application installation to Program Files
 - Desktop and Start Menu shortcuts
 - `.afire` file association
@@ -14,7 +15,8 @@ AutoFire uses NSIS (Nullsoft Scriptable Install System) to create a professional
 ### 1. NSIS Installation
 
 Download and install NSIS 3.0 or later:
-- **Download**: https://nsis.sourceforge.io/Download
+
+- **Download**: <https://nsis.sourceforge.io/Download>
 - **Install to**: `C:\Program Files (x86)\NSIS\` (default)
 
 ### 2. PyInstaller Build
@@ -46,6 +48,7 @@ Output: `dist\AutoFire\AutoFire.exe` + dependencies
 ```
 
 Or manually:
+
 ```powershell
 cd installer
 & "C:\Program Files (x86)\NSIS\makensis.exe" autofire-installer.nsi
@@ -93,6 +96,7 @@ Output: `installer\AutoFire-0.7.0-Setup.exe`
 ### Uninstallation
 
 The installer creates an uninstaller that removes:
+
 - All installed files
 - All shortcuts
 - All registry keys
@@ -103,11 +107,13 @@ The installer creates an uninstaller that removes:
 ### Test Installation
 
 1. **Build installer**:
+
    ```powershell
    .\installer\Build-Installer.ps1
    ```
 
 2. **Run installer** (on test VM recommended):
+
    ```powershell
    .\installer\AutoFire-0.7.0-Setup.exe
    ```
@@ -172,6 +178,7 @@ SectionEnd
 Error: `NSIS not found at: C:\Program Files (x86)\NSIS\makensis.exe`
 
 **Solution**: Install NSIS or update path in `Build-Installer.ps1`:
+
 ```powershell
 $NSIS = "C:\Your\Custom\Path\NSIS\makensis.exe"
 ```
@@ -181,6 +188,7 @@ $NSIS = "C:\Your\Custom\Path\NSIS\makensis.exe"
 Error: `AutoFire.exe not found in dist folder!`
 
 **Solution**: Run PyInstaller first:
+
 ```powershell
 pyinstaller AutoFire.spec --clean --noconfirm
 ```
@@ -189,7 +197,8 @@ pyinstaller AutoFire.spec --clean --noconfirm
 
 Warning: `Can't find icon: ..\app\data\icon.ico`
 
-**Solution**: 
+**Solution**:
+
 - Create icon file or
 - Remove icon lines from .nsi file or
 - Use default NSIS icon
@@ -199,6 +208,7 @@ Warning: `Can't find icon: ..\app\data\icon.ico`
 Installer >100MB may indicate unnecessary files included.
 
 **Solution**: Check PyInstaller spec excludes list:
+
 ```python
 excludes=['tkinter', 'matplotlib', 'numpy.tests'],
 ```
@@ -208,6 +218,7 @@ excludes=['tkinter', 'matplotlib', 'numpy.tests'],
 ### 1. Update Version
 
 Update `VERSION.txt`:
+
 ```
 0.7.0
 ```
@@ -232,6 +243,7 @@ signtool sign /f certificate.pfx /p password /t http://timestamp.digicert.com Au
 ### 4. Distribute
 
 Upload to:
+
 - GitHub Releases
 - Website download page
 - Microsoft Store (future)
