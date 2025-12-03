@@ -1,30 +1,24 @@
 """
 Model Space Window - CAD workspace for device placement and design
 """
-import json
-import math
+
 import os
 import sys
-from pathlib import Path
-from typing import Any
 
 # Allow running as `python app\main.py` by fixing sys.path for absolute `app.*` imports
 if __package__ in (None, ""):
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import QPointF, Qt
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QApplication,
     QMainWindow,
-    QMessageBox,
 )
 
-from app import catalog, dxf_import
 from app.logging_config import setup_logging
 
 # Grid scene and defaults used by the main window
-from app.scene import GridScene, DEFAULT_GRID_SIZE
+from app.scene import DEFAULT_GRID_SIZE, GridScene
 
 # Ensure logging is configured early so module-level loggers emit during
 # headless simulators and when the app starts from __main__.
@@ -32,6 +26,34 @@ setup_logging()
 import logging
 
 _logger = logging.getLogger(__name__)
+
+from app.tools import draw as draw_tools
+from app.tools.chamfer_tool import ChamferTool
+from app.tools.extend_tool import ExtendTool
+from app.tools.fillet_radius_tool import FilletRadiusTool
+from app.tools.fillet_tool import FilletTool
+from app.tools.freehand import FreehandTool
+from app.tools.leader import LeaderTool
+from app.tools.measure_tool import MeasureTool
+from app.tools.mirror_tool import MirrorTool
+from app.tools.move_tool import MoveTool
+from app.tools.revision_cloud import RevisionCloudTool
+from app.tools.rotate_tool import RotateTool
+from app.tools.scale_tool import ScaleTool
+from app.tools.scale_underlay import (
+    ScaleUnderlayDragTool,
+    ScaleUnderlayRefTool,
+)
+from app.tools.text_tool import TextTool
+from app.tools.trim_tool import TrimTool
+
+try:
+    from app.tools.dimension import DimensionTool
+except Exception:
+
+    class DimensionTool:
+        def __init__(self, *a, **k):
+            self.active = False
 
 
 class ModelSpaceWindow(QMainWindow):
@@ -43,7 +65,7 @@ class ModelSpaceWindow(QMainWindow):
     def __init__(self, app_controller, parent=None):
         super().__init__(parent)
         self.app_controller = app_controller
-        self.setWindowTitle("AutoFire - Model Space")
+        self.setWindowTitle("LV CAD - Model Space")
         self.setObjectName("ModelSpaceWindow")
 
         # Initialize core attributes
@@ -62,6 +84,9 @@ class ModelSpaceWindow(QMainWindow):
 
         # Setup UI components
         self._setup_ui()
+
+        # Add modern toolbar
+        self._setup_toolbar()
 
         # Initialize tools and state
         self._initialize_tools()
@@ -96,6 +121,10 @@ class ModelSpaceWindow(QMainWindow):
         self.layer_overlay.setZValue(200)
         self.scene.addItem(self.layer_overlay)
 
+        self.layer_underlay = QtWidgets.QGraphicsItemGroup()
+        self.layer_underlay.setZValue(-100)
+        self.scene.addItem(self.layer_underlay)
+
         # Create view
         self.view = CanvasView(
             self.scene,
@@ -121,6 +150,12 @@ class ModelSpaceWindow(QMainWindow):
 
         # Properties dock
         self._setup_properties_dock()
+
+        # AI Assistant dock
+        self._setup_assistant_dock()
+
+        # System Builder dock
+        self._setup_system_builder_dock()
 
     def _setup_device_palette(self):
         """Setup the device palette dock."""
@@ -177,6 +212,101 @@ class ModelSpaceWindow(QMainWindow):
         dock.setWidget(w)
         self.addDockWidget(Qt.RightDockWidgetArea, dock)
 
+    def _setup_assistant_dock(self):
+        """Setup the AI assistant dock."""
+        from app.assistant import AssistantDock
+
+        self.assistant_dock = AssistantDock(self)
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.assistant_dock)
+
+    def _setup_system_builder_dock(self):
+        """Setup the system builder dock for automatic system design."""
+        # SystemBuilder will be instantiated when first used
+        pass
+
+        dock = QtWidgets.QDockWidget("System Builder", self)
+        w = QtWidgets.QWidget()
+        lay = QtWidgets.QVBoxLayout(w)
+
+        # System type selection
+        type_layout = QtWidgets.QHBoxLayout()
+        type_layout.addWidget(QtWidgets.QLabel("System Type:"))
+        self.system_type_combo = QtWidgets.QComboBox()
+        self.system_type_combo.addItems(
+            [
+                "Conventional Fire Alarm",
+                "Addressable Fire Alarm",
+                "Emergency Voice/Alarm",
+                "Mass Notification",
+            ]
+        )
+        type_layout.addWidget(self.system_type_combo)
+        lay.addLayout(type_layout)
+
+        # Building parameters
+        params_group = QtWidgets.QGroupBox("Building Parameters")
+        params_lay = QtWidgets.QFormLayout(params_group)
+
+        self.building_area = QtWidgets.QSpinBox()
+        self.building_area.setRange(100, 100000)
+        self.building_area.setValue(10000)
+        self.building_area.setSuffix(" sq ft")
+        params_lay.addRow("Total Area:", self.building_area)
+
+        self.stories = QtWidgets.QSpinBox()
+        self.stories.setRange(1, 50)
+        self.stories.setValue(1)
+        params_lay.addRow("Stories:", self.stories)
+
+        self.occupancy_type = QtWidgets.QComboBox()
+        self.occupancy_type.addItems(
+            [
+                "Business",
+                "Educational",
+                "Healthcare",
+                "Residential",
+                "Mercantile",
+                "Assembly",
+                "Industrial",
+                "Storage",
+            ]
+        )
+        params_lay.addRow("Occupancy:", self.occupancy_type)
+
+        lay.addWidget(params_group)
+
+        # Design buttons
+        design_group = QtWidgets.QGroupBox("System Design")
+        design_lay = QtWidgets.QVBoxLayout(design_group)
+
+        self.btn_design_system = QtWidgets.QPushButton("🎯 Design System")
+        self.btn_design_system.clicked.connect(self.design_system)
+        design_lay.addWidget(self.btn_design_system)
+
+        self.btn_calculate_wiring = QtWidgets.QPushButton("⚡ Calculate Wiring")
+        self.btn_calculate_wiring.clicked.connect(self.calculate_wiring)
+        design_lay.addWidget(self.btn_calculate_wiring)
+
+        self.btn_generate_spool = QtWidgets.QPushButton("🧵 Generate Wire Spool")
+        self.btn_generate_spool.clicked.connect(self.generate_wire_spool)
+        design_lay.addWidget(self.btn_generate_spool)
+
+        lay.addWidget(design_group)
+
+        # Results display
+        results_group = QtWidgets.QGroupBox("Design Results")
+        results_lay = QtWidgets.QVBoxLayout(results_group)
+
+        self.results_text = QtWidgets.QTextEdit()
+        self.results_text.setMaximumHeight(400)
+        self.results_text.setPlaceholderText("NFPA 72 compliant design results will appear here...")
+        results_lay.addWidget(self.results_text)
+
+        lay.addWidget(results_group)
+
+        dock.setWidget(w)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, dock)
+
     def _setup_status_bar(self):
         """Setup the status bar."""
         self.statusBar().showMessage("Model Space - Ready")
@@ -205,105 +335,388 @@ class ModelSpaceWindow(QMainWindow):
         self.act_snap.toggled.connect(self.toggle_snap)
         view_menu.addAction(self.act_snap)
 
-    def _initialize_tools(self):
-        """Initialize CAD tools and state."""
-        # Initialize tool state
-        self.current_proto = None
-        self.current_kind = "other"
-        self.ghost = None
-        self.show_coverage = bool(self.prefs.get("show_coverage", True))
+        # Modify menu for CAD tools
+        modify_menu = menubar.addMenu("&Modify")
+        modify_menu.addAction("Offset Selected…", self.offset_selected_dialog)
+        modify_menu.addAction("Trim Lines", self.start_trim)
+        modify_menu.addAction("Finish Trim", self.finish_trim)
+        modify_menu.addAction("Extend Lines", self.start_extend)
+        modify_menu.addAction("Fillet (Corner)", self.start_fillet)
+        modify_menu.addAction("Fillet (Radius)…", self.start_fillet_radius)
+        modify_menu.addAction("Move", self.start_move)
+        modify_menu.addAction("Copy", self.start_copy)
+        modify_menu.addAction("Rotate", self.start_rotate)
+        modify_menu.addAction("Mirror", self.start_mirror)
+        modify_menu.addAction("Scale", self.start_scale)
+        # Add window-specific menus after global ones
+        menubar = self.menuBar()
 
-        # Initialize history
-        self.history = []
-        self.history_index = -1
+        # View menu for model space specific options
+        view_menu = menubar.addMenu("&View")
+        self.act_grid = QtGui.QAction("Grid", self, checkable=True)
+        self.act_grid.setChecked(True)
+        self.act_grid.toggled.connect(self.toggle_grid)
+        view_menu.addAction(self.act_grid)
+
+        self.act_snap = QtGui.QAction("Snap", self, checkable=True)
+        self.act_snap.setChecked(bool(self.prefs.get("snap", True)))
+        self.act_snap.toggled.connect(self.toggle_snap)
+        view_menu.addAction(self.act_snap)
+
+        # Modify menu for CAD tools
+        modify_menu = menubar.addMenu("&Modify")
+        modify_menu.addAction("Offset Selected…", self.offset_selected_dialog)
+        modify_menu.addAction("Trim Lines", self.start_trim)
+        modify_menu.addAction("Finish Trim", self.finish_trim)
+        modify_menu.addAction("Extend Lines", self.start_extend)
+        modify_menu.addAction("Fillet (Corner)", self.start_fillet)
+        modify_menu.addAction("Fillet (Radius)…", self.start_fillet_radius)
+        modify_menu.addAction("Move", self.start_move)
+        modify_menu.addAction("Copy", self.start_copy)
+        modify_menu.addAction("Rotate", self.start_rotate)
+        modify_menu.addAction("Mirror", self.start_mirror)
+        modify_menu.addAction("Scale", self.start_scale)
+        modify_menu.addAction("Chamfer…", self.start_chamfer)
+
+    def _setup_toolbar(self):
+        """Setup modern toolbar with drawing tools."""
+        # Create main toolbar
+        self.toolbar = self.addToolBar("Drawing Tools")
+        self.toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        self.toolbar.setIconSize(QtCore.QSize(20, 20))
+
+        # Drawing tools
+        self.act_draw_line = QtGui.QAction("📏 Line", self)
+        self.act_draw_line.triggered.connect(lambda: self.draw.select_tool("line"))
+        self.toolbar.addAction(self.act_draw_line)
+
+        self.act_draw_rect = QtGui.QAction("▭ Rect", self)
+        self.act_draw_rect.triggered.connect(lambda: self.draw.select_tool("rect"))
+        self.toolbar.addAction(self.act_draw_rect)
+
+        self.act_draw_circle = QtGui.QAction("○ Circle", self)
+        self.act_draw_circle.triggered.connect(lambda: self.draw.select_tool("circle"))
+        self.toolbar.addAction(self.act_draw_circle)
+
+        self.act_draw_poly = QtGui.QAction("△ Poly", self)
+        self.act_draw_poly.triggered.connect(lambda: self.draw.select_tool("polyline"))
+        self.toolbar.addAction(self.act_draw_poly)
+
+        self.act_draw_arc = QtGui.QAction("⌒ Arc", self)
+        self.act_draw_arc.triggered.connect(lambda: self.draw.select_tool("arc"))
+        self.toolbar.addAction(self.act_draw_arc)
+
+        self.toolbar.addSeparator()
+
+        # Device placement
+        self.act_place_device = QtGui.QAction("🔥 Device", self)
+        self.act_place_device.triggered.connect(self.start_device_placement)
+        self.toolbar.addAction(self.act_place_device)
+
+        self.act_place_wire = QtGui.QAction("⚡ Wire", self)
+        self.act_place_wire.triggered.connect(lambda: self.draw.select_tool("wire"))
+        self.toolbar.addAction(self.act_place_wire)
+
+        self.toolbar.addSeparator()
+
+        # Text and dimensions
+        self.act_text = QtGui.QAction("T Text", self)
+        self.act_text.triggered.connect(lambda: self.text_tool.start())
+        self.toolbar.addAction(self.act_text)
+
+        self.act_dimension = QtGui.QAction("📐 Dim", self)
+        self.act_dimension.triggered.connect(lambda: self.dim_tool.start())
+        self.toolbar.addAction(self.act_dimension)
+
+    def start_device_placement(self):
+        """Start device placement mode."""
+        self.statusBar().showMessage("Click to place selected device. Right-click to cancel.")
+        # Device placement logic would go here
+
+    # CAD tool methods
+    def start_trim(self):
+        self.trim_tool.start()
+
+    def finish_trim(self):
+        self.trim_tool.finish()
+
+    def start_extend(self):
+        self.extend_tool.start()
+
+    def start_fillet(self):
+        self.fillet_tool.start()
+
+    def start_fillet_radius(self):
+        self.fillet_radius_tool.start()
+
+    def start_move(self):
+        self.move_tool.start()
+
+    def start_copy(self):
+        self.move_tool.start_copy()
+
+    def start_rotate(self):
+        self.rotate_tool.start()
+
+    def start_mirror(self):
+        self.mirror_tool.start()
+
+    def start_scale(self):
+        self.scale_tool.start()
+
+    def start_chamfer(self):
+        self.chamfer_tool.start()
+
+    def _initialize_tools(self):
+        """Initialize CAD tools and drawing state."""
+        # Initialize drawing tools
+        self.draw = draw_tools.DrawController(self, self.layer_sketch)
+
+        # Initialize modify tools
+        self.trim_tool = TrimTool(self)
+        self.extend_tool = ExtendTool(self)
+        self.fillet_tool = FilletTool(self)
+        self.fillet_radius_tool = FilletRadiusTool(self, self.layer_sketch)
+        self.move_tool = MoveTool(self)
+        self.rotate_tool = RotateTool(self)
+        self.mirror_tool = MirrorTool(self)
+        self.scale_tool = ScaleTool(self)
+        self.chamfer_tool = ChamferTool(self)
+
+        # Initialize text and dimension tools
+        self.text_tool = TextTool(self, self.layer_sketch)
+        try:
+            self.dim_tool = DimensionTool(self, self.layer_overlay)
+        except Exception:
+            # Fallback if dimension tool fails to load
+            self.dim_tool = type("DummyDimTool", (), {"start": lambda: None, "active": False})()
+
+        # Initialize other tools
+        self.freehand_tool = FreehandTool(self, self.layer_sketch)
+        self.leader_tool = LeaderTool(self, self.layer_overlay)
+        self.measure_tool = MeasureTool(self, self.layer_overlay)
+        self.revision_cloud_tool = RevisionCloudTool(self, self.layer_overlay)
+
+        # Initialize scale underlay tools
+        self.scale_underlay_drag_tool = ScaleUnderlayDragTool(self, self.layer_underlay)
+        self.scale_underlay_ref_tool = ScaleUnderlayRefTool(self, self.layer_underlay)
+
+    def select_tool(self, tool_name):
+        """Select a drawing tool by name."""
+        from app.tools.draw import DrawMode
+
+        mode_map = {
+            "line": DrawMode.LINE,
+            "rect": DrawMode.RECT,
+            "circle": DrawMode.CIRCLE,
+            "polyline": DrawMode.POLYLINE,
+            "arc": DrawMode.ARC3,
+            "wire": DrawMode.WIRE,
+        }
+        if tool_name in mode_map:
+            self.draw.set_mode(mode_map[tool_name])
+            self.statusBar().showMessage(f"Selected {tool_name} tool")
+        else:
+            self.statusBar().showMessage(f"Unknown tool: {tool_name}")
+
+    def offset_selected_dialog(self):
+        """Show offset dialog for selected items."""
+        # Placeholder for offset tool
+        pass
+
+    def toggle_grid(self):
+        """Toggle grid visibility."""
+        # Placeholder for grid toggle
+        pass
+
+    def toggle_snap(self):
+        """Toggle snap functionality."""
+        # Placeholder for snap toggle
+        pass
+
+    def cancel_active_tool(self):
+        """Cancel any active tool."""
+        # Cancel drawing tool
+        if hasattr(self, "draw"):
+            self.draw.finish()
+        # Cancel other active tools
+        for tool_name in [
+            "trim_tool",
+            "extend_tool",
+            "fillet_tool",
+            "move_tool",
+            "rotate_tool",
+            "mirror_tool",
+            "scale_tool",
+            "chamfer_tool",
+            "text_tool",
+            "dim_tool",
+            "freehand_tool",
+            "leader_tool",
+            "measure_tool",
+            "revision_cloud_tool",
+        ]:
+            tool = getattr(self, tool_name, None)
+            if tool and hasattr(tool, "cancel"):
+                tool.cancel()
+        self.statusBar().showMessage("Active tool cancelled")
+
+    def push_history(self):
+        """Push current state to history (placeholder)."""
+        # Placeholder for undo/redo functionality
+        pass
+
+    def canvas_menu(self, pos):
+        """Show context menu at position (placeholder)."""
+        # Placeholder for canvas context menu
+        pass
 
     def _connect_signals(self):
         """Connect to app controller signals."""
-        # Connect device tree selection
-        self.device_tree.itemClicked.connect(self.on_device_selected)
-
         # Connect to app controller signals for inter-window communication
-        self.app_controller.model_space_changed.connect(self.on_model_space_changed)
-        self.app_controller.paperspace_changed.connect(self.on_paperspace_changed)
-        self.app_controller.project_changed.connect(self.on_project_changed)
-
-        # Note: CanvasView already handles coordinate display in status bar
-
-    def on_device_selected(self, item, column):
-        """Handle device selection from palette."""
-        dev = item.data(0, 256)  # Qt.UserRole
-        if dev:
-            self.current_proto = dev
-            self.current_kind = dev.get("type", "other").lower()
-            self.statusBar().showMessage(f"Selected: {dev.get('name', 'Unknown')}")
-
-            # Create ghost device for placement preview
-            self._create_ghost_device(dev)
-
-    def _create_ghost_device(self, device_proto):
-        """Create ghost device for placement preview."""
-        if self.ghost:
-            self.scene.removeItem(self.ghost)
-            self.ghost = None
-
-        # Create ghost device (semi-transparent preview)
-        # This will be implemented when we move the device creation logic
-
-    def on_model_space_changed(self, change_data):
-        """Handle model space changes from other windows."""
-        change_type = change_data.get("type", "general")
-        # Handle different types of changes
-        if change_type == "device_placed":
-            # Refresh device display if needed
-            self.scene.update()
-        elif change_type == "scene_cleared":
-            # Handle scene clearing
+        if hasattr(self.app_controller, "model_space_changed"):
+            # Connect any model space change signals if needed
             pass
 
-    def on_paperspace_changed(self, change_data):
-        """Handle paperspace changes from other windows."""
-        change_type = change_data.get("type", "general")
-        # Model space window might not need to react to paperspace changes
-        # but this is here for future expansion
-        pass
+    # System builder methods
+    def design_system(self):
+        """Automatically design a fire alarm system based on building parameters."""
+        try:
+            # Lazy import and instantiation of SystemBuilder
+            if not hasattr(self, "system_builder"):
+                from app.system_builder import SystemBuilder
 
-    def on_project_changed(self, change_data):
-        """Handle project state changes."""
-        change_type = change_data.get("type", "general")
-        if change_type == "new_project":
-            # Clear current scene
-            self._initialize_tools()
-        elif change_type == "project_loaded":
-            # Refresh display
-            self.scene.update()
+                self.system_builder = SystemBuilder()
 
-    def toggle_grid(self, on):
-        """Toggle grid visibility."""
-        self.scene.show_grid = bool(on)
-        self.scene.update()
+            system_type = self.system_type_combo.currentText()
+            area = self.building_area.value()
+            stories = self.stories.value()
+            occupancy = self.occupancy_type.currentText()
 
-    def toggle_snap(self, on):
-        """Toggle snap functionality."""
-        self.scene.snap_enabled = bool(on)
+            # Use real SystemBuilder for design
+            design_result = self.system_builder.design_system(
+                system_type=system_type,
+                building_area=area,
+                stories=stories,
+                occupancy_type=occupancy,
+            )
 
-    def get_scene_state(self):
-        """Get the current scene state for serialization."""
-        # Return scene data for project saving
-        return {
-            "scene_type": "model_space",
-            "devices": [],  # Will be populated
-            "wires": [],    # Will be populated
-            "sketch": [],   # Will be populated
-        }
+            # Display the formatted design result
+            self.results_text.setPlainText(design_result)
 
-    def load_scene_state(self, data):
-        """Load scene state from serialized data."""
-        # Load scene data from project
-        pass
+        except Exception as e:
+            self.results_text.setPlainText(f"❌ System Design Error: {str(e)}")
+            _logger.error(f"System design failed: {e}", exc_info=True)
 
-    def closeEvent(self, event):
-        """Handle window close event."""
-        # Notify controller about window closing
-        if hasattr(self.app_controller, 'on_model_space_closed'):
-            self.app_controller.on_model_space_closed()
-        event.accept()
+    def calculate_wiring(self):
+        """Calculate wiring requirements for the system."""
+        try:
+            # Ensure SystemBuilder is available
+            if not hasattr(self, "system_builder"):
+                from app.system_builder import SystemBuilder
+
+                self.system_builder = SystemBuilder()
+
+            # Get current design parameters
+            system_type = self.system_type_combo.currentText()
+            area = self.building_area.value()
+            stories = self.stories.value()
+            occupancy = self.occupancy_type.currentText()
+
+            # First design the system to get device counts
+            design_result = self.system_builder.design_system(
+                system_type=system_type,
+                building_area=area,
+                stories=stories,
+                occupancy_type=occupancy,
+            )
+
+            # Calculate wiring requirements
+            wiring_result = self.system_builder.calculate_wiring()
+
+            # Display the formatted wiring result
+            self.results_text.setPlainText(wiring_result)
+
+        except Exception as e:
+            self.results_text.setPlainText(f"❌ Wiring Calculation Error: {str(e)}")
+            _logger.error(f"Wiring calculation failed: {e}", exc_info=True)
+
+    def generate_wire_spool(self):
+        """Generate wire spool list for installation."""
+        try:
+            # Get current design parameters
+            system_type = self.system_type_combo.currentText()
+            area = self.building_area.value()
+            stories = self.stories.value()
+            occupancy = self.occupancy_type.currentText()
+
+            # First design the system to get device counts
+            design_result = self.system_builder.design_system(
+                system_type=system_type,
+                building_area=area,
+                stories=stories,
+                occupancy_type=occupancy,
+            )
+
+            # Generate wire spool based on design
+            spool_result = self.system_builder.generate_wire_spool(design_result)
+
+            # Format results for display
+            spool_lines = []
+            for spool in spool_result["spools"]:
+                conductors = spool["conductors"]
+                conductor_text = f"{conductors} conductor" + ("s" if conductors > 1 else "")
+                shield_text = " + shield" if spool.get("shielded") else ""
+
+                spool_lines.append(
+                    f"""
+{spool['description']}
+   - Wire Size: {spool['wire_size']} AWG, {conductor_text}{shield_text}
+   - Length per Spool: {spool['spool_length']:.0f} ft
+   - Quantity: {spool['quantity']} spool{'s' if spool['quantity'] > 1 else ''}
+   - Total Length: {spool['total_length']:.0f} ft
+   - Cable Type: {spool['cable_type']} ({spool['rating']})
+   - Application: {spool['application']}"""
+                )
+
+            result = f"""🧵 Wire Spool Requirements - NFPA 70/72 Compliant
+
+System Type: {system_type}
+Total Cable Length: {spool_result['total_length']:.0f} ft
+
+{'='*50}
+REQUIRED CABLE SPOOL LIST
+{'='*50}
+
+{''.join(spool_lines)}
+
+{'='*50}
+CONDUIT & RACEWAY REQUIREMENTS
+{'='*50}
+
+{chr(10).join(f"- {conduit['size']} conduit: {conduit['length']:.0f} ft for {conduit['application']}"
+              for conduit in spool_result['conduit_requirements'])}
+
+{'='*50}
+INSTALLATION & TESTING REQUIREMENTS
+{'='*50}
+
+{chr(10).join(f"- {req}" for req in spool_result['installation_requirements'])}
+
+{'='*50}
+MATERIAL SPECIFICATIONS
+{'='*50}
+
+{chr(10).join(f"- {spec}" for spec in spool_result['material_specs'])}
+
+📋 Procurement Notes:
+- All cable must be UL Listed for fire alarm use
+- Order 10% extra length for each spool type
+- Verify conductor stranding meets installation requirements
+- Check local AHJ requirements for cable substitutions"""
+
+            self.results_text.setPlainText(result)
+
+        except Exception as e:
+            self.results_text.setPlainText(f"❌ Wire Spool Generation Error: {str(e)}")
+            _logger.error(f"Wire spool generation failed: {e}", exc_info=True)

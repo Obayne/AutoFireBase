@@ -39,6 +39,8 @@ def _load_app_main():
     available). If that fails, probe common locations (PyInstaller's _MEIPASS
     and build/exe directories) and load via importlib.util.
     """
+    # Ensure the parent directory is in sys.path for app imports
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
     try:
         return importlib.import_module("app.main")
     except Exception:
@@ -98,6 +100,15 @@ def resolve_create_window() -> Callable[[], QtWidgets.QWidget]:
 
 
 def main() -> None:
+    # Initialize tracing/monitoring before app starts
+    try:
+        from backend.tracing import init_tracing
+
+        init_tracing(service_name="AutoFire")
+    except Exception:
+        # Tracing is optional; continue without it
+        pass
+
     app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
     try:
         m = _load_app_main()

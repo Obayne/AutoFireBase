@@ -2,13 +2,14 @@ import json
 import os
 import sqlite3
 from pathlib import Path
+
 from db import coverage_tables
 
 # This loader contains long SQL schema strings and seed data; allow E501 here.
 # ruff: noqa: E501
 # noqa: E501
 
-DB_DEFAULT = os.path.join(os.path.expanduser("~"), "AutoFire", "catalog.db")
+DB_DEFAULT = os.path.join(os.path.expanduser("~"), "LV_CAD", "catalog.db")
 
 
 def connect(db_path: str | None = None):
@@ -160,15 +161,27 @@ def list_types(con: sqlite3.Connection):
     cur.execute("SELECT code FROM device_types ORDER BY code")
     return ["(Any)"] + [r["code"] for r in cur.fetchall()]
 
+
 def get_wall_strobe_candela(con: sqlite3.Connection, room_size: int) -> int | None:
     cur = con.cursor()
-    cur.execute(f"SELECT candela FROM {coverage_tables.WALL_STROBE_TABLE_NAME} WHERE room_size >= ? ORDER BY room_size ASC LIMIT 1", (room_size,))
+    cur.execute(
+        f"SELECT candela FROM {coverage_tables.WALL_STROBE_TABLE_NAME} WHERE room_size >= ? ORDER BY room_size ASC LIMIT 1",
+        (room_size,),
+    )
     r = cur.fetchone()
     return int(r["candela"]) if r else None
 
-def get_ceiling_strobe_candela(con: sqlite3.Connection, ceiling_height: int, room_size: int) -> int | None:
+
+def get_ceiling_strobe_candela(
+    con: sqlite3.Connection, ceiling_height: int, room_size: int
+) -> int | None:
     cur = con.cursor()
-    cur.execute(f"SELECT candela FROM {coverage_tables.CEILING_STROBE_TABLE_NAME} WHERE ceiling_height >= ? AND room_size >= ? ORDER BY ceiling_height ASC, room_size ASC LIMIT 1", (ceiling_height, room_size,))
+    cur.execute(
+        f"SELECT candela FROM {coverage_tables.CEILING_STROBE_TABLE_NAME} WHERE ceiling_height >= ? AND room_size >= ? ORDER BY ceiling_height ASC, room_size ASC LIMIT 1",
+        (
+            ceiling_height,
+            room_size,
+        ),
+    )
     r = cur.fetchone()
     return int(r["candela"]) if r else None
-

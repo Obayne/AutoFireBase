@@ -394,7 +394,7 @@ from app import units
 
 APP_VERSION = "0.5.0-cadA"
 APP_TITLE = f"Auto-Fire {APP_VERSION}"
-PREF_DIR = os.path.join(os.path.expanduser("~"), "AutoFire")
+PREF_DIR = os.path.join(os.path.expanduser("~"), "LV CAD")
 PREF_PATH = os.path.join(PREF_DIR, "preferences.json")
 LOG_DIR = os.path.join(PREF_DIR, "logs")
 
@@ -545,7 +545,7 @@ class MainWindow(QMainWindow):
         act_scale = QtGui.QAction("Set Pixels per Foot…", self); act_scale.triggered.connect(self.set_px_per_ft); m_view.addAction(act_scale)
 
         m_help = menubar.addMenu("&Help")
-        m_help.addAction("About AutoFire…", self.show_about)
+        m_help.addAction("About LV CAD…", self.show_about)
 
         tb = QToolBar("Main"); tb.setIconSize(QSize(16,16)); self.addToolBar(tb)
         tb.addAction(self.act_view_grid); tb.addAction(self.act_view_snap); tb.addAction(self.act_view_cross)
@@ -741,9 +741,9 @@ class MainWindow(QMainWindow):
         self.push_history(); self.statusBar().showMessage("New project")
 
     def save_project_as(self):
-        p,_=QFileDialog.getSaveFileName(self,"Save Project As","","AutoFire Bundle (*.autofire)")
+        p,_=QFileDialog.getSaveFileName(self,"Save Project As","","LV CAD Bundle (*.lvcad)")
         if not p: return
-        if not p.lower().endswith(".autofire"): p += ".autofire"
+        if not p.lower().endswith(".lvcad"): p += ".lvcad"
         try:
             data=self.serialize_state()
             with zipfile.ZipFile(p,"w",compression=zipfile.ZIP_DEFLATED) as z:
@@ -753,7 +753,7 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self,"Save Project Error", str(ex))
 
     def open_project(self):
-        p,_=QFileDialog.getOpenFileName(self,"Open Project","","AutoFire Bundle (*.autofire)")
+        p,_=QFileDialog.getOpenFileName(self,"Open Project","","LV CAD Bundle (*.lvcad)")
         if not p: return
         try:
             with zipfile.ZipFile(p,"r") as z:
@@ -772,7 +772,7 @@ class MainWindow(QMainWindow):
 
     def show_about(self):
         QtWidgets.QMessageBox.information(self,"About", f"Auto-Fire\\nVersion {APP_VERSION}")
-    
+
 def main():
     app = QApplication([])
     win = MainWindow(); win.show()
@@ -848,7 +848,7 @@ def main():
     logging.getLogger(__name__).info(
         "Done. Now run:  Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned"
     )
-    logging.getLogger(__name__).info("Then:           .\\Build_AutoFire.ps1")
+    logging.getLogger(__name__).info("Then:           .\\Build_LV_CAD.ps1")
 
 
 if __name__ == "__main__":

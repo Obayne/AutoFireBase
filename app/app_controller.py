@@ -1,19 +1,18 @@
 """
 App Controller - Central coordinator for multi-window AutoFire application
 """
+
 import json
 import os
 import sys
 import zipfile
-from pathlib import Path
-from typing import Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 # Allow running as `python app\main.py` by fixing sys.path for absolute `app.*` imports
 if __package__ in (None, ""):
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import QPointF, Qt
+from PySide6 import QtCore, QtGui
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -26,6 +25,7 @@ from app.logging_config import setup_logging
 if TYPE_CHECKING:
     from app.model_space_window import ModelSpaceWindow
     from app.paperspace_window import PaperspaceWindow
+
     # from app.summary_window import SummaryWindow  # Not yet implemented
 
 # Ensure logging is configured early
@@ -44,33 +44,162 @@ class AppController(QMainWindow):
     # Signals for inter-window communication
     model_space_changed = QtCore.Signal(dict)  # Emitted when model space content changes
     paperspace_changed = QtCore.Signal(dict)  # Emitted when paperspace content changes
-    project_changed = QtCore.Signal(str)      # Emitted when project state changes
+    project_changed = QtCore.Signal(str)  # Emitted when project state changes
 
     def __init__(self):
-        # Initialize Qt application first
-        self.app = QApplication.instance() or QApplication(sys.argv)
-        self.app.setApplicationName("AutoFire")
-        self.app.setApplicationVersion("0.6.0")
-
-        # Initialize as QMainWindow for boot.py compatibility
+        # Initialize as QMainWindow first (QApplication should already exist)
         super().__init__()
-        self.setWindowTitle("AutoFire Controller")
+
+        # Get the existing Qt application
+        self.app = QApplication.instance()
+
+        self.setWindowTitle("LV CAD Controller")
         # Hide this dummy window
         self.hide()
 
         # Initialize preferences
         self.prefs = self._load_prefs()
 
+    def _apply_modern_theme(self):
+        """Apply modern dark theme to the application."""
+        dark_theme = """
+        /* Modern Dark Theme for AutoFire */
+        QMainWindow {
+            background-color: #2b2b2b;
+            color: #ffffff;
+        }
+
+        QDockWidget {
+            background-color: #3a3a3a;
+            color: #ffffff;
+            border: 1px solid #555;
+            titlebar-close-icon: url(close.png);
+            titlebar-normal-icon: url(undock.png);
+        }
+
+        QDockWidget::title {
+            background-color: #4a4a4a;
+            color: #ffffff;
+            padding: 6px;
+            border-bottom: 1px solid #555;
+            font-weight: bold;
+        }
+
+        QTreeWidget, QListWidget, QTextEdit, QLineEdit {
+            background-color: #404040;
+            color: #ffffff;
+            border: 1px solid #666;
+            border-radius: 4px;
+            padding: 4px;
+        }
+
+        QTreeWidget::item:hover, QListWidget::item:hover {
+            background-color: #505050;
+        }
+
+        QTreeWidget::item:selected, QListWidget::item:selected {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+
+        QPushButton {
+            background-color: #0078d4;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+
+        QPushButton:hover {
+            background-color: #106ebe;
+        }
+
+        QPushButton:pressed {
+            background-color: #005a9e;
+        }
+
+        QPushButton:disabled {
+            background-color: #666;
+            color: #999;
+        }
+
+        QMenuBar {
+            background-color: #2b2b2b;
+            color: #ffffff;
+            border-bottom: 1px solid #555;
+        }
+
+        QMenuBar::item {
+            background-color: transparent;
+            padding: 6px 12px;
+        }
+
+        QMenuBar::item:selected {
+            background-color: #4a4a4a;
+        }
+
+        QMenu {
+            background-color: #3a3a3a;
+            color: #ffffff;
+            border: 1px solid #555;
+        }
+
+        QMenu::item {
+            padding: 6px 20px;
+        }
+
+        QMenu::item:selected {
+            background-color: #0078d4;
+        }
+
+        QStatusBar {
+            background-color: #2b2b2b;
+            color: #ffffff;
+            border-top: 1px solid #555;
+        }
+
+        QGraphicsView {
+            background-color: #1e1e1e;
+            border: 1px solid #555;
+        }
+
+        /* Scroll bars */
+        QScrollBar:vertical {
+            background-color: #404040;
+            width: 16px;
+            border-radius: 8px;
+        }
+
+        QScrollBar::handle:vertical {
+            background-color: #666;
+            border-radius: 8px;
+            min-height: 30px;
+        }
+
+        QScrollBar::handle:vertical:hover {
+            background-color: #888;
+        }
+
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+            background: none;
+        }
+        """
+        self.app.setStyleSheet(dark_theme)
+
+        # Load preferences
+        self.prefs = self._load_prefs()
+
         # Load device catalog
         self.devices_all = catalog.load_catalog()
 
         # Window management
-        self.model_space_window: Optional['ModelSpaceWindow'] = None
-        self.paperspace_window: Optional['PaperspaceWindow'] = None
-        self.summary_window: Optional[Any] = None  # SummaryWindow not yet implemented
+        self.model_space_window: ModelSpaceWindow | None = None
+        self.paperspace_window: PaperspaceWindow | None = None
+        self.summary_window: Any | None = None  # SummaryWindow not yet implemented
 
         # Application state
-        self.current_project_path: Optional[str] = None
+        self.current_project_path: str | None = None
         self.is_modified = False
 
         # Setup global menus first
@@ -78,6 +207,11 @@ class AppController(QMainWindow):
 
         # Show the actual application windows
         self._initialize_windows()
+
+    def show(self):
+        """Override show() to do nothing - this controller window should remain hidden."""
+        # The controller window is a dummy for boot.py compatibility and should not be shown
+        pass
 
     def _setup_global_menus(self):
         """Setup global menu actions that work across windows."""
@@ -145,11 +279,21 @@ class AppController(QMainWindow):
         # Arrange windows
         QtCore.QTimer.singleShot(100, self.arrange_windows)
 
+        # Ensure model space is visible and on top initially
+        QtCore.QTimer.singleShot(200, self._ensure_model_space_visible)
+
+    def _ensure_model_space_visible(self):
+        """Ensure the model space window is visible and activated."""
+        if self.model_space_window:
+            self.model_space_window.show()
+            self.model_space_window.raise_()
+            self.model_space_window.activateWindow()
+
     def _load_prefs(self):
         """Load user preferences."""
         prefs_path = os.path.join(os.path.expanduser("~"), "AutoFire", "prefs.json")
         try:
-            with open(prefs_path, 'r') as f:
+            with open(prefs_path) as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return self._get_default_prefs()
@@ -187,7 +331,7 @@ class AppController(QMainWindow):
         prefs_path = os.path.join(os.path.expanduser("~"), "AutoFire", "prefs.json")
         os.makedirs(os.path.dirname(prefs_path), exist_ok=True)
         try:
-            with open(prefs_path, 'w') as f:
+            with open(prefs_path, "w") as f:
                 json.dump(self.prefs, f, indent=2)
         except Exception as e:
             _logger.error(f"Failed to save preferences: {e}")
@@ -195,9 +339,19 @@ class AppController(QMainWindow):
     def show_model_space(self):
         """Show or create the model space window."""
         if self.model_space_window is None:
-            from app.model_space_window import ModelSpaceWindow
-            self.model_space_window = ModelSpaceWindow(self)
-            self.model_space_window.show()
+            try:
+                from app.model_space_window import ModelSpaceWindow
+
+                self.model_space_window = ModelSpaceWindow(self)
+                self.model_space_window.show()
+                self.model_space_window.raise_()
+                self.model_space_window.activateWindow()
+            except Exception as e:
+                print(f"Error creating model space window: {e}")
+                import traceback
+
+                traceback.print_exc()
+                return
         else:
             self.model_space_window.raise_()
             self.model_space_window.activateWindow()
@@ -206,10 +360,13 @@ class AppController(QMainWindow):
         """Show or create the paperspace window."""
         if self.paperspace_window is None:
             from app.paperspace_window import PaperspaceWindow
+
             # Pass the model space scene to paperspace
             model_scene = self.model_space_window.scene if self.model_space_window else None
             self.paperspace_window = PaperspaceWindow(self, model_scene)
             self.paperspace_window.show()
+            self.paperspace_window.raise_()
+            self.paperspace_window.activateWindow()
         else:
             self.paperspace_window.raise_()
             self.paperspace_window.activateWindow()
@@ -245,12 +402,7 @@ class AppController(QMainWindow):
             # Summary window overlay if enabled
             if self.summary_window:
                 # Position summary window on secondary monitor
-                summary_geom = QtCore.QRect(
-                    secondary.x() + 50,
-                    secondary.y() + 50,
-                    400,
-                    600
-                )
+                summary_geom = QtCore.QRect(secondary.x() + 50, secondary.y() + 50, 400, 600)
                 self.summary_window.setGeometry(summary_geom)
         else:
             # Single monitor - tile windows
@@ -261,18 +413,18 @@ class AppController(QMainWindow):
             # Model space - left half
             if self.model_space_window:
                 self.model_space_window.setGeometry(0, 0, width // 2, height)
+                self.model_space_window.show()
+                self.model_space_window.raise_()
 
             # Paperspace - right half, top
             if self.paperspace_window:
-                self.paperspace_window.setGeometry(
-                    width // 2, 0, width // 2, height // 2
-                )
+                self.paperspace_window.setGeometry(width // 2, 0, width // 2, height // 2)
+                self.paperspace_window.show()
 
             # Summary - right half, bottom
             if self.summary_window:
-                self.summary_window.setGeometry(
-                    width // 2, height // 2, width // 2, height // 2
-                )
+                self.summary_window.setGeometry(width // 2, height // 2, width // 2, height // 2)
+                self.summary_window.show()
 
     def new_project(self):
         """Create a new project."""
@@ -322,7 +474,9 @@ class AppController(QMainWindow):
 
         try:
             data = self.serialize_project_state()
-            with zipfile.ZipFile(self.current_project_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+            with zipfile.ZipFile(
+                self.current_project_path, "w", compression=zipfile.ZIP_DEFLATED
+            ) as z:
                 z.writestr("project.json", json.dumps(data, indent=2))
 
             self.is_modified = False
@@ -410,10 +564,14 @@ class AppController(QMainWindow):
         modified_indicator = " *" if self.is_modified else ""
 
         if self.model_space_window:
-            self.model_space_window.setWindowTitle(f"AutoFire - Model Space - {project_name}{modified_indicator}")
+            self.model_space_window.setWindowTitle(
+                f"AutoFire - Model Space - {project_name}{modified_indicator}"
+            )
 
         if self.paperspace_window:
-            self.paperspace_window.setWindowTitle(f"AutoFire - Paperspace - {project_name}{modified_indicator}")
+            self.paperspace_window.setWindowTitle(
+                f"AutoFire - Paperspace - {project_name}{modified_indicator}"
+            )
 
     def on_model_space_closed(self):
         """Handle model space window closure."""
@@ -434,7 +592,7 @@ class AppController(QMainWindow):
         change_data = {
             "type": change_type,
             "data": data or {},
-            "timestamp": QtCore.QDateTime.currentDateTime().toString()
+            "timestamp": QtCore.QDateTime.currentDateTime().toString(),
         }
         self.model_space_changed.emit(change_data)
 
@@ -443,7 +601,7 @@ class AppController(QMainWindow):
         change_data = {
             "type": change_type,
             "data": data or {},
-            "timestamp": QtCore.QDateTime.currentDateTime().toString()
+            "timestamp": QtCore.QDateTime.currentDateTime().toString(),
         }
         self.paperspace_changed.emit(change_data)
 
@@ -452,7 +610,7 @@ class AppController(QMainWindow):
         change_data = {
             "type": change_type,
             "data": data or {},
-            "timestamp": QtCore.QDateTime.currentDateTime().toString()
+            "timestamp": QtCore.QDateTime.currentDateTime().toString(),
         }
         self.project_changed.emit(change_data)
 
@@ -464,8 +622,20 @@ class AppController(QMainWindow):
 
 def main():
     """Main application entry point."""
+    # Ensure QApplication exists before creating any Qt widgets
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication(sys.argv)
+        app.setApplicationName("LV CAD")
+        app.setApplicationVersion("0.6.0")
+
     controller = AppController()
-    return controller.run()
+    controller._apply_modern_theme()
+
+    # Show the main window
+    controller.show()
+
+    return app.exec()
 
 
 if __name__ == "__main__":

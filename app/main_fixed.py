@@ -3361,7 +3361,7 @@ class MainWindow(QMainWindow):
 
     def open_project(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Open Project", "", "AutoFire Files (*.autofire);;All Files (*)"
+            self, "Open Project", "", "LV CAD Files (*.lvcad);;All Files (*)"
         )
         if not path:
             return
@@ -3376,7 +3376,7 @@ class MainWindow(QMainWindow):
 
     def save_project_as(self):
         path, _ = QFileDialog.getSaveFileName(
-            self, "Save Project", "", "AutoFire Files (*.autofire);;All Files (*)"
+            self, "Save Project", "", "LV CAD Files (*.lvcad);;All Files (*)"
         )
         if not path:
             return
@@ -3895,7 +3895,7 @@ def main():
     app = QApplication(sys.argv)
 
     # Set application information
-    app.setApplicationName("Auto-Fire")
+    app.setApplicationName("LV CAD")
     app.setApplicationVersion(APP_VERSION)
 
     # Create and show the main window

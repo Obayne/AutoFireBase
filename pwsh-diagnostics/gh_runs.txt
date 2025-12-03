@@ -1,0 +1,8 @@
+completed	failure	chore: fix CI workflow and harden tools against local token defaults	PR Labeler	chore/hardening/ci-and-tools	pull_request	18787939364	12s	2025-10-24T17:57:12Z
+completed	failure	chore: fix CI workflow and harden tools against local token defaults	gui-tests-fixed	chore/hardening/ci-and-tools	pull_request	18787939380	39s	2025-10-24T17:57:12Z
+completed	failure	chore: fix CI workflow and harden tools against local token defaults	gui-tests-quick	chore/hardening/ci-and-tools	pull_request	18787939396	35s	2025-10-24T17:57:12Z
+in_progress		chore: fix CI workflow and harden tools against local token defaults	CI	chore/hardening/ci-and-tools	pull_request	18787939378	2m11s	2025-10-24T17:57:12Z
+completed	failure	chore: fix CI workflow and harden tools against local token defaults	gui-tests-ubuntu24	chore/hardening/ci-and-tools	pull_request	18787939375	43s	2025-10-24T17:57:12Z
+completed	failure	chore: fix CI workflow and harden tools against local token defaults	quick-tests	chore/hardening/ci-and-tools	pull_request	18787939363	1m29s	2025-10-24T17:57:12Z
+completed	success	chore: fix CI workflow and harden tools against local token defaults	CI Agent	chore/hardening/ci-and-tools	pull_request	18787939389	1m17s	2025-10-24T17:57:12Z
+completed	failure	ci: add ldd diagnostics + widen apt candidates for ubuntu-24 GUI tests	.github/workflows/gui-tests.yml	chore/hardening/ci-and-tools	push	18787938725	0s	2025-10-24T17:57:10Z

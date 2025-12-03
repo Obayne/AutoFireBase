@@ -1,8 +1,7 @@
-﻿import json
+import json
 import math
 import os
 import sys
-import zipfile
 
 # Many UI style blocks and template strings in this file intentionally exceed
 # the project's line-length setting. To reduce noisy E501 (line too long)
@@ -16,7 +15,6 @@ if __package__ in (None, ""):
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtWidgets import (
-    QApplication,
     QCheckBox,
     QComboBox,
     QDockWidget,
@@ -41,7 +39,7 @@ from app import catalog, dxf_import
 from app.logging_config import setup_logging
 
 # Grid scene and defaults used by the main window
-from app.scene import GridScene, DEFAULT_GRID_SIZE
+from app.scene import DEFAULT_GRID_SIZE, GridScene
 
 # Ensure logging is configured early so module-level loggers emit during
 # headless simulators and when the app starts from __main__.
@@ -54,14 +52,13 @@ from app.tools.chamfer_tool import ChamferTool
 from app.tools.extend_tool import ExtendTool
 
 _logger = logging.getLogger(__name__)
+from app.layout import PageFrame, TitleBlock, ViewportItem
 from app.tools.fillet_radius_tool import FilletRadiusTool
 from app.tools.fillet_tool import FilletTool
 from app.tools.freehand import FreehandTool
 from app.tools.leader import LeaderTool
 from app.tools.measure_tool import MeasureTool
 from app.tools.mirror_tool import MirrorTool
-from app.tools.text_tool import MTextTool, TextTool
-from app.layout import PageFrame, TitleBlock, ViewportItem
 from app.tools.move_tool import MoveTool
 from app.tools.revision_cloud import RevisionCloudTool
 from app.tools.rotate_tool import RotateTool
@@ -71,6 +68,7 @@ from app.tools.scale_underlay import (
     ScaleUnderlayRefTool,
     scale_underlay_by_factor,
 )
+from app.tools.text_tool import MTextTool, TextTool
 from app.tools.trim_tool import TrimTool
 
 try:
@@ -188,8 +186,8 @@ except Exception:
 
 
 APP_VERSION = "0.6.8-cad-base"
-APP_TITLE = f"Auto-Fire {APP_VERSION}"
-PREF_DIR = os.path.join(os.path.expanduser("~"), "AutoFire")
+APP_TITLE = f"LV CAD (Layer Vision) {APP_VERSION}"
+PREF_DIR = os.path.join(os.path.expanduser("~"), "LV_CAD")
 PREF_PATH = os.path.join(PREF_DIR, "preferences.json")
 LOG_DIR = os.path.join(PREF_DIR, "logs")
 
@@ -514,7 +512,7 @@ class CanvasView(QGraphicsView):
         except Exception:
             pass
         self.win.statusBar().showMessage(
-            f"x={dx_ft:.2f} ft   y={dy_ft:.2f} ft   scale={self.win.px_per_ft:.2f} px/ft  snap={self.win.snap_label}{draw_info}"
+            f"x={dx_ft:.2f} ft   y={dy_ft:.2f} ft   scale={self.win.px_per_ft:.2f} px/ft  snap={getattr(self.win, 'snap_label', getattr(self.win, 'sheet_label', ''))}{draw_info}"
         )
 
     def wheelEvent(self, e: QtGui.QWheelEvent):
@@ -974,6 +972,7 @@ class MainWindow(QMainWindow):
 
         # Initialize global database connection for coverage calculations
         from db import connection
+
         connection.initialize_database(in_memory=True)
 
         # Theme
@@ -1138,148 +1137,13 @@ class MainWindow(QMainWindow):
         self.fillet_radius_tool = FilletRadiusTool(self, self.layer_sketch)
 
         # Menus
-        menubar = self.menuBar()
-        m_file = menubar.addMenu("&File")
-        m_file.addAction("New", self.new_project, QtGui.QKeySequence.New)
-        m_file.addAction("Openâ€¦", self.open_project, QtGui.QKeySequence.Open)
-        m_file.addAction("Save Asâ€¦", self.save_project_as, QtGui.QKeySequence.SaveAs)
-        m_file.addSeparator()
-        imp = m_file.addMenu("Import")
-        imp.addAction("DXF Underlayâ€¦", self.import_dxf_underlay)
-        imp.addAction("PDF Underlayâ€¦", self.import_pdf_underlay)
-        exp = m_file.addMenu("Export")
-        exp.addAction("PNGâ€¦", self.export_png)
-        exp.addAction("PDFâ€¦", self.export_pdf)
-        exp.addAction("Device Schedule (CSV)â€¦", self.export_device_schedule_csv)
-        exp.addAction("Place Symbol Legend", self.place_symbol_legend)
-        # Settings submenu (moved under File)
-        m_settings = m_file.addMenu("Settings")
-        theme = m_settings.addMenu("Theme")
-        theme.addAction("Dark", lambda: self.set_theme("dark"))
-        theme.addAction("Light", lambda: self.set_theme("light"))
-        theme.addAction("High Contrast (Dark)", lambda: self.set_theme("high_contrast"))
-        m_file.addSeparator()
-        m_file.addAction("Quit", self.close, QtGui.QKeySequence.Quit)
+        from app.event_handlers import setup_event_handlers
+        from app.ui_setup import setup_menus, setup_toolbar
 
-        # Edit menu
-        m_edit = menubar.addMenu("&Edit")
-        act_undo = QtGui.QAction("Undo", self)
-        act_undo.setShortcut(QtGui.QKeySequence.Undo)
-        act_undo.triggered.connect(self.undo)
-        m_edit.addAction(act_undo)
-        act_redo = QtGui.QAction("Redo", self)
-        act_redo.setShortcut(QtGui.QKeySequence.Redo)
-        act_redo.triggered.connect(self.redo)
-        m_edit.addAction(act_redo)
-        m_edit.addSeparator()
-        act_del = QtGui.QAction("Delete", self)
-        act_del.setShortcut(Qt.Key_Delete)
-        act_del.triggered.connect(self.delete_selection)
-        m_edit.addAction(act_del)
+        setup_event_handlers(self)
+        setup_menus(self)
+        setup_toolbar(self)
 
-        m_tools = menubar.addMenu("&Tools")
-
-        def add_tool(name, cb):
-            act = QtGui.QAction(name, self)
-            act.triggered.connect(cb)
-            m_tools.addAction(act)
-            return act
-
-        self.act_draw_line = add_tool(
-            "Draw Line",
-            lambda: (
-                setattr(self.draw, "layer", self.layer_sketch),
-                self.draw.set_mode(draw_tools.DrawMode.LINE),
-            ),
-        )
-        self.act_draw_rect = add_tool(
-            "Draw Rect",
-            lambda: (
-                setattr(self.draw, "layer", self.layer_sketch),
-                self.draw.set_mode(draw_tools.DrawMode.RECT),
-            ),
-        )
-        self.act_draw_circle = add_tool(
-            "Draw Circle",
-            lambda: (
-                setattr(self.draw, "layer", self.layer_sketch),
-                self.draw.set_mode(draw_tools.DrawMode.CIRCLE),
-            ),
-        )
-        self.act_draw_poly = add_tool(
-            "Draw Polyline",
-            lambda: (
-                setattr(self.draw, "layer", self.layer_sketch),
-                self.draw.set_mode(draw_tools.DrawMode.POLYLINE),
-            ),
-        )
-        self.act_draw_arc3 = add_tool(
-            "Draw Arc (3-Point)",
-            lambda: (
-                setattr(self.draw, "layer", self.layer_sketch),
-                self.draw.set_mode(draw_tools.DrawMode.ARC3),
-            ),
-        )
-        self.act_draw_wire = add_tool("Draw Wire", lambda: self._set_wire_mode())
-        self.act_text = add_tool("Text", self.start_text)
-        self.act_mtext = add_tool("MText", self.start_mtext)
-        self.act_freehand = add_tool("Freehand", self.start_freehand)
-        self.act_leader = add_tool("Leader", self.start_leader)
-        self.act_cloud = add_tool("Revision Cloud", self.start_cloud)
-        m_tools.addSeparator()
-        m_tools.addAction("Dimension (D)", self.start_dimension)
-        m_tools.addAction("Measure (M)", self.start_measure)
-
-        # (Settings moved under File)
-
-        # Layout / Paper Space
-        m_layout = menubar.addMenu("&Layout")
-        m_layout.addAction("Add Page Frameâ€¦", self.add_page_frame)
-        m_layout.addAction("Remove Page Frame", self.remove_page_frame)
-        m_layout.addAction("Add/Update Title Blockâ€¦", self.add_or_update_title_block)
-        m_layout.addAction("Page Setupâ€¦", self.page_setup_dialog)
-        m_layout.addAction("Add Viewport", self.add_viewport)
-        m_layout.addSeparator()
-        m_layout.addAction("Switch to Paper Space", lambda: self.toggle_paper_space(True))
-        m_layout.addAction("Switch to Model Space", lambda: self.toggle_paper_space(False))
-        scale_menu = m_layout.addMenu("Print Scale")
-
-        def add_scale(label, inches_per_ft):
-            act = QtGui.QAction(label, self)
-            act.triggered.connect(lambda v=inches_per_ft: self.set_print_scale(v))
-            scale_menu.addAction(act)
-
-        for lbl, v in [
-            ("1/16\" = 1'", 1.0 / 16.0),
-            ("3/32\" = 1'", 3.0 / 32.0),
-            ("1/8\" = 1'", 1.0 / 8.0),
-            ("3/16\" = 1'", 3.0 / 16.0),
-            ("1/4\" = 1'", 0.25),
-            ("3/8\" = 1'", 0.375),
-            ("1/2\" = 1'", 0.5),
-            ("1\" = 1'", 1.0),
-        ]:
-            add_scale(lbl, v)
-        scale_menu.addAction("Customâ€¦", self.set_print_scale_custom)
-        # Status bar: left space selector/lock; right badges
-        self.space_combo = QtWidgets.QComboBox()
-        self.space_combo.addItems(["Model", "Paper"])
-        self.space_combo.setCurrentIndex(0)
-        self.space_lock = QtWidgets.QToolButton()
-        self.space_lock.setCheckable(True)
-        self.space_lock.setText("Lock")
-        self.statusBar().addWidget(QtWidgets.QLabel("Space:"))
-        self.statusBar().addWidget(self.space_combo)
-        self.statusBar().addWidget(self.space_lock)
-        self.space_combo.currentIndexChanged.connect(self._on_space_combo_changed)
-        # Right badges
-        self.scale_badge = QtWidgets.QLabel("")
-        self.scale_badge.setStyleSheet("QLabel { color: #c0c0c0; }")
-        self.statusBar().addPermanentWidget(self.scale_badge)
-        self.space_badge = QtWidgets.QLabel("MODEL SPACE")
-        self.space_badge.setStyleSheet("QLabel { color: #7dcfff; font-weight: bold; }")
-        self.statusBar().addPermanentWidget(self.space_badge)
-        self._init_sheet_manager()
     def _on_space_combo_changed(self, idx: int):
         if self.space_lock.isChecked():
             # Revert change if locked
@@ -1294,192 +1158,6 @@ class MainWindow(QMainWindow):
         # not every time the user switches the space. Avoid referencing local
         # variables here which may not be in scope.
         self.toggle_paper_space(idx == 1)
-
-        # Modify menu
-        m_modify = menubar.addMenu("&Modify")
-        m_modify.addAction("Offset Selectedâ€¦", self.offset_selected_dialog)
-        m_modify.addAction("Trim Lines", self.start_trim)
-        m_modify.addAction("Finish Trim", self.finish_trim)
-        m_modify.addAction("Extend Lines", self.start_extend)
-        m_modify.addAction("Fillet (Corner)", self.start_fillet)
-        m_modify.addAction("Fillet (Radius)â€¦", self.start_fillet_radius)
-        m_modify.addAction("Move", self.start_move)
-        m_modify.addAction("Copy", self.start_copy)
-        m_modify.addAction("Rotate", self.start_rotate)
-        m_modify.addAction("Mirror", self.start_mirror)
-        m_modify.addAction("Scale", self.start_scale)
-        m_modify.addAction("Chamferâ€¦", self.start_chamfer)
-
-        # Help menu
-        m_help = menubar.addMenu("&Help")
-        m_help.addAction("User Guide", self.show_user_guide)
-        m_help.addAction("Keyboard Shortcuts", self.show_shortcuts)
-        m_help.addSeparator()
-        m_help.addAction("About Auto-Fire", self.show_about)
-
-        m_view = menubar.addMenu("&View")
-        self.act_view_grid = QtGui.QAction("Grid", self, checkable=True)
-        self.act_view_grid.setChecked(True)
-        self.act_view_grid.toggled.connect(self.toggle_grid)
-        m_view.addAction(self.act_view_grid)
-        self.act_view_snap = QtGui.QAction("Snap", self, checkable=True)
-        self.act_view_snap.setChecked(self.scene.snap_enabled)
-        self.act_view_snap.toggled.connect(self.toggle_snap)
-        m_view.addAction(self.act_view_snap)
-        self.act_view_cross = QtGui.QAction("Crosshair (X)", self, checkable=True)
-        self.act_view_cross.setChecked(True)
-        self.act_view_cross.toggled.connect(self.toggle_crosshair)
-        m_view.addAction(self.act_view_cross)
-        self.act_paperspace = QtGui.QAction("Paper Space Mode", self, checkable=True)
-        self.act_paperspace.setChecked(False)
-        self.act_paperspace.toggled.connect(self.toggle_paper_space)
-        m_view.addAction(self.act_paperspace)
-        self.show_coverage = bool(self.prefs.get("show_coverage", True))
-        self.act_view_cov = QtGui.QAction("Show Device Coverage", self, checkable=True)
-        self.act_view_cov.setChecked(self.show_coverage)
-        self.act_view_cov.toggled.connect(self.toggle_coverage)
-        m_view.addAction(self.act_view_cov)
-        self.act_view_place_cov = QtGui.QAction(
-            "Show Coverage During Placement", self, checkable=True
-        )
-        self.act_view_place_cov.setChecked(bool(self.prefs.get("show_placement_coverage", True)))
-        self.act_view_place_cov.toggled.connect(self.toggle_placement_coverage)
-        m_view.addAction(self.act_view_place_cov)
-        m_view.addSeparator()
-        act_scale = QtGui.QAction("Set Pixels per Footâ€¦", self)
-        act_scale.triggered.connect(self.set_px_per_ft)
-        m_view.addAction(act_scale)
-        act_gridstyle = QtGui.QAction("Grid Styleâ€¦", self)
-        act_gridstyle.triggered.connect(self.grid_style_dialog)
-        m_view.addAction(act_gridstyle)
-        # Quick snap step presets (guardrail: snap to fixed inch steps or grid)
-        snap_menu = m_view.addMenu("Snap Step")
-
-        def add_snap(label, inches):
-            act = QtGui.QAction(label, self)
-            act.triggered.connect(lambda v=inches: self.set_snap_inches(v))
-            snap_menu.addAction(act)
-
-        add_snap("Grid (default)", 0.0)
-        add_snap("3 inches", 3.0)
-        add_snap("6 inches", 6.0)
-        add_snap("12 inches", 12.0)
-        add_snap("24 inches", 24.0)
-
-        # Object Snaps (OSNAP) toggles in View menu
-        m_view.addSeparator()
-        m_osnap = m_view.addMenu("Object Snaps")
-        self.act_os_end = QtGui.QAction("Endpoint", self, checkable=True)
-        self.act_os_mid = QtGui.QAction("Midpoint", self, checkable=True)
-        self.act_os_cen = QtGui.QAction("Center", self, checkable=True)
-        self.act_os_int = QtGui.QAction("Intersection", self, checkable=True)
-        self.act_os_perp = QtGui.QAction("Perpendicular", self, checkable=True)
-        self.act_os_end.setChecked(bool(self.prefs.get("osnap_end", True)))
-        self.act_os_mid.setChecked(bool(self.prefs.get("osnap_mid", True)))
-        self.act_os_cen.setChecked(bool(self.prefs.get("osnap_center", True)))
-        self.act_os_int.setChecked(bool(self.prefs.get("osnap_intersect", True)))
-        self.act_os_perp.setChecked(bool(self.prefs.get("osnap_perp", False)))
-        self.act_os_end.toggled.connect(lambda v: self._set_osnap("end", v))
-        self.act_os_mid.toggled.connect(lambda v: self._set_osnap("mid", v))
-        self.act_os_cen.toggled.connect(lambda v: self._set_osnap("center", v))
-        self.act_os_int.toggled.connect(lambda v: self._set_osnap("intersect", v))
-        self.act_os_perp.toggled.connect(lambda v: self._set_osnap("perp", v))
-        m_osnap.addAction(self.act_os_end)
-        m_osnap.addAction(self.act_os_mid)
-        m_osnap.addAction(self.act_os_cen)
-        m_osnap.addAction(self.act_os_int)
-        m_osnap.addAction(self.act_os_perp)
-        # apply initial states to view
-        self._set_osnap("end", self.act_os_end.isChecked())
-        self._set_osnap("mid", self.act_os_mid.isChecked())
-        self._set_osnap("center", self.act_os_cen.isChecked())
-        self._set_osnap("intersect", self.act_os_int.isChecked())
-        self._set_osnap("perp", self.act_os_perp.isChecked())
-
-        # No toolbars for base feel; reserve top bar for AutoFire items later
-
-        # Status bar Grid controls
-        sb = self.statusBar()
-        wrap = QWidget()
-        lay = QHBoxLayout(wrap)
-        lay.setContentsMargins(6, 0, 6, 0)
-        lay.setSpacing(10)
-        # Grid opacity control
-        lay.addWidget(QLabel("Grid"))
-        self.slider_grid = QtWidgets.QSlider(Qt.Horizontal)
-        self.slider_grid.setMinimum(10)
-        self.slider_grid.setMaximum(100)
-        self.slider_grid.setFixedWidth(110)
-        cur_op = float(self.prefs.get("grid_opacity", 0.25))
-        self.slider_grid.setValue(int(max(10, min(100, round(cur_op * 100)))))
-        self.lbl_gridp = QLabel(f"{int(self.slider_grid.value())}%")
-        lay.addWidget(self.slider_grid)
-        lay.addWidget(self.lbl_gridp)
-        # Grid size control
-        lay.addWidget(QLabel("Size"))
-        self.spin_grid_status = QSpinBox()
-        self.spin_grid_status.setRange(2, 500)
-        self.spin_grid_status.setValue(self.scene.grid_size)
-        self.spin_grid_status.setFixedWidth(70)
-        lay.addWidget(self.spin_grid_status)
-        sb.addPermanentWidget(wrap)
-
-        def _apply_grid_op(val: int):
-            op = max(0.10, min(1.00, val / 100.0))
-            self.scene.set_grid_style(opacity=op)
-            self.prefs["grid_opacity"] = op
-            save_prefs(self.prefs)
-            self.lbl_gridp.setText(f"{int(val)}%")
-
-        self.slider_grid.valueChanged.connect(_apply_grid_op)
-        self.spin_grid_status.valueChanged.connect(self.change_grid_size)
-
-        # Command bar
-        cmd_wrap = QWidget()
-        cmd_l = QHBoxLayout(cmd_wrap)
-        cmd_l.setContentsMargins(6, 0, 6, 0)
-        cmd_l.setSpacing(6)
-        cmd_l.addWidget(QLabel("Cmd:"))
-        self.cmd = QLineEdit()
-        self.cmd.setPlaceholderText("Type command (e.g., L, RECT, MOVE)â€¦")
-        self.cmd.returnPressed.connect(self._run_command)
-        cmd_l.addWidget(self.cmd)
-        sb.addPermanentWidget(cmd_wrap, 1)
-
-        # Toolbars removed: keeping top bar clean for AutoFire-specific UI later
-
-        # Left panel (device palette)
-        self._build_left_panel()
-
-        # Right dock: Layers & Properties
-        self._build_layers_and_props_dock()
-        # DXF Layers dock
-        self._dxf_layers = {}
-        self._build_dxf_layers_dock()
-
-        # Shortcuts
-        QtGui.QShortcut(QtGui.QKeySequence("D"), self, activated=self.start_dimension)
-        QtGui.QShortcut(QtGui.QKeySequence("Esc"), self, activated=self.cancel_active_tool)
-        QtGui.QShortcut(QtGui.QKeySequence("F2"), self, activated=self.fit_view_to_content)
-
-        # Selection change â†’ update Properties
-        self.scene.selectionChanged.connect(self._on_selection_changed)
-
-        # Initialize history structures before any tool or placement may push state.
-        self.history = []
-        self.history_index = -1
-        # Push initial state
-        try:
-            self.push_history()
-        except Exception:
-            # If push_history depends on other init steps not yet complete,
-            # leave the empty history in place; callers will handle gracefully.
-            pass
-        # Fit view after UI ready
-        try:
-            QtCore.QTimer.singleShot(0, self.fit_view_to_content)
-        except Exception:
-            pass
 
     # ---------- Theme ----------
     def apply_dark_theme(self):
@@ -2153,6 +1831,7 @@ class MainWindow(QMainWindow):
         # subset of the QTreeWidget API used by headless simulators.
         if getattr(self, "device_tree", None) is None:
             try:
+
                 class SimpleTreeItem:
                     def __init__(self, text):
                         self._text = text
@@ -2800,6 +2479,7 @@ class MainWindow(QMainWindow):
                 "color": color_hex,
                 "orig_color": grp.data(2002),
             }
+
         # sketch geometry
         def _line_json(it: QtWidgets.QGraphicsLineItem):
             l = it.line()
@@ -3163,53 +2843,9 @@ class MainWindow(QMainWindow):
             for it in layer.childItems():
                 apply(it, it.isSelected())
 
-    def new_project(self):
-        self.clear_underlay()
-        for it in list(self.layer_devices.childItems()):
-            it.scene().removeItem(it)
-        for it in list(self.layer_wires.childItems()):
-            it.scene().removeItem(it)
-        self.push_history()
-        self.statusBar().showMessage("New project")
-
-    def save_project_as(self):
-        p, _ = QFileDialog.getSaveFileName(
-            self, "Save Project As", "", "AutoFire Bundle (*.autofire)"
-        )
-        if not p:
-            return
-        if not p.lower().endswith(".autofire"):
-            p += ".autofire"
-        try:
-            data = self.serialize_state()
-            with zipfile.ZipFile(p, "w", compression=zipfile.ZIP_DEFLATED) as z:
-                z.writestr("project.json", json.dumps(data, indent=2))
-            self.statusBar().showMessage(f"Saved: {os.path.basename(p)}")
-        except Exception as ex:
-            QMessageBox.critical(self, "Save Project Error", str(ex))
-
-    def open_project(self):
-        p, _ = QFileDialog.getOpenFileName(self, "Open Project", "", "AutoFire Bundle (*.autofire)")
-        if not p:
-            return
-        try:
-            with zipfile.ZipFile(p, "r") as z:
-                data = json.loads(z.read("project.json").decode("utf-8"))
-            self.load_state(data)
-            self.push_history()
-            self.statusBar().showMessage(f"Opened: {os.path.basename(p)}")
-        except Exception as ex:
-            QMessageBox.critical(self, "Open Project Error", str(ex))
-
     def change_grid_size(self, v: int):
         self.scene.grid_size = max(2, int(v))
         self.scene.update()
-
-    def start_dimension(self):
-        try:
-            self.dim_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Dimension Tool Error", str(ex))
 
     def fit_view_to_content(self):
         rect = self.scene.itemsBoundingRect().adjusted(-100, -100, 100, 100)
@@ -3294,40 +2930,10 @@ class MainWindow(QMainWindow):
         self.push_history()
 
     # ---------- text / wire ----------
-    def start_text(self):
-        try:
-            self.text_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Text Tool Error", str(ex))
-
     def _set_wire_mode(self):
         # temporarily direct draw controller to wires layer for wire mode
         self.draw.layer = self.layer_wires
         self.draw.set_mode(draw_tools.DrawMode.WIRE)
-
-    def start_mtext(self):
-        try:
-            self.mtext_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "MText Tool Error", str(ex))
-
-    def start_freehand(self):
-        try:
-            self.freehand_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Freehand Tool Error", str(ex))
-
-    def start_leader(self):
-        try:
-            self.leader_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Leader Tool Error", str(ex))
-
-    def start_cloud(self):
-        try:
-            self.cloud_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Revision Cloud Error", str(ex))
 
     # ---------- underlay scaling ----------
     def start_underlay_scale_ref(self):
@@ -3399,12 +3005,6 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Underlay transform reset")
         except Exception as ex:
             QMessageBox.critical(self, "Reset Underlay Error", str(ex))
-
-    def start_measure(self):
-        try:
-            self.measure_tool.start()
-        except Exception as ex:
-            QMessageBox.critical(self, "Measure Tool Error", str(ex))
 
     # ---------- modify: trim ----------
     def start_trim(self):
@@ -4317,14 +3917,33 @@ Keyboard Shortcuts
 â€¢ F2 Fit View
 """
 
+
 # factory for boot.py
 def create_window():
+    import sys
+
+    # Ensure QApplication exists before any Qt imports
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication(sys.argv)
+        app.setApplicationName("LV CAD")
+        app.setApplicationVersion("0.6.0")
+
     from app.app_controller import AppController
-    return AppController()
+
+    controller = AppController()
+
+    # Apply modern dark theme
+    controller._apply_modern_theme()
+
+    return controller
 
 
 def main():
     from app.app_controller import main as app_main
+
     return app_main()
 
 
