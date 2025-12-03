@@ -17,6 +17,7 @@ class AssistantDock(QtWidgets.QDockWidget):
         super().__init__("AI Assistant", parent)
         self.setObjectName("AssistantDock")
         self.parent_window = parent
+        self.plan_set_files = []  # Track loaded plan set files
         w = QtWidgets.QWidget()
         self.setWidget(w)
         lay = QtWidgets.QVBoxLayout(w)
@@ -46,6 +47,16 @@ class AssistantDock(QtWidgets.QDockWidget):
         quick_row.addWidget(self.btn_submittals)
         lay.addLayout(quick_row)
 
+        # Plan set analysis buttons
+        planset_row = QtWidgets.QHBoxLayout()
+        self.btn_load_planset = QtWidgets.QPushButton("Load Plan Set")
+        self.btn_analyze_planset = QtWidgets.QPushButton("Analyze Plan Set")
+        self.btn_clear_planset = QtWidgets.QPushButton("Clear Plan Set")
+        planset_row.addWidget(self.btn_load_planset)
+        planset_row.addWidget(self.btn_analyze_planset)
+        planset_row.addWidget(self.btn_clear_planset)
+        lay.addLayout(planset_row)
+
         # Log/output
         self.log = QtWidgets.QTextEdit()
         self.log.setReadOnly(True)
@@ -59,6 +70,9 @@ class AssistantDock(QtWidgets.QDockWidget):
         self.btn_spacing.clicked.connect(self._on_spacing_check)
         self.btn_code.clicked.connect(self._on_code_compliance)
         self.btn_submittals.clicked.connect(self._on_submittals_guide)
+        self.btn_load_planset.clicked.connect(self._on_load_plan_set)
+        self.btn_analyze_planset.clicked.connect(self._on_analyze_plan_set)
+        self.btn_clear_planset.clicked.connect(self._on_clear_plan_set)
         self.input.returnPressed.connect(self._on_analyze)
 
         # Initialize AI client
@@ -397,3 +411,128 @@ NFPA 72 Requirements:
 ⚠️ Manual review recommended for full compliance
 • Occupancy type analysis needed
 • Special hazard considerations required"""
+
+    def _on_load_plan_set(self):
+        """Load multiple DXF files as a plan set for analysis."""
+        from PySide6.QtWidgets import QFileDialog
+
+        files, _ = QFileDialog.getOpenFileNames(
+            self, "Load Plan Set (Multiple DXF Files)", "", "DXF Files (*.dxf)"
+        )
+
+        if files:
+            self.plan_set_files = files
+            self.log.append(f"<b>Plan Set Loaded:</b> {len(files)} file(s)")
+            for f in files:
+                self.log.append(f"   • {os.path.basename(f)}")
+            self.log.append("Use 'Analyze Plan Set' to view combined analysis")
+
+    def _on_analyze_plan_set(self):
+        """Analyze the loaded plan set using multi-file analyzer."""
+        if not self.plan_set_files:
+            self.log.append("⚠️ No plan set loaded. Use 'Load Plan Set' first.")
+            return
+
+        self.log.append(f"<b>Analyzing Plan Set:</b> {len(self.plan_set_files)} sheets...")
+
+        try:
+            from app.plan_set_analyzer import PlanSetAnalyzer
+
+            analyzer = PlanSetAnalyzer()
+            analysis = analyzer.analyze_plan_set(self.plan_set_files)
+            report = analyzer.format_analysis_report(analysis)
+
+            self.log.append(report)
+
+            # Also provide AI-powered insights if available
+            if self.ai_client:
+                ai_prompt = f"""
+You are a fire protection system design expert. Analyze this plan set summary:
+
+{report}
+
+Provide professional insights including:
+1. Overall system coverage assessment
+2. Potential code compliance issues
+3. Recommendations for improvements
+4. Notable patterns in layer usage
+5. Coordination concerns across sheets
+
+Format as a professional analysis report.
+"""
+                ai_response = self._call_ai(ai_prompt)
+                self.log.append(f"\n<b>AI Analysis:</b>\n{ai_response}")
+
+        except Exception as e:
+            self.log.append(f"❌ Error analyzing plan set: {e}")
+
+    def _on_clear_plan_set(self):
+        """Clear the loaded plan set."""
+        if self.plan_set_files:
+            count = len(self.plan_set_files)
+            self.plan_set_files = []
+            self.log.append(f"✓ Plan set cleared ({count} file(s) removed)")
+        else:
+            self.log.append("No plan set loaded")
+
+    def load_plan_set(self, file_paths: list[str]):
+        """Load a plan set programmatically (for testing)."""
+        self.plan_set_files = file_paths
+        self.log.append(f"Plan set loaded: {len(file_paths)} file(s)")
+
+    def _get_plan_set_context(self) -> dict:
+        """Get context from loaded plan set for AI analysis."""
+        if not self.plan_set_files:
+            return {}
+
+        try:
+            from app.plan_set_analyzer import analyze_layers_batch
+
+            batch_analysis = analyze_layers_batch(self.plan_set_files)
+            return {
+                "sheet_count": batch_analysis["sheet_count"],
+                "total_devices": batch_analysis["devices_detected"],
+                "total_layers": batch_analysis["total_layers"],
+                "all_layers": list(batch_analysis["layer_summary"].keys()),
+                "fire_protection_layers": batch_analysis["fire_protection_layers"],
+            }
+        except Exception as e:
+            return {"error": str(e)}
+
+    def analyze_plan_set(self, file_paths: list[str], query: str) -> str:
+        """
+        Analyze a plan set with a specific query (for testing/API use).
+
+        Args:
+            file_paths: List of DXF file paths
+            query: Analysis query
+
+        Returns:
+            Analysis result text
+        """
+        self.plan_set_files = file_paths
+
+        try:
+            from app.plan_set_analyzer import PlanSetAnalyzer
+
+            analyzer = PlanSetAnalyzer()
+            analysis = analyzer.analyze_plan_set(file_paths)
+            report = analyzer.format_analysis_report(analysis)
+
+            result = f"{report}\n\nQuery: {query}\n"
+
+            if self.ai_client:
+                ai_prompt = f"""
+{report}
+
+User Query: {query}
+
+Provide a detailed answer based on the plan set analysis above.
+"""
+                ai_response = self._call_ai(ai_prompt)
+                result += f"\nAI Response:\n{ai_response}"
+
+            return result
+
+        except Exception as e:
+            return f"Error analyzing plan set: {e}"

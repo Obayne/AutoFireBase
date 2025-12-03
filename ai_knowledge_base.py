@@ -8,7 +8,7 @@ for fire protection and low voltage design systems.
 """
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -653,20 +653,184 @@ class AIKnowledgeBase:
 
         return guidance.get(system_type, {"error": f"No guidance available for {system_type}"})
 
+    def infer_occupancy_from_description(self, building_description: str) -> dict[str, Any]:
+        """
+        Infer occupancy classification from building description.
+
+        Uses pattern matching and contextual clues to make reasonable assumptions
+        about occupancy types when not explicitly stated.
+
+        Args:
+            building_description: Description of the building (e.g., "church", "office building")
+
+        Returns:
+            Dict with inferred occupancy information and confidence level
+        """
+        description_lower = building_description.lower()
+
+        # Building type to occupancy mapping with confidence levels
+        inference_rules = {
+            # High confidence mappings (direct matches)
+            "church": {"occupancy": "A-3", "confidence": 0.95, "reason": "Churches are classified as A-3 Assembly per NFPA 101"},
+            "school": {"occupancy": "E", "confidence": 0.95, "reason": "Educational facilities are E occupancy"},
+            "hospital": {"occupancy": "H-1", "confidence": 0.95, "reason": "Hospitals are H-1 Healthcare occupancy"},
+            "hotel": {"occupancy": "R-1", "confidence": 0.95, "reason": "Hotels/motels are R-1 Residential"},
+            "apartment": {"occupancy": "R-2", "confidence": 0.95, "reason": "Apartments are R-2 Residential"},
+            "office": {"occupancy": "B", "confidence": 0.90, "reason": "Office buildings are typically B Business occupancy"},
+            "restaurant": {"occupancy": "A-2", "confidence": 0.90, "reason": "Restaurants are A-2 Assembly occupancy"},
+            "store": {"occupancy": "M", "confidence": 0.90, "reason": "Retail stores are M Mercantile occupancy"},
+            "warehouse": {"occupancy": "S-1", "confidence": 0.85, "reason": "Warehouses are typically S-1 Storage"},
+            "factory": {"occupancy": "F-1", "confidence": 0.85, "reason": "Manufacturing facilities are F Factory occupancy"},
+
+            # Medium confidence patterns
+            "worship": {"occupancy": "A-3", "confidence": 0.85, "reason": "Places of worship are typically A-3 Assembly"},
+            "residential": {"occupancy": "R-2", "confidence": 0.80, "reason": "Residential buildings are typically R-2"},
+            "commercial": {"occupancy": "B", "confidence": 0.75, "reason": "Commercial buildings are often B Business occupancy"},
+            "industrial": {"occupancy": "F-1", "confidence": 0.75, "reason": "Industrial buildings are typically F Factory occupancy"},
+
+            # Contextual clues
+            "congregation": {"occupancy": "A-3", "confidence": 0.80, "reason": "References to congregation suggest A-3 Assembly (church)"},
+            "students": {"occupancy": "E", "confidence": 0.80, "reason": "Student populations suggest E Educational occupancy"},
+            "patients": {"occupancy": "H-1", "confidence": 0.85, "reason": "Patient references suggest H Healthcare occupancy"},
+        }
+
+        # Check for direct matches first
+        for keyword, inference in inference_rules.items():
+            if keyword in description_lower:
+                return {
+                    "inferred_occupancy": inference["occupancy"],
+                    "confidence": inference["confidence"],
+                    "reason": inference["reason"],
+                    "assumption_made": True,
+                    "clarification_needed": inference["confidence"] < 0.90,
+                }
+
+        # If no direct match, suggest asking for clarification
+        return {
+            "inferred_occupancy": None,
+            "confidence": 0.0,
+            "reason": "Building type not clearly identifiable from description",
+            "assumption_made": False,
+            "clarification_needed": True,
+            "suggested_questions": [
+                "What type of occupancy is this building (e.g., office, residential, assembly)?",
+                "What is the primary use of this building?",
+                "How many people typically occupy this building?"
+            ]
+        }
+
+    def get_design_assumptions(self, building_info: dict[str, Any]) -> dict[str, Any]:
+        """
+        Generate reasonable design assumptions based on partial building information.
+
+        Args:
+            building_info: Partial building information dictionary
+
+        Returns:
+            Dictionary with assumptions and confidence levels
+        """
+        assumptions: dict[str, Any] = {
+            "occupancy_assumptions": {},
+            "design_assumptions": {},
+            "code_assumptions": {},
+            "clarification_questions": []
+        }
+
+        # Occupancy inference
+        if "building_type" in building_info and not building_info.get("occupancy_type"):
+            occupancy_inference = self.infer_occupancy_from_description(building_info["building_type"])
+            if occupancy_inference["assumption_made"]:
+                assumptions["occupancy_assumptions"] = occupancy_inference
+                building_info["inferred_occupancy"] = occupancy_inference["inferred_occupancy"]
+            else:
+                assumptions["clarification_questions"].extend(occupancy_inference["suggested_questions"])
+
+        # Design parameter assumptions
+        if not building_info.get("ceiling_height"):
+            # Assume standard ceiling height based on building type
+            building_type = building_info.get("building_type", "").lower()
+            if any(word in building_type for word in ["warehouse", "industrial", "factory"]):
+                assumptions["design_assumptions"]["ceiling_height"] = {
+                    "assumed_value": 20.0,
+                    "confidence": 0.7,
+                    "reason": "Industrial buildings typically have higher ceilings"
+                }
+            else:
+                assumptions["design_assumptions"]["ceiling_height"] = {
+                    "assumed_value": 10.0,
+                    "confidence": 0.8,
+                    "reason": "Standard ceiling height for most commercial buildings"
+                }
+
+        # Code jurisdiction assumptions
+        if not building_info.get("jurisdiction"):
+            assumptions["code_assumptions"]["jurisdiction"] = {
+                "assumed_value": "IBC 2018 + NFPA 72 2019",
+                "confidence": 0.6,
+                "reason": "Current widely adopted codes - verify with local AHJ",
+                "note": "Local amendments may apply - confirm with Authority Having Jurisdiction"
+            }
+
+        return assumptions
+
     def calculate_system_requirements(
-        self, building_area: float, occupancy_type: str, ceiling_height: float = 10.0
+        self, building_area: float, occupancy_type: Optional[str] = None, ceiling_height: float = 10.0,
+        building_description: Optional[str] = None, make_assumptions: bool = True
     ) -> dict[str, Any]:
         """
         Calculate system requirements based on building characteristics.
 
+        Enhanced version that can make reasonable assumptions when information is incomplete.
+
         Args:
             building_area: Building area in square feet
-            occupancy_type: Building occupancy classification
+            occupancy_type: Building occupancy classification (optional if building_description provided)
             ceiling_height: Average ceiling height in feet
+            building_description: Description of building type for inference
+            make_assumptions: Whether to make reasonable assumptions for missing data
 
         Returns:
-            System requirements and recommendations
+            System requirements and recommendations with assumptions noted
         """
+        building_info = {
+            "area": building_area,
+            "occupancy_type": occupancy_type,
+            "ceiling_height": ceiling_height,
+            "building_type": building_description
+        }
+
+        # Make assumptions if enabled and information is incomplete
+        assumptions_made = {}
+        if make_assumptions:
+            assumptions_made = self.get_design_assumptions(building_info)
+
+            # Apply inferred occupancy if available
+            if "inferred_occupancy" in building_info:
+                occupancy_type = building_info["inferred_occupancy"]
+                building_info["occupancy_type"] = occupancy_type
+
+            # Apply assumed ceiling height if needed
+            if not ceiling_height and "ceiling_height" in assumptions_made.get("design_assumptions", {}):
+                assumed_height = assumptions_made["design_assumptions"]["ceiling_height"]["assumed_value"]
+                if isinstance(assumed_height, (int, float)):
+                    ceiling_height = float(assumed_height)
+
+        # Validate that we have enough information to proceed
+        if not occupancy_type and not make_assumptions:
+            return {
+                "error": "Insufficient information for system calculation",
+                "required_information": ["occupancy_type or building_description"],
+                "suggestion": "Provide building type description or occupancy classification"
+            }
+
+        if not occupancy_type:
+            return {
+                "error": "Could not determine occupancy type from description",
+                "building_description": building_description,
+                "suggestion": "Please specify the occupancy type (A, B, E, H, R, etc.) or provide more building details"
+            }
+
+        # Proceed with calculations using available information
         # Smoke detector calculations (NFPA 72)
         smoke_detector_max_area = 900  # sq ft per detector
         estimated_smoke_detectors = max(1, int(building_area / smoke_detector_max_area))
@@ -682,11 +846,12 @@ class AIKnowledgeBase:
         # Manual pull stations: 1 per 200 ft of exit travel, minimum 1 per exit
         estimated_pull_stations = max(2, int(building_area / 10000))
 
-        return {
+        result = {
             "building_characteristics": {
                 "area_sq_ft": building_area,
                 "occupancy_type": occupancy_type,
                 "ceiling_height_ft": ceiling_height,
+                "building_description": building_description,
             },
             "estimated_devices": {
                 "smoke_detectors": estimated_smoke_detectors,
@@ -712,6 +877,12 @@ class AIKnowledgeBase:
                 "emergency_power": "24 hour standby + 5 minute alarm operation",
             },
         }
+
+        # Include assumptions if any were made
+        if assumptions_made:
+            result["assumptions_made"] = assumptions_made
+
+        return result
 
     def _recommend_panel_size(self, device_count: int) -> str:
         """Recommend appropriate fire alarm control panel size."""

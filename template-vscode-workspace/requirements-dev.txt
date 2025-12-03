@@ -1,0 +1,20 @@
+# Development dependencies
+pre-commit
+black
+ruff
+mypy
+pytest
+pytest-cov
+pytest-qt
+pytest-asyncio
+flake8
+pylint
+bandit
+safety
+sphinx
+sphinx-rtd-theme
+coverage
+pytest-benchmark
+pytest-xdist
+selenium
+webdriver-manager
