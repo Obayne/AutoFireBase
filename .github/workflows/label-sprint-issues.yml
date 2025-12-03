@@ -16,7 +16,7 @@ jobs:
       contents: read
     steps:
       - name: Add agent:auto label to Sprint 01 issues
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const owner = context.repo.owner;
