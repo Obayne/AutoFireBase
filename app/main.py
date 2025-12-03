@@ -41,6 +41,12 @@ from app.logging_config import setup_logging
 # Grid scene and defaults used by the main window
 from app.scene import DEFAULT_GRID_SIZE, GridScene
 
+# Sentry error tracking (optional)
+try:
+    import sentry_sdk
+except ImportError:
+    sentry_sdk = None  # type: ignore
+
 # Ensure logging is configured early so module-level loggers emit during
 # headless simulators and when the app starts from __main__.
 setup_logging()
@@ -1918,6 +1924,12 @@ class MainWindow(QMainWindow):
     # ---------- FACP placement ----------
     def place_facp_panel(self):
         """Place a FACP panel using the wizard dialog."""
+        if sentry_sdk:
+            sentry_sdk.add_breadcrumb(
+                category="device",
+                message="Starting FACP panel placement",
+                level="info",
+            )
         try:
             # Create and show the FACP wizard dialog
             dialog = FACPWizardDialog(self)
@@ -1962,6 +1974,8 @@ class MainWindow(QMainWindow):
                     self.connections_tree.add_panel(name, device_item, panel.panel_type)
 
         except Exception as e:
+            if sentry_sdk:
+                sentry_sdk.capture_exception(e)
             QtWidgets.QMessageBox.critical(
                 self, "FACP Placement Error", f"Failed to place FACP panel: {str(e)}"
             )
@@ -2858,6 +2872,12 @@ class MainWindow(QMainWindow):
         p, _ = QFileDialog.getOpenFileName(self, "Import DXF Underlay", "", "DXF Files (*.dxf)")
         if not p:
             return
+        if sentry_sdk:
+            sentry_sdk.add_breadcrumb(
+                category="file",
+                message=f"Importing DXF underlay: {os.path.basename(p)}",
+                level="info",
+            )
         try:
             bounds, layer_groups = dxf_import.import_dxf_into_group(
                 p, self.layer_underlay, self.px_per_ft
@@ -2872,6 +2892,8 @@ class MainWindow(QMainWindow):
             self._dxf_layers = layer_groups
             self._refresh_dxf_layers_dock()
         except Exception as ex:
+            if sentry_sdk:
+                sentry_sdk.capture_exception(ex)
             QMessageBox.critical(self, "DXF Import Error", str(ex))
 
     def import_pdf_underlay(self):
