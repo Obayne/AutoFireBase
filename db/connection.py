@@ -15,8 +15,12 @@ def initialize_database(in_memory: bool = True):
     if in_memory:
         _connection = sqlite3.connect(":memory:")
     else:
-        # This path can be configured later
-        _connection = sqlite3.connect("autofire.db")
+        # Use catalog database in user's LV_CAD folder
+        import os
+
+        catalog_path = os.path.join(os.path.expanduser("~"), "LV_CAD", "catalog.db")
+        os.makedirs(os.path.dirname(catalog_path), exist_ok=True)
+        _connection = sqlite3.connect(catalog_path)
 
     # Set row factory for dict-like access
     _connection.row_factory = sqlite3.Row
@@ -24,11 +28,11 @@ def initialize_database(in_memory: bool = True):
     # Create schema
     schema.create_schema_tables(_connection)
     coverage_tables.create_tables(_connection)
-    
+
     # Populate with data
     loader.seed_demo(_connection)
     coverage_tables.populate_tables(_connection)
-    
+
     _connection.commit()
 
 

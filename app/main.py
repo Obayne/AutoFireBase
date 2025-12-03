@@ -979,7 +979,8 @@ class MainWindow(QMainWindow):
         # Initialize global database connection for coverage calculations
         from db import connection
 
-        connection.initialize_database(in_memory=True)
+        # Use persistent database for 16k+ device catalog
+        connection.initialize_database(in_memory=False)
 
         # Theme
         self.set_theme(self.prefs.get("theme", "dark"))  # apply early

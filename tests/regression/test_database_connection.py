@@ -1,7 +1,5 @@
 """Regression test for database connectivity and catalog loading."""
 
-import pytest
-
 
 class TestDatabaseConnection:
     """Test that database is properly connected and catalog loads from it."""
@@ -17,7 +15,7 @@ class TestDatabaseConnection:
         # Check that tables exist
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
         tables = [row[0] for row in cursor.fetchall()]
-        
+
         assert "manufacturers" in tables
         assert "device_types" in tables
         assert "devices" in tables
@@ -48,7 +46,7 @@ class TestDatabaseConnection:
 
         # Should have devices
         assert len(devices) > 0, "Catalog should load devices"
-        
+
         # Devices should have required fields
         for device in devices:
             assert "name" in device
@@ -74,8 +72,9 @@ class TestDatabaseConnection:
         devices = catalog.load_catalog()
 
         # Counts should match
-        assert len(devices) == db_count, \
-            f"Catalog has {len(devices)} devices but database has {db_count}"
+        assert (
+            len(devices) == db_count
+        ), f"Catalog has {len(devices)} devices but database has {db_count}"
 
     def test_database_coverage_tables_populated(self):
         """Verify coverage calculation tables are populated."""
@@ -97,20 +96,22 @@ class TestDatabaseConnection:
 
     def test_database_row_factory_set(self):
         """Verify database connection has row_factory for dict-like access."""
-        from db import connection
         import sqlite3
+
+        from db import connection
 
         connection.initialize_database(in_memory=True)
         conn = connection.get_connection()
 
         # Check row_factory is set
-        assert conn.row_factory == sqlite3.Row, \
-            "Connection should have row_factory set to sqlite3.Row"
+        assert (
+            conn.row_factory == sqlite3.Row
+        ), "Connection should have row_factory set to sqlite3.Row"
 
         # Verify it works
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM manufacturers LIMIT 1")
         row = cursor.fetchone()
-        
+
         # Should be able to access by column name
         assert "name" in row.keys()

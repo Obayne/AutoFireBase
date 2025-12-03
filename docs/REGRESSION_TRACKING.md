@@ -39,6 +39,7 @@
 **Symptom**: User reports database items are missing
 
 **Root Cause**:
+
 - Two separate database connections existed:
   - `db/connection.py` - Used by coverage calculations (in-memory)
   - `db/loader.py` - Used by catalog (separate file ~/LV_CAD/catalog.db)
@@ -47,6 +48,7 @@
 - Result: Device tables existed but were EMPTY
 
 **Solution Implemented**:
+
 - ✅ Modified `db/connection.py` to call `loader.seed_demo()` during initialization
 - ✅ Modified `app/catalog.py` to use shared `db/connection` first
 - ✅ Falls back to separate connection if needed
@@ -54,6 +56,7 @@
 - ✅ Created regression tests in `tests/regression/test_database_connection.py`
 
 **Verification**:
+
 - Database now contains 6 devices, 3 device types, 1 manufacturer
 - Catalog loads 6 devices from database
 - Coverage tables properly populated (6 wall, 18 ceiling, 7 strobe)
