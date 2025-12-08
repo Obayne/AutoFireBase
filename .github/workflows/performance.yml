@@ -52,7 +52,7 @@ jobs:
                   alert-comment-cc-users: "@Obayne"
 
             - name: Upload benchmark artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: always()
               with:
                   name: benchmark-results
