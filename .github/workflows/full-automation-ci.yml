@@ -170,7 +170,7 @@ jobs:
           safety check --json | jq . > safety_report.json || true
 
       - name: Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: security-reports
           path: |
@@ -211,7 +211,7 @@ jobs:
           pyinstaller --clean *.spec
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: build-artifacts
           path: dist/*
@@ -308,7 +308,7 @@ jobs:
           echo "*Report generated automatically by full automation pipeline*" >> automation_report.md
 
       - name: Upload automation report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: automation-report
           path: automation_report.md
